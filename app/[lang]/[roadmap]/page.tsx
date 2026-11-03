@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return { title: r.title[lang as Lang], description: r.description[lang as Lang] };
 }
 
-const BRANCH: Record<RoadmapId, DictKey> = { savers: "branchSavers", builders: "branchBuilders" };
+const BRANCH: Record<RoadmapId, DictKey> = { savers: "branchSavers", builders: "branchBuilders", lightning: "branchLightning" };
 
 export default async function RoadmapPage({ params }: Params) {
   const { lang: l, roadmap: rid } = await params;

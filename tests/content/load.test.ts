@@ -15,7 +15,7 @@ describe("roadmaps", () => {
     expect(flatLessons(getRoadmap("savers", FIX))).toEqual(["alpha", "beta", "gamma"]);
   });
   test("listRoadmaps finds every roadmap file", () => {
-    expect(listRoadmaps(FIX).map((r) => r.id)).toEqual(["savers"]);
+    expect(listRoadmaps(FIX).map((r) => r.id)).toEqual(["savers", "lightning"]);
   });
 });
 

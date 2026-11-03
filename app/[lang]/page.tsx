@@ -5,7 +5,7 @@ import { flatLessons, getLesson, listRoadmaps } from "@/lib/content/load";
 import { t, type DictKey, type Lang } from "@/lib/i18n";
 import { introScript } from "@/lib/intro/shouldPlay";
 
-const BRANCH: Record<string, DictKey> = { savers: "branchSavers", builders: "branchBuilders" };
+const BRANCH: Record<string, DictKey> = { savers: "branchSavers", builders: "branchBuilders", lightning: "branchLightning" };
 
 const LOOP: [DictKey, DictKey][] = [
   ["loop1Title", "loop1Body"],

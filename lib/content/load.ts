@@ -3,6 +3,8 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { Lang } from "../i18n.ts";
 import {
+  ExerciseFileSchema,
+  type ExerciseFile,
   GlossarySchema,
   LessonFrontmatterSchema,
   LibrarySchema,
@@ -77,6 +79,16 @@ export function getQuiz(roadmap: RoadmapId, slug: string, root: string = CONTENT
   const file = path.join(root, "quizzes", roadmap, `${slug}.json`);
   if (!fs.existsSync(file)) return null;
   return QuizFileSchema.parse(readJson(file));
+}
+
+export function exercisePath(id: string, root: string = CONTENT_ROOT, roadmap: RoadmapId = "lightning"): string {
+  return path.join(root, roadmap, "exercises", `${id}.json`);
+}
+
+export function getExercise(id: string, root: string = CONTENT_ROOT, roadmap: RoadmapId = "lightning"): ExerciseFile {
+  const file = exercisePath(id, root, roadmap);
+  if (!fs.existsSync(file)) throw new Error(`Exercise not found: ${id}`);
+  return ExerciseFileSchema.parse(readJson(file));
 }
 
 export function getGlossary(root: string = CONTENT_ROOT): GlossaryTerm[] {

@@ -6,7 +6,8 @@ export const PROGRESS_VERSION = 1;
 
 export type LessonKey = `${RoadmapId}/${string}`;
 export type QuizScore = { correct: number; total: number; at: string };
-export type LessonProgress = { completedAt?: string; quiz?: QuizScore };
+export type LabProgress = { passed: string[] };
+export type LessonProgress = { completedAt?: string; quiz?: QuizScore; lab?: LabProgress };
 export type Progress = { app: typeof APP_ID; version: typeof PROGRESS_VERSION; lessons: Record<string, LessonProgress> };
 export type ParseError = "invalid-json" | "wrong-app" | "unsupported-version" | "invalid-shape";
 
@@ -44,6 +45,17 @@ export function recordQuiz(p: Progress, key: LessonKey, correct: number, total: 
   return withLesson(p, key, { ...current, quiz: best });
 }
 
+/** Record that a lab exercise passed; the lesson counts as complete once all its exercises pass. */
+export function recordLabPass(p: Progress, key: LessonKey, exerciseId: string, allIds: string[], now: string): Progress {
+  const current = p.lessons[key] ?? {};
+  const passed = current.lab?.passed ?? [];
+  const nextPassed = passed.includes(exerciseId) ? passed : [...passed, exerciseId];
+  const next: LessonProgress = { ...current, lab: { passed: nextPassed } };
+  if (!next.completedAt && allIds.length > 0 && allIds.every((id) => nextPassed.includes(id))) next.completedAt = now;
+  if (nextPassed === passed && next.completedAt === current.completedAt) return p;
+  return withLesson(p, key, next);
+}
+
 function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
@@ -56,6 +68,10 @@ function isLessonProgress(v: unknown): v is LessonProgress {
     if (!isObject(q)) return false;
     if (!Number.isInteger(q.correct) || !Number.isInteger(q.total) || typeof q.at !== "string") return false;
     if ((q.correct as number) < 0 || (q.total as number) < (q.correct as number)) return false;
+  }
+  if (v.lab !== undefined) {
+    if (!isObject(v.lab) || !Array.isArray(v.lab.passed)) return false;
+    if (!v.lab.passed.every((id) => typeof id === "string" && id.length <= 64)) return false;
   }
   return true;
 }
@@ -73,12 +89,13 @@ export function parseProgressFile(text: string): { ok: true; progress: Progress 
   if (!isObject(data.lessons)) return { ok: false, error: "invalid-shape" };
   const lessons: Record<string, LessonProgress> = {};
   for (const [key, value] of Object.entries(data.lessons)) {
-    if (!/^(savers|builders)\/[a-z0-9-]+$/.test(key) || !isLessonProgress(value)) {
+    if (!/^(savers|builders|lightning)\/[a-z0-9-]+$/.test(key) || !isLessonProgress(value)) {
       return { ok: false, error: "invalid-shape" };
     }
     const entry: LessonProgress = {};
     if (value.completedAt) entry.completedAt = value.completedAt;
     if (value.quiz) entry.quiz = { correct: value.quiz.correct, total: value.quiz.total, at: value.quiz.at };
+    if (value.lab) entry.lab = { passed: [...new Set(value.lab.passed)] };
     lessons[key] = entry;
   }
   return { ok: true, progress: { app: APP_ID, version: PROGRESS_VERSION, lessons } };
@@ -98,6 +115,8 @@ export function mergeProgress(current: Progress, incoming: Progress): Progress {
     const merged: LessonProgress = {};
     if (completedAt) merged.completedAt = completedAt;
     if (quiz) merged.quiz = quiz;
+    const passed = [...new Set([...(cur.lab?.passed ?? []), ...(inc.lab?.passed ?? [])])];
+    if (passed.length) merged.lab = { passed };
     lessons[key] = merged;
   }
   return { ...current, lessons };

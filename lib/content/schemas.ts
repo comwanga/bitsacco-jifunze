@@ -4,7 +4,7 @@ const LangSchema = z.enum(["sw", "en"]);
 const LocalizedSchema = z.object({ sw: z.string().min(1), en: z.string().min(1) });
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slugs are lowercase words joined by hyphens");
 
-export const ROADMAP_IDS = ["savers", "builders"] as const;
+export const ROADMAP_IDS = ["savers", "builders", "lightning"] as const;
 export const RoadmapIdSchema = z.enum(ROADMAP_IDS);
 export type RoadmapId = z.infer<typeof RoadmapIdSchema>;
 
@@ -78,6 +78,21 @@ export const QuizFileSchema = z.object({
     .min(1),
 });
 export type QuizFile = z.infer<typeof QuizFileSchema>;
+
+export const LAB_NODES = ["alice", "bob", "chan", "dina", "erin", "none"] as const;
+export const LAB_TABS = ["cli", "python"] as const;
+
+export const ExerciseFileSchema = z.object({
+  id: slug,
+  lesson: slug,
+  title: LocalizedSchema,
+  node: z.enum(LAB_NODES),
+  tab: z.enum(LAB_TABS),
+  profile: z.literal("full").optional(),
+  starter: z.object({ cli: z.string().optional(), python: z.string().optional() }),
+  solution: z.object({ cli: z.string().optional(), python: z.string().optional() }),
+});
+export type ExerciseFile = z.infer<typeof ExerciseFileSchema>;
 
 export const GlossaryTermSchema = z.object({
   id: slug,

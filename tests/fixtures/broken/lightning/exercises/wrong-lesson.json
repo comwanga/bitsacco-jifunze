@@ -1,0 +1,1 @@
+{ "id": "wrong-lesson", "lesson": "somewhere-else", "title": { "sw": "W", "en": "W" }, "node": "alice", "tab": "cli", "starter": { "cli": "x" }, "solution": { "cli": "x" } }

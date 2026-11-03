@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { LANGS, type Lang } from "../i18n.ts";
 import {
+  ExerciseFileSchema,
   GlossarySchema,
   LessonFrontmatterSchema,
   LibrarySchema,
@@ -15,10 +16,74 @@ import {
 
 export type Issue = {
   level: "error" | "warning";
-  rule: 1 | 2 | 3 | 4 | 5;
+  rule: 1 | 2 | 3 | 4 | 5 | 6;
   file: string;
   message: string;
 };
+
+export type ValidateOptions = {
+  /** Where lab check modules live; defaults to <repo>/lab/jifunze_lab/checks next to content/. */
+  checksDir?: string;
+};
+
+function checkIdsIn(dir: string): Set<string> {
+  const ids = new Set<string>();
+  if (!fs.existsSync(dir)) return ids;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith(".py"))) {
+    for (const m of fs.readFileSync(path.join(dir, f), "utf8").matchAll(/"([a-z0-9]+(?:-[a-z0-9]+)*)"\s*:/g)) {
+      ids.add(m[1]);
+    }
+  }
+  return ids;
+}
+
+// Rule 6: every <Exercise id> has an exercise file for this lesson, a starter for its tab, a check
+// in the lab, and (warning) a model solution.
+function validateExercises(root: string, roadmap: Roadmap, checks: Set<string>, issues: Issue[]): void {
+  for (const slug of roadmap.sections.flatMap((s) => s.lessons.map((l) => l.slug))) {
+    for (const lang of LANGS) {
+      const lessonFile = path.join(root, roadmap.id, lang, `${slug}.mdx`);
+      if (!fs.existsSync(lessonFile)) continue;
+      const where = rel(root, lessonFile);
+      for (const m of fs.readFileSync(lessonFile, "utf8").matchAll(/<Exercise\s+id="([^"]+)"/g)) {
+        const id = m[1];
+        const file = path.join(root, roadmap.id, "exercises", `${id}.json`);
+        if (!fs.existsSync(file)) {
+          issues.push({ level: "error", rule: 6, file: where, message: `<Exercise id="${id}"> has no exercises/${id}.json` });
+          continue;
+        }
+        let raw: unknown;
+        try {
+          raw = JSON.parse(fs.readFileSync(file, "utf8"));
+        } catch (e) {
+          issues.push({ level: "error", rule: 6, file: rel(root, file), message: `cannot read JSON: ${(e as Error).message}` });
+          continue;
+        }
+        const parsed = ExerciseFileSchema.safeParse(raw);
+        if (!parsed.success) {
+          issues.push({ level: "error", rule: 6, file: rel(root, file), message: parsed.error.message });
+          continue;
+        }
+        const ex = parsed.data;
+        if (lang !== "sw") continue; // file-level checks once per lesson, not once per language
+        const exWhere = rel(root, file);
+        if (ex.id !== id) issues.push({ level: "error", rule: 6, file: exWhere, message: `id "${ex.id}" must be "${id}"` });
+        if (ex.lesson !== slug) {
+          issues.push({ level: "error", rule: 6, file: exWhere, message: `${id}: lesson is "${ex.lesson}" but it is used in "${slug}"` });
+        }
+        if (!ex.starter[ex.tab]) {
+          issues.push({ level: "error", rule: 6, file: exWhere, message: `${id}: no starter for its "${ex.tab}" tab` });
+        }
+        if (!checks.has(id)) {
+          issues.push({ level: "error", rule: 6, file: exWhere, message: `${id}: no check in lab/jifunze_lab/checks` });
+        }
+        if (!ex.solution[ex.tab]) {
+          issues.push({ level: "warning", rule: 6, file: exWhere, message: `${id}: no model solution for reviewers and the smoke test` });
+        }
+      }
+    }
+  }
+}
 
 const ADAPTED_FIELDS = ["from", "url", "licence", "credit"] as const;
 
@@ -134,7 +199,7 @@ function validateLessonFile(
   }
 }
 
-export function validateContent(root: string): Issue[] {
+export function validateContent(root: string, opts: ValidateOptions = {}): Issue[] {
   const issues: Issue[] = [];
 
   const glossaryFile = path.join(root, "glossary.json");
@@ -280,6 +345,9 @@ export function validateContent(root: string): Issue[] {
       }
     }
   }
+
+  const checks = checkIdsIn(opts.checksDir ?? path.join(root, "..", "lab", "jifunze_lab", "checks"));
+  for (const roadmap of roadmaps) validateExercises(root, roadmap, checks, issues);
 
   return issues;
 }

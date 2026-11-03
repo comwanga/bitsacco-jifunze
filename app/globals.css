@@ -22,14 +22,15 @@
   --color-sand: #f5ead8;
   --color-ink: #1f1a17;
   --color-bark: #3b1e14;
+  --color-earth: #170d09;
 }
 
 :root {
-  --bg: var(--color-cream);
+  --bg: #ffffff;
   --fg: var(--color-ink);
   --muted: #6b5e53;
   --card: #ffffff;
-  --line: #eadfce;
+  --line: #ece4d8;
   color-scheme: light dark;
 }
 

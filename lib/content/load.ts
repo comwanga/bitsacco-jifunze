@@ -17,7 +17,8 @@ import {
   type RoadmapId,
 } from "./schemas.ts";
 
-export const CONTENT_ROOT = path.join(process.cwd(), "content");
+// JIFUNZE_CONTENT_DIR lets tests and early builds point at a fixture tree.
+export const CONTENT_ROOT = path.resolve(process.env.JIFUNZE_CONTENT_DIR ?? path.join(process.cwd(), "content"));
 
 function readJson(file: string): unknown {
   return JSON.parse(fs.readFileSync(file, "utf8"));

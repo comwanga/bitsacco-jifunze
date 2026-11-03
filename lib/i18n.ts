@@ -11,6 +11,14 @@ export function otherLang(lang: Lang): Lang {
   return lang === "sw" ? "en" : "sw";
 }
 
+/** Same page in another language: "/sw/savers/x/" -> "/en/savers/x/". */
+export function switchHref(pathname: string, to: Lang): string {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length > 0 && isLang(parts[0])) parts.shift();
+  const rest = parts.join("/");
+  return `/${to}/${rest ? `${rest}/` : ""}`;
+}
+
 const sw = {
   siteName: "Bitsacco Jifunze",
   navPaths: "Njia",
@@ -36,6 +44,9 @@ const sw = {
   loop4Title: "Shiriki",
   loop4Body: "Fundisha chama chako, au changia masomo na msimbo kwenye GitHub.",
   pathsTitle: "Chagua njia",
+  openPath: "Fungua njia",
+  libraryCta: "Soma vitabu na karatasi nyeupe ya Bitcoin kwa Kiswahili na Kiingereza.",
+  glossaryCta: "Tafuta maana ya maneno ya Bitcoin.",
   lessons: "masomo",
   minutes: "dakika",
   level_beginner: "Mwanzo",
@@ -140,6 +151,9 @@ const en: Record<DictKey, string> = {
   loop4Title: "Share",
   loop4Body: "Teach your chama, or contribute lessons and code on GitHub.",
   pathsTitle: "Choose a path",
+  openPath: "Open path",
+  libraryCta: "Read the books and the Bitcoin whitepaper in Kiswahili and English.",
+  glossaryCta: "Look up what Bitcoin words mean.",
   lessons: "lessons",
   minutes: "min",
   level_beginner: "Beginner",

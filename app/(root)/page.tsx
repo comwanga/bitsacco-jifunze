@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- "/" has its own root layout, so a full page load is intended. */
 export default function RootRedirect() {
   return (
     <>

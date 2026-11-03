@@ -29,11 +29,7 @@ reflection:
   - "Mweleze mwenzako regtest bila maneno magumu. Inatatua tatizo gani?"
   - "Nini kingeharibika kama ungejaribu msimbo wako kwenye mainnet badala yake?"
 source:
-  type: adapted
-  from: "Pull"
-  url: "https://pullos.dev"
-  licence: "CC BY-SA 4.0"
-  credit: "Limetoholewa kutoka mtaala wa Pull, somo la Regtest Development"
+  type: original
 terms:
   - regtest
   - node
@@ -44,18 +40,19 @@ terms:
 
 <Term id="regtest">Regtest</Term> ni mtandao binafsi wa Bitcoin ambao ni wewe tu unayeuona. Uchimbaji ni wa papo hapo, sarafu ni bure, na makosa hayagharimu chochote. Kila somo katika njia hii linautumia kama maabara yako.
 
-## Hatua ya 1: Maneno muhimu
+## Hatua ya 1: Mitandao mitatu, programu moja
 
-| Neno | Maana yake | Unapolitumia |
-| --- | --- | --- |
-| **Regtest** | Mnyororo binafsi; unachimba unapotaka | Maabara yako |
-| **Testnet / signet** | Mitandao ya majaribio ya umma | Majaribio ya mara kwa mara na wengine |
-| **Mainnet** | Mtandao halisi, pesa halisi | Si kwa kujifunzia |
-| `bitcoind` / `bitcoin-cli` | Nodi na programu yake ya amri | Kuendesha na kuongoza nodi |
-| **Ukomavu wa coinbase** | Sarafu mpya zinahitaji uthibitisho 100 kabla ya kutumika | Kwa nini unachimba bloku 101 |
-| **Datadir** | Mahali nodi inapohifadhi data | Ifute ili kuanza upya |
+Programu ile ile ya Bitcoin Core inaweza kujiunga na aina tatu za mtandao. Fikiria shule ya udereva:
 
-**Umemaliza ukiweza:** kueleza ukomavu wa coinbase kwa sentensi moja.
+- **Mainnet** ni barabara kuu: magari halisi, pesa halisi, matokeo halisi. Hapa hujifunzii.
+- **Testnet na signet** ni uwanja wa mazoezi wa pamoja. Wanafunzi wengine wako humo pia, na unasubiri bloku zake kama kila mtu.
+- **Regtest** ni uwanja wako mwenyewe wa kuegesha magari ulio mtupu. Hakuna mwingine, na bloku inatokea papo hapo unapoiomba.
+
+Programu mbili zinafanya kazi. `bitcoind` ni nodi yenyewe, inayoendeshwa nyuma, na `bitcoin-cli` ndiyo njia ya kuzungumza nayo. Kila kitu nodi inachojua kiko kwenye folda yake ya data, kwa hiyo ukiifuta unapata mnyororo mpya kabisa.
+
+Sheria moja itakushangaza katika Hatua ya 3: zawadi ya mchimbaji haiwezi kutumika hadi bloku 100 zaidi zijengwe juu yake. Bitcoin huita hii **ukomavu wa coinbase**.
+
+**Umemaliza ukiweza:** kusema, kwa maneno yako, kwa nini sarafu zako za kwanza za majaribio zinaweza kutumika tu baada ya bloku 101.
 
 ## Hatua ya 2: Sakinisha na uanzishe nodi
 

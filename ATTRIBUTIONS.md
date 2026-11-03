@@ -1,20 +1,6 @@
 # Attributions
 
-## Lessons adapted from Pull
-
-These builder lessons are adapted from the [Pull](https://pullos.dev) curriculum ([github.com/Megasley/pull](https://github.com/Megasley/pull)), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). They were rewritten for Jifunze, translated into Kiswahili, and keep Pull's lesson pattern: key terms, setup, steps with "Done when", and lab evidence. Each lesson also credits Pull in its `source` front matter.
-
-| Jifunze lesson | Adapted from |
-| --- | --- |
-| `builders/dev-environment-regtest` | Pull: Developer Environment, Regtest Development |
-| `builders/utxos-transactions` | Pull: UTXO Model, Transactions |
-| `builders/keys-addresses-descriptors` | Pull: Keys, Descriptors |
-| `builders/lightning-basics` | Pull: Lightning overview, channels, invoices |
-| `builders/contributing-oss` | Pull: open source discovery, review, pull requests |
-
-The adapted lessons are distributed under CC BY-SA 4.0, as the licence requires.
-
-No code was copied from Pull. The content loaders, validation script and MDX setup were written for Jifunze. Pull's name and logo are not used.
+All lessons in `content/` are original Bitsacco Jifunze lessons, released under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Any lesson adapted from another work names its source and licence in its `source` front matter and is listed here.
 
 ## Learning-flow inspiration
 

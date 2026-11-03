@@ -43,7 +43,7 @@
         { "id": "c", "label": { "sw": "Hakuna leseni", "en": "No licence" } }
       ],
       "answer": "a",
-      "explanation": { "sw": "Msimbo ni MIT; masomo ni CC BY-SA 4.0, kama Pull na Kujifunza Bitcoin.", "en": "Code is MIT; lessons are CC BY-SA 4.0, like Pull and Kujifunza Bitcoin." }
+      "explanation": { "sw": "Msimbo ni MIT; masomo ni CC BY-SA 4.0, kama Kujifunza Bitcoin.", "en": "Code is MIT; lessons are CC BY-SA 4.0, like Kujifunza Bitcoin." }
     }
   ]
 }

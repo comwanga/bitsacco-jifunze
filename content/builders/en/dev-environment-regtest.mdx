@@ -29,11 +29,7 @@ reflection:
   - "Explain regtest to a teammate without jargon. What problem does it solve?"
   - "What could go wrong if you tested your code against mainnet instead?"
 source:
-  type: adapted
-  from: "Pull"
-  url: "https://pullos.dev"
-  licence: "CC BY-SA 4.0"
-  credit: "Adapted from the Pull curriculum, Regtest Development lesson"
+  type: original
 translationOf: sw
 terms:
   - regtest
@@ -45,18 +41,19 @@ terms:
 
 <Term id="regtest" /> is a private Bitcoin network that only you can see. Mining is instant, coins are free, and mistakes cost nothing. Every lesson in this path uses it as your lab.
 
-## Step 1: Key terms
+## Step 1: Three networks, one program
 
-| Term | What it means | Where you use it |
-| --- | --- | --- |
-| **Regtest** | Private chain; you mine on demand | Your local lab |
-| **Testnet / signet** | Shared public test networks | Occasional testing with others |
-| **Mainnet** | The real network, real money | Not for learning |
-| `bitcoind` / `bitcoin-cli` | The node and its command-line client | Running and driving the node |
-| **Coinbase maturity** | New coins need 100 confirmations before they can be spent | Why you mine 101 blocks |
-| **Datadir** | Where the node stores its data | Delete it to start fresh |
+The same Bitcoin Core program can join three kinds of network. Think of a driving school:
 
-**Done when:** you can explain coinbase maturity in one sentence.
+- **Mainnet** is the highway: real traffic, real money, real consequences. You don't learn here.
+- **Testnet and signet** are a shared practice track. Other learners are on it too, and you wait for its blocks like everyone else.
+- **Regtest** is your own empty car park. Nobody else is there, and a block appears the moment you ask for one.
+
+Two programs do the work. `bitcoind` is the node itself, running in the background, and `bitcoin-cli` is how you talk to it. Everything the node knows lives in its data directory, so deleting that folder gives you a brand-new chain.
+
+One rule will surprise you in Step 3: a miner's reward can't be spent until 100 more blocks are built on top of it. Bitcoin calls this **coinbase maturity**.
+
+**Done when:** you can say, in your own words, why your first test coins only become spendable after 101 blocks.
 
 ## Step 2: Install and start a node
 

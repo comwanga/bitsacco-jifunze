@@ -30,8 +30,11 @@
   - Stored as `HMAC-SHA256(pepper_vN, normalised)` with a `pepper_version`; `code_hash` is globally unique.
   - `POST /api/auth/recovery` takes `{ code }` only.
 - **Rate limits** (in memory; a restart resets them, which is documented):
-  - recovery: 5 per 15 minutes per IP, 20 per hour per /24, 300 per hour globally;
+  - Recovery blocks: 5 per 15 minutes per IP, and 20 per hour per /24. For IPv6, "IP" means the /64 and the network is the /48.
+  - Recovery has **no global block**. A shared ceiling would let one attacker exhaust it and lock every learner out, which is maintainer correction C. Instead, global volume above 300 per hour records one `recovery_flood` security event per hour and never refuses a request.
   - `GET /api/auth/github/start`: 30 per 10 minutes per IP.
+- **Re-authentication** (correction A) must be completed by the GitHub identity **already linked** to the account, matched on numeric id. A different GitHub account is refused with `reauth_mismatch` and changes nothing. Replacing an identity is a separate operation with its own authorization (Task 6).
+- **Session binding** (correction B): `reauth` and `replace` challenges store the initiating session's `sha256(token)` (`session_token_hash`). The callback succeeds only if it presents **that same session**, still valid (not expired or revoked), belonging to the challenge's `account_id`, and with the scope the purpose requires. Anything else is rejected, as are replays (single-use challenges).
 - **Every `/api` response** carries `Cache-Control: no-store`, `X-Robots-Tag: noindex`, `Referrer-Policy: no-referrer` and `Vary: Cookie`.
 - **Every non-GET request** needs `Origin` equal to `SITE_ORIGIN` exactly, plus `X-Jifunze: 1`. Bodies are JSON only, at most 16 KB.
 - **Errors** look like `{ "error": { "code", "message_sw", "message_en" } }`.
@@ -114,7 +117,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config;
 // errors.ts
 export type ErrorCode = "not_found" | "method_not_allowed" | "bad_origin" | "bad_request" | "payload_too_large" | "unauthenticated"
   | "recovery_scope" | "reauth_required" | "recovery_invalid" | "rate_limited" | "state_invalid" | "github_denied" | "github_failed"
-  | "identity_in_use" | "replace_conflict" | "codes_already_issued" | "internal";
+  | "identity_in_use" | "replace_conflict" | "codes_already_issued" | "reauth_mismatch" | "internal";
 export class ApiError extends Error { constructor(readonly status: number, readonly code: ErrorCode) }
 export const MESSAGES: Record<ErrorCode, { sw: string; en: string }>;
 
@@ -161,13 +164,17 @@ export function createServer(routes: Route[], deps: { cfg: Config; sql: Sql; rea
 - Produces `export function connect(url: string): Sql`.
 - Produces `export async function migrate(sql: Sql, dir: string): Promise<string[]>`, which returns the newly applied file names.
 - Produces `export async function resetTestDb(sql: Sql): Promise<void>` (helpers).
-- Tables are as in design E3. `accounts` adds `recovery_codes_issued_at timestamptz`, and `sessions` adds `scope text not null check (scope in ('full','recovery'))`.
+- Tables are as in design E3, with these additions:
+  - `accounts` adds `recovery_codes_issued_at timestamptz`.
+  - `sessions` adds `scope text not null check (scope in ('full','recovery'))`.
+  - `auth_challenges` adds `session_token_hash bytea`, with `check ((purpose = 'signin') = (session_token_hash is null))`, so a `reauth` or `replace` challenge can't exist without its initiating session (correction B).
 
 - [ ] **Step 1: Write the failing tests** `api/test/db.test.ts` (with `TEST_DATABASE_URL`):
   - `migrate applies 0001 once and records it in schema_migrations; a second run applies nothing`;
   - `identities enforce unique (provider, provider_uid) and unique (account_id, provider)`;
   - `deleting an account cascades identities, sessions, challenges and recovery codes`;
-  - `security_events keep rows with account_id null after deletion`.
+  - `security_events keep rows with account_id null after deletion`;
+  - `an auth_challenges row with purpose reauth or replace and no session_token_hash is rejected by the constraint, and a signin row with one is rejected too`.
 - [ ] **Step 2: Run** `npm run api:test -- db`. Expected: FAIL.
 - [ ] **Step 3: Implement:**
   - The migration SQL exactly as design E3, limited to the 2a tables plus the two columns above.
@@ -231,9 +238,11 @@ Consumes `createSession`, `markReauth` and `revokeOtherSessions`. Produces:
 ```ts
 // challenges.ts
 export async function createChallenge(sql: Sql, c: { purpose: "signin" | "reauth" | "replace"; provider: "github";
-  accountId?: string; lang: "sw" | "en"; returnTo: string; pkceVerifier: string }): Promise<{ secret: string; preauth: string }>;
+  accountId?: string; sessionTokenHash?: Buffer; lang: "sw" | "en"; returnTo: string; pkceVerifier: string }):
+  Promise<{ secret: string; preauth: string }>;
 export async function consumeChallenge(sql: Sql, c: { secret: string; preauth: string; provider: "github" }):
-  Promise<{ purpose: string; accountId: string | null; lang: "sw" | "en"; returnTo: string; pkceVerifier: string } | null>;
+  Promise<{ purpose: "signin" | "reauth" | "replace"; accountId: string | null; sessionTokenHash: Buffer | null;
+    lang: "sw" | "en"; returnTo: string; pkceVerifier: string } | null>;
   // one UPDATE … WHERE secret_hash AND binding_hash AND used_at IS NULL AND expires_at > now() RETURNING
 export function safeReturn(path: string | null, lang: "sw" | "en"): string; // ^/(sw|en)/[a-z0-9/_-]*$, else /{lang}/account/
 
@@ -314,7 +323,7 @@ Routes:
 - `POST /api/me/recovery-codes/initial` (full; only while `recovery_codes_issued_at` is null) → `{ codes }`. Otherwise 409 `codes_already_issued`.
 - `POST /api/me/recovery-codes` (full with re-auth ≤ 10 minutes, or recovery scope) → `{ codes }`. Otherwise 403 `reauth_required`.
 - `POST /api/auth/recovery` (public; body `{ code: string }` only):
-  1. Apply the limits first: 5 per 15 minutes per IP, 20 per hour per /24, 300 per hour globally → 429 `rate_limited`.
+  1. Apply the blocking limits first: 5 per 15 minutes per IP (IPv6 /64), and 20 per hour per /24 (IPv6 /48) → 429 `rate_limited`. Count global volume for the alert only: above 300 per hour, write one `recovery_flood` security event per hour, and **never** return 429 for that reason.
   2. Then normalise, look up by HMAC (every pepper version), and consume atomically.
   3. On success: revoke **all** of the account's sessions, create a `recovery` session, log the event, and return 200 `{ redirect: "/{lang}/account/recovery/" }`.
   4. Every failure returns `401 recovery_invalid` with the same body.
@@ -330,14 +339,18 @@ Routes:
   - `the body accepts no handle or account id` (extra keys → 400 bad_request, with no hint);
   - `the 6th attempt from one IP in 15 minutes → 429`;
   - `the 21st from one /24 in an hour → 429`;
-  - `the 301st globally → 429`;
+  - `an attacker exhausting IP A's limit does not affect IP B` (B's first attempt is evaluated normally);
+  - `an attacker exhausting /24 X does not affect /24 Y`;
+  - `IPv6 addresses in one /64 share a limit, and different /64s in one /48 share only the network limit`;
+  - `400 attempts in an hour from 400 distinct /24s are all evaluated (none gets 429 for global volume), and exactly one recovery_flood event is written for that hour`;
+  - `a legitimate code from a fresh IP succeeds during such a flood`;
   - `a recovery session revokes the account's other sessions`;
   - `a recovery session expires at 15 minutes`;
   - `/api/me shows a recovery_code_used notice afterwards`;
   - `security_events contain no code`;
   - `a code hashed with pepper v1 still works after v2 becomes current`.
 - [ ] **Step 2: Run** `npm run api:test -- recovery`. Expected: FAIL.
-- [ ] **Step 3: Implement** `recovery.ts`, the limiter keys (`ip`, `/24`, `global`) and the three routes.
+- [ ] **Step 3: Implement** `recovery.ts`, the limiter keys (per IP or /64, and per /24 or /48), a global volume counter that only writes the hourly `recovery_flood` event, and the three routes.
 - [ ] **Step 4: Run** `npm run api:test -- recovery`. Expected: PASS.
 - [ ] **Step 5: Commit** `feat(api): single-use recovery codes and restricted recovery sessions`.
 
@@ -360,8 +373,16 @@ export async function replaceGithubIdentity(sql: Sql, accountId: string, gh: { i
 ```
 
 `GET /api/auth/github/start` accepts `purpose`:
-- `reauth` (full session) → the callback runs `markReauth`.
-- `replace` (a recovery session, or a full session with re-auth ≤ 10 minutes) → the callback runs `replaceGithubIdentity` for the challenge's `accountId`, and **requires that challenge's session to still be valid**.
+- **`reauth`** (needs a full session). The challenge stores `accountId` and the **initiating session's** `sessionTokenHash`. On callback, all of these must hold:
+  1. the request carries a session cookie whose hash equals `sessionTokenHash`;
+  2. that session is still valid (not expired or revoked);
+  3. its `accountId` equals the challenge's;
+  4. its scope is `full`;
+  5. **the GitHub numeric id returned by `/user` equals the account's currently linked GitHub `provider_uid`** (correction A).
+
+  Only then does `markReauth` run on that session. A different GitHub account → `reauth_mismatch`, nothing changes, and a 302 to `/{lang}/account/?error=reauth_mismatch`.
+- **`replace`** (needs a recovery session, or a full session with re-auth ≤ 10 minutes at start). It has the same session binding as checks 1–3, and the scope must still be the initiating one: `recovery`, or `full`. Only then does `replaceGithubIdentity` run for the challenge's `accountId`.
+- **Failed checks.** A missing or different session cookie, an expired or revoked session, or an account mismatch → `unauthenticated` (302 to the sign-in page with the code), and nothing changes. A reused challenge → `state_invalid`.
 
 A `replace` or `reauth` challenge is never accepted as `signin`, and the reverse holds too.
 
@@ -375,7 +396,20 @@ A `replace` or `reauth` challenge is never accepted as `signin`, and the reverse
   - `a replace callback after the recovery session expired → 401 unauthenticated, nothing changed`;
   - `a replace challenge used for signin → state_invalid`, and the reverse;
   - `a full session without recent re-auth cannot start replace → 403 reauth_required`;
-  - `reauth sets reauth_at, and regenerating codes then succeeds within 10 minutes and fails after`.
+  - `reauth sets reauth_at, and regenerating codes then succeeds within 10 minutes and fails after`;
+  - **Correction A:**
+    - `reauth completed with a different GitHub account than the one linked → reauth_mismatch; reauth_at unchanged; no identity, account or session change; the other GitHub account is not linked or created`;
+    - `reauth with the linked account succeeds even after its login was renamed` (the id matches);
+    - `a reauth_mismatch cannot then be used to regenerate codes`.
+  - **Correction B:**
+    - `a replace or reauth callback presenting a different session of the same account → unauthenticated, nothing changed`;
+    - `… presenting no session cookie → unauthenticated`;
+    - `… after the initiating session was revoked (logout or recovery elsewhere) → unauthenticated`;
+    - `… after it expired → unauthenticated`;
+    - `… with a session of another account → unauthenticated`;
+    - `a replace started from a recovery session whose scope changed (the recovery session ended and the user signed in normally) → unauthenticated`;
+    - `replaying a completed callback (same state and code) → state_invalid`;
+    - `the binding check happens before the transaction, and the transaction still holds the account row lock, so the concurrency tests above keep passing`.
 - [ ] **Step 2: Run** `npm run api:test -- replace`. Expected: FAIL.
 - [ ] **Step 3: Implement** `replaceGithubIdentity` and the purpose handling. `replace_conflict` is raised when the row lock waits beyond `lock_timeout = '2s'`, or when the identity changed between the challenge and the commit.
 - [ ] **Step 4: Run** `npm run api:test`. Expected: every API test passes.

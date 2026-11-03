@@ -380,7 +380,10 @@ create table admin_actions (                    -- section F5: every manual remo
 - **`sync_runs`** gains two fields:
   - `coverage jsonb`: per statistic, the date slices requested, `total_count` per slice, items retrieved and whether each slice is complete.
   - `partial boolean`.
-- **Unchanged:** `accounts`, `identities` (`unique(provider, provider_uid)`), `sessions`, `auth_challenges`, `learning_progress` and `security_events`. Sessions gain `scope text check (scope in ('full','recovery'))`.
+- **Unchanged:** `accounts`, `identities` (`unique(provider, provider_uid)`), `sessions`, `auth_challenges`, `learning_progress` and `security_events`.
+  - Sessions gain `scope text check (scope in ('full','recovery'))`.
+  - `auth_challenges` gains `session_token_hash bytea` (Increment 2a review, correction B). A `reauth` or `replace` challenge is bound to the exact session that started it, and its callback must present that same valid session.
+  - Re-authentication must come from the identity already linked to the account (correction A).
 
 ### E4. API contracts (changes from revision 1)
 
@@ -577,11 +580,11 @@ Unchanged from revision 1:
 - **Lookup:** normalise (upper-case, strip `-` and spaces, check the alphabet), compute the HMAC, then one indexed lookup. Wrong or used codes and wrong-format input all return the same `401 recovery_invalid` after the same work, so there's no oracle.
 - **Atomic consumption:** `update recovery_codes set used_at = now() where code_hash = $1 and used_at is null returning account_id`.
 - **Rate limits, applied before lookup:**
-  - **per IP:** 5 attempts per 15 minutes;
-  - **per /24 network:** 20 per hour;
-  - **global:** 300 per hour, and above that every attempt returns 429.
+  - **per IP** (IPv6: per /64): 5 attempts per 15 minutes;
+  - **per /24 network** (IPv6: per /48): 20 per hour;
+  - **no global block** (Increment 2a review, correction C). A shared global ceiling would let one attacker exhaust it and lock every learner out of recovery.
 
-  At 80 bits, even the global ceiling running for a century gives a negligible chance of guessing any code. The limits exist to stop noise and denial of service.
+  Global volume above 300 per hour only records one `recovery_flood` security event per hour for operators. At 80 bits, guessing a code is infeasible however many networks an attacker uses. The per-source limits exist to stop noise and denial of service.
 - **Logging:** every failure counts in a security event (no code is stored), and a global spike raises an operator alert.
 
 **The recovery session and replacing an identity (condition 1)**
@@ -620,7 +623,10 @@ Unchanged from revision 1:
   - the 21st of 20 concurrent uses of one code still gives exactly one success;
   - regenerating invalidates the whole previous set;
   - the same 401 comes back for an unknown code, a used code, a malformed code and an empty input.
-- **Rate limits:** per IP, per /24 and global, each returning 429, with no account identifier accepted or echoed.
+- **Rate limits:**
+  - per IP and per /24, each returning 429, with no account identifier accepted or echoed;
+  - exhausting one source never limits another;
+  - global volume only alerts, never blocks.
 - **The recovery session:**
   - it revokes other sessions;
   - it gets 403 on every route outside its allowlist;

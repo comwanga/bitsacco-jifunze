@@ -1,0 +1,16 @@
+{
+  "id": "ch07-funding-tx",
+  "lesson": "payment-channels",
+  "node": "alice",
+  "tab": "python",
+  "title": {
+    "sw": "Tafuta muamala wa ufadhili",
+    "en": "Find the funding transaction"
+  },
+  "starter": {
+    "python": "from jifunze_lab import btc, lnd\n\nchannel = lnd(\"alice\").channels()[0]\ntxid, index = channel[\"channel_point\"].split(\":\")\nprint(\"channel point:\", channel[\"channel_point\"])\nprint(\"capacity (sats):\", channel[\"capacity\"])\n\ntx = btc().getrawtransaction(txid, True)\noutput = tx[\"vout\"][int(index)]\nprint(\"funding output (BTC):\", output[\"value\"])\n# TODO: print the output's script type (look inside output[\"scriptPubKey\"])\n"
+  },
+  "solution": {
+    "python": "from jifunze_lab import btc, lnd\n\nchannel = lnd(\"alice\").channels()[0]\ntxid, index = channel[\"channel_point\"].split(\":\")\nprint(\"channel point:\", channel[\"channel_point\"])\nprint(\"capacity (sats):\", channel[\"capacity\"])\ntx = btc().getrawtransaction(txid, True)\noutput = tx[\"vout\"][int(index)]\nprint(\"funding output (BTC):\", output[\"value\"])\nprint(\"script type:\", output[\"scriptPubKey\"][\"type\"])\n"
+  }
+}

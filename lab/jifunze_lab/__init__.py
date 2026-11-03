@@ -5,7 +5,7 @@
 """
 from .nodes import nodes, profile  # noqa: F401
 
-_CLIENTS = {"LabClientError", "btc", "client", "cln", "eclair", "lnd"}
+_CLIENTS = {"LabClientError", "btc", "client", "cln", "eclair", "lnd", "probe"}
 
 
 def __getattr__(name: str):

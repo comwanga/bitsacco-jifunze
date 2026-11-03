@@ -1,0 +1,16 @@
+{
+  "id": "ch02-alice-pays",
+  "lesson": "getting-started",
+  "node": "alice",
+  "tab": "cli",
+  "title": {
+    "sw": "Alice analipa ankara ya Dina",
+    "en": "Alice pays Dina's invoice"
+  },
+  "starter": {
+    "cli": "# Paste Dina's payment_request (it starts with lnbcrt) in place of INVOICE.\nlncli payinvoice --force INVOICE"
+  },
+  "solution": {
+    "cli": "INV=$(JIFUNZE_NODE=dina lncli addinvoice --amt 50000 --memo \"kahawa\" | jq -r .payment_request)\nlncli payinvoice --force \"$INV\""
+  }
+}

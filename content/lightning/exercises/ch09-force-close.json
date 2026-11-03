@@ -1,0 +1,16 @@
+{
+  "id": "ch09-force-close",
+  "lesson": "channel-operation",
+  "node": "dina",
+  "tab": "cli",
+  "title": {
+    "sw": "Funga chaneli kwa nguvu na utazame kufuli la muda",
+    "en": "Force-close and watch the timelock"
+  },
+  "starter": {
+    "cli": "CHAN=$(JIFUNZE_NODE=chan lightning-cli getinfo | jq -r .id)\nPOINT=$(lncli listchannels | jq -r --arg c \"$CHAN\" '.channels[] | select(.remote_pubkey==$c) | .channel_point' | head -1)\nlncli closechannel --force --chan_point \"$POINT\"\nbitcoin-cli -generate 1\nsleep 3\nlncli pendingchannels | jq '.pending_force_closing_channels[] | {blocks_til_maturity, limbo_balance}'"
+  },
+  "solution": {
+    "cli": "CHAN=$(JIFUNZE_NODE=chan lightning-cli getinfo | jq -r .id)\nPOINT=$(lncli listchannels | jq -r --arg c \"$CHAN\" '.channels[] | select(.remote_pubkey==$c) | .channel_point' | head -1)\nlncli closechannel --force --chan_point \"$POINT\"\nbitcoin-cli -generate 1\nsleep 5\nlncli pendingchannels | jq '.pending_force_closing_channels[] | {blocks_til_maturity, limbo_balance}'"
+  }
+}

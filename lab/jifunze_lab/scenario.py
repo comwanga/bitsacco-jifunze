@@ -69,6 +69,32 @@ def _wait(what: str, predicate, timeout: float = 90, step: float = 1.0, nudge=No
     raise ScenarioError(f"timed out waiting for {what}")
 
 
+def _tx_known(b, txid: str) -> bool:
+    try:
+        b.call("getrawtransaction", txid)
+        return True
+    except Exception:  # noqa: BLE001 - unknown to the chain and the mempool
+        return False
+
+
+def _clear_zombies(b, log) -> None:
+    from .clients import client
+    from .nodes import nodes
+
+    for node in nodes().values():
+        c = client(node.name)
+        if node.impl == "cln":
+            for peer, channel_id, txid in c.pending_funding():
+                if not _tx_known(b, txid):
+                    log(f"Removing {node.name}'s channel whose funding was never broadcast…")
+                    c.forget(peer, channel_id)
+        elif node.impl == "lnd":
+            for point in c.pending_funding_points():
+                if not _tx_known(b, point.split(":")[0]):
+                    log(f"Abandoning {node.name}'s pending channel whose funding was never broadcast…")
+                    c.abandon(point)
+
+
 def ensure(sc: dict, log=print) -> None:
     from .clients import btc, client
 
@@ -93,38 +119,85 @@ def ensure(sc: dict, log=print) -> None:
         for name in sc["fund"]:
             _wait(f"{name} to see its funds", lambda n=name: client(n).onchain_sats() >= FUND_MIN_SATS, 60)
 
-    opened = []
+    # Let recent outputs (e.g. from a force close) mature before they are spent into new channels,
+    # then clear channels whose funding transaction bitcoind never accepted.
+    b.mine(1)
+    _clear_zombies(b, log)
+
+    not_active = []
     for ch in sc["channels"]:
         a, z = client(ch["from"]), client(ch["to"])
         zpub = z.pubkey
-        if a.has_channel_with(zpub):
+        if a.active_channel_with(zpub):
             continue
-        log(f"Opening a {ch['sats']:,}-sat channel {ch['from']} → {ch['to']}…")
-        a.connect(zpub, ch["to"])
-        a.open_channel(zpub, int(ch["sats"]), int(ch.get("push", 0)))
-        opened.append(ch)
-    if opened:
+        if not a.has_channel_with(zpub):
+            log(f"Opening a {ch['sats']:,}-sat channel {ch['from']} → {ch['to']}…")
+            for attempt in range(4):
+                try:
+                    a.connect(zpub, ch["to"])
+                    a.open_channel(zpub, int(ch["sats"]), int(ch.get("push", 0)))
+                    break
+                except Exception as e:  # noqa: BLE001 - a peer that just restarted may drop the first try
+                    if attempt == 3 or not any(s in str(e) for s in ("not connected", "not online", "disconnected", "connection", "died")):
+                        raise
+                    time.sleep(3)
+        not_active.append(ch)  # new, or opened earlier but never confirmed
+    if not_active:
         b.mine(6)
-        for ch in opened:
+        for ch in not_active:
             a, zpub = client(ch["from"]), client(ch["to"]).pubkey
+            ticks = {"n": 0}
+
+            def more_blocks() -> None:  # some implementations want extra confirmations
+                ticks["n"] += 1
+                if ticks["n"] % 10 == 0:
+                    b.mine(1)
+
             _wait(
                 f"channel {ch['from']} → {ch['to']} to become active",
                 lambda a=a, zpub=zpub: a.active_channel_with(zpub),
+                120,
+                1.0,
+                more_blocks,
             )
     if sc["mine"]:
         b.mine(int(sc["mine"]))
     involved = {c["from"] for c in sc["channels"]} | {c["to"] for c in sc["channels"]}
     if sc["channels"] and "alice" in involved:
-        # Alice must hear about every channel before she can route over them.
-        want = len(sc["channels"])
+        # Alice must hear about every scenario channel (by its two ends, with both fee policies)
+        # before she can route over them. Counting edges is not enough: closed channels linger.
+        pub = {n: client(n).pubkey for n in involved}
+        want = {frozenset((pub[c["from"]], pub[c["to"]])) for c in sc["channels"]}
         ticks = {"n": 0}
+
+        def usable(policy) -> bool:
+            return bool(policy) and not policy.get("disabled")
+
+        def known() -> bool:
+            have = {
+                frozenset((e["node1_pub"], e["node2_pub"]))
+                for e in client("alice").graph().get("edges", [])
+                if usable(e.get("node1_policy")) and usable(e.get("node2_policy"))
+            }
+            return want <= have
+
+        def reconnect() -> None:
+            # A peer that restarted leaves its channels disabled until the two reconnect.
+            for c in sc["channels"]:
+                try:
+                    client(c["from"]).connect(pub[c["to"]], c["to"])
+                except Exception:  # noqa: BLE001 - already connected is fine
+                    pass
+
+        reconnect()
 
         def nudge() -> None:
             ticks["n"] += 1
             if ticks["n"] % 10 == 0:
                 b.mine(1)
+                reconnect()
 
-        _wait("Alice to learn the channel graph", lambda: len(client("alice").graph().get("edges", [])) >= want, 150, 2.0, nudge)
+        _wait("Alice to learn the channel graph", known, 180, 2.0, nudge)
     log("Scenario ready.")
 
 

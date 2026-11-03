@@ -1,0 +1,16 @@
+{
+  "id": "ch03-mine",
+  "lesson": "how-ln-works",
+  "node": "none",
+  "tab": "cli",
+  "title": {
+    "sw": "Thibitisha chaneli kwa kuchimba bloku",
+    "en": "Confirm the channel by mining blocks"
+  },
+  "starter": {
+    "cli": "# The funding transaction needs confirmations before the channel can be used.\nbitcoin-cli -generate 6\nsleep 3\nJIFUNZE_NODE=alice lncli listchannels | jq '.channels[] | {remote_pubkey, capacity, active}'"
+  },
+  "solution": {
+    "cli": "bitcoin-cli -generate 6\nsleep 5\nJIFUNZE_NODE=alice lncli listchannels | jq '.channels[] | {remote_pubkey, capacity, active}'"
+  }
+}

@@ -97,6 +97,20 @@ class LndREST:
     def active_channel_with(self, pubkey: str) -> bool:
         return any(c["remote_pubkey"] == pubkey and c.get("active") for c in self.channels())
 
+    def pending_funding_points(self) -> list[str]:
+        return [p["channel"]["channel_point"] for p in self.pending_channels().get("pending_open_channels", [])]
+
+    def abandon(self, channel_point: str) -> None:
+        txid, index = channel_point.split(":")
+        r = requests.delete(
+            f"{self.base}/v1/channels/abandon/{txid}/{index}",
+            headers=self._headers,
+            params={"i_know_what_i_am_doing": "true"},
+            verify=self.node.lnd_cert,
+            timeout=60,
+        )
+        self._json(r)
+
     def addinvoice(self, sats: int, memo: str = "") -> dict:
         return self.post("/v1/invoices", {"value": str(sats), "memo": memo})
 
@@ -147,6 +161,23 @@ class LndREST:
     def fee_report(self) -> dict:
         return self.get("/v1/fees")
 
+    def probe(self, dest_pubkey: str, sats: int) -> bool:
+        """Send a payment that can't settle (random hash). True if the amount reached the destination."""
+        import secrets
+
+        self.post("/v2/router/mc/reset", {})
+        res = self.post(
+            "/v1/channels/transactions",
+            {
+                "dest": base64.b64encode(bytes.fromhex(dest_pubkey)).decode(),
+                "amt": str(sats),
+                "payment_hash": base64.b64encode(secrets.token_bytes(32)).decode(),
+                "final_cltv_delta": 40,
+            },
+        )
+        err = (res.get("payment_error") or "").lower()
+        return "incorrect" in err and "payment_details" in err  # reached Dina: she just did not know the hash
+
 
 class ClnRPC:
     def __init__(self, node: Node):
@@ -186,6 +217,17 @@ class ClnRPC:
     def active_channel_with(self, pubkey: str) -> bool:
         return any(c["peer_id"] == pubkey and c["state"] == "CHANNELD_NORMAL" for c in self.channels())
 
+    def pending_funding(self) -> list[tuple[str, str, str]]:
+        """(peer_id, channel_id, funding_txid) for channels still waiting to lock in."""
+        return [
+            (c["peer_id"], c["channel_id"], c["funding_txid"])
+            for c in self.channels()
+            if c["state"] == "CHANNELD_AWAITING_LOCKIN"
+        ]
+
+    def forget(self, peer_id: str, channel_id: str) -> None:
+        self.rpc.call("dev-forget-channel", {"id": peer_id, "channel_id": channel_id, "force": True})
+
     def connect(self, pubkey: str, host: str) -> None:
         self.connect_to(pubkey, host)
 
@@ -193,7 +235,9 @@ class ClnRPC:
         self.rpc.connect(pubkey, host, 9735)
 
     def open_channel(self, pubkey: str, sats: int, push_sats: int = 0) -> dict:
-        params: dict[str, Any] = {"id": pubkey, "amount": sats}
+        # Regtest has no fee estimates; c-lightning's fallback can fall just under bitcoind's
+        # minimum relay fee ("min relay fee not met"), so the funding is never broadcast.
+        params: dict[str, Any] = {"id": pubkey, "amount": sats, "feerate": "2500perkw"}
         if push_sats:
             params["push_msat"] = push_sats * 1000
         return self.rpc.call("fundchannel", params)
@@ -242,7 +286,8 @@ class EclairREST:
         self.call("connect", uri=f"{pubkey}@{host}:9735")
 
     def open_channel(self, pubkey: str, sats: int, push_sats: int = 0) -> dict:
-        params: dict[str, Any] = {"nodeId": pubkey, "fundingSatoshis": sats}
+        # Eclair caps the on-chain fee it will pay to open (default 1000 sats); regtest fees exceed it.
+        params: dict[str, Any] = {"nodeId": pubkey, "fundingSatoshis": sats, "fundingFeeBudgetSatoshis": 20000}
         if push_sats:
             params["pushMsat"] = push_sats * 1000
         return self.call("open", **params)
@@ -251,7 +296,7 @@ class EclairREST:
 def client(name: str):
     node = nodes().get(name)
     if node is None:
-        raise LabClientError(f"unknown node {name!r}; choose alice, bob, chan or dina")
+        raise LabClientError(f"unknown node {name!r}; choose alice, bob, chan or dina (erin: full profile)")
     return {"lnd": LndREST, "cln": ClnRPC, "eclair": EclairREST}[node.impl](node)
 
 
@@ -267,8 +312,13 @@ def cln(name: str = "bob") -> ClnRPC:
     return ClnRPC(nodes()[name])
 
 
-def eclair(name: str = "chan") -> EclairREST:
+def eclair(name: str = "erin") -> EclairREST:
     return EclairREST(nodes()[name])
+
+
+def probe(sats: int, source: str = "alice", dest: str = "dina") -> bool:
+    """Could `sats` travel from source to dest right now? Uses a fake payment hash, so nothing is paid."""
+    return lnd(source).probe(client(dest).pubkey, int(sats))
 
 
 def current_node() -> str:

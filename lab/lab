@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Jifunze Lightning lab. Regtest only: nothing here touches real bitcoin.
 #
-#   ./lab up [--full]        start the lab (lite: Chan on c-lightning; full: Chan on Eclair)
+#   ./lab up [--full]        start the lab (--full also starts Erin, an Eclair node)
 #   ./lab pair [--raw]       show the pairing code to paste into the lesson page
 #   ./lab reset [--hard] <lesson>   set up a lesson's starting channels (--hard: wipe the chain first)
 #   ./lab doctor             check this computer can run the lab
@@ -40,12 +40,15 @@ cmd_up() {
   local profile=lite
   if [[ ${1:-} == "--full" ]]; then profile=full; fi
   say "Starting the Jifunze lab ($profile profile)…"
-  # Only one Chan may run: stop the other implementation if it is up.
-  if [[ $profile == full ]]; then dc stop chan-cln >/dev/null 2>&1 || true; else dc stop chan-eclair >/dev/null 2>&1 || true; fi
+  if [[ $profile == lite ]]; then dc stop erin >/dev/null 2>&1 || true; fi
   dcp "$profile" up -d --build bitcoind
   wait_for 60 bitcoind btc getblockchaininfo
   ensure_wallet lab
-  if [[ $profile == full ]]; then ensure_wallet chan; fi
+  if [[ $profile == full ]]; then
+    ensure_wallet erin
+    # Eclair refuses to start while its bitcoind wallet has locked coins (left by an interrupted open).
+    btc -rpcwallet=erin lockunspent true >/dev/null 2>&1 || true
+  fi
   dcp "$profile" up -d --build --remove-orphans
   dc exec -T lab sh -c "echo $profile > /lab/state/profile"
   say "Waiting for the Lightning nodes…"

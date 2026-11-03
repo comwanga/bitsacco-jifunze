@@ -149,7 +149,7 @@ class Bridge:
         tab, node, code, exercise = data.get("tab"), data.get("node"), data.get("code"), data.get("exercise", "")
         if tab not in TABS:
             return self._json(400, {"error": f"tab must be one of {', '.join(TABS)}"}, cors)
-        if node not in (*NODE_NAMES, "none"):
+        if node not in (*NODE_NAMES, "erin", "none"):
             return self._json(400, {"error": "unknown node"}, cors)
         if not isinstance(code, str):
             return self._json(400, {"error": "code must be text"}, cors)

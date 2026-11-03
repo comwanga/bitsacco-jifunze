@@ -1,0 +1,16 @@
+{
+  "id": "ch13-parse-init",
+  "lesson": "wire-protocol",
+  "node": "none",
+  "tab": "python",
+  "title": {
+    "sw": "Changanua ujumbe wa init",
+    "en": "Parse an init message"
+  },
+  "starter": {
+    "python": "# A Lightning 'init' message, as bytes on the wire (after decryption):\n#   type (u16) | gflen (u16) | globalfeatures | flen (u16) | features | TLV stream\nmsg = bytes.fromhex(\"0010\" \"0000\" \"0003\" \"0a69a2\" \"0120\" + \"06\" * 32)\n\n\ndef parse_init(data: bytes) -> dict:\n    \"\"\"Return {\"type\": int, \"global_features\": bytes, \"features\": bytes, \"tlv\": bytes}.\"\"\"\n    msg_type = int.from_bytes(data[0:2], \"big\")\n    # TODO: read gflen, then globalfeatures, then flen and features; the rest is the TLV stream\n    return {\"type\": msg_type, \"global_features\": b\"\", \"features\": b\"\", \"tlv\": b\"\"}\n\n\nparsed = parse_init(msg)\nprint(\"type:\", parsed[\"type\"])\nprint(\"features:\", parsed[\"features\"].hex())\nprint(\"tlv bytes:\", len(parsed[\"tlv\"]))\n"
+  },
+  "solution": {
+    "python": "msg = bytes.fromhex(\"0010\" \"0000\" \"0003\" \"0a69a2\" \"0120\" + \"06\" * 32)\n\n\ndef parse_init(data: bytes) -> dict:\n    msg_type = int.from_bytes(data[0:2], \"big\")\n    gflen = int.from_bytes(data[2:4], \"big\")\n    gf = data[4 : 4 + gflen]\n    pos = 4 + gflen\n    flen = int.from_bytes(data[pos : pos + 2], \"big\")\n    features = data[pos + 2 : pos + 2 + flen]\n    tlv = data[pos + 2 + flen :]\n    return {\"type\": msg_type, \"global_features\": gf, \"features\": features, \"tlv\": tlv}\n\n\nparsed = parse_init(msg)\nprint(\"type:\", parsed[\"type\"])\nprint(\"features:\", parsed[\"features\"].hex())\nprint(\"tlv bytes:\", len(parsed[\"tlv\"]))\n"
+  }
+}

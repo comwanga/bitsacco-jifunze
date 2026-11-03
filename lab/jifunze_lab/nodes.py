@@ -1,4 +1,8 @@
-"""The lab's nodes. Chan is c-lightning in the lite profile and Eclair in the full profile."""
+"""The lab's nodes: Alice and Dina (LND), Bob and Chan (c-lightning), and in the full profile Erin (Eclair).
+
+The book runs Chan on Eclair. Eclair's native signing library crashes under some Docker setups, so
+the lab keeps routing on c-lightning and adds Eclair as a fifth node for the chapter that compares
+implementations."""
 from __future__ import annotations
 
 import os
@@ -41,13 +45,15 @@ def profile() -> str:
 
 
 def nodes() -> dict[str, Node]:
-    chan_impl = "eclair" if profile() == "full" else "cln"
-    return {
+    table = {
         "alice": Node("alice", "lnd", "alice"),
         "bob": Node("bob", "cln", "bob"),
-        "chan": Node("chan", chan_impl, "chan"),
+        "chan": Node("chan", "cln", "chan"),
         "dina": Node("dina", "lnd", "dina"),
     }
+    if profile() == "full":
+        table["erin"] = Node("erin", "eclair", "erin")
+    return table
 
 
 CLI_FOR = {"lnd": "lncli", "cln": "lightning-cli", "eclair": "eclair-cli"}

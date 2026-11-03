@@ -1,0 +1,16 @@
+{
+  "id": "ch03-open-channel",
+  "lesson": "how-ln-works",
+  "node": "alice",
+  "tab": "cli",
+  "title": {
+    "sw": "Alice anafungua chaneli na Bob",
+    "en": "Alice opens a channel to Bob"
+  },
+  "starter": {
+    "cli": "# 1. Find Bob's node id (his public key).\nBOB=$(JIFUNZE_NODE=bob lightning-cli getinfo | jq -r .id)\necho \"Bob is $BOB\"\n# 2. Connect to Bob, then fund a 500,000-sat channel.\nlncli connect \"$BOB@bob:9735\"\nlncli openchannel --node_key \"$BOB\" --local_amt 500000"
+  },
+  "solution": {
+    "cli": "BOB=$(JIFUNZE_NODE=bob lightning-cli getinfo | jq -r .id)\nlncli connect \"$BOB@bob:9735\" || true\nlncli openchannel --node_key \"$BOB\" --local_amt 500000"
+  }
+}

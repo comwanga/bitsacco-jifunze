@@ -1,0 +1,16 @@
+{
+  "id": "ch10-toy-onion",
+  "lesson": "onion-routing",
+  "node": "none",
+  "tab": "python",
+  "title": {
+    "sw": "Jenga kitunguu cha kuchezea",
+    "en": "Build a toy onion"
+  },
+  "starter": {
+    "python": "import hashlib\n\n\ndef keystream(key: bytes, n: int) -> bytes:\n    \"\"\"A toy stream cipher: SHA-256 in counter mode. (Real Lightning uses ChaCha20.)\"\"\"\n    out = b\"\"\n    counter = 0\n    while len(out) < n:\n        out += hashlib.sha256(key + counter.to_bytes(4, \"big\")).digest()\n        counter += 1\n    return out[:n]\n\n\ndef xor(data: bytes, stream: bytes) -> bytes:\n    return bytes(a ^ b for a, b in zip(data, stream))\n\n\ndef wrap(message: bytes, keys: list[bytes]) -> bytes:\n    \"\"\"Encrypt one layer per hop. keys[0] is the first hop (Bob).\"\"\"\n    onion = message\n    # TODO: add a layer for every key, so the first hop's layer is on the outside\n    return onion\n\n\ndef peel(onion: bytes, key: bytes) -> bytes:\n    \"\"\"Remove one layer with this hop's key.\"\"\"\n    # TODO\n    return onion\n\n\nkeys = [b\"bob-secret\", b\"chan-secret\", b\"dina-secret\"]\nonion = wrap(b\"lipa Dina sats 21000\", keys)\nprint(\"onion:\", onion.hex()[:40], \"...\")\nfor key in keys:\n    onion = peel(onion, key)\n    print(\"after\", key.decode(), \"->\", onion)\n"
+  },
+  "solution": {
+    "python": "import hashlib\n\n\ndef keystream(key: bytes, n: int) -> bytes:\n    out = b\"\"\n    counter = 0\n    while len(out) < n:\n        out += hashlib.sha256(key + counter.to_bytes(4, \"big\")).digest()\n        counter += 1\n    return out[:n]\n\n\ndef xor(data: bytes, stream: bytes) -> bytes:\n    return bytes(a ^ b for a, b in zip(data, stream))\n\n\ndef wrap(message: bytes, keys: list[bytes]) -> bytes:\n    onion = message\n    for key in reversed(keys):\n        onion = xor(onion, keystream(key, len(onion)))\n    return onion\n\n\ndef peel(onion: bytes, key: bytes) -> bytes:\n    return xor(onion, keystream(key, len(onion)))\n\n\nkeys = [b\"bob-secret\", b\"chan-secret\", b\"dina-secret\"]\nonion = wrap(b\"lipa Dina sats 21000\", keys)\nfor key in keys:\n    onion = peel(onion, key)\n    print(\"after\", key.decode(), \"->\", onion)\n"
+  }
+}

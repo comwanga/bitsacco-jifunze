@@ -1,0 +1,16 @@
+{
+  "id": "ch11-graph",
+  "lesson": "gossip-channel-graph",
+  "node": "alice",
+  "tab": "python",
+  "title": {
+    "sw": "Soma ramani ya chaneli",
+    "en": "Read the channel graph"
+  },
+  "starter": {
+    "python": "from jifunze_lab import lnd\n\ngraph = lnd(\"alice\").graph()\nalias = {n[\"pub_key\"]: n.get(\"alias\") or n[\"pub_key\"][:8] for n in graph[\"nodes\"]}\nprint(\"nodes:\", len(graph[\"nodes\"]))\nprint(\"channels:\", len(graph[\"edges\"]))\nfor edge in graph[\"edges\"]:\n    print(alias.get(edge[\"node1_pub\"]), \"<->\", alias.get(edge[\"node2_pub\"]), edge[\"capacity\"], \"sats\")\n"
+  },
+  "solution": {
+    "python": "from jifunze_lab import lnd\n\ngraph = lnd(\"alice\").graph()\nalias = {n[\"pub_key\"]: n.get(\"alias\") or n[\"pub_key\"][:8] for n in graph[\"nodes\"]}\nprint(\"nodes:\", len(graph[\"nodes\"]))\nprint(\"channels:\", len(graph[\"edges\"]))\nfor edge in graph[\"edges\"]:\n    print(alias.get(edge[\"node1_pub\"]), \"<->\", alias.get(edge[\"node2_pub\"]), edge[\"capacity\"], \"sats\")\n"
+  }
+}

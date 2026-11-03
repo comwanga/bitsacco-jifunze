@@ -7,13 +7,13 @@ from jifunze_lab.cli import CliTargetError, parse_value, target_node, wrong_cli
 from jifunze_lab.clients import EclairREST, LabClientError
 from jifunze_lab.nodes import nodes
 
-name = target_node("chan")
+name = target_node("erin")
 node = nodes().get(name)
 if node is None or node.impl != "eclair":
     e: CliTargetError = wrong_cli("eclair-cli", name)
     print(e, file=sys.stderr)
-    if node is not None and node.name == "chan":
-        print("Chan runs Eclair only in the full profile: ./lab up --full", file=sys.stderr)
+    if node is None:
+        print("Erin (Eclair) runs only in the full profile: ./lab up --full", file=sys.stderr)
     sys.exit(e.code)
 
 args = [a for a in sys.argv[1:] if not a.startswith("-p")]

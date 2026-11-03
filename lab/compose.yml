@@ -1,4 +1,4 @@
-# Jifunze Lightning lab: regtest only. Start with ./lab up (lite) or ./lab up --full.
+# Jifunze Lightning lab: regtest only. Start with ./lab up (lite) or ./lab up --full (adds Erin on Eclair).
 # Topology (Alice, Bob, Chan, Dina) follows Mastering the Lightning Network, CC BY-SA 4.0.
 name: jifunze-lab
 
@@ -22,7 +22,7 @@ services:
       --bitcoin.regtest --bitcoin.node=bitcoind
       --bitcoind.rpchost=bitcoind --bitcoind.rpcuser=jifunze --bitcoind.rpcpass=jifunze
       --bitcoind.zmqpubrawblock=tcp://bitcoind:28334 --bitcoind.zmqpubrawtx=tcp://bitcoind:28335
-      --accept-keysend --protocol.wumbo-channels --trickledelay=1000
+      --accept-keysend --protocol.wumbo-channels --trickledelay=1000 --maxpendingchannels=10
     volumes: [alice:/home/lnd/.lnd]
     networks: [ln]
     depends_on: [bitcoind]
@@ -36,7 +36,7 @@ services:
       --bitcoin.regtest --bitcoin.node=bitcoind
       --bitcoind.rpchost=bitcoind --bitcoind.rpcuser=jifunze --bitcoind.rpcpass=jifunze
       --bitcoind.zmqpubrawblock=tcp://bitcoind:28334 --bitcoind.zmqpubrawtx=tcp://bitcoind:28335
-      --accept-keysend --protocol.wumbo-channels --trickledelay=1000
+      --accept-keysend --protocol.wumbo-channels --trickledelay=1000 --maxpendingchannels=10
     volumes: [dina:/home/lnd/.lnd]
 
   bob: &cln
@@ -51,35 +51,31 @@ services:
     depends_on: [bitcoind]
     restart: unless-stopped
 
-  chan-cln:
+  chan:
     <<: *cln
-    profiles: [lite]
     command: >-
       lightningd --alias=chan --lightning-dir=/home/clightning/.lightning --network=regtest
       --addr=0.0.0.0:9735 --bitcoin-rpcconnect=bitcoind --bitcoin-rpcport=18443
       --bitcoin-rpcuser=jifunze --bitcoin-rpcpassword=jifunze --rpc-file-mode=0666
       --log-level=info --developer --dev-bitcoind-poll=2 --dev-fast-gossip
     volumes: [chan:/home/clightning/.lightning]
-    networks:
-      ln:
-        aliases: [chan]
 
-  chan-eclair:
-    image: polarlightning/eclair:${ECLAIR_TAG:-0.13.1}
+  # Full profile: a fifth node, Erin, on Eclair (chapter 4 compares three implementations).
+  erin:
+    image: polarlightning/eclair:${ECLAIR_TAG:-0.12.0}
     profiles: [full]
     command: >-
-      polar-eclair --node.alias=chan --server.port=9735 --api.enabled=true
+      polar-eclair --node-alias=erin --server.port=9735 --api.enabled=true
       --api.binding-ip=0.0.0.0 --api.port=8080 --api.password=jifunze --chain=regtest
       --bitcoind.host=bitcoind --bitcoind.rpcport=18443 --bitcoind.rpcuser=jifunze
       --bitcoind.rpcpassword=jifunze --bitcoind.zmqblock=tcp://bitcoind:28334
-      --bitcoind.zmqtx=tcp://bitcoind:28335 --bitcoind.wallet=chan
+      --bitcoind.zmqtx=tcp://bitcoind:28335 --bitcoind.wallet=erin
+      --bitcoind.startup-locked-utxos-behavior=unlock
       --datadir=/home/eclair/.eclair --printToConsole=true
       --on-chain-fees.feerate-tolerance.ratio-low=0.00001
       --on-chain-fees.feerate-tolerance.ratio-high=10000.0
-    volumes: [chan-eclair:/home/eclair]
-    networks:
-      ln:
-        aliases: [chan]
+    volumes: [erin:/home/eclair]
+    networks: [ln]
     depends_on: [bitcoind]
     restart: unless-stopped
 
@@ -108,5 +104,5 @@ volumes:
   dina: {}
   bob: {}
   chan: {}
-  chan-eclair: {}
+  erin: {}
   state: {}

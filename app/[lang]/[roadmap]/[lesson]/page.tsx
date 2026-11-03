@@ -4,7 +4,8 @@ import { MarkComplete } from "@/components/lesson/MarkComplete";
 import { KeyTerms, Objectives, PrevNext, Reflection, Resources, SourceCredit } from "@/components/lesson/LessonParts";
 import { Quiz } from "@/components/quiz/Quiz";
 import { flatLessons, getGlossary, getLesson, getQuiz, getRoadmap, listRoadmaps } from "@/lib/content/load";
-import { renderLessonBody } from "@/lib/content/mdx";
+import { exerciseIds, renderLessonBody } from "@/lib/content/mdx";
+import { LazyLabBar } from "@/components/lab/LabIslands";
 import type { RoadmapId } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
 import { lessonKey } from "@/lib/progress/model";
@@ -32,17 +33,23 @@ export default async function LessonPage({ params }: Params) {
   const fm = lesson.frontmatter;
   const glossary = getGlossary();
   const terms = (fm.terms ?? []).map((id) => glossary.find((g) => g.id === id)).filter((g) => g !== undefined);
-  const body = await renderLessonBody(lesson.body, lesson.servedLang, glossary);
+  const key = lessonKey(roadmap.id, slug);
+  const ids = exerciseIds(lesson.body);
+  const body = await renderLessonBody(lesson.body, lesson.servedLang, glossary, { lessonKey: key, lesson: slug, exerciseIds: ids });
   const quizFile = getQuiz(roadmap.id, slug);
   const order = flatLessons(roadmap);
   const i = order.indexOf(slug);
   const neighbour = (s: string | undefined) =>
     s ? { href: `/${lang}/${roadmap.id}/${s}/`, title: getLesson(roadmap.id, s, lang).frontmatter.title } : undefined;
   const section = roadmap.sections.find((s) => s.lessons.some((x) => x.slug === slug))!;
-  const key = lessonKey(roadmap.id, slug);
 
   return (
-    <article className="mx-auto max-w-[68ch] px-4 pt-6 pb-16" lang={lesson.servedLang}>
+    <article className={`mx-auto px-4 pt-6 pb-16 ${ids.length ? "max-w-[84ch]" : "max-w-[68ch]"}`} lang={lesson.servedLang}>
+      {ids.length > 0 && (
+        <div lang={lang}>
+          <LazyLabBar lang={lang} />
+        </div>
+      )}
       <p className="text-sm text-[var(--muted)]" lang={lang}>
         <Link href={`/${lang}/${roadmap.id}/`} className="underline underline-offset-2 hover:text-[var(--fg)]">
           {roadmap.title[lang]}

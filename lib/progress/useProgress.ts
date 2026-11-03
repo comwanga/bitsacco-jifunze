@@ -6,6 +6,7 @@ import {
   markComplete,
   mergeProgress,
   parseProgressFile,
+  recordLabPass,
   recordQuiz,
   type LessonKey,
   type ParseError,
@@ -60,6 +61,7 @@ export function useProgress(): {
   complete(key: LessonKey): void;
   quiz(key: LessonKey, correct: number, total: number): void;
   importText(text: string): ParseError | null;
+  labPass(key: LessonKey, exerciseId: string, allIds: string[]): void;
 } {
   const progress = useSyncExternalStore(subscribe, read, () => SERVER_SNAPSHOT);
   const canPersist = useSyncExternalStore(subscribe, canPersistNow, () => true);
@@ -77,5 +79,11 @@ export function useProgress(): {
     return null;
   }, []);
 
-  return { progress, canPersist, complete, quiz, importText };
+  const labPass = useCallback(
+    (key: LessonKey, exerciseId: string, allIds: string[]) =>
+      write(recordLabPass(read(), key, exerciseId, allIds, new Date().toISOString())),
+    [],
+  );
+
+  return { progress, canPersist, complete, quiz, importText, labPass };
 }

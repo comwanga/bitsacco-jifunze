@@ -13,14 +13,17 @@ export function inlineScriptHashes(html: string): string[] {
   return hashes;
 }
 
-export function buildCsp(hashes: string[]): string {
+// Pages with a lab exercise may talk to the learner's own lab bridge (or their Codespace).
+export const LAB_CONNECT = "http://127.0.0.1:7777 http://localhost:7777 https://*.app.github.dev";
+
+export function buildCsp(hashes: string[], opts: { lab?: boolean } = {}): string {
   return [
     "default-src 'self'",
     `script-src 'self' ${[...new Set(hashes)].join(" ")}`.trim(),
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self'",
-    "connect-src 'self'",
+    opts.lab ? `connect-src 'self' ${LAB_CONNECT}` : "connect-src 'self'",
     "manifest-src 'self'",
     "worker-src 'self'",
     "object-src 'none'",

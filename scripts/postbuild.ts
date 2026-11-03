@@ -23,7 +23,7 @@ const pages = htmlFiles(OUT);
 // 1. CSP
 for (const file of pages) {
   const html = fs.readFileSync(file, "utf8");
-  fs.writeFileSync(file, injectCsp(html, buildCsp(inlineScriptHashes(html))));
+  fs.writeFileSync(file, injectCsp(html, buildCsp(inlineScriptHashes(html), { lab: html.includes("data-jifunze-lab") })));
 }
 
 // 2. Service worker version
@@ -39,10 +39,15 @@ for (const file of pages) {
 }
 
 // 4. Performance budget
-const weights = pages.map((file) => ({ file: path.relative(OUT, file).replaceAll("\\", "/"), ...pageWeight(OUT, file) }));
+const weights = pages.map((file) => ({
+  file: path.relative(OUT, file).replaceAll("\\", "/"),
+  lab: fs.readFileSync(file, "utf8").includes("data-jifunze-lab"),
+  ...pageWeight(OUT, file),
+}));
 const overSpec: string[] = [];
 for (const w of weights) {
-  if (w.jsGzip > BUDGET.jsCeiling) failures.push(`${w.file}: JavaScript ${kb(w.jsGzip)} > ceiling ${kb(BUDGET.jsCeiling)}`);
+  const ceiling = w.lab ? BUDGET.jsCeilingLab : BUDGET.jsCeiling;
+  if (w.jsGzip > ceiling) failures.push(`${w.file}: JavaScript ${kb(w.jsGzip)} > ceiling ${kb(ceiling)}`);
   else if (w.jsGzip > BUDGET.jsPerPage) overSpec.push(w.file);
 }
 const first = `sw/savers/${flatLessons(getRoadmap("savers"))[0]}/index.html`;

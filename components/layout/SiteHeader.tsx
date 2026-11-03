@@ -1,41 +1,40 @@
-import Link from "next/link";
 import { t, type Lang } from "@/lib/i18n";
-import { BitsaccoLogo } from "./BitsaccoLogo";
+import { BrandLockup } from "./BrandLockup";
+import { HeaderNav, type NavItem } from "./HeaderNav";
 import { LanguageSwitch } from "./LanguageSwitch";
 
-// Header links never prefetch: they are on screen on every page, so prefetching their routes costs every
-// visitor data and makes each page's measured JavaScript depend on how many prefetches finish in time.
-export function SiteHeader({ lang }: { lang: Lang }) {
-  const nav = [
-    { href: `/${lang}/learn/`, label: t(lang, "navPaths") },
-    { href: `/${lang}/lightning/`, label: t(lang, "navLabs") },
-    { href: `/${lang}/library/`, label: t(lang, "navLibrary") },
-    { href: `/${lang}/glossary/`, label: t(lang, "navGlossary") },
-    { href: `/${lang}/progress/`, label: t(lang, "navProgress") },
+/** Main destinations, with the paths that count as "inside" each one for the current-page marker. */
+export function siteNav(lang: Lang): NavItem[] {
+  const p = (s: string) => `/${lang}/${s}`;
+  return [
+    {
+      href: p("learn/"),
+      label: t(lang, "navPaths"),
+      match: [p("learn/"), p("savers/"), p("builders/"), p("tree/savers/"), p("tree/builders/"), p("simulations/")],
+    },
+    { href: p("lightning/"), label: t(lang, "navLabs"), match: [p("lightning/"), p("tree/lightning/")] },
+    { href: p("library/"), label: t(lang, "navLibrary"), match: [p("library/")] },
+    { href: p("glossary/"), label: t(lang, "navGlossary"), match: [p("glossary/")] },
+    { href: p("progress/"), label: t(lang, "navProgress"), match: [p("progress/")] },
   ];
+}
+
+/** One compact row pinned by CSS while scrolling: brand on the left, navigation and language switch grouped on the right. */
+export function SiteHeader({ lang }: { lang: Lang }) {
   return (
-    <header className="bg-night text-white">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:text-ink">
+    <header data-site-header className="site-header sticky top-0 z-40 h-[var(--header-h)] border-b border-white/10 bg-night text-white">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:text-ink"
+      >
         {t(lang, "skipToContent")}
       </a>
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 pt-3 pb-2">
-        <Link href={`/${lang}/`} prefetch={false} className="flex items-center gap-2 text-white">
-          <BitsaccoLogo className="h-9 w-auto text-teal-200" />
-          <span className="text-lg font-bold tracking-tight">Jifunze</span>
-        </Link>
-        <LanguageSwitch lang={lang} />
+      <div className="mx-auto flex h-full max-w-[96rem] items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
+        <BrandLockup lang={lang} />
+        <HeaderNav items={siteNav(lang)} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
+          <LanguageSwitch lang={lang} />
+        </HeaderNav>
       </div>
-      <nav aria-label={t(lang, "menu")} className="mx-auto max-w-6xl overflow-x-auto px-4 pb-2">
-        <ul className="flex gap-5 whitespace-nowrap text-[15px] text-white/80">
-          {nav.map((n) => (
-            <li key={n.href}>
-              <Link href={n.href} prefetch={false} className="inline-block py-1 hover:text-white">
-                {n.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </header>
   );
 }

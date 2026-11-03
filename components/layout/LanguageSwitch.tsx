@@ -11,7 +11,7 @@ export function LanguageSwitch({ lang }: { lang: Lang }) {
     <a
       href={switchHref(pathname, to)}
       hrefLang={to}
-      className="rounded-full border border-white/30 px-3 py-1 text-sm font-semibold text-white hover:bg-white/10"
+      className="flex h-10 items-center rounded-full border border-white/30 px-3.5 text-sm font-semibold text-white hover:bg-white/10"
     >
       <span className="sr-only">{t(lang, "switchLabel")}: </span>
       <span lang={to}>{t(lang, "otherLangName")}</span>

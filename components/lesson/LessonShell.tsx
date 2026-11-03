@@ -26,18 +26,18 @@ export function LessonShell({ lang, course, toc, children }: { lang: Lang; cours
   return (
     <div className="mx-auto max-w-[96rem] min-[1100px]:grid min-[1100px]:grid-cols-[15rem_minmax(0,1fr)_13rem] min-[1100px]:gap-6 min-[1100px]:px-4">
       <ReadingProgress />
-      <div className="sticky top-0 z-30 border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur min-[1100px]:hidden">
-        <div className="relative flex gap-2 px-4 py-2">
+      <div data-lesson-bar className="sticky top-[var(--header-h)] z-30 h-[var(--lesson-bar-h)] border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur min-[1100px]:hidden">
+        <div className="relative flex h-full items-center gap-2 px-4">
           <PhoneMenu label={t(lang, "courseNav")}>{course}</PhoneMenu>
           <PhoneMenu label={t(lang, "onThisPage")}>{toc}</PhoneMenu>
         </div>
       </div>
       <aside className="hidden min-[1100px]:block">
-        <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-auto py-6 pr-1">{course}</div>
+        <div className="sticky top-[calc(var(--header-h)+1rem)] max-h-[calc(100vh-var(--header-h)-2rem)] overflow-auto py-6 pr-1">{course}</div>
       </aside>
       {children}
       <aside className="hidden min-[1100px]:block">
-        <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-auto py-6">{toc}</div>
+        <div className="sticky top-[calc(var(--header-h)+1rem)] max-h-[calc(100vh-var(--header-h)-2rem)] overflow-auto py-6">{toc}</div>
       </aside>
     </div>
   );

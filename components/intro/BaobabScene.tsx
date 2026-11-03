@@ -45,6 +45,10 @@ export function BaobabScene({ lang }: { lang: Lang }) {
           <stop offset=".22" stopColor="#5a2e1f" />
           <stop offset="1" stopColor="#22110c" />
         </linearGradient>
+        <linearGradient id="mb-fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#170d09" stopOpacity="0" />
+          <stop offset="1" stopColor="#170d09" />
+        </linearGradient>
         <filter id="mb-grain">
           <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="9" />
           <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .7 -.3" />
@@ -89,6 +93,8 @@ export function BaobabScene({ lang }: { lang: Lang }) {
 
       <path d="M0 280 Q600 268 1200 280 L1200 400 L0 400Z" fill="url(#mb-ground)" />
       <rect y="272" width="1200" height="128" filter="url(#mb-grain)" opacity=".45" />
+      {/* Settle the grain into the page's earth colour, so the copy below meets no seam. */}
+      <rect y="330" width="1200" height="70" fill="url(#mb-fade)" />
       <ellipse cx="600" cy="283" rx="44" ry="5" fill="#000" opacity=".35" />
 
       <g transform="translate(600 281) scale(1.5) translate(-120 -252)">

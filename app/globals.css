@@ -32,7 +32,23 @@
   --muted: #6b5e53;
   --card: #ffffff;
   --line: #ece4d8;
+  --surface-warm: var(--color-cream); /* lower home sections, between the dark earth and the page */
+  /* Heights of the sticky bars, so anchors, sidebars and the lab bar land below them. */
+  --header-h: 3.5rem;
+  --lesson-bar-h: 3.25rem; /* phone lesson menus; none from 1100px */
   color-scheme: light dark;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 4rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --lesson-bar-h: 0rem;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,11 +58,33 @@
     --muted: #b3a597;
     --card: #1e1916;
     --line: #362c25;
+    --surface-warm: #1b1410;
   }
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 0.75rem);
+}
+
+/* The header keeps one height; scrolling only adds a shadow and an edge, so nothing below it moves. */
+@supports (animation-timeline: scroll()) {
+  .site-header {
+    animation: header-lift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 96px;
+  }
+}
+
+@keyframes header-lift {
+  from {
+    border-bottom-color: transparent;
+    box-shadow: 0 0 0 0 rgb(6 9 28 / 0);
+  }
+  to {
+    border-bottom-color: rgb(255 255 255 / 0.1);
+    box-shadow: 0 10px 24px -12px rgb(6 9 28 / 0.6);
+  }
 }
 
 body {
@@ -178,7 +216,7 @@ body {
   }
 }
 
-/* Headings land below the sticky phone menu bar when reached from the table of contents. */
+/* Headings land below the phone lesson menus (html scroll-padding already clears the site header). */
 .lesson-body :is(h2, h3) {
-  scroll-margin-top: 4rem;
+  scroll-margin-top: var(--lesson-bar-h);
 }

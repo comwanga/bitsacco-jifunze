@@ -42,7 +42,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
       <div className="mx-auto max-w-[96rem] px-4 pt-10 pb-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-x-10">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <BrandLockup lang={lang} size="lg" prefetch={false} />
+            <BrandLockup lang={lang} size="lg" />
             <p className="mt-3 max-w-xs text-white/85">{c.footerTagline}</p>
           </div>
           <Group

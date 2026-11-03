@@ -4,12 +4,19 @@ import { expect, test } from "vitest";
 
 const src = fs.readFileSync(path.join(import.meta.dirname, "../../public/sw.js"), "utf8");
 const fakeSelf = { addEventListener: () => {}, location: { origin: "http://x" } };
-const sw = new Function("self", "caches", "fetch", `${src}; return { pageOfData, langOf, staleCaches, cacheableStatic };`)(fakeSelf, {}, () => {}) as {
+const sw = new Function("self", "caches", "fetch", `${src}; return { pageOfData, langOf, staleCaches, cacheableStatic, staticAssetsOf };`)(fakeSelf, {}, () => {}) as {
   pageOfData(p: string): string | null;
   langOf(p: string): string;
   staleCaches(keys: string[]): string[];
   cacheableStatic(p: string): boolean;
+  staticAssetsOf(html: string): string[];
 };
+
+test("offline precaching uses real asset tags and skips legacy-only scripts and serialized paths", () => {
+  const html = '<script src="/_next/static/modern.js"></script><script src="/_next/static/polyfill.js" noModule=""></script>' +
+    '<link rel="stylesheet" href="/_next/static/styles.css"><script>const path="/_next/static/not-a-tag.js";</script>';
+  expect(sw.staticAssetsOf(html)).toEqual(["/_next/static/modern.js", "/_next/static/styles.css"]);
+});
 
 test("only known static paths may enter the fallback cache", () => {
   for (const p of ["/_next/static/x.js", "/icons/icon-192.png", "/logo.svg", "/manifest.webmanifest"]) {

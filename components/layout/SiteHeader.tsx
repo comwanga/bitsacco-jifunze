@@ -3,6 +3,8 @@ import { t, type Lang } from "@/lib/i18n";
 import { BitsaccoLogo } from "./BitsaccoLogo";
 import { LanguageSwitch } from "./LanguageSwitch";
 
+// Header links never prefetch: they are on screen on every page, so prefetching their routes costs every
+// visitor data and makes each page's measured JavaScript depend on how many prefetches finish in time.
 export function SiteHeader({ lang }: { lang: Lang }) {
   const nav = [
     { href: `/${lang}/learn/`, label: t(lang, "navPaths") },
@@ -17,7 +19,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
         {t(lang, "skipToContent")}
       </a>
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 pt-3 pb-2">
-        <Link href={`/${lang}/`} className="flex items-center gap-2 text-white">
+        <Link href={`/${lang}/`} prefetch={false} className="flex items-center gap-2 text-white">
           <BitsaccoLogo className="h-9 w-auto text-teal-200" />
           <span className="text-lg font-bold tracking-tight">Jifunze</span>
         </Link>
@@ -27,7 +29,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
         <ul className="flex gap-5 whitespace-nowrap text-[15px] text-white/80">
           {nav.map((n) => (
             <li key={n.href}>
-              <Link href={n.href} className="inline-block py-1 hover:text-white">
+              <Link href={n.href} prefetch={false} className="inline-block py-1 hover:text-white">
                 {n.label}
               </Link>
             </li>

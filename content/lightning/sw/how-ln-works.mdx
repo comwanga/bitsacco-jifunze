@@ -1,0 +1,60 @@
+---
+title: "Jinsi mtandao wa Lightning unavyofanya kazi"
+description: "Fungua chaneli mwenyewe, ithibitishe kwenye blockchain, kisha ulipe kupitia hiyo, ili uone hatua tatu ambazo kila chaneli hupitia: kufungua, kusasisha, kufunga."
+level: beginner
+minutes: 45
+objectives:
+  - Eleza jinsi muamala wa ufadhili unavyounda chaneli
+  - Fungua na uthibitishe chaneli kutoka Alice kwenda Bob
+  - Lipa kupitia chaneli mpya na ueleze kilichobadilika kila upande
+resources:
+  - title: "Mastering the Lightning Network, chapter 3: How the Lightning Network Works"
+    url: "https://github.com/lnbook/lnbook/blob/develop/03_how_ln_works.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Kwa nini chaneli inahitaji uthibitisho kabla ya kutumika?"
+  - "Baada ya Alice kumlipa Bob, Bob angewezaje kumlipa Alice kupitia chaneli ile ile?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - channel
+  - multisig
+  - commitment-transaction
+  - confirmation
+  - liquidity
+---
+
+Kila <Term id="channel" /> hupitia hatua tatu.
+
+1. **Kufungua.** Upande mmoja hutuma bitcoin kwenye tokeo la <Term id="multisig" /> la 2 kati ya 2 linalohitaji sahihi zote mbili ili kutumika. *Muamala huu wa ufadhili* ni muamala wa kawaida wa Bitcoin.
+2. **Kusasisha.** Kwa kila malipo, pande zote mbili hutia sahihi <Term id="commitment-transaction" /> mpya unaogawanya pesa kwa namna tofauti. Hakuna anayeuchapisha: unakaa tayari tu, na ule wa zamani hubatilishwa.
+3. **Kufunga.** Wakimaliza, mgawanyo wa mwisho huenda kwenye blockchain, ama kwa pamoja (kufunga kwa ushirikiano) au na upande mmoja peke yake.
+
+Ni hatua ya 1 na ya 3 tu zinazogusa blockchain. Kila kitu katikati ni jumbe tu.
+
+## Hatua ya 1: Alice anafungua chaneli na Bob
+
+Alice anahitaji kitambulisho cha nodi ya Bob (ufunguo wake wa umma) na mahali alipo kwenye mtandao. Kisha anafadhili sats 500,000:
+
+<Exercise id="ch03-open-channel" />
+
+Matokeo yana `funding_txid`. Chaneli ipo, lakini **inasubiri**: muamala wa ufadhili uko kwenye mempool, bado haujaingia kwenye bloku.
+
+## Hatua ya 2: Ithibitishe
+
+Kwenye regtest wewe ndiye mchimbaji. Bloku sita zinaupa muamala wa ufadhili <Term id="confirmation" /> sita, na chaneli inakuwa hai:
+
+<Exercise id="ch03-mine" />
+
+## Hatua ya 3: Bob analipwa
+
+Bob anaendesha c-lightning, kwa hiyo amri yake ya ankara ni tofauti, na c-lightning huhesabu kwa *millisatoshi*. Tengeneza ankara kwa Bob, kisha ilipe kutoka kwa Alice:
+
+<Exercise id="ch03-pay-bob" />
+
+Alice alifungua chaneli akiwa na sats zote 500,000 upande wake. Baada ya kulipa sats 20,000, Bob ana 20,000 upande wake na sasa anaweza kumlipa tena. Salio hilo la kila upande ndilo <Term id="liquidity" /> wa chaneli.

@@ -1,0 +1,57 @@
+{
+  "id": "lightning",
+  "title": { "sw": "Lightning kwa Wajenzi", "en": "Lightning for Builders" },
+  "tagline": {
+    "sw": "Mastering the Lightning Network, sura zote 17, kwa lugha rahisi na maabara hai kwenye kompyuta yako.",
+    "en": "All 17 chapters of Mastering the Lightning Network, simplified, with a live lab on your laptop."
+  },
+  "description": {
+    "sw": "Endesha nodi halisi za Lightning kwenye regtest: tengeneza ankara, fungua chaneli, pitisha malipo, chunguza HTLC, kitunguu na ramani ya mtandao, kwa amri za kitabu na Python. Inahitaji kompyuta yenye Docker.",
+    "en": "Run real Lightning nodes on regtest: create invoices, open channels, route payments, and dig into HTLCs, onions and the network graph, with the book's commands and Python. Needs a laptop with Docker."
+  },
+  "sections": [
+    {
+      "id": "misingi",
+      "title": { "sw": "Misingi", "en": "Foundations" },
+      "lessons": [
+        { "slug": "introduction" },
+        { "slug": "getting-started", "prerequisites": ["introduction"] },
+        { "slug": "how-ln-works", "prerequisites": ["getting-started"] }
+      ]
+    },
+    {
+      "id": "nodi",
+      "title": { "sw": "Nodi", "en": "Nodes" },
+      "lessons": [{ "slug": "node-software" }, { "slug": "node-operations", "prerequisites": ["how-ln-works"] }]
+    },
+    {
+      "id": "ndani",
+      "title": { "sw": "Ndani ya Lightning", "en": "Inside Lightning" },
+      "lessons": [
+        { "slug": "architecture" },
+        { "slug": "payment-channels", "prerequisites": ["how-ln-works"] },
+        { "slug": "routing-htlcs", "prerequisites": ["payment-channels"] },
+        { "slug": "channel-operation", "prerequisites": ["routing-htlcs"] }
+      ]
+    },
+    {
+      "id": "mtandao",
+      "title": { "sw": "Mtandao", "en": "The network" },
+      "lessons": [
+        { "slug": "onion-routing", "prerequisites": ["routing-htlcs"] },
+        { "slug": "gossip-channel-graph" },
+        { "slug": "pathfinding", "prerequisites": ["gossip-channel-graph"] }
+      ]
+    },
+    {
+      "id": "itifaki",
+      "title": { "sw": "Itifaki", "en": "Protocol" },
+      "lessons": [{ "slug": "wire-protocol" }, { "slug": "encrypted-transport" }, { "slug": "payment-requests" }]
+    },
+    {
+      "id": "usalama",
+      "title": { "sw": "Usalama na hatua inayofuata", "en": "Security and next steps" },
+      "lessons": [{ "slug": "security-privacy", "prerequisites": ["routing-htlcs"] }, { "slug": "conclusion" }]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+---
+title: "Getting started: your lab and your first payment"
+description: "Start the four-node lab on your laptop, connect it to this page, and make Dina's first invoice and Alice's first payment."
+level: beginner
+minutes: 40
+objectives:
+  - Start the lab and pair it with the lesson page
+  - Create a Lightning invoice from the command line
+  - Pay an invoice across the network and read the result
+resources:
+  - title: "Mastering the Lightning Network, chapter 2: Getting Started"
+    url: "https://github.com/lnbook/lnbook/blob/develop/02_getting_started.asciidoc"
+    kind: book
+    language: en
+  - title: "Docker Desktop (Windows uses the WSL2 backend)"
+    url: "https://docs.docker.com/desktop/"
+    kind: tool
+    language: en
+reflection:
+  - "What did the payment output tell you about the route? Which nodes did it pass through?"
+  - "Why is it safe to show an invoice to anyone, but not a seed phrase?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - invoice
+  - node
+  - regtest
+---
+
+In the book, Alice buys a coffee from Bob's café with a phone wallet. Here you play every part. Your lab has four <Term id="node">nodes</Term> on <Term id="regtest" />: Alice and Dina run LND, Bob and Chan run c-lightning, and they are already linked in a line, Alice → Bob → Chan → Dina.
+
+## Step 1: Start the lab
+
+In a terminal (on Windows, inside WSL2):
+
+```bash
+git clone https://github.com/bitsacco/jifunze
+cd jifunze/lab
+./lab doctor     # checks Docker, memory, disk and port 7777
+./lab up         # starts the nodes; the first run downloads about 2 GB
+```
+
+`./lab up` ends by printing a **pairing code** like `ABCD-EFGH-JKLM`. Paste it into the lab bar at the top of this page and press Connect. You should see six green chips: bitcoind and the four nodes.
+
+<Callout type="warning" title="Why pair?">
+The lab only answers this website, and only with your code. Another site you visit can't run commands on your laptop.
+</Callout>
+
+## Step 2: Dina asks to be paid
+
+An <Term id="invoice" /> is a payment request. Dina makes one for 50,000 sats:
+
+<Exercise id="ch02-dina-invoice" />
+
+Look at the output: `payment_request` is the invoice text (it starts with `lnbcrt`, for Lightning on regtest), and `r_hash` is the hash of a secret only Dina knows.
+
+## Step 3: Alice pays
+
+Copy Dina's `payment_request` into the next exercise, replacing `INVOICE`, and run it. The `--force` flag skips the "are you sure?" question.
+
+<Exercise id="ch02-alice-pays" />
+
+The table in the output shows the route: Alice → Bob → Chan → Dina, with a tiny fee for each hop. Payment status `SUCCEEDED` and a **preimage** mean Dina was paid: in lesson 8 you'll see why that secret is the receipt.
+
+If something gets stuck, press **Reset lesson** on any exercise to restore this lesson's starting channels.

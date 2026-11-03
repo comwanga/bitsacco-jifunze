@@ -1,0 +1,64 @@
+---
+title: "Lightning node software"
+description: "LND, c-lightning and Eclair all speak the same protocol but feel different to use. Ask all three the same question."
+level: intermediate
+minutes: 30
+objectives:
+  - Name the three main Lightning implementations and their languages
+  - Explain why different implementations can still pay each other
+  - Run the same query on LND, c-lightning and Eclair
+resources:
+  - title: "Mastering the Lightning Network, chapter 4: Lightning Node Software"
+    url: "https://github.com/lnbook/lnbook/blob/develop/04_node_client.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT specifications"
+    url: "https://github.com/lightning/bolts"
+    kind: docs
+    language: en
+reflection:
+  - "Why is it healthy for a network to have several independent implementations?"
+  - "Which implementation would you pick for a chama's node, and what would you want to know first?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - node
+  - open-source
+---
+
+A Lightning <Term id="node" /> is a program. Three <Term id="open-source" /> programs run most of the network:
+
+| Implementation | Made by | Written in | Its CLI |
+| --- | --- | --- | --- |
+| **LND** | Lightning Labs | Go | `lncli` |
+| **c-lightning** (Core Lightning) | Blockstream | C | `lightning-cli` |
+| **Eclair** | ACINQ | Scala | `eclair-cli` |
+
+They can pay each other because they all follow the same specifications, the **BOLTs** (Basis of Lightning Technology). A message from an LND node means exactly the same thing to an Eclair node.
+
+## Different tools, same network
+
+Each implementation makes its own choices: how amounts are shown (sats or millisats), what the commands are called, how plugins work. In your lab you already met two of them. Alice and Dina are LND; Bob and Chan are c-lightning.
+
+## Step 1: Start the full profile
+
+The book runs Chan on Eclair. In this lab, Eclair runs as a fifth node, **Erin**, so the routing lessons stay stable. Start it once:
+
+```bash
+./lab up --full
+```
+
+## Step 2: One question, three answers
+
+Ask each node for its alias. The commands differ; the answers come from the same protocol.
+
+<Exercise id="ch04-three-nodes" />
+
+Compare the full JSON of each `getinfo` if you like: all three report a public key, a network (`regtest`), a block height and channel counts, just under different names.
+
+When you're done, `./lab up` (without `--full`) stops Erin and frees about 1.5 GB of memory.

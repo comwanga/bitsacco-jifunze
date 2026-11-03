@@ -1,0 +1,66 @@
+---
+title: "Operating a Lightning Network node"
+description: "Running a node is a job: set the fees you charge for routing, back up your channels, and know what to watch."
+level: intermediate
+minutes: 35
+objectives:
+  - Explain how routing fees are calculated from a base fee and a fee rate
+  - Set Alice's routing fees and read the fee report
+  - Make a static channel backup and explain what it can and can't recover
+resources:
+  - title: "Mastering the Lightning Network, chapter 5: Operating a Lightning Network Node"
+    url: "https://github.com/lnbook/lnbook/blob/develop/05_node_operations.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "If Alice charges too much, what happens to the payments that would have used her channels?"
+  - "Why is a channel backup not the same as a copy of the whole node?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - fee
+  - backup
+  - node
+---
+
+Lesson 2 showed a payment paying a small <Term id="fee" /> at every hop. Those fees are set by the <Term id="node">nodes</Term> that forward the payment, and earning them takes some work.
+
+## Routing fees
+
+Every channel direction has a fee policy with two parts:
+
+- a **base fee**, a fixed amount per payment (in millisats), and
+- a **fee rate**, in parts per million (ppm) of the amount.
+
+For a 100,000-sat payment through a node charging 1 sat + 100 ppm:
+
+```text
+fee = 1 sat + 100,000 × 100 / 1,000,000 = 1 + 10 = 11 sats
+```
+
+Set fees too high and senders route around you; too low and you earn nothing for locking up your coins.
+
+## Step 1: Set Alice's fees
+
+<Exercise id="ch05-fees" />
+
+`feereport` lists each channel's new policy. The change is announced to the network, so other nodes will use it when they plan routes.
+
+## Backups
+
+A node's channels exist only as signed transactions in its database. If the disk dies, a seed phrase alone gets back the on-chain wallet, but **not** the channels.
+
+A **static channel backup** (SCB) records who your channels were with. After a disaster, your node uses it to ask each peer to close the channel, so you get your funds on-chain. It can't restore the channels themselves, and it is only as good as its last update, so keep it current.
+
+## Step 2: Back up Alice's channels
+
+<Exercise id="ch05-backup" />
+
+<Callout type="warning" title="Never restore an old database">
+Copying an old node database back can broadcast a revoked state, which the other side can punish by taking the whole channel. Use the static channel backup instead.
+</Callout>

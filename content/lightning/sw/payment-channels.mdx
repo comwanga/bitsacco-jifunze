@@ -1,0 +1,62 @@
+---
+title: "Chaneli za malipo"
+description: "Tazama ndani ya chaneli halisi: pata muamala wake wa ufadhili kwenye blockchain na uone jinsi miamala ya ahadi na ubatilishaji vinavyozifanya pande zote mbili ziwe waaminifu."
+level: intermediate
+minutes: 40
+objectives:
+  - Pata muamala wa ufadhili wa chaneli kutoka kwa channel point yake
+  - Eleza jinsi miamala ya ahadi inavyorekodi kila salio jipya
+  - Eleza jinsi ubatilishaji unavyoadhibu kuchapisha salio la zamani
+resources:
+  - title: "Mastering the Lightning Network, chapter 7: Payment Channels"
+    url: "https://github.com/lnbook/lnbook/blob/develop/07_payment_channels.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 3: Bitcoin transaction and script formats"
+    url: "https://github.com/lightning/bolts/blob/master/03-transactions.md"
+    kind: docs
+    language: en
+reflection:
+  - "Kwa nini kila upande una toleo tofauti la muamala wa ahadi?"
+  - "Bob angehitaji kufanya nini, na kwa haraka kiasi gani, kama Alice angechapisha salio la zamani?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - commitment-transaction
+  - multisig
+  - transaction
+  - utxo
+---
+
+Chaneli ni <Term id="utxo" />: tokeo moja kwenye blockchain, lililofungwa ili Alice na Bob tu kwa pamoja waweze kulitumia. Kila kitu kingine kuhusu chaneli ni seti ya <Term id="transaction">miamala</Term> iliyotiwa sahihi lakini haijachapishwa.
+
+## Muamala wa ufadhili
+
+LND huita chaneli kwa **channel point** yake, `txid:index`: muamala wa ufadhili na tokeo lipi kati ya matokeo yake linashika chaneli. Tokeo hilo ni <Term id="multisig" /> ya 2 kati ya 2, likiwa ndani ya hati ya pay-to-witness-script-hash (P2WSH), au tokeo la Taproot kwa aina mpya za chaneli.
+
+<Exercise id="ch07-funding-tx" />
+
+Thamani ya tokeo inalingana na uwezo wa chaneli. Hakuna kitu kwenye blockchain kinachoonyesha nani anamiliki kiasi gani; hilo liko kwenye nodi mbili tu.
+
+## Miamala ya ahadi
+
+Kila upande unashika <Term id="commitment-transaction" /> unaotumia tokeo la ufadhili na kulipa salio la sasa. Nakala ya Alice imetiwa sahihi na Bob, kwa hiyo anaweza kuichapisha wakati wowote, na nakala ya Bob imetiwa sahihi na Alice.
+
+Kwa kila malipo wanatia sahihi jozi mpya na kutupa ya zamani. Lakini muamala uliotupwa bado ni Bitcoin halali, kwa hiyo nini kinamzuia Alice kuchapisha wa zamani ambapo alikuwa na zaidi?
+
+## Ubatilishaji
+
+Wanapohamia hali mpya, Alice anampa Bob **siri ya ubatilishaji** ya ahadi yake iliyotangulia. Akiwahi kuchapisha ahadi hiyo ya zamani:
+
+- tokeo lake mwenyewe limefungwa kwa muda (kwa mfano bloku 144, takriban siku moja), na
+- katika muda huo Bob anaweza kutumia siri ya ubatilishaji kuchukua pesa **zote** za chaneli.
+
+Kwa hiyo kudanganya kunahatarisha kila kitu bila faida. Ndiyo maana nodi yako, au mlinzi wa mtandao, lazima iendelee kutazama blockchain.
+
+<Callout type="tip" title="Hazilingani kwa makusudi">
+Ahadi za Alice na Bob ni picha za kioo: katika kila moja, pesa za *anayechapisha* zinasubiri nyuma ya kufuli la muda, na upande mwingine unalipwa mara moja. Anayechapisha ndiye anayesubiri.
+</Callout>

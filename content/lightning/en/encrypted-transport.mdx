@@ -1,0 +1,54 @@
+---
+title: "Lightning's encrypted message transport"
+description: "Every peer link is encrypted and authenticated with the Noise protocol before a single Lightning message flows. What the handshake does, and what your node's connections look like."
+level: intermediate
+minutes: 25
+objectives:
+  - Explain why Lightning encrypts and authenticates every peer connection
+  - Describe the three acts of the Noise_XK handshake in plain words
+  - Inspect a node's live peer connections
+resources:
+  - title: "Mastering the Lightning Network, chapter 14: Lightning's Encrypted Message Transport"
+    url: "https://github.com/lnbook/lnbook/blob/develop/14_encrypted_transport.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 8: encrypted and authenticated transport"
+    url: "https://github.com/lightning/bolts/blob/master/08-transport.md"
+    kind: docs
+    language: en
+reflection:
+  - "Why does the connecting node need to know the other node's public key in advance?"
+  - "What could an attacker on the same Wi-Fi learn if Lightning messages were not encrypted?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - public-key
+  - node
+---
+
+When Alice connected to Bob in lesson 3, you typed `BOB_PUBKEY@bob:9735`. That <Term id="public-key" /> wasn't just an address: it is how Alice makes sure she is talking to the real Bob, over a link nobody else can read.
+
+## Why encrypt?
+
+Lightning messages reveal a lot: which channels you have, which payments you are forwarding, which HTLCs are pending. Without encryption, anyone on the network path could watch, or even change, them. BOLT 8 gives every peer connection **confidentiality** (nobody can read it), **integrity** (nobody can change it unnoticed) and **authentication** (you know who is on the other end).
+
+## The Noise handshake, in three acts
+
+Lightning uses the **Noise_XK** pattern. "K" means Alice already knows Bob's static public key.
+
+1. **Act one.** Alice sends a fresh, one-time public key, and proves she knows Bob's static key.
+2. **Act two.** Bob replies with his own one-time key. Both now share a secret that nobody watching can compute.
+3. **Act three.** Alice sends her static key, encrypted, and proves she owns it.
+
+After 50 + 50 + 66 bytes, both sides have encryption keys, which are rotated every 1,000 messages. Only then does the `init` message from last lesson flow.
+
+## Look at Alice's connections
+
+<Exercise id="ch14-peers" />
+
+Each peer shows its public key, the address it connected through, and how many bytes have flowed, all of them encrypted.

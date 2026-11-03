@@ -1,0 +1,63 @@
+---
+title: "Payment channels"
+description: "Look inside a real channel: find its funding transaction on-chain and see how commitment transactions and revocation keep both sides honest."
+level: intermediate
+minutes: 40
+objectives:
+  - Find a channel's funding transaction from its channel point
+  - Explain how commitment transactions record each new balance
+  - Explain how revocation punishes publishing an old balance
+resources:
+  - title: "Mastering the Lightning Network, chapter 7: Payment Channels"
+    url: "https://github.com/lnbook/lnbook/blob/develop/07_payment_channels.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 3: Bitcoin transaction and script formats"
+    url: "https://github.com/lightning/bolts/blob/master/03-transactions.md"
+    kind: docs
+    language: en
+reflection:
+  - "Why does each side hold a different version of the commitment transaction?"
+  - "What would Bob need to do, and how fast, if Alice published an old balance?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - commitment-transaction
+  - multisig
+  - transaction
+  - utxo
+---
+
+A channel is a <Term id="utxo" />: one output on the blockchain, locked so that only Alice and Bob together can spend it. Everything else about the channel is a set of unpublished, signed <Term id="transaction">transactions</Term>.
+
+## The funding transaction
+
+LND names a channel by its **channel point**, `txid:index`: the funding transaction and which of its outputs holds the channel. That output is a 2-of-2 <Term id="multisig" />, wrapped in a pay-to-witness-script-hash (P2WSH) script, or a Taproot output for newer channel types.
+
+<Exercise id="ch07-funding-tx" />
+
+The output value matches the channel's capacity. Nothing on-chain shows who owns how much of it; that lives only in the two nodes.
+
+## Commitment transactions
+
+Each side holds a <Term id="commitment-transaction" /> that spends the funding output and pays out the current balances. Alice's copy is signed by Bob, so she can publish it whenever she wants, and Bob's copy is signed by Alice.
+
+With each payment they sign a new pair and throw away the old one. But a thrown-away transaction is still valid Bitcoin, so what stops Alice from publishing an old one where she had more?
+
+## Revocation
+
+When they move to a new state, Alice hands Bob a **revocation secret** for her previous commitment. If she ever publishes that old commitment:
+
+- her own output is time-locked (for example 144 blocks, about a day), and
+- during that time Bob can use the revocation secret to take **all** the channel's funds.
+
+So cheating risks everything for nothing. This is why your node, or a watchtower, must keep watching the chain.
+
+<Callout type="tip" title="Asymmetric on purpose">
+Alice's and Bob's commitments are mirror images: in each, the *publisher's* own money waits behind the time lock, and the other side is paid at once. Whoever publishes takes the delay.
+</Callout>

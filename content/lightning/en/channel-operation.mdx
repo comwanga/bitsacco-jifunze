@@ -1,0 +1,57 @@
+---
+title: "Channel operation and payment forwarding"
+description: "Two ways to end a channel: a cooperative close that settles at once, and a force close where the time lock makes you wait. Do both."
+level: intermediate
+minutes: 40
+objectives:
+  - Explain the difference between a cooperative and a force close
+  - Close Alice's channel with Bob cooperatively
+  - Force-close Dina's channel with Chan and watch the time lock
+resources:
+  - title: "Mastering the Lightning Network, chapter 9: Channel Operation and Payment Forwarding"
+    url: "https://github.com/lnbook/lnbook/blob/develop/09_channel_operation.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 5: on-chain transaction handling"
+    url: "https://github.com/lightning/bolts/blob/master/05-onchain.md"
+    kind: docs
+    language: en
+reflection:
+  - "When would a node have no choice but to force close?"
+  - "Why do force closes cost more in fees than cooperative ones?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - force-close
+  - commitment-transaction
+  - htlc
+---
+
+While a channel is open, the two nodes keep adding and removing <Term id="htlc">HTLCs</Term> and signing new commitments: that is payment forwarding. Sooner or later, a channel ends.
+
+## Cooperative close
+
+Both nodes agree on the final balance and sign one new **closing transaction** that pays each side directly. There are no time locks, the fee is small and agreed, and both get their money as soon as it confirms. This is how a channel *should* end.
+
+<Exercise id="ch09-coop-close" />
+
+## Force close
+
+If the other side is offline, unresponsive or misbehaving, a node can <Term id="force-close" />: it publishes its latest <Term id="commitment-transaction" /> on its own. Then:
+
+- the other side is paid immediately,
+- the publisher's own output waits behind its time lock (`blocks_til_maturity`), and
+- any HTLCs still in flight are settled on-chain, each with its own deadline.
+
+<Exercise id="ch09-force-close" />
+
+Dina's funds now show as `limbo_balance` with a count of blocks to go. On regtest you can mine them away; on mainnet that wait could be a day or more.
+
+<Callout type="warning" title="After this lesson">
+These two channels are now closed. Any exercise's **Reset lesson** button reopens the channels the next lesson needs.
+</Callout>

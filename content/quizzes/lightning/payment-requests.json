@@ -1,0 +1,145 @@
+{
+  "lesson": "payment-requests",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "lnbc2500u ni sats ngapi?",
+        "en": "How many sats is lnbc2500u?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "250,000",
+            "en": "250,000"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "2,500",
+            "en": "2,500"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "25,000,000",
+            "en": "25,000,000"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "2500 × 10⁻⁶ BTC = 0.0025 BTC.",
+        "en": "2500 × 10⁻⁶ BTC = 0.0025 BTC."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kitenganishi cha ankara ni kipi?",
+        "en": "Which character separates the hrp from the data?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Nukta",
+            "en": "A dot"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "@",
+            "en": "@"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "1 ya mwisho",
+            "en": "The last 1"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Data ya bech32 haina 1.",
+        "en": "Bech32 data never contains a 1."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Sehemu ya p kwenye ankara ina nini?",
+        "en": "What does the p field hold?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Nenosiri",
+            "en": "A password"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Hashi ya malipo",
+            "en": "The payment hash"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Bei",
+            "en": "The price"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Ni hashi ya preimage.",
+        "en": "It's the hash of the preimage."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Ofa za BOLT 12 zinatofautiana vipi na ankara za BOLT 11?",
+        "en": "How do BOLT 12 offers differ from BOLT 11 invoices?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Zinaweza kutumika tena",
+            "en": "They can be reused"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Hazina kiasi kamwe",
+            "en": "They never have amounts"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ziko kwenye blockchain",
+            "en": "They live on-chain"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Pochi inapata ankara mpya kupitia Lightning.",
+        "en": "The wallet fetches a fresh invoice over Lightning."
+      }
+    }
+  ]
+}

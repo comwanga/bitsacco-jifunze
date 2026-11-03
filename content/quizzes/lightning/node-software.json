@@ -1,0 +1,145 @@
+{
+  "lesson": "node-software",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Ni utekelezaji upi umeandikwa kwa Go?",
+        "en": "Which implementation is written in Go?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "LND",
+            "en": "LND"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "c-lightning",
+            "en": "c-lightning"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Eclair",
+            "en": "Eclair"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "LND ni Go, c-lightning ni C, Eclair ni Scala.",
+        "en": "LND is Go, c-lightning is C, Eclair is Scala."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kwa nini LND inaweza kumlipa Eclair?",
+        "en": "Why can an LND node pay an Eclair node?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Zinatoka kampuni moja",
+            "en": "They come from the same company"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Hazilipani",
+            "en": "They can't"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Zote zinafuata vipimo vya BOLT",
+            "en": "They both follow the BOLT specifications"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "BOLT ni lugha ya pamoja ya Lightning.",
+        "en": "The BOLTs are Lightning's common language."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "CLI ya c-lightning inaitwaje?",
+        "en": "What is c-lightning's CLI called?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "eclair-cli",
+            "en": "eclair-cli"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "lightning-cli",
+            "en": "lightning-cli"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "lncli",
+            "en": "lncli"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "lncli ni LND, eclair-cli ni Eclair.",
+        "en": "lncli is LND, eclair-cli is Eclair."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Kwenye maabara, Eclair inaendeshwa na nodi gani?",
+        "en": "In the lab, which node runs Eclair?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Erin, katika wasifu kamili",
+            "en": "Erin, in the full profile"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Chan, daima",
+            "en": "Chan, always"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Alice",
+            "en": "Alice"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Washa kwa ./lab up --full.",
+        "en": "Start it with ./lab up --full."
+      }
+    }
+  ]
+}

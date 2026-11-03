@@ -1,0 +1,145 @@
+{
+  "lesson": "onion-routing",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Bob anajua nini kuhusu malipo anayopitisha?",
+        "en": "What does Bob learn about a payment he forwards?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Hatua inayofuata tu",
+            "en": "Only the next hop"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Njia yote",
+            "en": "The whole route"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Jina la mpokeaji",
+            "en": "The recipient's name"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Tabaka lake linasema tu apitishe wapi.",
+        "en": "His layer only says where to forward."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kwa nini kila kitunguu kina ukubwa sawa (baiti 1,366)?",
+        "en": "Why is every onion the same size (1,366 bytes)?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Ili iwe nafuu",
+            "en": "To make it cheaper"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ni bahati",
+            "en": "By chance"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ili hatua isiweze kuhesabu hatua zilizobaki",
+            "en": "So a hop can't count the remaining hops"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Vijazio vinaficha urefu wa njia.",
+        "en": "Filler hides the route length."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Tabaka la nje kabisa la kitunguu ni la nani?",
+        "en": "Whose layer is the outermost one?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Mchimbaji",
+            "en": "A miner"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Hatua ya kwanza (Bob)",
+            "en": "The first hop (Bob)"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Dina",
+            "en": "Dina"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Bob anamenya kwanza, kisha Chan, kisha Dina.",
+        "en": "Bob peels first, then Chan, then Dina."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "HMAC katika kila tabaka inafanya nini?",
+        "en": "What does the HMAC in each layer do?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Inagundua kitunguu kilichoharibiwa",
+            "en": "It detects a tampered onion"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Inaongeza ada",
+            "en": "It adds a fee"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Inahifadhi maneno ya siri",
+            "en": "It stores seed phrases"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Kitunguu kilichobadilishwa kinakataliwa.",
+        "en": "A modified onion is rejected."
+      }
+    }
+  ]
+}

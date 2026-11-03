@@ -1,0 +1,145 @@
+{
+  "lesson": "getting-started",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Ankara ya regtest inaanza na nini?",
+        "en": "How does a regtest invoice start?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "lnbcrt",
+            "en": "lnbcrt"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "bc1q",
+            "en": "bc1q"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "xpub",
+            "en": "xpub"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "ln = Lightning, bcrt = regtest.",
+        "en": "ln = Lightning, bcrt = regtest."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Msimbo wa kuunganisha wa maabara unazuia nini?",
+        "en": "What does the lab's pairing code prevent?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Malipo ya Lightning",
+            "en": "Lightning payments"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kusoma masomo",
+            "en": "Reading lessons"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Tovuti nyingine kuendesha amri kwenye kompyuta yako",
+            "en": "Other websites running commands on your laptop"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Maabara inajibu Jifunze tu, kwa msimbo wako tu.",
+        "en": "The lab only answers Jifunze, and only with your code."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Malipo ya Alice kwa Dina yalipitia njia gani?",
+        "en": "Which route did Alice's payment to Dina take?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Alice → benki → Dina",
+            "en": "Alice → a bank → Dina"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Alice → Bob → Chan → Dina",
+            "en": "Alice → Bob → Chan → Dina"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Alice → Dina moja kwa moja",
+            "en": "Alice → Dina directly"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Hakuna chaneli ya moja kwa moja; malipo yanapita kwa Bob na Chan.",
+        "en": "There's no direct channel; the payment hops through Bob and Chan."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Malipo yakifaulu, Alice anapata nini kinachothibitisha?",
+        "en": "When a payment succeeds, what does Alice receive as proof?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Preimage",
+            "en": "The preimage"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Maneno ya siri ya Dina",
+            "en": "Dina's seed phrase"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Barua pepe",
+            "en": "An email"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Preimage ni siri ambayo hashi yake iko kwenye ankara.",
+        "en": "The preimage is the secret whose hash is in the invoice."
+      }
+    }
+  ]
+}

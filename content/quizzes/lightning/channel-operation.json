@@ -1,0 +1,145 @@
+{
+  "lesson": "channel-operation",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Kufunga kwa ushirikiano kuna kufuli la muda?",
+        "en": "Does a cooperative close have a time lock?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Hapana; pande zote zinapata pesa zikithibitishwa",
+            "en": "No; both sides get paid once it confirms"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ndiyo, siku moja",
+            "en": "Yes, a day"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ndiyo, kwa Bob tu",
+            "en": "Yes, only for Bob"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Ni muamala mmoja uliokubaliwa.",
+        "en": "It's one agreed transaction."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Ni lini nodi inafunga kwa nguvu?",
+        "en": "When does a node force close?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kila siku",
+            "en": "Every day"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Inapopokea malipo",
+            "en": "When it receives a payment"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Upande mwingine haupo au una tabia mbaya",
+            "en": "When the other side is offline or misbehaving"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Kufunga kwa nguvu ni njia ya dharura.",
+        "en": "A force close is the emergency exit."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Baada ya kufunga kwa nguvu, pesa za mchapishaji zinaonekana wapi kwenye LND?",
+        "en": "After a force close, where do the publisher's funds show in LND?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kwa Chan",
+            "en": "With Chan"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "limbo_balance, zikisubiri kukomaa",
+            "en": "limbo_balance, waiting to mature"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Zimepotea",
+            "en": "They're lost"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "blocks_til_maturity inaonyesha bloku zilizobaki.",
+        "en": "blocks_til_maturity shows the blocks left."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Kwa nini kufunga kwa nguvu kunagharimu zaidi?",
+        "en": "Why does a force close cost more?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Miamala zaidi na ada zilizowekwa mapema",
+            "en": "More transactions and fees set in advance"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ni bure",
+            "en": "It's free"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Benki inatoza",
+            "en": "A bank charges for it"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Ahadi na HTLC zinamalizwa kwenye blockchain moja moja.",
+        "en": "The commitment and HTLCs settle on-chain one by one."
+      }
+    }
+  ]
+}

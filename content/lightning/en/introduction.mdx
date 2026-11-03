@@ -1,0 +1,60 @@
+---
+title: "Introduction: why the Lightning Network exists"
+description: "Bitcoin settles; Lightning moves. What problem Lightning solves, how it keeps Bitcoin's trust model, and what it costs you in return."
+level: beginner
+minutes: 15
+objectives:
+  - Explain why Bitcoin alone struggles with small, frequent payments
+  - Describe Lightning as payment channels on top of Bitcoin, without a trusted middleman
+  - Name two things Lightning asks of its users in return
+resources:
+  - title: "Mastering the Lightning Network, chapter 1: Introduction"
+    url: "https://github.com/lnbook/lnbook/blob/develop/01_introduction.asciidoc"
+    kind: book
+    language: en
+  - title: "Kujifunza Bitcoin, chapter 14: second-layer applications"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+reflection:
+  - "Which of your daily payments would you never make on-chain, and why?"
+  - "What does it mean for a payment system to be 'trustless', and is Lightning fully trustless?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - lightning
+  - channel
+  - block
+  - fee
+---
+
+Bitcoin adds a <Term id="block" /> about every ten minutes, and each block has limited space. When many people want to pay at once, the <Term id="fee">fees</Term> rise. That is fine for saving or for large payments, but nobody wants to wait ten minutes and pay a big fee for a cup of tea.
+
+## Payment channels
+
+The <Term id="lightning" /> fixes this with **payment channels**. Two people lock some bitcoin into a shared output on the blockchain once. After that, they can pay each other thousands of times by exchanging signed messages, without touching the blockchain at all. When they are done, they close the <Term id="channel" /> and the final balance is written on-chain.
+
+Channels link up. If Alice has a channel with Bob, and Bob has one with Chan, Alice can pay Chan through Bob, and Bob can't steal the money on the way. That network of channels is the Lightning Network.
+
+## What stays the same
+
+Lightning doesn't add a bank or a company in the middle. Every channel is enforced by Bitcoin's own rules: if someone cheats, the other side can prove it on-chain and take the funds. You keep your own keys.
+
+## What Lightning asks of you
+
+- **Be online.** Your node has to watch the blockchain so nobody closes a channel with an old balance. (Watchtowers can do this for you.)
+- **Manage liquidity.** You can only send what is on your side of a channel, and only receive what is on the other side.
+- **Accept some complexity.** Channels open, close and need balancing. This path teaches how.
+
+## Meet the lab
+
+This path follows *Mastering the Lightning Network*, and its characters live on your laptop: **Alice**, **Bob**, **Chan** and **Dina**, four real Lightning nodes on a private test network. From the next lesson you'll give them commands and watch payments move.
+
+<Callout type="tip" title="You need a laptop">
+Reading works on any phone. The exercises from lesson 2 onward need a laptop (Windows with WSL2, macOS or Linux) with Docker and about 8 GB of memory.
+</Callout>

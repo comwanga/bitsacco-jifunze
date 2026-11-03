@@ -1,0 +1,145 @@
+{
+  "lesson": "security-privacy",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Kwa nini malipo ya majaribio hayawezi kukamilika?",
+        "en": "Why can a probe payment never complete?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Hashi yake ni ya bahati nasibu; hakuna preimage",
+            "en": "Its hash is random; nobody has the preimage"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Hayana ada",
+            "en": "They pay no fee"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Yamezuiwa na benki",
+            "en": "A bank blocks them"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Dina anajibu kwamba hajui malipo hayo.",
+        "en": "Dina answers that she doesn't know the payment."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kupima kwa majaribio kunafichua nini?",
+        "en": "What does probing reveal?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Maneno ya siri",
+            "en": "Seed phrases"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Anwani ya nyumba",
+            "en": "A home address"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Salio la chaneli",
+            "en": "A channel's balance"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Kila kushindwa kunajibu swali la ndiyo au hapana.",
+        "en": "Each failure answers a yes-or-no question."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Kuziba chaneli kunafanya nini?",
+        "en": "What does channel jamming do?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kuchimba bloku",
+            "en": "Mines blocks"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kujaza nafasi za HTLC au kufunga ukwasi bila kumaliza malipo",
+            "en": "Fills HTLC slots or locks liquidity without settling"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kuiba funguo",
+            "en": "Steals keys"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Hadi nafasi 483 kwa kila upande zinaweza kujazwa.",
+        "en": "Up to 483 slots per side can be filled."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Kwa watumiaji wengi, hatari kubwa zaidi ni ipi?",
+        "en": "For most users, what is the biggest risk?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Maneno ya siri yaliyovuja au programu bandia",
+            "en": "A leaked seed phrase or a fake app"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kuziba chaneli",
+            "en": "Channel jamming"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Mashambulizi ya kutenganisha",
+            "en": "Eclipse attacks"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Hatari za kila siku huja kwanza.",
+        "en": "Everyday risks come first."
+      }
+    }
+  ]
+}

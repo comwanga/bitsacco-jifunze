@@ -1,0 +1,56 @@
+---
+title: "Routing on a network of payment channels"
+description: "How Alice pays Dina through two strangers without trusting either: hash time-locked contracts, step by step, then a real two-hop payment."
+level: intermediate
+minutes: 45
+objectives:
+  - Explain how an HTLC makes a payment conditional on a secret
+  - Explain why time locks decrease along the route
+  - Pay across two intermediate nodes and verify the preimage
+resources:
+  - title: "Mastering the Lightning Network, chapter 8: Routing on a Network of Payment Channels"
+    url: "https://github.com/lnbook/lnbook/blob/develop/08_routing_htlcs.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Why can't Bob take Alice's payment and keep it?"
+  - "What would go wrong if every hop had the same time lock?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - htlc
+  - preimage
+  - invoice
+---
+
+Alice wants to pay Dina 21,000 sats. They have no channel, but Alice → Bob → Chan → Dina is a path. Why would Bob and Chan, strangers to Alice, pass the money on honestly?
+
+## The promise: an HTLC
+
+1. Dina picks a random secret, the <Term id="preimage" />, and puts its hash in her <Term id="invoice" />.
+2. Alice offers Bob an <Term id="htlc" />: "21,002 sats are yours if you show me the secret behind this hash before block height *H*."
+3. Bob offers Chan the same deal for 21,001 sats, with an earlier deadline. Chan offers Dina 21,000 sats, earlier still.
+4. Dina knows the secret, so she reveals it to Chan and claims her 21,000. Chan now knows it and claims from Bob; Bob claims from Alice.
+
+Each hop keeps 1 sat as its fee. Nobody can claim without the secret, and the secret only travels backwards once Dina has been paid. If anything fails, the deadlines pass and every HTLC is cancelled: the whole payment happens, or none of it does.
+
+## Why the deadlines shrink
+
+Bob must have time to claim from Alice *after* Chan claims from him. So each hop's time lock is shorter than the one before it, by that node's `time_lock_delta` (you saw 80 blocks for LND in lesson 5).
+
+## Step 1: Pay through two hops
+
+<Exercise id="ch08-multihop" />
+
+The route table lists Bob and Chan, each taking a small fee.
+
+## Step 2: The preimage is the receipt
+
+Alice now holds the preimage. Hash it, and you get exactly the payment hash in Dina's invoice. That is proof she was paid, which Dina can't deny.
+
+<Exercise id="ch08-preimage" />

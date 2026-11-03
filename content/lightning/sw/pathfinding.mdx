@@ -1,0 +1,54 @@
+---
+title: "Kutafuta njia na kufikisha malipo"
+description: "Andika kitafuta-njia chako mwenyewe juu ya ramani halisi ya chaneli ya Alice, kisha uone kwa nini nodi halisi pia hujifunza kutoka majaribio yaliyoshindwa na kugawanya malipo makubwa."
+level: intermediate
+minutes: 50
+objectives:
+  - Eleza kwa nini kutafuta njia katika Lightning ni utafutaji bila uhakika kamili
+  - Tekeleza algorithimu ya Dijkstra ukitumia ada za upitishaji kama gharama
+  - Eleza mission control na malipo ya sehemu nyingi
+resources:
+  - title: "Mastering the Lightning Network, chapter 12: Pathfinding and Payment Delivery"
+    url: "https://github.com/lnbook/lnbook/blob/develop/12_path_finding.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Kitafuta-njia chako kinajua ada lakini si salio. Gharama nzuri inapaswa kujumuisha nini kingine?"
+  - "Kwa nini kugawanya malipo katika sehemu kunaweza kufaulu pale malipo moja makubwa yanaposhindwa?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - fee
+  - liquidity
+  - channel
+---
+
+Somo lililopita Alice alisoma ramani. Sasa lazima achague njia. Katika Lightning mlipaji ndiye anachagua njia yote, si mtandao, na lazima ifanye kazi bila kujua salio la mtu yeyote.
+
+## Tatizo la njia fupi zaidi, lenye mzunguko
+
+Fikiria kila upande wa chaneli kama barabara yenye ushuru, yaani <Term id="fee" /> ya upitishaji. Kutafuta njia nafuu zaidi ni tatizo la zamani la njia fupi zaidi, na algorithimu ya Dijkstra inalitatua: kila mara ongeza njia nafuu zaidi uliyopata hadi ufike unakoenda.
+
+Mzunguko: ramani inaonyesha uwezo, si <Term id="liquidity" />. Njia nafuu zaidi kwenye karatasi inaweza kushindwa kwa sababu <Term id="channel" /> haina salio upande unaohitajika.
+
+## Andika kitafuta-njia
+
+Msimbo wa kuanzia unageuza ramani ya Alice kuwa orodha ya majirani pamoja na sera zao za ada. Jaza `find_route` kwa Dijkstra, ukitumia `heapq`:
+
+<Exercise id="ch12-pathfind" />
+
+Kwenye maabara kuna njia moja tu, Alice → Bob → Chan → Dina, lakini kitendakazi chako kinajaribiwa kuhakikisha kila hatua inafuata chaneli halisi.
+
+## Nodi halisi zinavyofanya vizuri zaidi
+
+- **Gharama ya uwezekano.** Mbali na ada, nodi hupima uwezekano wa kila chaneli kuwa na salio la kutosha. Chaneli kubwa ukilinganisha na kiasi zinaonekana salama zaidi.
+- **Mission control.** Jaribio likishindwa, hitilafu inasema ni chaneli ipi ilishindwa. Nodi inakumbuka na kuiepuka kwa muda, kisha inajaribu tena. (Utaitumia katika somo la 16.)
+- **Malipo ya sehemu nyingi (MPP).** Malipo makubwa yanaweza kugawanywa katika sehemu ndogo kadhaa kupitia njia tofauti, kila moja ikiwa na uwezekano mkubwa wa kutosha. Dina anaachia preimage tu baada ya kila sehemu kufika.
+
+<Callout type="tip" title="Utafiti ulio kitabuni">
+Kazi ya mwandishi mwenza René Pickhardt kuhusu kutafuta njia kwa uwezekano, yaani malipo "yenye uhakika bora", sasa inaongoza jinsi utekelezaji kadhaa unavyochagua njia.
+</Callout>

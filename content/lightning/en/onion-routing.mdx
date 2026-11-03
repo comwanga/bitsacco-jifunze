@@ -1,0 +1,58 @@
+---
+title: "Onion routing"
+description: "How each node on a route learns only its neighbours: build and peel a toy onion in Python, then compare it with the real Sphinx format."
+level: intermediate
+minutes: 45
+objectives:
+  - Explain what each hop can and can't see in an onion-routed payment
+  - Build a layered encryption and peel it hop by hop
+  - "Name what real Lightning onions add: fixed size, shared secrets, HMACs"
+resources:
+  - title: "Mastering the Lightning Network, chapter 10: Onion Routing"
+    url: "https://github.com/lnbook/lnbook/blob/develop/10_onion_routing.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 4: onion routing protocol"
+    url: "https://github.com/lightning/bolts/blob/master/04-onion-routing.md"
+    kind: docs
+    language: en
+reflection:
+  - "Chan forwards the payment to Dina. Can Chan tell whether Dina is the final recipient?"
+  - "Why must every onion be the same size, however long the route?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - onion-routing
+  - node
+---
+
+When Alice pays Dina through Bob and Chan, Bob needs to know where to send the payment next, but not that it's going to Dina. <Term id="onion-routing" /> gives each <Term id="node" /> exactly what it needs and nothing more.
+
+## Layers, like an onion
+
+Alice knows the whole route. She builds a message in layers, innermost first:
+
+1. The **Dina** layer: "you are the final hop; the amount is 21,000."
+2. Wrapped in the **Chan** layer: "forward 21,000 to Dina."
+3. Wrapped in the **Bob** layer: "forward 21,001 to Chan."
+
+Each layer is encrypted with a key only that hop can work out. Bob peels his layer, reads "forward to Chan", and passes on the rest, which to him is random-looking bytes. Chan peels the next one. Only Dina's layer says "it's for you".
+
+## Build a toy onion
+
+The real thing uses elliptic-curve shared secrets and ChaCha20; ours uses a SHA-256 stream. The layering is the same idea. Fill in `wrap` and `peel`:
+
+<Exercise id="ch10-toy-onion" />
+
+The check runs your functions with random keys and messages, and makes sure the message only appears after the last layer.
+
+## What real onions add (Sphinx)
+
+- **Fixed size.** Every onion is 1,366 bytes, padded with filler, so a hop can't count the remaining hops.
+- **Per-hop shared secrets.** Alice uses a fresh ephemeral key per payment; each hop derives its secret with ECDH, and the key is blinded at every step so hops can't link the onion they received with the one they send on.
+- **HMACs.** Each layer carries an integrity tag. A tampered onion is rejected, and the error travels back encrypted, layer by layer, to Alice.

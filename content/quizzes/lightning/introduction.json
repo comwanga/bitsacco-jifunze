@@ -1,0 +1,145 @@
+{
+  "lesson": "introduction",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Kwa nini malipo madogo ya kila siku ni magumu moja kwa moja kwenye blockchain?",
+        "en": "Why are small everyday payments hard to make directly on-chain?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Bloku ni chache na ada zinaweza kuwa kubwa",
+            "en": "Blocks are slow and fees can be high"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Bitcoin haiwezi kugawanywa",
+            "en": "Bitcoin can't be divided"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Benki zinazuia",
+            "en": "Banks block them"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Bloku huja takriban kila dakika 10 na nafasi yake ni ndogo.",
+        "en": "Blocks come about every 10 minutes and space is limited."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Chaneli ya malipo inagusa blockchain lini?",
+        "en": "When does a payment channel touch the blockchain?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Inapofunguliwa na inapofungwa tu",
+            "en": "Only when it opens and closes"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kamwe",
+            "en": "Never"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kila malipo",
+            "en": "On every payment"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Malipo ya katikati ni jumbe zilizotiwa sahihi tu.",
+        "en": "Payments in between are just signed messages."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Nini kinazuia nodi ya kati kuiba malipo?",
+        "en": "What stops an intermediate node from stealing a payment?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Uaminifu wa kibinafsi tu",
+            "en": "Personal trust alone"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Sheria za Bitcoin zinazolinda chaneli",
+            "en": "Bitcoin's rules, which enforce the channels"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kampuni ya Lightning",
+            "en": "The Lightning company"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Hakuna kampuni katikati; kila chaneli inalindwa na Bitcoin.",
+        "en": "There's no company in the middle; Bitcoin enforces every channel."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Lightning inawaomba watumiaji nini?",
+        "en": "What does Lightning ask of its users?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kuwa hewani na kusimamia ukwasi",
+            "en": "To stay online and manage liquidity"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kumpa mtu funguo zao",
+            "en": "To hand someone their keys"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kulipa usajili",
+            "en": "To pay a subscription"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Nodi lazima itazame blockchain na chaneli zinahitaji salio pande sahihi.",
+        "en": "Nodes must watch the chain and channels need balance on the right side."
+      }
+    }
+  ]
+}

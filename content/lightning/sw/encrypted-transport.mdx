@@ -1,0 +1,53 @@
+---
+title: "Usafirishaji wa jumbe uliosimbwa wa Lightning"
+description: "Kila kiungo cha wenzako kinasimbwa na kuthibitishwa kwa itifaki ya Noise kabla ujumbe mmoja wa Lightning haujapita. Salamu ya mwanzo inafanya nini, na miunganisho ya nodi yako inaonekanaje."
+level: intermediate
+minutes: 25
+objectives:
+  - Eleza kwa nini Lightning inasimba na kuthibitisha kila muunganisho wa wenzako
+  - Eleza sehemu tatu za salamu ya Noise_XK kwa maneno rahisi
+  - Kagua miunganisho hai ya nodi
+resources:
+  - title: "Mastering the Lightning Network, chapter 14: Lightning's Encrypted Message Transport"
+    url: "https://github.com/lnbook/lnbook/blob/develop/14_encrypted_transport.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 8: encrypted and authenticated transport"
+    url: "https://github.com/lightning/bolts/blob/master/08-transport.md"
+    kind: docs
+    language: en
+reflection:
+  - "Kwa nini nodi inayounganisha inahitaji kujua ufunguo wa umma wa nodi nyingine mapema?"
+  - "Mshambuliaji kwenye Wi-Fi ile ile angejua nini kama jumbe za Lightning zisingesimbwa?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - public-key
+  - node
+---
+
+Alice alipounganisha na Bob katika somo la 3, uliandika `BOB_PUBKEY@bob:9735`. <Term id="public-key">Ufunguo huo wa umma</Term> haukuwa anwani tu: ndio jinsi Alice anavyohakikisha anazungumza na Bob halisi, kupitia kiungo ambacho hakuna mwingine anayeweza kukisoma.
+
+## Kwa nini kusimba?
+
+Jumbe za Lightning zinafichua mengi: una chaneli zipi, unapitisha malipo yapi, HTLC zipi zinasubiri. Bila usimbaji, yeyote kwenye njia ya mtandao angeweza kuzitazama, au hata kuzibadilisha. BOLT 8 inaupa kila muunganisho wa wenzako **usiri** (hakuna anayeweza kuusoma), **uadilifu** (hakuna anayeweza kuubadilisha bila kujulikana) na **uthibitisho** (unajua nani yuko upande mwingine).
+
+## Salamu ya Noise, katika sehemu tatu
+
+Lightning inatumia mpangilio wa **Noise_XK**. "K" inamaanisha Alice tayari anajua ufunguo wa umma wa kudumu wa Bob.
+
+1. **Sehemu ya kwanza.** Alice anatuma ufunguo mpya wa umma wa mara moja, na anathibitisha kwamba anajua ufunguo wa kudumu wa Bob.
+2. **Sehemu ya pili.** Bob anajibu kwa ufunguo wake wa mara moja. Sasa wote wawili wana siri ya pamoja ambayo hakuna mtazamaji anayeweza kuihesabu.
+3. **Sehemu ya tatu.** Alice anatuma ufunguo wake wa kudumu, ukiwa umesimbwa, na anathibitisha kwamba ni wake.
+
+Baada ya baiti 50 + 50 + 66, pande zote mbili zina funguo za usimbaji, ambazo hubadilishwa kila baada ya jumbe 1,000. Hapo tu ndipo ujumbe wa `init` wa somo lililopita unapita.
+
+## Tazama miunganisho ya Alice
+
+<Exercise id="ch14-peers" />
+
+Kila mwenzako anaonyesha ufunguo wake wa umma, anwani aliyounganishia, na baiti ngapi zimepita, zote zikiwa zimesimbwa.

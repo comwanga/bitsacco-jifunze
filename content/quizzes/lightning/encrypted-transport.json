@@ -1,0 +1,145 @@
+{
+  "lesson": "encrypted-transport",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Lightning inatumia mpangilio gani wa Noise?",
+        "en": "Which Noise pattern does Lightning use?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Noise_XK",
+            "en": "Noise_XK"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Noise_NN",
+            "en": "Noise_NN"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Hakuna",
+            "en": "None"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "K: anayeunganisha tayari anajua ufunguo wa kudumu wa mwenzake.",
+        "en": "K: the initiator already knows the other side's static key."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kwa nini unaunganisha kwa ufunguo_wa_umma@mwenyeji?",
+        "en": "Why do you connect with pubkey@host?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Ni mapambo tu",
+            "en": "It's just decoration"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ili kulipa ada",
+            "en": "To pay a fee"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ili kuthibitisha unazungumza na nodi sahihi",
+            "en": "To make sure you're talking to the right node"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Salamu inathibitisha mmiliki wa ufunguo huo.",
+        "en": "The handshake proves who owns that key."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Salamu ya Noise ina sehemu ngapi?",
+        "en": "How many acts does the Noise handshake have?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kumi",
+            "en": "Ten"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Tatu",
+            "en": "Three"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Moja",
+            "en": "One"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Baiti 50 + 50 + 66.",
+        "en": "50 + 50 + 66 bytes."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Usimbaji wa usafirishaji unalinda nini?",
+        "en": "What does transport encryption protect?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Usiri, uadilifu na uthibitisho",
+            "en": "Confidentiality, integrity and authentication"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Bei ya bitcoin",
+            "en": "The bitcoin price"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ada za uchimbaji",
+            "en": "Mining fees"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Hakuna anayeweza kusoma au kubadilisha jumbe bila kujulikana.",
+        "en": "Nobody can read or change messages unnoticed."
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+---
+title: "Programu za nodi za Lightning"
+description: "LND, c-lightning na Eclair zote zinazungumza itifaki moja lakini zinatofautiana kutumia. Uliza zote tatu swali moja."
+level: intermediate
+minutes: 30
+objectives:
+  - Taja utekelezaji mkuu tatu wa Lightning na lugha zake
+  - Eleza kwa nini utekelezaji tofauti bado unaweza kulipana
+  - Endesha swali lile lile kwenye LND, c-lightning na Eclair
+resources:
+  - title: "Mastering the Lightning Network, chapter 4: Lightning Node Software"
+    url: "https://github.com/lnbook/lnbook/blob/develop/04_node_client.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT specifications"
+    url: "https://github.com/lightning/bolts"
+    kind: docs
+    language: en
+reflection:
+  - "Kwa nini ni vizuri kwa mtandao kuwa na utekelezaji kadhaa unaojitegemea?"
+  - "Ungechagua utekelezaji gani kwa nodi ya chama, na ungetaka kujua nini kwanza?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - node
+  - open-source
+---
+
+<Term id="node">Nodi</Term> ya Lightning ni programu. Programu tatu za <Term id="open-source" /> huendesha sehemu kubwa ya mtandao:
+
+| Utekelezaji | Umetengenezwa na | Lugha | CLI yake |
+| --- | --- | --- | --- |
+| **LND** | Lightning Labs | Go | `lncli` |
+| **c-lightning** (Core Lightning) | Blockstream | C | `lightning-cli` |
+| **Eclair** | ACINQ | Scala | `eclair-cli` |
+
+Zinaweza kulipana kwa sababu zote zinafuata vipimo vilevile, yaani **BOLT** (Basis of Lightning Technology). Ujumbe kutoka nodi ya LND una maana ile ile kabisa kwa nodi ya Eclair.
+
+## Zana tofauti, mtandao mmoja
+
+Kila utekelezaji hufanya maamuzi yake: jinsi kiasi kinavyoonyeshwa (sats au millisats), majina ya amri, jinsi programu-jalizi zinavyofanya kazi. Kwenye maabara yako tayari umekutana na mbili. Alice na Dina ni LND; Bob na Chan ni c-lightning.
+
+## Hatua ya 1: Washa wasifu kamili
+
+Kitabu kinamwendesha Chan kwenye Eclair. Kwenye maabara hii, Eclair inaendeshwa kama nodi ya tano, **Erin**, ili masomo ya upitishaji yabaki imara. Iwashe mara moja:
+
+```bash
+./lab up --full
+```
+
+## Hatua ya 2: Swali moja, majibu matatu
+
+Uliza kila nodi jina lake. Amri zinatofautiana; majibu yanatoka kwenye itifaki ile ile.
+
+<Exercise id="ch04-three-nodes" />
+
+Ukipenda, linganisha JSON kamili ya kila `getinfo`: zote tatu zinaonyesha ufunguo wa umma, mtandao (`regtest`), urefu wa bloku na idadi ya chaneli, kwa majina tofauti tu.
+
+Ukimaliza, `./lab up` (bila `--full`) inamzima Erin na kuachia takriban GB 1.5 za kumbukumbu.

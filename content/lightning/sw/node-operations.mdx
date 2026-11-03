@@ -1,0 +1,65 @@
+---
+title: "Kuendesha nodi ya mtandao wa Lightning"
+description: "Kuendesha nodi ni kazi: weka ada unazotoza kwa kupitisha malipo, hifadhi nakala ya chaneli zako, na ujue cha kutazama."
+level: intermediate
+minutes: 35
+objectives:
+  - Eleza jinsi ada za upitishaji zinavyohesabiwa kutoka ada ya msingi na kiwango cha ada
+  - Weka ada za upitishaji za Alice na usome ripoti ya ada
+  - Tengeneza nakala tuli ya chaneli na ueleze inachoweza na isichoweza kurejesha
+resources:
+  - title: "Mastering the Lightning Network, chapter 5: Operating a Lightning Network Node"
+    url: "https://github.com/lnbook/lnbook/blob/develop/05_node_operations.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Alice akitoza ada kubwa mno, nini kitatokea kwa malipo ambayo yangetumia chaneli zake?"
+  - "Kwa nini nakala ya chaneli si sawa na nakala ya nodi nzima?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - fee
+  - backup
+  - node
+---
+
+Somo la 2 lilionyesha malipo yakilipa <Term id="fee" /> ndogo kwa kila hatua. Ada hizo huwekwa na <Term id="node">nodi</Term> zinazopitisha malipo, na kuzipata kunahitaji kazi.
+
+## Ada za upitishaji
+
+Kila upande wa chaneli una sera ya ada yenye sehemu mbili:
+
+- **ada ya msingi**, kiasi kisichobadilika kwa kila malipo (kwa millisats), na
+- **kiwango cha ada**, kwa sehemu kwa milioni (ppm) ya kiasi.
+
+Kwa malipo ya sats 100,000 kupitia nodi inayotoza sat 1 + ppm 100:
+
+```text
+ada = sat 1 + 100,000 × 100 / 1,000,000 = 1 + 10 = sats 11
+```
+
+Ukiweka ada kubwa mno, walipaji wanakupita; ndogo mno, hupati chochote kwa kufunga sarafu zako.
+
+## Hatua ya 1: Weka ada za Alice
+
+<Exercise id="ch05-fees" />
+
+`feereport` inaorodhesha sera mpya ya kila chaneli. Badiliko linatangazwa kwa mtandao, kwa hiyo nodi nyingine zitalitumia zinapopanga njia.
+
+## Nakala za akiba
+
+Chaneli za nodi zipo tu kama miamala iliyotiwa sahihi kwenye hifadhidata yake. Diski ikiharibika, maneno ya siri peke yake yanarudisha pochi ya blockchain, lakini **si** chaneli.
+
+**Nakala tuli ya chaneli** (SCB) inarekodi ulikuwa na chaneli na nani. Baada ya maafa, nodi yako inaitumia kumwomba kila mwenzako afunge chaneli, ili upate pesa zako kwenye blockchain. Haiwezi kurejesha chaneli zenyewe, na ni nzuri kadiri ilivyosasishwa mara ya mwisho, kwa hiyo iweke ya sasa.
+
+## Hatua ya 2: Hifadhi nakala ya chaneli za Alice
+
+<Exercise id="ch05-backup" />
+
+<Callout type="warning" title="Usirejeshe kamwe hifadhidata ya zamani">
+Kunakili hifadhidata ya zamani ya nodi kunaweza kuchapisha hali iliyobatilishwa, na upande mwingine unaweza kuadhibu kwa kuchukua chaneli nzima. Tumia nakala tuli ya chaneli badala yake.
+</Callout>

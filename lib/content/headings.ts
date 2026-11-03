@@ -27,11 +27,14 @@ function textOf(node: Node): string {
   return (node.children ?? []).map(textOf).join("");
 }
 
+/** Ids the lesson page already uses for its own landmarks and sections; headings must not take them. */
+const RESERVED = ["main", "obj", "terms", "reflect", "res", "quiz-title", "practice-title"];
+
 /** Every ## and ### in document order, paired with its unique id. The one place ids are decided. */
 function collect(tree: Node): { node: Node; heading: Heading }[] {
   const out: { node: Node; heading: Heading }[] = [];
   const seen = new Map<string, number>();
-  const used = new Set<string>();
+  const used = new Set<string>(RESERVED);
   const walk = (node: Node) => {
     if (node.type === "heading" && (node.depth === 2 || node.depth === 3)) {
       const text = textOf(node).replace(/\s+/g, " ").trim();

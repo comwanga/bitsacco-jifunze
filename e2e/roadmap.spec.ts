@@ -20,5 +20,13 @@ test("roadmap resumes the next lesson and counts completion by section", async (
   await page.reload();
   await expect(page.locator("[data-resume]")).toHaveText("Endelea");
   await expect(page.locator("[data-resume]")).toHaveAttribute("href", "/sw/savers/sats-and-volatility/");
-  await expect(page.getByRole("heading", { name: /Misingi/ })).toContainText("1 / 2");
+  const heading = page.getByRole("heading", { name: "Misingi", exact: true }); // progress is not part of the heading
+  await expect(heading).toBeVisible();
+  await expect(page.locator('[data-section-progress="misingi"]')).toHaveText("1 / 2 umemaliza");
+});
+
+test("tree section headings are named by their title alone", async ({ page }) => {
+  await page.goto("/sw/tree/savers/");
+  await expect(page.getByRole("heading", { level: 2, name: "Misingi", exact: true })).toBeVisible();
+  await expect(page.locator('[data-section-progress="misingi"]')).toHaveText("0 / 2 umemaliza");
 });

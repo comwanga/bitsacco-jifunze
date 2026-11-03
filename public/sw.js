@@ -29,12 +29,19 @@ const PRECACHE = [
 ];
 
 // The offline pages must hydrate without a connection, so cache the scripts and styles they use.
+function staticAssetsOf(html) {
+  // Modern browsers do not need noModule polyfills. Only inspect actual asset tags,
+  // not paths embedded in serialized React data or inline scripts.
+  const modern = html.replace(/<script\b[^>]*\bnomodule\b[^>]*>[\s\S]*?<\/script>/gi, "");
+  return [...modern.matchAll(/<(?:script|link)\b[^>]*?\b(?:src|href)=["'](\/_next\/static\/[^"']+)["']/gi)].map((m) => m[1]);
+}
+
 async function precacheAssetsOf(pagesCache, paths) {
   const assets = new Set();
   for (const p of paths) {
     const res = await pagesCache.match(p);
     if (!res) continue;
-    for (const m of (await res.text()).matchAll(/\/_next\/static\/[^"'\s)]+/g)) assets.add(m[0]);
+    for (const asset of staticAssetsOf(await res.text())) assets.add(asset);
   }
   const statics = await caches.open(STATIC);
   await Promise.all([...assets].map((a) => statics.add(a).catch(() => undefined)));

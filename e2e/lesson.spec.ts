@@ -42,3 +42,15 @@ test("the reading progress bar fills as you scroll", async ({ page }) => {
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await expect.poll(() => bar.evaluate((el) => getComputedStyle(el).transform)).not.toBe(before);
 });
+
+test("on a phone, opening one lesson menu closes the other", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile", "phone menus only");
+  await page.goto(LESSON);
+  const course = page.locator("details[data-lesson-menu]").nth(0);
+  const toc = page.locator("details[data-lesson-menu]").nth(1);
+  await course.locator("summary").click();
+  await expect(course).toHaveAttribute("open", "");
+  await toc.locator("summary").click();
+  await expect(toc).toHaveAttribute("open", "");
+  await expect(course).not.toHaveAttribute("open", "");
+});

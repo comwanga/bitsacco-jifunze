@@ -1,0 +1,15 @@
+.learning-tree { position: relative; padding-left: 1.5rem; }
+.learning-tree::before { content: ""; position: absolute; top: 0; bottom: 0; left: .25rem; width: 3px; border-radius: 2px; background: var(--color-teal-600); }
+.tree-node { position: relative; padding-bottom: 1.5rem; min-width: 0; overflow-wrap: anywhere; }
+.tree-node::before { content: ""; position: absolute; left: -1.25rem; top: 2rem; width: 1.25rem; height: 3px; background: var(--color-teal-600); }
+.tree-node::after { content: ""; position: absolute; top: 1.8rem; left: -1.5rem; width: .65rem; height: .65rem; border-radius: 50%; background: var(--color-dawn); border: 2px solid var(--color-teal-700); }
+@media (min-width: 768px) {
+  .learning-tree { padding-left: 0; }
+  .learning-tree::before { left: calc(50% - 1.5px); }
+  .tree-node { width: 50%; padding-right: 2rem; }
+  .tree-node:nth-child(even) { margin-left: 50%; padding-right: 0; padding-left: 2rem; }
+  .tree-node::before { left: auto; right: 0; width: 2rem; }
+  .tree-node::after { left: auto; right: -.325rem; }
+  .tree-node:nth-child(even)::before { left: 0; right: auto; }
+  .tree-node:nth-child(even)::after { left: -.325rem; right: auto; }
+}

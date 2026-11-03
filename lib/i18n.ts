@@ -22,6 +22,9 @@ export function switchHref(pathname: string, to: Lang): string {
 const sw = {
   siteName: "Bitsacco Jifunze",
   navPaths: "Njia",
+  pathView: "Mwonekano wa njia",
+  viewList: "Orodha",
+  viewTree: "Mti",
   navLabs: "Maabara",
   catalogTitle: "Masomo yote",
   catalogLead: "Tafuta somo na uchague njia, kiwango au aina ya somo.",
@@ -183,6 +186,9 @@ export type DictKey = keyof typeof sw;
 const en: Record<DictKey, string> = {
   siteName: "Bitsacco Jifunze",
   navPaths: "Paths",
+  pathView: "Path view",
+  viewList: "List",
+  viewTree: "Tree",
   navLabs: "Labs",
   catalogTitle: "All lessons",
   catalogLead: "Find a lesson and filter by path, level or lesson type.",

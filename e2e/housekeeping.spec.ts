@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { indexablePaths } from "../lib/content/routes";
+import { LANGS } from "../lib/i18n";
 
 test("static metadata includes lessons and language alternatives", async ({ request }, info) => {
   test.skip(info.project.name !== "desktop", "static files are shared by both projects");
@@ -7,7 +9,10 @@ test("static metadata includes lessons and language alternatives", async ({ requ
   const xml = await sitemap.text();
   expect(xml).toContain("/sw/savers/wallets-keys/");
   expect(xml).toContain("/en/lightning/conclusion/");
-  expect(xml.match(/<url>/g)).toHaveLength(84);
+  expect(xml.match(/<url>/g)).toHaveLength(indexablePaths().length * LANGS.length);
+  expect(xml).not.toContain("/offline/");
+  expect(xml).toContain("/en/tree/lightning/");
+  expect(xml).toContain("/sw/simulations/channel-balances/");
   expect(xml).toContain('hreflang="sw"');
   expect(xml).toContain('hreflang="en"');
   const robots = await request.get("/robots.txt");

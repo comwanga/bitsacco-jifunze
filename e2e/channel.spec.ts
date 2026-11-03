@@ -1,0 +1,32 @@
+import { expect, test } from "@playwright/test";
+import { simulationCopy } from "../lib/simulations/copy";
+
+for (const lang of ["en", "sw"] as const) test(`channel direction, conservation, errors and reset in ${lang}`, async ({ page }) => {
+  const c = simulationCopy[lang];
+  await page.goto(`/${lang}/simulations/channel-balances/`);
+  await page.evaluate(() => localStorage.setItem("jifunze:progress:v1", JSON.stringify({ app: "bitsacco-jifunze", version: 1, lessons: { "savers/money-and-bitcoin": { completedAt: "2026-11-03T10:00:00Z" } } })));
+  const saved = await page.evaluate(() => localStorage.getItem("jifunze:progress:v1"));
+  await page.getByRole("button", { name: c.start, exact: true }).click();
+  const sim = page.locator('[data-module="CHANNEL_INTERACTIVE_MODULE"]');
+  const legend = sim.locator("[data-channel-legend]");
+  await expect(legend).toBeVisible();
+  await expect(legend).toContainText(c.alice);
+  await expect(legend).toContainText(c.bob);
+  await sim.getByRole("button", { name: c.send, exact: true }).click();
+  await expect(sim.locator("[data-alice]")).toHaveText("49,000");
+  await expect(sim.locator("[data-bob]")).toHaveText("51,000");
+  await sim.getByLabel(c.recipient, { exact: true }).fill("60000");
+  await sim.getByRole("button", { name: c.send, exact: true }).click();
+  await expect(sim.getByRole("alert")).toHaveText(c.channelFunds);
+  await expect(sim.locator("[data-alice]")).toHaveText("49,000");
+  await sim.getByRole("radio", { name: c.bobToAlice, exact: true }).check();
+  await sim.getByLabel(c.recipient, { exact: true }).fill("10000");
+  await sim.getByRole("button", { name: c.send, exact: true }).click();
+  await expect(sim.locator("[data-alice]")).toHaveText("59,000");
+  await expect(sim.locator("[data-bob]")).toHaveText("41,000");
+  await expect(sim.getByRole("button", { name: c.send, exact: true })).toBeFocused();
+  await sim.getByRole("button", { name: c.reset, exact: true }).click();
+  await expect(sim.locator("[data-alice]")).toHaveText("70,000");
+  await expect(sim.locator("[data-bob]")).toHaveText("30,000");
+  expect(await page.evaluate(() => localStorage.getItem("jifunze:progress:v1"))).toBe(saved);
+});

@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProgressTick } from "@/components/roadmap/ProgressTick";
-import { RoadmapProgress } from "@/components/roadmap/RoadmapProgress";
+import { PathHeader } from "@/components/roadmap/PathHeader";
 import { SectionProgress } from "@/components/roadmap/SectionProgress";
-import { ResumeLink } from "@/components/home/ResumeLink";
 import { buildCatalog } from "@/lib/content/catalog";
 import { flatLessons, getLesson, getRoadmap, listRoadmaps } from "@/lib/content/load";
 import type { RoadmapId } from "@/lib/content/schemas";
-import { t, type DictKey, type Lang } from "@/lib/i18n";
+import { t, type Lang } from "@/lib/i18n";
 
 export const dynamicParams = false;
 
@@ -23,8 +22,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return { title: r.title[lang as Lang], description: r.description[lang as Lang] };
 }
 
-const BRANCH: Record<RoadmapId, DictKey> = { savers: "branchSavers", builders: "branchBuilders", lightning: "branchLightning" };
-
 export default async function RoadmapPage({ params }: Params) {
   const { lang: l, roadmap: rid } = await params;
   const lang = l as Lang;
@@ -37,27 +34,17 @@ export default async function RoadmapPage({ params }: Params) {
 
   return (
     <>
-      <section className="bg-night px-4 pt-6 pb-10 text-white">
-        <div className="mx-auto max-w-3xl">
-          <p className="text-sm font-semibold text-dawn">{t(lang, BRANCH[r.id])}</p>
-          <h1 id="roadmap-title" className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">{r.title[lang]}</h1>
-          <p className="mt-2 text-lg text-white/85">{r.tagline[lang]}</p>
-          <p className="mt-3 max-w-prose text-white/75">{r.description[lang]}</p>
-          <p className="mt-3 text-sm text-white/60">
-            {slugs.length} {t(lang, "lessons")}, {minutes} {t(lang, "minutes")}
-          </p>
-          <RoadmapProgress roadmap={r.id} slugs={slugs} lang={lang} />
-          <ResumeLink roadmap={r.id} slugs={slugs} lang={lang} describedBy="roadmap-title" className="mt-5 inline-block rounded-full bg-sun-deep px-5 py-2.5 font-semibold text-white" />
-        </div>
-      </section>
+      <PathHeader path={{ id: r.id, title: r.title[lang], tagline: r.tagline[lang], description: r.description[lang] }} lang={lang} slugs={slugs} minutes={minutes} view="list" />
 
       <div className="mx-auto max-w-3xl px-4 py-10">
         {r.sections.map((section) => (
           <section key={section.id} className="mb-10" aria-labelledby={`s-${section.id}`}>
-            <h2 id={`s-${section.id}`} className="text-xl font-bold">
-              {section.title[lang]}
-              <SectionProgress roadmap={r.id} slugs={section.lessons.map((e) => e.slug)} lang={lang} />
-            </h2>
+            <div className="flex flex-wrap items-baseline gap-x-3">
+              <h2 id={`s-${section.id}`} className="text-xl font-bold">
+                {section.title[lang]}
+              </h2>
+              <SectionProgress section={section.id} roadmap={r.id} slugs={section.lessons.map((e) => e.slug)} lang={lang} />
+            </div>
             <ol className="mt-4 space-y-2">
               {section.lessons.map((entry) => {
                 const n = slugs.indexOf(entry.slug) + 1;

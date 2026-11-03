@@ -29,6 +29,8 @@ npm run dev          # http://localhost:3000/sw/
 ```bash
 npm run check        # lint, typecheck, unit tests, content validation
 npm run build        # static export to out/, then CSP hashes, link check and performance budget
+npm run check:ux-budget # stricter Phase 1/2 page budgets, after the build
+npm run e2e          # Chromium desktop/mobile flows, axe and activated script budgets
 ```
 
 `npm run build` runs `scripts/postbuild.ts` after `next build`. It:
@@ -36,7 +38,26 @@ npm run build        # static export to out/, then CSP hashes, link check and pe
 - adds a per-page Content Security Policy with hashes of that page's inline scripts;
 - stamps the service worker with the build ID;
 - fails on any broken internal link;
-- fails if the first lesson page is over **200 KB** gzip, or if any page's JavaScript is over **150 KB** gzip. It also warns above the spec's 100 KB target; see "Known gaps" below.
+- fails if the first lesson page is over **200 KB** gzip, or if ordinary-page JavaScript is over **150 KB** gzip (**165 KB** for live labs). It also warns above the spec's 100 KB target; see "Known gaps" below.
+
+CI additionally runs `npm run check:ux-budget` for the tighter Phase 1/2 limits and browser checks for requested simulation chunks. Install the browser once with `npx playwright install chromium` before running local browser checks.
+
+## Learning trees and practice
+
+Each roadmap offers **List / Tree** navigation. The tree uses the existing sections, lesson order, prerequisites and saved progress. Its lesson links also work without JavaScript; prerequisites are suggestions and never lock a lesson.
+
+- `/{lang}/tree/{savers,builders,lightning}/`: learning trees.
+- `/{lang}/simulations/`: practice index, linked from the catalogue.
+- `/{lang}/simulations/utxo/`: example coin selection, inputs, payment, fees and change.
+- `/{lang}/simulations/channel-balances/`: settled two-party payments with a fixed 100,000 sat model capacity.
+
+Simulation explanations and worked examples are server-rendered in Kiswahili and English. Start loads only the chosen interactive module. The designated lessons link to simulations through a central registry, and every simulation links back to its lessons. These are arithmetic practice models: they do not sign, broadcast, connect to a node or mark lessons/exercises complete. Model state resets on reload.
+
+Previously opened explanations remain readable offline. An interactive module works offline after it has been activated and cached; a never-loaded module needs a connection and shows a retry message. Browser tests cover both cases. Service-worker asset precaching excludes legacy-only polyfills and reads actual asset tags.
+
+Initial JavaScript caps (gzip KB) are home 144.9, catalogue 145.0, roadmap/tree 145.1, ordinary lesson 147.3, live lab 153.2, and simulation pages 145.0. Activated simulations must stay within 150.0 KB total and 6.0 KB of additional chunks. Browser measurements include requests from the service worker and dynamic imports; passing an initial HTML-reference measurement alone is insufficient.
+
+See the [Phase 2 design](docs/superpowers/specs/2026-11-03-phase-2-ux-design.md) and [implementation plan](docs/superpowers/plans/2026-11-03-phase-2-ux.md) for scope and verification.
 
 ## Run the container
 

@@ -16,7 +16,7 @@ test("the language switch keeps you on the same lesson", async ({ page }) => {
 test("pages never scroll sideways on a phone", async ({ page }, info) => {
   test.skip(info.project.name !== "mobile", "phone layout only");
   await page.setViewportSize({ width: 360, height: 800 });
-  for (const path of ["/sw/", "/sw/learn/", "/en/learn/", "/sw/savers/", "/sw/savers/wallets-keys/", "/en/lightning/routing-htlcs/", "/sw/glossary/"]) {
+  for (const path of ["/sw/", "/sw/learn/", "/en/learn/", "/sw/savers/", "/sw/savers/wallets-keys/", "/en/lightning/routing-htlcs/", "/sw/glossary/", "/sw/tree/lightning/", "/en/simulations/", "/sw/simulations/utxo/", "/sw/simulations/channel-balances/"]) {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, `${path} overflows by ${overflow}px`).toBeLessThanOrEqual(0);

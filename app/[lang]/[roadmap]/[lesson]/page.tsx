@@ -6,6 +6,7 @@ import { MarkComplete } from "@/components/lesson/MarkComplete";
 import { Toc } from "@/components/lesson/Toc";
 import { KeyTerms, Objectives, PrevNext, Reflection, Resources, SourceCredit } from "@/components/lesson/LessonParts";
 import { Quiz } from "@/components/quiz/Quiz";
+import { LessonPracticeLinks } from "@/components/simulations/LessonPracticeLinks";
 import { flatLessons, getGlossary, getLesson, getQuiz, getRoadmap, listRoadmaps } from "@/lib/content/load";
 import { extractHeadings } from "@/lib/content/headings";
 import { exerciseIds, renderLessonBody } from "@/lib/content/mdx";
@@ -91,6 +92,7 @@ export default async function LessonPage({ params }: Params) {
       <KeyTerms lang={lang} terms={terms} />
 
       <div className="lesson-body">{body}</div>
+      <LessonPracticeLinks lessonKey={key} lang={lang} />
 
       <Reflection lang={lang} prompts={fm.reflection} />
 

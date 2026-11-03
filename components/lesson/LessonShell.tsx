@@ -4,7 +4,7 @@ import { ReadingProgress } from "./ReadingProgress";
 
 function PhoneMenu({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <details data-lesson-menu className="group">
+    <details data-lesson-menu name="lesson-menu" className="group">
       <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-[var(--line)] px-3 py-1.5 text-sm font-semibold [&::-webkit-details-marker]:hidden">
         {label}
         <span aria-hidden="true" className="text-xs transition-transform group-open:rotate-180 motion-reduce:transition-none">

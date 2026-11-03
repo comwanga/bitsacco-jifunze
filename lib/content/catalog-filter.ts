@@ -1,3 +1,4 @@
+import type { Lang } from "../i18n.ts";
 import type { RoadmapId } from "./schemas.ts";
 
 export type LessonType = "reading" | "quiz" | "lab";
@@ -12,6 +13,8 @@ export type CatalogEntry = {
   level: "beginner" | "intermediate" | "advanced";
   minutes: number;
   types: LessonType[];
+  /** Language of the title and description; differs from the page language when a translation is missing. */
+  contentLang: Lang;
 };
 
 function norm(text: string): string {

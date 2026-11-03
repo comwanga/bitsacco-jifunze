@@ -9,14 +9,15 @@ const subscribe = () => () => {};
 const clientSnapshot = () => true;
 const serverSnapshot = () => false;
 
-export function SectionProgress({ roadmap, slugs, lang }: { roadmap: RoadmapId; slugs: string[]; lang: Lang }) {
+/** "1 / 3 done" for one section. Sits beside the section heading so the heading's name stays the title. */
+export function SectionProgress({ section, roadmap, slugs, lang }: { section: string; roadmap: RoadmapId; slugs: string[]; lang: Lang }) {
   const { progress } = useProgress();
   const ready = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
   if (!ready) return null;
   const done = slugs.filter((s) => progress.lessons[`${roadmap}/${s}`]?.completedAt).length;
   return (
-    <span className="ml-3 inline-block text-sm font-normal text-[var(--muted)]" aria-live="polite" aria-atomic="true">
+    <p data-section-progress={section} className="text-sm text-[var(--muted)]">
       {done} / {slugs.length} {t(lang, "done")}
-    </span>
+    </p>
   );
 }

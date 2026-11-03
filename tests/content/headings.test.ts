@@ -54,3 +54,14 @@ describe("rendered lessons carry the heading ids", () => {
     expect(ids).toEqual(["kazi-tatu-za-pesa", "hatua-ya-1-mfumo-wa-utxo", "jaribu", "jaribu-2", "jaribu-2-2"]);
   });
 });
+
+describe("headings never reuse ids the lesson page already owns", () => {
+  test("Terms, Main and Resources-style headings get a suffix instead of colliding", () => {
+    expect(extractHeadings(["## Terms", "## Main", "## Obj", "## Practice title"].join("\n\n")).map((h) => h.id)).toEqual([
+      "terms-2",
+      "main-2",
+      "obj-2",
+      "practice-title-2",
+    ]);
+  });
+});

@@ -58,10 +58,10 @@ export function CatalogList({ lang, entries }: { lang: Lang; entries: CatalogEnt
         {shown.map((e) => (
           <li key={`${e.roadmap}/${e.slug}`} data-catalog-entry={`${e.roadmap}/${e.slug}`} className="py-5">
             <p className="text-sm text-[var(--muted)]">{e.roadmapTitle} · {e.section} · {e.n}</p>
-            <h2 className="mt-1 text-xl font-bold">
+            <h2 className="mt-1 text-xl font-bold" lang={e.contentLang !== lang ? e.contentLang : undefined}>
               <Link prefetch={false} href={`/${lang}/${e.roadmap}/${e.slug}/`} className="underline decoration-teal-600/50 underline-offset-4 hover:text-teal-700 dark:hover:text-teal-400">{e.title}</Link>
             </h2>
-            <p className="mt-1 text-[var(--muted)]">{e.description}</p>
+            <p className="mt-1 text-[var(--muted)]" lang={e.contentLang !== lang ? e.contentLang : undefined}>{e.description}</p>
             <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
               <span>{e.minutes} {t(lang, "minutes")}</span>
               <span>{t(lang, `level_${e.level}`)}</span>

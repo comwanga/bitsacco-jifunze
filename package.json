@@ -12,7 +12,10 @@
     "test": "vitest run",
     "validate": "node scripts/validate-content.ts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run validate",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "api:typecheck": "tsc -p api --noEmit",
+    "api:test": "vitest run --config api/vitest.config.ts",
+    "api:start": "node api/src/main.ts"
   },
   "dependencies": {
     "@mdx-js/mdx": "3.1.1",

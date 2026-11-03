@@ -1,0 +1,10 @@
+{
+  "name": "bitsacco-jifunze-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "postgres": "3.4.7",
+    "zod": "4.6.7"
+  }
+}

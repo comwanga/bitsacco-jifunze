@@ -8,8 +8,9 @@ import "./baobab.css";
  */
 export function BaobabScene({ lang }: { lang: Lang }) {
   const branches = [
-    { x: 531, href: `/${lang}/savers/`, label: t(lang, "branchSavers") },
-    { x: 669, href: `/${lang}/builders/`, label: t(lang, "branchBuilders") },
+    { x: 531, y: 58, href: `/${lang}/savers/`, label: t(lang, "branchSavers") },
+    { x: 603, y: 18, href: `/${lang}/lightning/`, label: t(lang, "branchLightning") },
+    { x: 669, y: 58, href: `/${lang}/builders/`, label: t(lang, "branchBuilders") },
   ];
   return (
     <svg
@@ -125,8 +126,8 @@ export function BaobabScene({ lang }: { lang: Lang }) {
 
       {branches.map((b) => (
         <a key={b.href} href={b.href} className="mb-label">
-          <rect x={b.x - 44} y={58} width={88} height={26} rx={13} fill="#170d09" fillOpacity=".55" />
-          <text x={b.x} y={76} textAnchor="middle" fontSize="14" fontWeight="700" fill="#fde6c2">
+          <rect x={b.x - 44} y={b.y} width={88} height={26} rx={13} fill="#170d09" fillOpacity=".55" />
+          <text x={b.x} y={b.y + 18} textAnchor="middle" fontSize="14" fontWeight="700" fill="#fde6c2">
             {b.label}
           </text>
         </a>

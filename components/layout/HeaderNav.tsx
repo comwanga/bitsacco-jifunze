@@ -40,7 +40,8 @@ export function HeaderNav({ items, label, menuLabel, children }: { items: NavIte
             <path className="group-open:hidden" d="M3 5.5h14M3 10h14M3 14.5h14" />
             <path className="hidden group-open:block" d="M5 5l10 10M15 5L5 15" />
           </svg>
-          {menuLabel}
+          {/* Below 380px the button is icon-only so the row fits with room for wider phone fonts; the name stays for screen readers. */}
+          <span className="max-[379px]:sr-only">{menuLabel}</span>
         </summary>
         <nav
           aria-label={label}

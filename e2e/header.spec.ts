@@ -140,3 +140,21 @@ test("nothing scrolls sideways at 360px, menu open or closed", async ({ browser 
   }
   await ctx.close();
 });
+
+test("at 360px the phone header row keeps spare width for wider fonts", async ({ browser }) => {
+  // CI's Linux fonts render about 11px wider than Windows; Android's Roboto/Noto are wider still.
+  const ctx = await browser.newContext({ viewport: { width: 360, height: 740 } });
+  const page = await ctx.newPage();
+  for (const path of ["/en/simulations/utxo/", "/sw/simulations/utxo/", "/en/", "/sw/glossary/"]) {
+    await page.goto(path);
+    const need = await page.evaluate(() => {
+      const brand = document.querySelector("header [data-brand]")!;
+      const row = brand.parentElement!;
+      const group = row.lastElementChild!;
+      const s = getComputedStyle(row);
+      return parseFloat(s.paddingLeft) + brand.getBoundingClientRect().width + parseFloat(s.columnGap) + group.getBoundingClientRect().width + parseFloat(s.paddingRight);
+    });
+    expect(need, `${path} header needs ${need.toFixed(0)}px`).toBeLessThanOrEqual(360 - 24);
+  }
+  await ctx.close();
+});

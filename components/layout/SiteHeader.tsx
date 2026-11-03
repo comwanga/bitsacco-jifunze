@@ -29,7 +29,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       >
         {t(lang, "skipToContent")}
       </a>
-      <div className="mx-auto flex h-full max-w-[96rem] items-center gap-6 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-full max-w-[96rem] items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
         <BrandLockup lang={lang} />
         <HeaderNav items={siteNav(lang)} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
           <LanguageSwitch lang={lang} />

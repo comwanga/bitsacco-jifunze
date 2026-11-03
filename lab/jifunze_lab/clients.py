@@ -85,6 +85,18 @@ class LndREST:
     def balance(self) -> dict:
         return self.get("/v1/balance/blockchain")
 
+    def onchain_sats(self) -> int:
+        return int(self.balance().get("confirmed_balance", 0))
+
+    def has_channel_with(self, pubkey: str) -> bool:
+        if any(c["remote_pubkey"] == pubkey for c in self.channels()):
+            return True
+        pending = self.pending_channels().get("pending_open_channels", [])
+        return any(p["channel"]["remote_node_pub"] == pubkey for p in pending)
+
+    def active_channel_with(self, pubkey: str) -> bool:
+        return any(c["remote_pubkey"] == pubkey and c.get("active") for c in self.channels())
+
     def addinvoice(self, sats: int, memo: str = "") -> dict:
         return self.post("/v1/invoices", {"value": str(sats), "memo": memo})
 
@@ -163,6 +175,20 @@ class ClnRPC:
     def channels(self) -> list[dict]:
         return self.rpc.listpeerchannels()["channels"]
 
+    def onchain_sats(self) -> int:
+        outs = self.rpc.listfunds()["outputs"]
+        return sum(int(o["amount_msat"]) // 1000 for o in outs if o.get("status") == "confirmed")
+
+    def has_channel_with(self, pubkey: str) -> bool:
+        live = ("CHANNELD_AWAITING_LOCKIN", "CHANNELD_NORMAL", "DUALOPEND_AWAITING_LOCKIN", "DUALOPEND_OPEN_INIT")
+        return any(c["peer_id"] == pubkey and c["state"] in live for c in self.channels())
+
+    def active_channel_with(self, pubkey: str) -> bool:
+        return any(c["peer_id"] == pubkey and c["state"] == "CHANNELD_NORMAL" for c in self.channels())
+
+    def connect(self, pubkey: str, host: str) -> None:
+        self.connect_to(pubkey, host)
+
     def connect_to(self, pubkey: str, host: str) -> None:
         self.rpc.connect(pubkey, host, 9735)
 
@@ -199,6 +225,18 @@ class EclairREST:
 
     def channels(self) -> list[dict]:
         return self.call("channels")
+
+    def onchain_sats(self) -> int:
+        return int(self.call("onchainbalance").get("confirmed", 0))
+
+    def has_channel_with(self, pubkey: str) -> bool:
+        return any(c["nodeId"] == pubkey and c["state"] not in ("CLOSED", "CLOSING") for c in self.channels())
+
+    def active_channel_with(self, pubkey: str) -> bool:
+        return any(c["nodeId"] == pubkey and c["state"] == "NORMAL" for c in self.channels())
+
+    def connect(self, pubkey: str, host: str) -> None:
+        self.connect_to(pubkey, host)
 
     def connect_to(self, pubkey: str, host: str) -> None:
         self.call("connect", uri=f"{pubkey}@{host}:9735")

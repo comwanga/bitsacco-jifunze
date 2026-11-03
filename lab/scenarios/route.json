@@ -1,0 +1,8 @@
+{
+  "base": "funded",
+  "channels": [
+    { "from": "alice", "to": "bob", "sats": 1000000, "push": 300000 },
+    { "from": "bob", "to": "chan", "sats": 1000000, "push": 300000 },
+    { "from": "chan", "to": "dina", "sats": 1000000, "push": 300000 }
+  ]
+}

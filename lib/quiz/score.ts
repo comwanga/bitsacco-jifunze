@@ -1,5 +1,9 @@
 import type { QuizFile } from "../content/schemas.ts";
 
+export function quizPassed(correct: number, total: number): boolean {
+  return total > 0 && correct / total >= 0.75;
+}
+
 export function scoreQuiz(
   quiz: QuizFile,
   answers: Record<string, string>,

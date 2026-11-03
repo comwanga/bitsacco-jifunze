@@ -99,6 +99,7 @@ export default async function LessonPage({ params }: Params) {
           <Quiz
             lessonKey={key}
             lang={lang}
+            completesLesson={ids.length === 0}
             questions={quizFile.questions.map((q) => ({
               id: q.id,
               prompt: q.prompt[lang],

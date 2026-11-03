@@ -4,11 +4,34 @@ import { expect, test } from "vitest";
 
 const src = fs.readFileSync(path.join(import.meta.dirname, "../../public/sw.js"), "utf8");
 const fakeSelf = { addEventListener: () => {}, location: { origin: "http://x" } };
-const sw = new Function("self", "caches", "fetch", `${src}; return { pageOfData, langOf, staleCaches };`)(fakeSelf, {}, () => {}) as {
+const sw = new Function("self", "caches", "fetch", `${src}; return { pageOfData, langOf, staleCaches, cacheableStatic };`)(fakeSelf, {}, () => {}) as {
   pageOfData(p: string): string | null;
   langOf(p: string): string;
   staleCaches(keys: string[]): string[];
+  cacheableStatic(p: string): boolean;
 };
+
+test("only known static paths may enter the fallback cache", () => {
+  for (const p of ["/_next/static/x.js", "/icons/icon-192.png", "/logo.svg", "/manifest.webmanifest"]) {
+    expect(sw.cacheableStatic(p), p).toBe(true);
+  }
+  for (const p of ["/api/me", "/unknown.json", "/logo.svg/private", "/icons-private/x.png"]) {
+    expect(sw.cacheableStatic(p), p).toBe(false);
+  }
+});
+
+test("unknown same-origin fetches bypass the worker's caches", () => {
+  let listener: (event: unknown) => void = () => {};
+  const self = {
+    location: { origin: "http://x" },
+    addEventListener: (name: string, fn: (event: unknown) => void) => { if (name === "fetch") listener = fn; },
+  };
+  const fail = () => { throw new Error("unknown paths must use the browser network directly"); };
+  new Function("self", "caches", "fetch", src)(self, { open: fail, match: fail }, fail);
+  for (const headers of [new Headers(), new Headers({ RSC: "1" })]) {
+    listener({ request: new Request("http://x/api/me", { headers }), respondWith: fail, waitUntil: fail });
+  }
+});
 
 test("a new deploy keeps the pages readers saved offline; only unknown caches are removed", () => {
   const keep = ["pages-v1", "static-v1", "data-v1"];

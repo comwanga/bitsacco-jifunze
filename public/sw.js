@@ -67,8 +67,14 @@ function langOf(pathname) {
 
 // "/sw/savers/x/index.txt" or "/sw/savers/x/__next.a.b/c.txt" -> "/sw/savers/x/"
 function pageOfData(pathname) {
+  if (!/^\/(sw|en)\//.test(pathname)) return null;
   const i = pathname.search(/\/(index\.txt|__next\.)/);
   return i >= 0 ? pathname.slice(0, i + 1) : null;
+}
+
+function cacheableStatic(pathname) {
+  return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/") ||
+    pathname === "/logo.svg" || pathname === "/manifest.webmanifest";
 }
 
 async function cacheFirst(request) {
@@ -141,10 +147,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   const page = pageOfData(url.pathname);
-  if (page || request.headers.get("RSC") === "1") {
+  if (page) {
     event.respondWith(staleWhileRevalidate(DATA, request));
     if (page && !request.headers.get("Next-Router-Prefetch")) event.waitUntil(warmPage(page));
     return;
   }
-  event.respondWith(staleWhileRevalidate(STATIC, request));
+  if (cacheableStatic(url.pathname)) event.respondWith(staleWhileRevalidate(STATIC, request));
+  // Unknown same-origin paths use the browser's network without entering a cache.
 });

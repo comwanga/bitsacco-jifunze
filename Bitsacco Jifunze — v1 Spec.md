@@ -44,13 +44,13 @@ Version 1 launches two short roadmaps of about 8 lessons each, so both can be wr
 
 | # | Lesson | Source |
 | --- | --- | --- |
-| 1 | Developer environment and a local regtest lab | Adapted from Pull |
-| 2 | UTXOs and transactions | Adapted from Pull; Kujifunza Bitcoin chapters |
-| 3 | Keys, addresses and descriptors | Adapted from Pull; Kujifunza Bitcoin chapters |
-| 4 | Lightning: channels, invoices and routing basics | Adapted from Pull but do not identify it |
+| 1 | Developer environment and a local regtest lab | Original |
+| 2 | UTXOs and transactions | Original |
+| 3 | Keys, addresses and descriptors | Original |
+| 4 | Lightning: channels, invoices and routing basics | Original |
 | 5 | Fedimint: federations, ecash and guardians | Original |
 | 6 | Building a Bitsacco mini-app | Original |
-| 7 | Contributing to Bitsacco open source | Original, adapted from Pull's OSS lessons |
+| 7 | Contributing to Bitsacco open source | Original |
 | 8 | Project: ship a small Lightning or Fedimint tool | Original |
 
 Kujifunza Bitcoin, the Kiswahili edition of Mastering Bitcoin, is the long-form companion for both roadmaps. Lessons link to its chapters rather than copying them.
@@ -106,7 +106,7 @@ Each lesson's front matter carries: `title`, `description`, `level`, `minutes`, 
 1. Every lesson exists in both `sw` and `en` with the same slug, or is marked `translationPending` and shows a notice.
 2. Front matter matches the schema; every roadmap entry points to a real lesson.
 3. Every quiz answer is valid and every link in `resources` is well formed.
-4. Adapted lessons do not name their source and licence in `source`.
+4. Adapted lessons name their source and licence in `source`.
 5. Glossary terms are used consistently (warning, not failure).
 
 ## Licensing and attribution
@@ -117,8 +117,8 @@ Use two licences, like Pull: MIT for code and CC BY-SA 4.0 for the curriculum. C
 | --- | --- | --- |
 | Jifunze code | MIT (proposed) | Add `LICENSE`. The main bitsacco repo currently has no licence file, so confirm the org is happy with MIT. |
 | Jifunze curriculum (`content/`) | CC BY-SA 4.0 | Add `content/LICENSE`; contributors agree their lessons and translations are released under it. |
-| Code reused from Pull (validation scripts, content loaders) | MIT | Keep Pull's copyright notice in the copied files and list them in `ATTRIBUTIONS.md`. |
-| Lessons adapted from Pull | CC BY-SA 4.0 | Credit Pull with a link to pullos.dev and the licence on each adapted lesson and in `ATTRIBUTIONS.md`. |
+| Code reused from Pull | Not used | No Pull code is used; Jifunze's validation scripts and content loaders are original. |
+| Lessons adapted from Pull | Not used | No Pull lessons are used; the curriculum is original and links to companion reading. |
 | Pull name and logo | Reserved by Pull | Don't use them. Jifunze has its own name and Bitsacco branding. |
 | Kujifunza Bitcoin and the whitepaper | CC BY-SA 4.0 / as published | Link to them; keep the existing credits (Antonopoulos and Harding, translated by comwanga). |
 

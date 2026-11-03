@@ -1,0 +1,59 @@
+---
+title: "Wire protocol: framing and extensibility"
+description: "What a Lightning message looks like as bytes, how TLV fields let the protocol grow, and why feature bits follow the 'it's OK to be odd' rule. Parse a real init message."
+level: intermediate
+minutes: 40
+objectives:
+  - Describe the layout of a Lightning message, from type to TLV stream
+  - Explain how TLV records and feature bits let nodes upgrade without breaking each other
+  - Parse an init message byte by byte in Python
+resources:
+  - title: "Mastering the Lightning Network, chapter 13: Wire Protocol: Framing and Extensibility"
+    url: "https://github.com/lnbook/lnbook/blob/develop/13_wire_protocol.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 1: base protocol"
+    url: "https://github.com/lightning/bolts/blob/master/01-messaging.md"
+    kind: docs
+    language: en
+reflection:
+  - "A new node sends a TLV record with an odd type you have never seen. What should your node do, and why?"
+  - "Why does every message start with its type?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - node
+---
+
+Underneath every channel, invoice and onion, Lightning <Term id="node">nodes</Term> exchange plain messages: a few bytes with a fixed layout, sent over an encrypted link (next lesson).
+
+## A message, byte by byte
+
+Every message starts with a **2-byte type**, big-endian, then the fields for that type. The first message on every connection is `init`, type 16:
+
+```text
+0010          type = 16 (init)
+0000          gflen = 0       (length of the old "global features")
+0003          flen  = 3       (length of the features field)
+0a69a2        features        (a bit field)
+0120 0606…    TLV stream      (optional extra records)
+```
+
+## Feature bits: "it's OK to be odd"
+
+Each feature has a pair of bits. The **even** bit means "I require this; disconnect if you don't support it". The **odd** bit means "I support this, but it's optional". Unknown odd bits are ignored and unknown even bits end the connection. New features can roll out gradually without splitting the network.
+
+## TLV: type, length, value
+
+After the fixed fields, a message can carry a **TLV stream**: records of `type | length | value`. The same rule applies: unknown odd types are skipped, unknown even types are an error. This is how the protocol grows; older nodes simply skip records they don't understand.
+
+## Parse it
+
+<Exercise id="ch13-parse-init" />
+
+The check feeds your `parse_init` several init messages with random features and TLV bytes. If yours handles them all, you have read the same bytes a real node reads.

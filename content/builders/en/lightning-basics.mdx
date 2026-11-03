@@ -1,0 +1,98 @@
+---
+title: "Lightning: channels, invoices and routing basics"
+description: "How two Bitcoin transactions can carry thousands of payments: channels, BOLT11 invoices, routing and liquidity, with a local Polar network."
+level: intermediate
+minutes: 60
+objectives:
+  - Explain how a channel is opened, used and closed
+  - Decode a BOLT11 invoice and name its main fields
+  - Pay across a three-node route and explain inbound vs outbound liquidity
+resources:
+  - title: "Kujifunza Bitcoin, chapter 14: second-layer applications (payment channels and Lightning)"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "BOLT specifications"
+    url: "https://github.com/lightning/bolts"
+    kind: docs
+    language: en
+  - title: "Polar"
+    url: "https://lightningpolar.com/"
+    kind: tool
+    language: en
+  - title: "Lightning Network"
+    url: "https://lightning.network"
+    kind: article
+    language: en
+reflection:
+  - "Why can't Alice receive a payment on a channel she just opened with all the funds on her side?"
+  - "Which parts of a Lightning payment are on-chain, and which are not?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - lightning
+  - channel
+  - invoice
+  - node
+  - multisig
+---
+
+The <Term id="lightning" /> moves payments off-chain. Two parties lock bitcoin into a shared output once, then update who owns how much as often as they like, settling on-chain only when they're done.
+
+## Step 1: Channels in three moves
+
+1. **Open.** Alice and Bob create a funding transaction paying into a 2-of-2 <Term id="multisig" /> output. It is mined like any other transaction.
+2. **Update.** For every payment they sign a new *commitment transaction* that splits the funds differently. Old states are revoked, so publishing one would let the other side take everything.
+3. **Close.** Either side publishes the latest commitment, or both sign a cooperative close. The final balances go on-chain.
+
+A <Term id="channel" /> has a **capacity** (the funding amount) split into **outbound** liquidity (what you can send) and **inbound** liquidity (what you can receive).
+
+**Done when:** you can explain why a brand-new channel funded only by Alice can't receive.
+
+## Step 2: Routing
+
+Alice doesn't need a channel to everyone. If Alice→Bob and Bob→Carol channels exist, Alice can pay Carol through Bob. HTLCs (hash time-locked contracts) make each hop conditional on revealing a secret, the **preimage**, so either the whole route settles or none of it does. Bob earns a small routing fee.
+
+## Step 3: Invoices
+
+A BOLT11 <Term id="invoice" /> such as `lnbcrt10u1p...` encodes:
+
+| Field | Meaning |
+| --- | --- |
+| `lnbcrt` | Lightning, regtest network |
+| `10u` | Amount: 10 micro-bitcoin = 1,000 sats |
+| payment hash | Hash of the preimage that unlocks the payment |
+| description | Human-readable purpose |
+| expiry | Seconds until it can't be paid |
+| signature | Proves which <Term id="node" /> issued it |
+
+## Step 4: Lab with Polar
+
+1. Install Polar and create a network with three LND nodes: Alice, Bob and Carol.
+2. Start it, then mine a few blocks and fund Alice from Polar's UI.
+3. Open channels Alice→Bob and Bob→Carol (for example 1,000,000 sats each). Mine 6 blocks.
+4. On Carol, create an invoice for 10,000 sats. In Alice's terminal:
+
+```bash
+lncli decodepayreq <invoice>
+lncli payinvoice <invoice>
+```
+
+**Expected:** `decodepayreq` shows the amount, description and expiry; `payinvoice` succeeds with a route through Bob.
+
+Now try paying Alice from Carol. If it fails, look at each channel's local and remote balance and explain why.
+
+<Callout type="tip" title="Regtest only">
+Polar runs everything on regtest. Never point lab tools at mainnet nodes holding real funds.
+</Callout>
+
+## Lab evidence
+
+- Decoded invoice with amount, description and expiry marked.
+- Successful payment output showing the route.
+- One sentence explaining the failure (or success) of the reverse payment in terms of liquidity.
+
+<Callout type="tip" title="Go deeper">
+The [Lightning for Builders](/en/lightning/) path takes you through all 17 chapters of *Mastering the Lightning Network*, with a live lab and exercises you run from the lesson page.
+</Callout>

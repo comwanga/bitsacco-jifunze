@@ -1,0 +1,69 @@
+---
+title: "Kuanza: maabara yako na malipo yako ya kwanza"
+description: "Washa maabara ya nodi nne kwenye kompyuta yako, iunganishe na ukurasa huu, kisha tengeneza ankara ya kwanza ya Dina na malipo ya kwanza ya Alice."
+level: beginner
+minutes: 40
+objectives:
+  - Washa maabara na uiunganishe na ukurasa wa somo
+  - Tengeneza ankara ya Lightning kwa mstari wa amri
+  - Lipa ankara kupitia mtandao na usome matokeo
+resources:
+  - title: "Mastering the Lightning Network, chapter 2: Getting Started"
+    url: "https://github.com/lnbook/lnbook/blob/develop/02_getting_started.asciidoc"
+    kind: book
+    language: en
+  - title: "Docker Desktop (Windows uses the WSL2 backend)"
+    url: "https://docs.docker.com/desktop/"
+    kind: tool
+    language: en
+reflection:
+  - "Matokeo ya malipo yalikuambia nini kuhusu njia? Yalipita kwenye nodi zipi?"
+  - "Kwa nini ni salama kumwonyesha mtu yeyote ankara, lakini si maneno ya siri?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - invoice
+  - node
+  - regtest
+---
+
+Kitabuni, Alice ananunua kahawa kwenye mgahawa wa Bob kwa pochi ya simu. Hapa unacheza kila sehemu. Maabara yako ina <Term id="node">nodi</Term> nne kwenye <Term id="regtest" />: Alice na Dina wanaendesha LND, Bob na Chan wanaendesha c-lightning, na tayari wameunganishwa kwa mstari, Alice → Bob → Chan → Dina.
+
+## Hatua ya 1: Washa maabara
+
+Kwenye terminal (kwenye Windows, ndani ya WSL2):
+
+```bash
+git clone https://github.com/bitsacco/jifunze
+cd jifunze/lab
+./lab doctor     # inakagua Docker, kumbukumbu, diski na mlango 7777
+./lab up         # inawasha nodi; mara ya kwanza inapakua takriban GB 2
+```
+
+`./lab up` inamaliza kwa kuonyesha **msimbo wa kuunganisha** kama `ABCD-EFGH-JKLM`. Ubandike kwenye upau wa maabara juu ya ukurasa huu na ubonyeze Unganisha. Unapaswa kuona alama sita za kijani: bitcoind na nodi nne.
+
+<Callout type="warning" title="Kwa nini kuunganisha?">
+Maabara inajibu tovuti hii tu, na kwa msimbo wako tu. Tovuti nyingine unayotembelea haiwezi kuendesha amri kwenye kompyuta yako.
+</Callout>
+
+## Hatua ya 2: Dina anaomba kulipwa
+
+<Term id="invoice">Ankara</Term> ni ombi la malipo. Dina anatengeneza moja ya sats 50,000:
+
+<Exercise id="ch02-dina-invoice" />
+
+Tazama matokeo: `payment_request` ni maandishi ya ankara (yanaanza na `lnbcrt`, yaani Lightning kwenye regtest), na `r_hash` ni hashi ya siri ambayo ni Dina tu anaijua.
+
+## Hatua ya 3: Alice analipa
+
+Nakili `payment_request` ya Dina kwenye zoezi linalofuata, mahali pa `INVOICE`, kisha liendeshe. Bendera ya `--force` inaruka swali la "una uhakika?".
+
+<Exercise id="ch02-alice-pays" />
+
+Jedwali kwenye matokeo linaonyesha njia: Alice → Bob → Chan → Dina, na ada ndogo kwa kila hatua. Hali ya malipo `SUCCEEDED` na **preimage** zinamaanisha Dina amelipwa: katika somo la 8 utaona kwa nini siri hiyo ndiyo risiti.
+
+Kitu kikikwama, bonyeza **Anza somo upya** kwenye zoezi lolote ili kurudisha chaneli za mwanzo za somo hili.

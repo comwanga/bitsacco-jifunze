@@ -1,0 +1,59 @@
+---
+title: "Muundo wa mtandao wa Lightning"
+description: "Ramani ya itifaki nzima, tabaka kwa tabaka, ili kila somo linalofuata liwe na mahali pake."
+level: intermediate
+minutes: 20
+objectives:
+  - Taja tabaka za itifaki ya Lightning kutoka mtandao hadi malipo
+  - Weka chaneli, upitishaji, gossip, kitunguu na ankara kwenye ramani hiyo
+  - Tafuta BOLT inayoeleza kila sehemu
+resources:
+  - title: "Mastering the Lightning Network, chapter 6: Lightning Network Architecture"
+    url: "https://github.com/lnbook/lnbook/blob/develop/06_lightning_architecture.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT specifications"
+    url: "https://github.com/lightning/bolts"
+    kind: docs
+    language: en
+reflection:
+  - "Ungebadilisha tabaka gani ili malipo yawe ya faragha zaidi, na lipi ili yawe nafuu zaidi?"
+  - "Kwa nini inasaidia kwamba kila tabaka limeelezwa peke yake?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - onion-routing
+  - gossip
+  - invoice
+---
+
+Kitabu kinachora Lightning kama mrundikano. Kila tabaka linategemea lile lililo chini yake tu, kama ghorofa za jengo. Lisome kutoka chini kwenda juu:
+
+| Tabaka | Kazi yake | Masomo | BOLT |
+| --- | --- | --- | --- |
+| **Muunganisho wa mtandao** | Viungo vilivyosimbwa na kuthibitishwa kati ya nodi | 14 | 8 |
+| **Ujumbe** | Muundo wa kila ujumbe unaotumwa | 13 | 1 |
+| **Rika kwa rika** | Matangazo na masasisho ya chaneli, yaani <Term id="gossip" /> | 11 | 7 |
+| **Upitishaji** | Kutafuta njia na kuituma kwa safu, kwa <Term id="onion-routing" /> | 10, 12 | 4 |
+| **Chaneli za malipo** | Ufadhili, ahadi, HTLC, kufunga | 7, 8, 9 | 2, 3, 5 |
+| **Malipo** | Anachoona mtumiaji: <Term id="invoice" />, kiasi, risiti | 15 | 11 |
+
+Chini ya yote kuna **Bitcoin**, inayolinda chaneli.
+
+## Kwa nini tabaka
+
+Tabaka huwaruhusu wasanidi kuboresha sehemu moja bila kuandika upya nyingine. Muundo mpya wa ankara (kama BOLT 12 offers) haubadilishi jinsi chaneli zinavyofadhiliwa. Njia ya haraka zaidi ya kutafuta njia haibadilishi muundo wa jumbe.
+
+Pia zinawezesha kutafuta hitilafu. Malipo yakishindwa, unauliza: ni muunganisho, gossip (mlipaji hakujua chaneli fulani), upitishaji (hakuna njia yenye ukwasi wa kutosha), au chaneli yenyewe?
+
+## Jinsi ya kutumia ramani hii
+
+Acha jedwali hili wazi unapoendelea. Kuanzia hapa, kila somo linakuza safu moja. Hakuna maabara katika sura hii; ni ramani ya sura kumi zinazofuata.
+
+<Callout type="tip" title="Soma BOLT">
+Fungua BOLT 1 kwenye GitHub na usome utangulizi wake tu. Vipimo ni vifupi na vinasomeka kuliko watu wanavyotarajia, na kitabu kinavirejelea kila mahali.
+</Callout>

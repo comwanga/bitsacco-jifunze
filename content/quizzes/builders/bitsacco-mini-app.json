@@ -1,0 +1,49 @@
+{
+  "lesson": "bitsacco-mini-app",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Hatua ya kwanza ya kulipa anwani ya Lightning alice@example.com ni ipi?", "en": "What is the first step in paying the Lightning Address alice@example.com?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kupakua https://example.com/.well-known/lnurlp/alice", "en": "Fetch https://example.com/.well-known/lnurlp/alice" } },
+        { "id": "b", "label": { "sw": "Kutuma barua pepe kwa alice@example.com", "en": "Email alice@example.com" } },
+        { "id": "c", "label": { "sw": "Kufungua chaneli na Alice", "en": "Open a channel with Alice" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "LUD-16 inageuza anwani kuwa URL ya LNURL-pay iliyo kwenye .well-known.", "en": "LUD-16 turns the address into an LNURL-pay URL under .well-known." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Unataka kulipa sats 100. Utatuma amount gani kwa callback?", "en": "You want to pay 100 sats. What amount do you send to the callback?" },
+      "options": [
+        { "id": "a", "label": { "sw": "100", "en": "100" } },
+        { "id": "b", "label": { "sw": "100000", "en": "100000" } },
+        { "id": "c", "label": { "sw": "0.000001", "en": "0.000001" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "LNURL hutumia millisats: sats 100 × 1,000.", "en": "LNURL uses millisats: 100 sats × 1,000." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Programu ndogo ya Bitsacco inapaswa kushika funguo za watumiaji?", "en": "Should a Bitsacco mini-app hold users' keys?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Hapana; pochi ya mtumiaji ndiyo inalipa", "en": "No; the user's own wallet pays" } },
+        { "id": "b", "label": { "sw": "Ndiyo, ili malipo yawe ya haraka", "en": "Yes, so payments are faster" } },
+        { "id": "c", "label": { "sw": "Ndiyo, kama nakala ya akiba", "en": "Yes, as a backup" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Programu inayoonyesha maombi tu haina pesa za kuibiwa.", "en": "An app that only shows requests has no funds to be stolen." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Kwa nini ujaribu dhidi ya seva ya kuiga?", "en": "Why test against a mock server?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Ili makosa yasigharimu pesa halisi na majaribio yarudiwe", "en": "So mistakes cost no real money and tests are repeatable" } },
+        { "id": "b", "label": { "sw": "Kwa sababu Lightning haifanyi kazi kwenye simu", "en": "Because Lightning doesn't work on phones" } },
+        { "id": "c", "label": { "sw": "Ili kupata sats bure", "en": "To earn free sats" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Kama regtest, seva ya kuiga hukupa maabara salama.", "en": "Like regtest, a mock server gives you a safe lab." }
+    }
+  ]
+}

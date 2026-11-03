@@ -1,0 +1,49 @@
+{
+  "lesson": "ship-a-tool",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Mradi wako wa mwisho unapaswa kuendeshwa wapi?", "en": "Where should your capstone run?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kwenye regtest, signet au seva ya kuiga tu", "en": "On regtest, signet or a mock only" } },
+        { "id": "b", "label": { "sw": "Kwenye mainnet kwa pesa za chama", "en": "On mainnet with the chama's money" } },
+        { "id": "c", "label": { "sw": "Popote, bila majaribio", "en": "Anywhere, without tests" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Mradi wa kujifunzia haupaswi kuhatarisha pesa halisi.", "en": "A learning project must never put real money at risk." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Zana yako inaruhusiwa kuomba maneno ya siri ya mtumiaji?", "en": "May your tool ask for a user's seed phrase?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Hapana, kamwe", "en": "No, never" } },
+        { "id": "b", "label": { "sw": "Ndiyo, kama nakala ya akiba", "en": "Yes, as a backup" } },
+        { "id": "c", "label": { "sw": "Ndiyo, ikiwa imesimbwa", "en": "Yes, if encrypted" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Hiyo ni sheria ya kwanza ya zana yoyote ya Bitsacco.", "en": "That is the first rule of any Bitsacco tool." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Njia bora ya kugundua mahali watumiaji wanapokwama ni ipi?", "en": "What is the best way to find where users get stuck?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kumtazama mtu mpya akiitumia bila kumsaidia", "en": "Watch a new person use it without helping" } },
+        { "id": "b", "label": { "sw": "Kudhani tu", "en": "Just guess" } },
+        { "id": "c", "label": { "sw": "Kuongeza vipengele zaidi", "en": "Add more features" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Unachokiona kinaonyesha matatizo ambayo wewe, kama mjenzi, huwezi kuyaona tena.", "en": "What you see shows problems you, as the builder, can no longer notice." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Baada ya ukaguzi wa kwanza, ufanye nini?", "en": "After the first review, what should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kufanya mabadiliko, kujibu kila maoni na kuomba kuangaliwa tena", "en": "Make the changes, reply to each comment and ask for another look" } },
+        { "id": "b", "label": { "sw": "Kupuuza maoni", "en": "Ignore the comments" } },
+        { "id": "c", "label": { "sw": "Kuanza mradi mpya", "en": "Start a new project" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Ukaguzi ni mazungumzo; zana nzuri huboreshwa kupitia mizunguko kadhaa.", "en": "Review is a conversation; good tools improve over several rounds." }
+    }
+  ]
+}

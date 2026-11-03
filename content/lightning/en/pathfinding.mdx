@@ -1,0 +1,55 @@
+---
+title: "Pathfinding and payment delivery"
+description: "Write your own route finder over Alice's real channel graph, then see why real nodes also learn from failed attempts and split large payments."
+level: intermediate
+minutes: 50
+objectives:
+  - Explain why pathfinding in Lightning is search under uncertainty
+  - Implement Dijkstra's algorithm with routing fees as the cost
+  - Describe mission control and multipart payments
+resources:
+  - title: "Mastering the Lightning Network, chapter 12: Pathfinding and Payment Delivery"
+    url: "https://github.com/lnbook/lnbook/blob/develop/12_path_finding.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Your route finder knows fees but not balances. What else should a good cost include?"
+  - "Why might splitting a payment into parts succeed when one large payment fails?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - fee
+  - liquidity
+  - channel
+---
+
+Last lesson Alice read the map. Now she must pick a route. The sender picks the whole route in Lightning, not the network, and it has to work without knowing anyone's balances.
+
+## A shortest-path problem, with a twist
+
+Think of each channel direction as a road with a toll, the routing <Term id="fee" />. Finding the cheapest route is a classic shortest-path problem, and Dijkstra's algorithm solves it: always extend the cheapest path found so far until you reach the destination.
+
+The twist: the map shows capacity, not <Term id="liquidity" />. The cheapest route on paper may fail because a <Term id="channel" /> lacks balance on the right side.
+
+## Write the route finder
+
+The starter turns Alice's graph into a list of neighbours with fee policies. Fill in `find_route` with Dijkstra, using `heapq`:
+
+<Exercise id="ch12-pathfind" />
+
+In the lab there is only one path, Alice → Bob → Chan → Dina, but your function is tested to make sure every step follows a real channel.
+
+## How real nodes do better
+
+- **Probabilistic cost.** Besides fees, nodes score how likely each channel is to have enough balance. Bigger channels relative to the amount look safer.
+- **Mission control.** When an attempt fails, the error says which channel failed. The node remembers and avoids it for a while, then retries. (You'll use this in lesson 16.)
+- **Multipart payments (MPP).** A large payment can be split into several smaller parts over different routes, each more likely to fit. Dina only releases the preimage once every part has arrived.
+
+<Callout type="tip" title="Research in the book">
+Co-author René Pickhardt's work on probabilistic pathfinding, "optimally reliable" payments, now shapes how several implementations pick routes.
+</Callout>

@@ -1,0 +1,58 @@
+---
+title: "Itifaki ya jumbe: muundo na upanuzi"
+description: "Ujumbe wa Lightning unavyoonekana kama baiti, jinsi sehemu za TLV zinavyoruhusu itifaki kukua, na kwa nini biti za vipengele zinafuata kanuni ya 'ni sawa kuwa witiri'. Changanua ujumbe halisi wa init."
+level: intermediate
+minutes: 40
+objectives:
+  - Eleza mpangilio wa ujumbe wa Lightning, kuanzia aina hadi mtiririko wa TLV
+  - Eleza jinsi rekodi za TLV na biti za vipengele zinavyoruhusu nodi kusasishwa bila kuvunjana
+  - Changanua ujumbe wa init baiti kwa baiti kwa Python
+resources:
+  - title: "Mastering the Lightning Network, chapter 13: Wire Protocol: Framing and Extensibility"
+    url: "https://github.com/lnbook/lnbook/blob/develop/13_wire_protocol.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 1: base protocol"
+    url: "https://github.com/lightning/bolts/blob/master/01-messaging.md"
+    kind: docs
+    language: en
+reflection:
+  - "Nodi mpya inatuma rekodi ya TLV yenye aina witiri ambayo hujawahi kuiona. Nodi yako ifanye nini, na kwa nini?"
+  - "Kwa nini kila ujumbe unaanza na aina yake?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - node
+---
+
+Chini ya kila chaneli, ankara na kitunguu, <Term id="node">nodi</Term> za Lightning hubadilishana jumbe za kawaida: baiti chache zenye mpangilio maalum, zinazotumwa kupitia kiungo kilichosimbwa (somo linalofuata).
+
+## Ujumbe, baiti kwa baiti
+
+Kila ujumbe unaanza na **aina ya baiti 2**, kubwa-kwanza, kisha sehemu za aina hiyo. Ujumbe wa kwanza kwenye kila muunganisho ni `init`, aina 16:
+
+```text
+0010          aina = 16 (init)
+0000          gflen = 0       (urefu wa "global features" za zamani)
+0003          flen  = 3       (urefu wa sehemu ya vipengele)
+0a69a2        vipengele       (sehemu ya biti)
+0120 0606…    mtiririko wa TLV (rekodi za ziada za hiari)
+```
+
+## Biti za vipengele: "ni sawa kuwa witiri"
+
+Kila kipengele kina jozi ya biti. Biti **shufwa** inamaanisha "ninahitaji hiki; katisha muunganisho kama hukiungi mkono". Biti **witiri** inamaanisha "ninakiunga mkono, lakini ni hiari". Biti witiri zisizojulikana zinapuuzwa na biti shufwa zisizojulikana zinakatisha muunganisho. Vipengele vipya vinaweza kuenea polepole bila kugawanya mtandao.
+
+## TLV: aina, urefu, thamani
+
+Baada ya sehemu zisizobadilika, ujumbe unaweza kubeba **mtiririko wa TLV**: rekodi za `aina | urefu | thamani`. Kanuni ile ile inatumika: aina witiri zisizojulikana zinarukwa, aina shufwa zisizojulikana ni hitilafu. Hivi ndivyo itifaki inavyokua; nodi za zamani zinaruka tu rekodi wasizozielewa.
+
+## Ichanganue
+
+<Exercise id="ch13-parse-init" />
+
+Ukaguzi unampa `parse_init` wako jumbe kadhaa za init zenye vipengele na baiti za TLV za bahati nasibu. Wako ukizishughulikia zote, umesoma baiti zile zile ambazo nodi halisi inasoma.

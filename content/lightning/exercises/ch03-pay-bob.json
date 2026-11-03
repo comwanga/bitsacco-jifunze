@@ -1,0 +1,16 @@
+{
+  "id": "ch03-pay-bob",
+  "lesson": "how-ln-works",
+  "node": "bob",
+  "tab": "cli",
+  "title": {
+    "sw": "Bob anaomba malipo, Alice analipa",
+    "en": "Bob requests a payment, Alice pays"
+  },
+  "starter": {
+    "cli": "# c-lightning counts in millisatoshis: 20,000 sats = 20000000 msat.\n# Every invoice needs a unique label.\nlightning-cli invoice 20000000 chai-1 \"Chai ya Bob\"\n# Then switch the node to Alice and run:  lncli payinvoice --force <bolt11>"
+  },
+  "solution": {
+    "cli": "INV=$(lightning-cli invoice 20000000 \"chai-$RANDOM$RANDOM\" \"Chai ya Bob\" | jq -r .bolt11)\nJIFUNZE_NODE=alice lncli payinvoice --force \"$INV\""
+  }
+}

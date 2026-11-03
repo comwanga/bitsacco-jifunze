@@ -1,0 +1,79 @@
+---
+title: "Fedimint: federations, ecash and guardians"
+description: "How a group of guardians can hold bitcoin together and issue private ecash, and where Lightning gateways fit in."
+level: intermediate
+minutes: 45
+objectives:
+  - Explain what a federation, a guardian and a gateway do
+  - Describe how blind signatures make ecash private
+  - Weigh the trust trade-offs of a federation against self-custody and custodial wallets
+resources:
+  - title: "Fedimint"
+    url: "https://fedimint.org"
+    kind: docs
+    language: en
+  - title: "Fedimint source code"
+    url: "https://github.com/fedimint/fedimint"
+    kind: tool
+    language: en
+  - title: "Kujifunza Bitcoin, chapter 14: second-layer applications"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+    note: "Fedimint itself isn't covered in the book; chapter 14 gives the second-layer background."
+reflection:
+  - "Which people in your community would make good guardians, and what would you ask them to promise?"
+  - "What would a federation of four guardians do if one went offline? If two did?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - fedimint
+  - federation
+  - guardian
+  - ecash
+  - multisig
+---
+
+The savers path introduced Fedimint as community custody. This lesson looks at how it works underneath, so you can build on it.
+
+## Step 1: The parts
+
+| Part | Role |
+| --- | --- |
+| <Term id="guardian">Guardians</Term> | Run the federation's servers, hold key shares and agree on every state change |
+| <Term id="federation">Federation</Term> | The guardians together: a <Term id="multisig" /> wallet plus a mint |
+| <Term id="ecash">Ecash</Term> notes | Bearer tokens users hold, each worth a fixed number of millisats |
+| Gateway | A Lightning node that swaps ecash for Lightning payments, in both directions |
+| Client | The user's app, which stores ecash notes and talks to guardians and gateways |
+
+## Step 2: Consensus
+
+Guardians run a Byzantine-fault-tolerant consensus. With *n* guardians, the federation keeps working as long as fewer than a third are faulty: four guardians tolerate one bad or offline guardian, seven tolerate two. Every deposit, note issuance and withdrawal is agreed by the threshold before it happens.
+
+**Done when:** you can say how many faulty guardians a federation of 10 tolerates. (Answer: 3.)
+
+## Step 3: Why ecash is private
+
+When you mint ecash, your client **blinds** a random note before sending it to the guardians to sign, like putting it in a carbon-lined envelope. The guardians sign without seeing the note. Later, when anyone redeems it, the guardians can check their signature is valid but can't link it to the moment it was issued. That is the classic Chaumian ecash idea, run by a federation instead of a single bank.
+
+## Step 4: Money in and out
+
+- **Peg-in:** a user deposits on-chain bitcoin to the federation's multisig address and receives the same value in ecash, minus fees.
+- **Peg-out:** the user hands back ecash and the federation pays on-chain.
+- **Lightning:** to pay an invoice, the client gives ecash to a gateway, which pays the invoice from its own channels. To receive, the gateway is paid over Lightning and hands the user ecash. A contract makes sure the gateway is only paid if it actually completes the payment.
+
+<Callout type="warning" title="Trust is reduced, not removed">
+Users trust that a majority of guardians stay honest and online. Choose guardians who are known to the community, in different places, using different hardware and operators. Fedimint is excellent for a group with existing trust, such as a chama; it is not a substitute for self-custody of large, long-term savings.
+</Callout>
+
+## Lab
+
+1. Clone the Fedimint repository and read its README and module list. Find the code for the mint, the on-chain wallet and Lightning.
+2. Draw a diagram of a four-guardian federation with one gateway, and trace a Lightning payment from a user's ecash to a shop's invoice.
+3. If you want to run one locally, follow the development setup in the repository's docs; it starts a test federation on regtest.
+
+## Lab evidence
+
+- Your diagram, with the peg-in, ecash and Lightning flows labelled.
+- The fault tolerance of federations with 4, 7 and 10 guardians.

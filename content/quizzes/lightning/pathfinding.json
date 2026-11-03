@@ -1,0 +1,145 @@
+{
+  "lesson": "pathfinding",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Nani anachagua njia ya malipo katika Lightning?",
+        "en": "Who chooses a payment's route in Lightning?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Mlipaji",
+            "en": "The sender"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Mpokeaji",
+            "en": "The receiver"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kila nodi ya kati",
+            "en": "Each intermediate node"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Mlipaji anajenga kitunguu kwa njia yote.",
+        "en": "The sender builds the onion for the whole route."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Dijkstra inaongeza njia ipi kila mara?",
+        "en": "Which path does Dijkstra extend each time?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Ndefu zaidi",
+            "en": "The longest"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ya bahati nasibu",
+            "en": "A random one"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Nafuu zaidi iliyopatikana hadi sasa",
+            "en": "The cheapest found so far"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Hiyo ndiyo inahakikisha njia nafuu zaidi.",
+        "en": "That guarantees the cheapest route."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Mission control inakumbuka nini?",
+        "en": "What does mission control remember?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Bei ya bitcoin",
+            "en": "The bitcoin price"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Chaneli zilizoshindwa hivi karibuni",
+            "en": "Channels that failed recently"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Maneno ya siri",
+            "en": "Seed phrases"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Nodi inaziepuka kwa muda.",
+        "en": "The node avoids them for a while."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Malipo ya sehemu nyingi (MPP) yanasaidia vipi?",
+        "en": "How do multipart payments (MPP) help?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Sehemu ndogo zina uwezekano mkubwa zaidi wa kupita",
+            "en": "Smaller parts are more likely to fit"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Yanapunguza usalama",
+            "en": "They reduce security"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Hayahitaji preimage",
+            "en": "They need no preimage"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Dina anaachia preimage baada ya sehemu zote kufika.",
+        "en": "Dina releases the preimage once every part arrives."
+      }
+    }
+  ]
+}

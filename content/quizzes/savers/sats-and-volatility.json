@@ -1,0 +1,49 @@
+{
+  "lesson": "sats-and-volatility",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Bitcoin moja ina sats ngapi?", "en": "How many sats are in one bitcoin?" },
+      "options": [
+        { "id": "a", "label": { "sw": "1,000", "en": "1,000" } },
+        { "id": "b", "label": { "sw": "1,000,000", "en": "1,000,000" } },
+        { "id": "c", "label": { "sw": "100,000,000", "en": "100,000,000" } }
+      ],
+      "answer": "c",
+      "explanation": { "sw": "Bitcoin moja = sats milioni mia moja.", "en": "One bitcoin = one hundred million sats." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Ikiwa bitcoin 1 ni KES 10,000,000 (bei ya mfano), shilingi 100 zinanunua sats ngapi?", "en": "If 1 bitcoin is KES 10,000,000 (an example price), how many sats does 100 shillings buy?" },
+      "options": [
+        { "id": "a", "label": { "sw": "sats 10", "en": "10 sats" } },
+        { "id": "b", "label": { "sw": "sats 1,000", "en": "1,000 sats" } },
+        { "id": "c", "label": { "sw": "sats 100,000", "en": "100,000 sats" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "100 ÷ 10,000,000 × 100,000,000 = 1,000.", "en": "100 ÷ 10,000,000 × 100,000,000 = 1,000." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Kupanda na kushuka kwa bei (volatility) kunamaanisha nini?", "en": "What does volatility mean?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Bei inabadilika haraka na kwa kiasi kikubwa, juu au chini", "en": "The price moves quickly and a lot, up or down" } },
+        { "id": "b", "label": { "sw": "Bei inapanda kila siku", "en": "The price goes up every day" } },
+        { "id": "c", "label": { "sw": "Bei haibadiliki kamwe", "en": "The price never changes" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Volatility ni ukubwa na kasi ya mabadiliko ya bei, pande zote mbili.", "en": "Volatility is how big and fast price moves are, in both directions." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Kauli ipi ni ya kweli?", "en": "Which statement is true?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Bei ya bitcoin kwa shilingi imehakikishwa kupanda", "en": "Bitcoin's price in shillings is guaranteed to rise" } },
+        { "id": "b", "label": { "sw": "Bei ya bitcoin kwa shilingi inaweza kushuka pamoja na kupanda", "en": "Bitcoin's price in shillings can fall as well as rise" } },
+        { "id": "c", "label": { "sw": "Lazima ununue bitcoin nzima", "en": "You must buy a whole bitcoin" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Hakuna anayeweza kuahidi mwelekeo wa bei. Yeyote anayeahidi faida ya uhakika ni tahadhari.", "en": "Nobody can promise which way the price goes. Anyone promising a guaranteed return is a warning sign." }
+    }
+  ]
+}

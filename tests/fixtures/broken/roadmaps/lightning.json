@@ -1,0 +1,5 @@
+{
+  "id": "lightning",
+  "title": { "sw": "L", "en": "L" }, "tagline": { "sw": "L", "en": "L" }, "description": { "sw": "L", "en": "L" },
+  "sections": [{ "id": "all", "title": { "sw": "Yote", "en": "All" }, "lessons": [{ "slug": "labby" }] }]
+}

@@ -1,0 +1,172 @@
+/* Mbuyu sunrise. Default (no html.intro-play) = final frame. */
+.mbuyu {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.mbuyu .mb-birds {
+  opacity: 0;
+}
+.mbuyu .mb-label rect {
+  transition: fill-opacity 0.2s;
+}
+.mbuyu .mb-label:hover rect,
+.mbuyu .mb-label:focus-visible rect {
+  fill-opacity: 0.85;
+}
+.mbuyu .mb-label:focus-visible {
+  outline: none;
+}
+.mbuyu .mb-label:focus-visible rect {
+  stroke: #ff5800;
+  stroke-width: 2;
+}
+.mbuyu .mb-seed {
+  opacity: 0;
+}
+.mbuyu .mb-trunk,
+.mbuyu .mb-limb,
+.mbuyu .mb-leaf {
+  transform-box: fill-box;
+}
+.mbuyu .mb-trunk {
+  transform-origin: 50% 100%;
+}
+.mbuyu .mb-limb-l {
+  transform-origin: 100% 100%;
+}
+.mbuyu .mb-limb-r {
+  transform-origin: 0% 100%;
+}
+.mbuyu .mb-limb-m {
+  transform-origin: 50% 100%;
+}
+.mbuyu .mb-leaf {
+  transform-origin: center;
+}
+
+/* ---- First-visit sequence (~3.4s) ---- */
+.intro-play .mbuyu .mb-sun {
+  animation: mb-sun-up 3.4s ease-out both;
+}
+.intro-play .mbuyu .mb-glow {
+  animation: mb-glow-in 3.4s ease-out both;
+}
+.intro-play .mbuyu .mb-seed {
+  animation: mb-seed-drop 0.7s cubic-bezier(0.5, 0, 0.75, 0) 0.2s both;
+}
+.intro-play .mbuyu .mb-trunk {
+  animation: mb-grow-y 1s cubic-bezier(0.3, 0.7, 0.3, 1) 0.85s both;
+}
+.intro-play .mbuyu .mb-limb-l {
+  animation: mb-grow 0.7s ease-out 1.7s both;
+}
+.intro-play .mbuyu .mb-limb-r {
+  animation: mb-grow 0.7s ease-out 1.85s both;
+}
+.intro-play .mbuyu .mb-limb-m {
+  animation: mb-grow 0.6s ease-out 2s both;
+}
+.intro-play .mbuyu .mb-twig {
+  stroke-dasharray: 1;
+  animation: mb-draw 0.5s ease-out 2.3s both;
+}
+.intro-play .mbuyu .mb-leaf {
+  animation: mb-grow 0.5s cubic-bezier(0.3, 1.4, 0.6, 1) 2.5s both;
+}
+.intro-play .mbuyu .mb-label {
+  animation: mb-fade 0.5s ease-out 2.8s both;
+}
+.intro-play .mbuyu .mb-birds {
+  animation: mb-fly 5s linear 0.6s both;
+}
+.intro-play .hero-copy > * {
+  animation: mb-rise 0.7s ease-out both;
+}
+.intro-play .hero-copy > :nth-child(1) {
+  animation-delay: 3.1s;
+}
+.intro-play .hero-copy > :nth-child(2) {
+  animation-delay: 3.25s;
+}
+.intro-play .hero-copy > :nth-child(3) {
+  animation-delay: 3.4s;
+}
+.intro-play .hero-copy > :nth-child(n + 4) {
+  animation-delay: 3.55s;
+}
+
+/* Tap or key press: jump to the final frame. */
+.intro-skip .mbuyu *,
+.intro-skip .hero-copy > * {
+  animation: none !important;
+}
+
+@keyframes mb-sun-up {
+  from {
+    transform: translateY(50px);
+  }
+}
+@keyframes mb-glow-in {
+  from {
+    opacity: 0.2;
+  }
+}
+@keyframes mb-seed-drop {
+  0% {
+    opacity: 1;
+    transform: translateY(-220px);
+  }
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes mb-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes mb-grow {
+  from {
+    transform: scale(0);
+  }
+}
+@keyframes mb-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes mb-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes mb-fly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  10% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-260px, -40px);
+  }
+}
+@keyframes mb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

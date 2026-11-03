@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Ubuntu, sans-serif;
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-200: #99f6e4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+  --color-teal-800: #115e59;
+  --color-teal-900: #134e4a;
+  --color-brand: #008080;
+  --color-sun: #ff5800;
+  --color-btc: #f7931a;
+  --color-night: #1b2550;
+  --color-dusk: #5a3767;
+  --color-ember: #c8603f;
+  --color-dawn: #f3b866;
+  --color-cream: #fdf6ec;
+  --color-sand: #f5ead8;
+  --color-ink: #1f1a17;
+  --color-bark: #3b1e14;
+  --color-earth: #170d09;
+}
+
+:root {
+  --bg: #ffffff;
+  --fg: var(--color-ink);
+  --muted: #6b5e53;
+  --card: #ffffff;
+  --line: #ece4d8;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14100e;
+    --fg: #f3ece3;
+    --muted: #b3a597;
+    --card: #1e1916;
+    --line: #362c25;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-sun);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lesson reading styles (no typography plugin, to keep CSS small). */
+.lesson-body {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+.lesson-body > * + * {
+  margin-top: 1em;
+}
+.lesson-body h2 {
+  margin-top: 2.2em;
+  font-size: 1.45rem;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.lesson-body h3 {
+  margin-top: 1.8em;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.lesson-body ul,
+.lesson-body ol {
+  padding-left: 1.4em;
+}
+.lesson-body ul {
+  list-style: disc;
+}
+.lesson-body ol {
+  list-style: decimal;
+}
+.lesson-body li + li {
+  margin-top: 0.35em;
+}
+.lesson-body a {
+  color: var(--color-teal-700);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.lesson-body strong {
+  font-weight: 700;
+}
+.lesson-body blockquote {
+  border-left: 4px solid var(--color-dawn);
+  padding-left: 1em;
+  color: var(--muted);
+  font-style: italic;
+}
+.lesson-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--line);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.lesson-body pre {
+  overflow-x: auto;
+  background: #1b1714;
+  color: #f3ece3;
+  border-radius: 12px;
+  padding: 1em;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.lesson-body pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.lesson-body table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.lesson-body th,
+.lesson-body td {
+  border: 1px solid var(--line);
+  padding: 0.45em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+.lesson-body th {
+  background: var(--line);
+  font-weight: 700;
+}
+.lesson-body .term {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.lesson-body dfn {
+  font-style: normal;
+  font-weight: 600;
+}
+.lesson-body .callout-body > * + * {
+  margin-top: 0.6em;
+}
+.lesson-body .callout-body {
+  margin-top: 0.3em;
+}
+@media (prefers-color-scheme: dark) {
+  .lesson-body a {
+    color: var(--color-teal-400);
+  }
+}

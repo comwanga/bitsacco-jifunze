@@ -1,0 +1,59 @@
+---
+title: "Security and privacy of the Lightning Network"
+description: "What an attacker can learn or break: probe a route's hidden balance yourself, then survey jamming, fee attacks and the defences."
+level: intermediate
+minutes: 45
+objectives:
+  - Explain how probing reveals channel balances that gossip keeps private
+  - Find a route's limit by binary search with fake payments
+  - Describe channel jamming and other attacks, and the main defences
+resources:
+  - title: "Mastering the Lightning Network, chapter 16: Security and Privacy of the Lightning Network"
+    url: "https://github.com/lnbook/lnbook/blob/develop/16_security_privacy_ln.asciidoc"
+    kind: book
+    language: en
+  - title: "Kujifunza Bitcoin, chapter 13: Bitcoin security"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+reflection:
+  - "If anyone can probe your balances, what does that mean for a shop's privacy?"
+  - "Why are jamming attacks hard to stop without making honest payments cost more?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - probing
+  - htlc
+  - liquidity
+---
+
+Lightning is private by design: balances aren't gossiped, and onions hide senders and receivers. But privacy here is a matter of degree, and a curious or hostile node has tricks.
+
+## Probing
+
+Alice can send Dina a payment with a **random** payment hash. It can never settle, because nobody knows the preimage. Look at how it fails:
+
+- If it reaches Dina, she says "I don't know this payment" (`incorrect_payment_details`).
+- If a channel on the way is too small, a node says so earlier.
+
+So each failure answers a yes-or-no question: can this amount get through? Ask enough questions and you learn a channel's balance. That is <Term id="probing" />.
+
+<Exercise id="ch16-probe" />
+
+Your binary search should land within 20,000 sats of the route's real limit, without ever paying a sat.
+
+## Other attacks
+
+- **Channel jamming.** An attacker sends many payments to themselves and never settles them, filling channels' HTLC slots (483 per side) or locking up <Term id="liquidity" /> until the time locks expire. Proposed defences include upfront fees and reputation for peers.
+- **Fee and timelock manipulation.** An attacker can try to make an <Term id="htlc" /> expire before it can be claimed on-chain when fees are high. Anchor outputs let nodes raise fees on their closing transactions.
+- **Privacy leaks.** Your node's public channels, aliases and on-chain funding outputs can be linked to you. Private channels, onion services (Tor) and careful coin selection help.
+- **Eclipse attacks.** A node fed only by attacker-controlled peers can be shown a false view of the chain. Connect to several honest Bitcoin nodes.
+
+<Callout type="scam" title="The real-world risks first">
+For most users the biggest risks are still the ordinary ones: a leaked seed phrase, a fake wallet app, or a fake "support" agent. The savers path covers them.
+</Callout>

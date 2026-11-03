@@ -1,0 +1,108 @@
+# Jifunze Lightning lab: regtest only. Start with ./lab up (lite) or ./lab up --full (adds Erin on Eclair).
+# Topology (Alice, Bob, Chan, Dina) follows Mastering the Lightning Network, CC BY-SA 4.0.
+name: jifunze-lab
+
+services:
+  bitcoind:
+    image: polarlightning/bitcoind:${BITCOIND_TAG:-29.0}
+    command: >-
+      bitcoind -server=1 -regtest=1 -rpcuser=jifunze -rpcpassword=jifunze
+      -rpcbind=0.0.0.0 -rpcallowip=0.0.0.0/0 -rpcport=18443 -txindex=1
+      -fallbackfee=0.0002 -dnsseed=0 -listen=1 -printtoconsole
+      -zmqpubrawblock=tcp://0.0.0.0:28334 -zmqpubrawtx=tcp://0.0.0.0:28335
+    volumes: [bitcoind:/home/bitcoin/.bitcoin]
+    networks: [ln]
+    restart: unless-stopped
+
+  alice: &lnd
+    image: polarlightning/lnd:${LND_TAG:-0.20.0-beta}
+    command: >-
+      lnd --noseedbackup --alias=alice --externalip=alice --tlsextradomain=alice
+      --listen=0.0.0.0:9735 --rpclisten=0.0.0.0:10009 --restlisten=0.0.0.0:8080
+      --bitcoin.regtest --bitcoin.node=bitcoind
+      --bitcoind.rpchost=bitcoind --bitcoind.rpcuser=jifunze --bitcoind.rpcpass=jifunze
+      --bitcoind.zmqpubrawblock=tcp://bitcoind:28334 --bitcoind.zmqpubrawtx=tcp://bitcoind:28335
+      --accept-keysend --protocol.wumbo-channels --trickledelay=1000 --maxpendingchannels=10
+    volumes: [alice:/home/lnd/.lnd]
+    networks: [ln]
+    depends_on: [bitcoind]
+    restart: unless-stopped
+
+  dina:
+    <<: *lnd
+    command: >-
+      lnd --noseedbackup --alias=dina --externalip=dina --tlsextradomain=dina
+      --listen=0.0.0.0:9735 --rpclisten=0.0.0.0:10009 --restlisten=0.0.0.0:8080
+      --bitcoin.regtest --bitcoin.node=bitcoind
+      --bitcoind.rpchost=bitcoind --bitcoind.rpcuser=jifunze --bitcoind.rpcpass=jifunze
+      --bitcoind.zmqpubrawblock=tcp://bitcoind:28334 --bitcoind.zmqpubrawtx=tcp://bitcoind:28335
+      --accept-keysend --protocol.wumbo-channels --trickledelay=1000 --maxpendingchannels=10
+    volumes: [dina:/home/lnd/.lnd]
+
+  bob: &cln
+    image: polarlightning/clightning:${CLN_TAG:-25.09.3}
+    command: >-
+      lightningd --alias=bob --lightning-dir=/home/clightning/.lightning --network=regtest
+      --addr=0.0.0.0:9735 --bitcoin-rpcconnect=bitcoind --bitcoin-rpcport=18443
+      --bitcoin-rpcuser=jifunze --bitcoin-rpcpassword=jifunze --rpc-file-mode=0666
+      --log-level=info --developer --dev-bitcoind-poll=2 --dev-fast-gossip
+    volumes: [bob:/home/clightning/.lightning]
+    networks: [ln]
+    depends_on: [bitcoind]
+    restart: unless-stopped
+
+  chan:
+    <<: *cln
+    command: >-
+      lightningd --alias=chan --lightning-dir=/home/clightning/.lightning --network=regtest
+      --addr=0.0.0.0:9735 --bitcoin-rpcconnect=bitcoind --bitcoin-rpcport=18443
+      --bitcoin-rpcuser=jifunze --bitcoin-rpcpassword=jifunze --rpc-file-mode=0666
+      --log-level=info --developer --dev-bitcoind-poll=2 --dev-fast-gossip
+    volumes: [chan:/home/clightning/.lightning]
+
+  # Full profile: a fifth node, Erin, on Eclair (chapter 4 compares three implementations).
+  erin:
+    image: polarlightning/eclair:${ECLAIR_TAG:-0.12.0}
+    profiles: [full]
+    command: >-
+      polar-eclair --node-alias=erin --server.port=9735 --api.enabled=true
+      --api.binding-ip=0.0.0.0 --api.port=8080 --api.password=jifunze --chain=regtest
+      --bitcoind.host=bitcoind --bitcoind.rpcport=18443 --bitcoind.rpcuser=jifunze
+      --bitcoind.rpcpassword=jifunze --bitcoind.zmqblock=tcp://bitcoind:28334
+      --bitcoind.zmqtx=tcp://bitcoind:28335 --bitcoind.wallet=erin
+      --bitcoind.startup-locked-utxos-behavior=unlock
+      --datadir=/home/eclair/.eclair --printToConsole=true
+      --on-chain-fees.feerate-tolerance.ratio-low=0.00001
+      --on-chain-fees.feerate-tolerance.ratio-high=10000.0
+    volumes: [erin:/home/eclair]
+    networks: [ln]
+    depends_on: [bitcoind]
+    restart: unless-stopped
+
+  lab:
+    build: .
+    image: jifunze/lab:local
+    environment:
+      JIFUNZE_ORIGINS: ${JIFUNZE_ORIGINS:-https://jifunze.bitsacco.com,http://localhost:3000,http://localhost:4321}
+    ports: ["127.0.0.1:7777:7777"]
+    volumes:
+      - alice:/lab/nodes/alice:ro
+      - dina:/lab/nodes/dina:ro
+      - bob:/lab/nodes/bob:ro
+      - chan:/lab/nodes/chan:ro
+      - state:/lab/state
+    networks: [ln]
+    depends_on: [bitcoind]
+    restart: unless-stopped
+
+networks:
+  ln: {}
+
+volumes:
+  bitcoind: {}
+  alice: {}
+  dina: {}
+  bob: {}
+  chan: {}
+  erin: {}
+  state: {}

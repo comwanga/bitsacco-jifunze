@@ -1,0 +1,55 @@
+---
+title: "Kupitisha malipo kwenye mtandao wa chaneli"
+description: "Jinsi Alice anavyomlipa Dina kupitia wageni wawili bila kumwamini yeyote: mikataba ya hashi yenye kufuli la muda, hatua kwa hatua, kisha malipo halisi ya hatua mbili."
+level: intermediate
+minutes: 45
+objectives:
+  - Eleza jinsi HTLC inavyofanya malipo yategemee siri
+  - Eleza kwa nini kufuli za muda hupungua kwenye njia
+  - Lipa kupitia nodi mbili za kati na uthibitishe preimage
+resources:
+  - title: "Mastering the Lightning Network, chapter 8: Routing on a Network of Payment Channels"
+    url: "https://github.com/lnbook/lnbook/blob/develop/08_routing_htlcs.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Kwa nini Bob hawezi kuchukua malipo ya Alice na kuyabaki nayo?"
+  - "Nini kingeharibika kama kila hatua ingekuwa na kufuli la muda lile lile?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - htlc
+  - preimage
+  - invoice
+---
+
+Alice anataka kumlipa Dina sats 21,000. Hawana chaneli, lakini Alice → Bob → Chan → Dina ni njia. Kwa nini Bob na Chan, wageni kwa Alice, wapitishe pesa kwa uaminifu?
+
+## Ahadi: HTLC
+
+1. Dina anachagua siri ya bahati nasibu, yaani <Term id="preimage" />, na kuweka hashi yake kwenye <Term id="invoice" /> yake.
+2. Alice anampa Bob <Term id="htlc" />: "Sats 21,002 ni zako ukinionyesha siri iliyo nyuma ya hashi hii kabla ya bloku *H*."
+3. Bob anampa Chan mpango ule ule kwa sats 21,001, na muda wa mwisho wa mapema zaidi. Chan anampa Dina sats 21,000, mapema zaidi tena.
+4. Dina anaijua siri, kwa hiyo anaifichua kwa Chan na kudai sats 21,000 zake. Sasa Chan anaijua na anadai kutoka kwa Bob; Bob anadai kutoka kwa Alice.
+
+Kila hatua inabaki na sat 1 kama ada yake. Hakuna anayeweza kudai bila siri, na siri inasafiri kurudi nyuma tu baada ya Dina kulipwa. Kitu chochote kikishindikana, muda wa mwisho unapita na kila HTLC inafutwa: malipo yote yanatokea, au hakuna kinachotokea.
+
+## Kwa nini muda wa mwisho hupungua
+
+Bob lazima apate muda wa kudai kutoka kwa Alice *baada ya* Chan kudai kutoka kwake. Kwa hiyo kufuli la muda la kila hatua ni fupi kuliko la iliyotangulia, kwa `time_lock_delta` ya nodi hiyo (uliona bloku 80 kwa LND katika somo la 5).
+
+## Hatua ya 1: Lipa kupitia hatua mbili
+
+<Exercise id="ch08-multihop" />
+
+Jedwali la njia linaorodhesha Bob na Chan, kila mmoja akichukua ada ndogo.
+
+## Hatua ya 2: Preimage ndiyo risiti
+
+Sasa Alice anashika preimage. Ukiipitisha kwenye hashi, unapata hashi ile ile ya malipo iliyo kwenye ankara ya Dina. Huo ni ushahidi kwamba amelipwa, ambao Dina hawezi kuukana.
+
+<Exercise id="ch08-preimage" />

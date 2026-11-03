@@ -1,0 +1,52 @@
+---
+title: "Conclusion: what to build next"
+description: "You have run every layer of Lightning yourself. Where the protocol is heading, and how to turn what you learned into a tool people use."
+level: intermediate
+minutes: 15
+objectives:
+  - Summarise the path from a single channel to a network of private payments
+  - Name three areas where Lightning is still changing
+  - Choose a project to build and share
+resources:
+  - title: "Mastering the Lightning Network, chapter 17: Conclusion"
+    url: "https://github.com/lnbook/lnbook/blob/develop/17_conclusion.asciidoc"
+    kind: book
+    language: en
+  - title: "Bitsacco on GitHub"
+    url: "https://github.com/bitsacco"
+    kind: community
+    language: en
+reflection:
+  - "Which lesson changed how you think about Lightning the most?"
+  - "What small tool would make Lightning easier for a chama to use?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - lightning
+  - open-source
+---
+
+You started with one invoice. Since then you have opened and closed channels, followed a payment through HTLCs, built an onion, read the gossip graph, written a route finder, parsed raw messages, decoded invoices and probed a balance, all on real nodes.
+
+## Where Lightning is heading
+
+- **Better payment formats.** BOLT 12 offers, blinded paths that hide the receiver, and async payments for phones that are often offline.
+- **Easier liquidity.** Splicing (resizing a channel without closing it), dual-funded channels, and liquidity markets.
+- **Communities and custody.** Fedimint and ecash bring Lightning to groups that share trust, like chamas, without each member running a node.
+
+## Build something
+
+The <Term id="lightning" /> is <Term id="open-source" />, and so is everything in this lab. The best way to keep learning is to ship a small tool and get feedback:
+
+1. Pick a brief from the builders path's final project, such as a chama tip jar, a UTXO explainer or an offline sats calculator, or invent your own.
+2. Build it against this lab: it's the same regtest network you already know.
+3. Share the repository in the Bitsacco community and ask for a review.
+
+<Callout type="tip" title="Keep the lab">
+Your lab keeps its channels between sessions. `./lab down` stops it; `./lab down -v` wipes it for a fresh start; `./lab reset --hard route` rebuilds the chain from scratch.
+</Callout>

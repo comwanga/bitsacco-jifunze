@@ -1,0 +1,3 @@
+{ "lesson": "only-en", "questions": [ { "id": "q1", "prompt": { "sw": "S", "en": "Q" },
+  "options": [ { "id": "a", "label": { "sw": "A", "en": "A" } }, { "id": "b", "label": { "sw": "B", "en": "B" } } ],
+  "answer": "z", "explanation": { "sw": "E", "en": "E" } } ] }

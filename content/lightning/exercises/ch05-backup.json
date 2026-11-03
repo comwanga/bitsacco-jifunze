@@ -1,0 +1,16 @@
+{
+  "id": "ch05-backup",
+  "lesson": "node-operations",
+  "node": "alice",
+  "tab": "cli",
+  "title": {
+    "sw": "Hifadhi nakala ya chaneli",
+    "en": "Back up the channels"
+  },
+  "starter": {
+    "cli": "# A static channel backup lets Alice recover funds if her node is lost.\nlncli exportchanbackup --all --output_file /tmp/alice-channels.backup\nls -l /tmp/alice-channels.backup"
+  },
+  "solution": {
+    "cli": "lncli exportchanbackup --all --output_file /tmp/alice-channels.backup\nls -l /tmp/alice-channels.backup"
+  }
+}

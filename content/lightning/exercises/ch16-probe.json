@@ -1,0 +1,16 @@
+{
+  "id": "ch16-probe",
+  "lesson": "security-privacy",
+  "node": "alice",
+  "tab": "python",
+  "title": {
+    "sw": "Pima salio la njia kwa kujaribu",
+    "en": "Probe a route's balance"
+  },
+  "starter": {
+    "python": "from jifunze_lab import probe\n\n# probe(sats) sends a payment with a fake hash from Alice to Dina. It can never succeed,\n# but the error tells us whether the amount could have reached Dina (True) or not (False).\nprint(\"10,000 sats:\", probe(10_000))\nprint(\"5,000,000 sats:\", probe(5_000_000))\n\nlow, high = 0, 1_000_000\n# TODO: binary-search between low and high (steps of 10,000 sats are fine)\n# and print the largest amount that can reach Dina, as:  max_sats: N\n"
+  },
+  "solution": {
+    "python": "from jifunze_lab import probe\n\nlow, high = 0, 1_000_000\nwhile high - low > 10_000:\n    mid = (low + high) // 2\n    if probe(mid):\n        low = mid\n    else:\n        high = mid\nprint(\"max_sats:\", low)\n"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "ch05-fees",
+  "lesson": "node-operations",
+  "node": "alice",
+  "tab": "cli",
+  "title": {
+    "sw": "Weka ada za kupitisha malipo",
+    "en": "Set routing fees"
+  },
+  "starter": {
+    "cli": "# Charge 1 sat (1000 msat) per payment plus 100 parts per million.\nlncli updatechanpolicy --base_fee_msat 1000 --fee_rate_ppm 100 --time_lock_delta 80\nlncli feereport"
+  },
+  "solution": {
+    "cli": "lncli updatechanpolicy --base_fee_msat 1000 --fee_rate_ppm 100 --time_lock_delta 80\nlncli feereport"
+  }
+}

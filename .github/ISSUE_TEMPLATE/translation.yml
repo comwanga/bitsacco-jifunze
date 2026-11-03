@@ -1,0 +1,23 @@
+name: Translation
+description: Improve Kiswahili or English wording, or offer to translate a lesson
+labels: [translation]
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson (roadmap and slug)
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options: [Kiswahili, English]
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Current wording and suggested wording
+    validations:
+      required: true

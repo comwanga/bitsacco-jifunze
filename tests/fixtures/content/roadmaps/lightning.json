@@ -1,0 +1,7 @@
+{
+  "id": "lightning",
+  "title": { "sw": "Lightning kwa Wajenzi", "en": "Lightning for Builders" },
+  "tagline": { "sw": "Maabara", "en": "Lab" },
+  "description": { "sw": "Maelezo", "en": "Description" },
+  "sections": [{ "id": "misingi", "title": { "sw": "Misingi", "en": "Basics" }, "lessons": [{ "slug": "getting-started" }] }]
+}

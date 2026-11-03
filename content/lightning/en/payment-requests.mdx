@@ -1,0 +1,63 @@
+---
+title: "Lightning payment requests"
+description: "Take an invoice apart: the human-readable part that holds the amount, the tagged fields inside, and the signature. Write a decoder for the amount."
+level: intermediate
+minutes: 35
+objectives:
+  - Name the parts of a BOLT11 invoice
+  - Convert an invoice's amount and multiplier into sats
+  - Explain what BOLT 12 offers add
+resources:
+  - title: "Mastering the Lightning Network, chapter 15: Lightning Payment Requests"
+    url: "https://github.com/lnbook/lnbook/blob/develop/15_payment_requests.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 11: invoice protocol for Lightning payments"
+    url: "https://github.com/lightning/bolts/blob/master/11-payment-encoding.md"
+    kind: docs
+    language: en
+reflection:
+  - "Why is a BOLT11 invoice meant to be paid only once?"
+  - "What would a shop gain from a reusable offer instead of a new invoice per sale?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - bolt11
+  - invoice
+  - preimage
+---
+
+You have pasted many invoices by now. A <Term id="bolt11" /> <Term id="invoice" /> is a bech32 string with three parts:
+
+```text
+lnbcrt500u 1 pj9x…(data)…  (signature)
+└── hrp ─┘ ↑ └──── tagged fields ────┘
+       separator
+```
+
+## The human-readable part (hrp)
+
+- `ln`: Lightning.
+- `bc` mainnet, `tb` testnet, `tbs` signet, `bcrt` regtest.
+- An optional **amount** with a **multiplier**: `m` milli (10⁻³ BTC), `u` micro (10⁻⁶), `n` nano (10⁻⁹), `p` pico (10⁻¹²).
+
+So `lnbcrt500u` means 500 × 10⁻⁶ BTC = 0.0005 BTC = 50,000 sats. The separator is the **last** `1` in the string; bech32 data never contains a `1`.
+
+## Tagged fields
+
+After a timestamp, the data holds tagged fields: `p` the payment hash (the hash of the <Term id="preimage" />), `d` a description, `x` expiry, `c` the final time lock, `s` a payment secret, `r` routing hints for private channels, and `9` feature bits. The invoice ends with Dina's signature, which also reveals her public key.
+
+## Decode the amount
+
+<Exercise id="ch15-decode" />
+
+The check tries your `amount_sats` on several kinds of invoices: micro, milli and nano amounts on mainnet and regtest.
+
+## Beyond BOLT11: offers
+
+BOLT 11 invoices are single-use and carry everything in one string. **BOLT 12 offers** are reusable: a shop prints one offer, and each payer's wallet fetches a fresh invoice over Lightning itself. That allows refunds, recurring payments and more privacy for the receiver.

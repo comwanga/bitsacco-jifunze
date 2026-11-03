@@ -1,0 +1,145 @@
+{
+  "lesson": "architecture",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Tabaka gani linasimba miunganisho kati ya nodi?",
+        "en": "Which layer encrypts connections between nodes?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Muunganisho wa mtandao (BOLT 8)",
+            "en": "Network connection (BOLT 8)"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Malipo (BOLT 11)",
+            "en": "Payments (BOLT 11)"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Gossip (BOLT 7)",
+            "en": "Gossip (BOLT 7)"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "BOLT 8 inaeleza usafirishaji uliosimbwa.",
+        "en": "BOLT 8 specifies the encrypted transport."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Ankara zinaelezwa katika BOLT ipi?",
+        "en": "Which BOLT specifies invoices?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "BOLT 1",
+            "en": "BOLT 1"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "BOLT 4",
+            "en": "BOLT 4"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "BOLT 11",
+            "en": "BOLT 11"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "BOLT 11 ni ankara; BOLT 12 ni ofa.",
+        "en": "BOLT 11 is invoices; BOLT 12 is offers."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Chini ya tabaka zote za Lightning kuna nini?",
+        "en": "What sits beneath all of Lightning's layers?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Seva ya kampuni",
+            "en": "A company server"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Bitcoin",
+            "en": "Bitcoin"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Benki",
+            "en": "A bank"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Bitcoin inalinda chaneli.",
+        "en": "Bitcoin enforces the channels."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Faida moja ya tabaka ni ipi?",
+        "en": "What is one benefit of layers?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Sehemu moja inaweza kuboreshwa bila kuandika upya nyingine",
+            "en": "One part can improve without rewriting the rest"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Zinafanya malipo kuwa ghali",
+            "en": "They make payments expensive"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Zinaficha msimbo",
+            "en": "They hide the code"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Kwa mfano, ofa mpya hazibadilishi ufadhili wa chaneli.",
+        "en": "For example, new offers don't change channel funding."
+      }
+    }
+  ]
+}

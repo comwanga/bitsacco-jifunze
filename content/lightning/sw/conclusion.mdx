@@ -1,0 +1,51 @@
+---
+title: "Hitimisho: cha kujenga baadaye"
+description: "Umeendesha kila tabaka la Lightning mwenyewe. Itifaki inaelekea wapi, na jinsi ya kugeuza ulichojifunza kuwa zana ambayo watu wanaitumia."
+level: intermediate
+minutes: 15
+objectives:
+  - Fupisha njia kutoka chaneli moja hadi mtandao wa malipo ya faragha
+  - Taja maeneo matatu ambapo Lightning bado inabadilika
+  - Chagua mradi wa kujenga na kushiriki
+resources:
+  - title: "Mastering the Lightning Network, chapter 17: Conclusion"
+    url: "https://github.com/lnbook/lnbook/blob/develop/17_conclusion.asciidoc"
+    kind: book
+    language: en
+  - title: "Bitsacco on GitHub"
+    url: "https://github.com/bitsacco"
+    kind: community
+    language: en
+reflection:
+  - "Ni somo gani lililobadilisha zaidi jinsi unavyofikiri kuhusu Lightning?"
+  - "Ni zana gani ndogo ingefanya Lightning iwe rahisi kwa chama kutumia?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - lightning
+  - open-source
+---
+
+Ulianza na ankara moja. Tangu hapo umefungua na kufunga chaneli, umefuatilia malipo kupitia HTLC, umejenga kitunguu, umesoma ramani ya gossip, umeandika kitafuta-njia, umechanganua jumbe ghafi, umesimbua ankara na umepima salio, yote kwenye nodi halisi.
+
+## Lightning inaelekea wapi
+
+- **Miundo bora ya malipo.** Ofa za BOLT 12, njia zilizofichwa zinazomficha mpokeaji, na malipo yasiyosubiri kwa simu ambazo mara nyingi hazipo hewani.
+- **Ukwasi rahisi zaidi.** Splicing (kubadilisha ukubwa wa chaneli bila kuifunga), chaneli zinazofadhiliwa na pande mbili, na masoko ya ukwasi.
+- **Jumuiya na ulinzi.** Fedimint na ecash zinaleta Lightning kwa vikundi vinavyoaminiana, kama vyama, bila kila mwanachama kuendesha nodi.
+
+## Jenga kitu
+
+<Term id="lightning">Mtandao wa Lightning</Term> ni <Term id="open-source" />, na vivyo hivyo kila kitu kwenye maabara hii. Njia bora ya kuendelea kujifunza ni kuchapisha zana ndogo na kupata maoni:
+
+1. Chagua mradi kutoka mradi wa mwisho wa njia ya wajenzi, kama sanduku la michango la chama, mfafanuzi wa UTXO au kikokotoo cha sats bila mtandao, au ubuni wako mwenyewe.
+2. Ujenge dhidi ya maabara hii: ni mtandao ule ule wa regtest unaoujua tayari.
+3. Shiriki hazina yako kwenye jumuiya ya Bitsacco na uombe ukaguzi.
+
+<Callout type="tip" title="Hifadhi maabara">
+Maabara yako inahifadhi chaneli zake kati ya vipindi. `./lab down` inaisimamisha; `./lab down -v` inaifuta ili uanze upya; `./lab reset --hard route` inajenga mnyororo upya kabisa.
+</Callout>

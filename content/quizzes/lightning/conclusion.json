@@ -1,0 +1,145 @@
+{
+  "lesson": "conclusion",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Splicing inaruhusu nini?",
+        "en": "What does splicing allow?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kubadilisha ukubwa wa chaneli bila kuifunga",
+            "en": "Resizing a channel without closing it"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kufuta blockchain",
+            "en": "Deleting the blockchain"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kulipa bila ada kamwe",
+            "en": "Paying with no fees ever"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Chaneli inakua au kupungua ikiwa wazi.",
+        "en": "The channel grows or shrinks while open."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Fedimint inaleta Lightning kwa nani?",
+        "en": "Who does Fedimint bring Lightning to?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Wachimbaji tu",
+            "en": "Only miners"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Benki",
+            "en": "Banks"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Vikundi vinavyoaminiana, kama vyama",
+            "en": "Groups that share trust, like chamas"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Wanachama hawahitaji kila mmoja kuendesha nodi.",
+        "en": "Members don't each need to run a node."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Amri ipi inafuta maabara yote ili uanze upya?",
+        "en": "Which command wipes the lab for a fresh start?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "./lab doctor",
+            "en": "./lab doctor"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "./lab down -v",
+            "en": "./lab down -v"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "./lab pair",
+            "en": "./lab pair"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "-v inafuta pia data.",
+        "en": "-v also deletes the data."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Njia bora ya kuendelea kujifunza ni ipi?",
+        "en": "What is the best way to keep learning?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kuchapisha zana ndogo na kupata maoni",
+            "en": "Ship a small tool and get feedback"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kusoma tu bila kujaribu",
+            "en": "Only read, never try"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kusubiri",
+            "en": "Wait"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Shiriki hazina yako kwenye jumuiya ya Bitsacco.",
+        "en": "Share your repository in the Bitsacco community."
+      }
+    }
+  ]
+}

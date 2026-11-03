@@ -1,0 +1,452 @@
+[
+  {
+    "id": "bitcoin",
+    "sw": "bitcoin",
+    "en": "bitcoin",
+    "definition": {
+      "sw": "Pesa ya kidijitali isiyotolewa na serikali wala kampuni yoyote. Sheria zake ziko kwenye programu huria inayoendeshwa na maelfu ya kompyuta duniani.",
+      "en": "Digital money that no government or company issues. Its rules live in open-source software run by thousands of computers around the world."
+    }
+  },
+  {
+    "id": "sats",
+    "sw": "sats",
+    "en": "sats",
+    "definition": {
+      "sw": "Kipimo kidogo zaidi cha bitcoin. Bitcoin moja ina sats milioni 100.",
+      "en": "The smallest unit of bitcoin. One bitcoin is 100 million sats."
+    }
+  },
+  {
+    "id": "wallet",
+    "sw": "pochi",
+    "en": "wallet",
+    "definition": {
+      "sw": "Programu au kifaa kinachohifadhi funguo zako na kukuwezesha kutuma na kupokea bitcoin. Pochi haihifadhi sarafu zenyewe.",
+      "en": "An app or device that stores your keys and lets you send and receive bitcoin. It doesn't hold the coins themselves."
+    }
+  },
+  {
+    "id": "seed-phrase",
+    "sw": "maneno ya siri",
+    "en": "seed phrase",
+    "definition": {
+      "sw": "Maneno 12 au 24 yanayoweza kurejesha funguo zote za pochi yako. Anayeyajua ndiye mmiliki wa pesa.",
+      "en": "12 or 24 words that can restore every key in your wallet. Whoever knows them owns the money."
+    }
+  },
+  {
+    "id": "private-key",
+    "sw": "ufunguo binafsi",
+    "en": "private key",
+    "definition": {
+      "sw": "Nambari ya siri inayotia sahihi malipo yako. Usimpe mtu yeyote.",
+      "en": "A secret number that signs your payments. Never give it to anyone."
+    }
+  },
+  {
+    "id": "public-key",
+    "sw": "ufunguo wa umma",
+    "en": "public key",
+    "definition": {
+      "sw": "Nambari inayotokana na ufunguo binafsi. Wengine huitumia kuthibitisha sahihi yako bila kujua siri yako.",
+      "en": "A number derived from your private key. Others use it to check your signature without learning your secret."
+    }
+  },
+  {
+    "id": "address",
+    "sw": "anwani",
+    "en": "address",
+    "definition": {
+      "sw": "Mfuatano wa herufi unaompa mtu ili akutumie bitcoin, kama nambari ya simu ya M-Pesa.",
+      "en": "A string you give someone so they can send you bitcoin, like an M-Pesa phone number."
+    }
+  },
+  {
+    "id": "self-custody",
+    "sw": "kujitunzia",
+    "en": "self-custody",
+    "definition": {
+      "sw": "Kushika funguo zako mwenyewe, bila kumtegemea mtu mwingine kuzilinda.",
+      "en": "Holding your own keys, without relying on anyone else to keep them."
+    }
+  },
+  {
+    "id": "custodial",
+    "sw": "pochi ya mtunzaji",
+    "en": "custodial wallet",
+    "definition": {
+      "sw": "Pochi ambayo kampuni au mtu mwingine anashika funguo kwa niaba yako.",
+      "en": "A wallet where a company or another person holds the keys for you."
+    }
+  },
+  {
+    "id": "ecash",
+    "sw": "ecash",
+    "en": "ecash",
+    "definition": {
+      "sw": "Noti za kidijitali zinazowakilisha bitcoin iliyoshikwa na shirikisho. Malipo yake ni ya faragha.",
+      "en": "Digital notes that stand for bitcoin held by a federation. Payments with them are private."
+    }
+  },
+  {
+    "id": "fedimint",
+    "sw": "Fedimint",
+    "en": "Fedimint",
+    "definition": {
+      "sw": "Programu huria inayoruhusu jumuiya kuendesha shirikisho linaloshika bitcoin kwa pamoja na kutoa ecash.",
+      "en": "Open-source software that lets a community run a federation that holds bitcoin together and issues ecash."
+    }
+  },
+  {
+    "id": "federation",
+    "sw": "shirikisho",
+    "en": "federation",
+    "definition": {
+      "sw": "Kikundi cha walinzi wanaoshika bitcoin kwa pamoja; wengi wao lazima wakubaliane kabla pesa kusonga.",
+      "en": "A group of guardians who hold bitcoin together; most of them must agree before money moves."
+    }
+  },
+  {
+    "id": "guardian",
+    "sw": "mlinzi",
+    "en": "guardian",
+    "definition": {
+      "sw": "Mwanachama wa shirikisho anayeendesha seva na kushika sehemu ya funguo.",
+      "en": "A member of a federation who runs a server and holds part of the keys."
+    }
+  },
+  {
+    "id": "multisig",
+    "sw": "multisig",
+    "en": "multisig",
+    "definition": {
+      "sw": "Mpangilio ambapo sahihi kadhaa zinahitajika ili kutumia bitcoin, kwa mfano 2 kati ya 3.",
+      "en": "A setup where several signatures are needed to spend bitcoin, for example 2 of 3."
+    }
+  },
+  {
+    "id": "lightning",
+    "sw": "mtandao wa Lightning",
+    "en": "Lightning Network",
+    "definition": {
+      "sw": "Mtandao juu ya Bitcoin unaowezesha malipo ya haraka na ada ndogo sana.",
+      "en": "A network on top of Bitcoin for fast payments with very small fees."
+    }
+  },
+  {
+    "id": "invoice",
+    "sw": "ankara",
+    "en": "invoice",
+    "definition": {
+      "sw": "Ombi la malipo la Lightning, mara nyingi kama msimbo wa QR, lenye kiasi na muda wa kuisha.",
+      "en": "A Lightning payment request, often shown as a QR code, with an amount and an expiry time."
+    }
+  },
+  {
+    "id": "channel",
+    "sw": "chaneli",
+    "en": "channel",
+    "definition": {
+      "sw": "Uhusiano wa malipo kati ya nodi mbili za Lightning, uliofungwa kwa muamala wa Bitcoin.",
+      "en": "A payment link between two Lightning nodes, locked by a Bitcoin transaction."
+    }
+  },
+  {
+    "id": "node",
+    "sw": "nodi",
+    "en": "node",
+    "definition": {
+      "sw": "Kompyuta inayoendesha programu ya Bitcoin au Lightning na kukagua sheria zote yenyewe.",
+      "en": "A computer running Bitcoin or Lightning software that checks every rule for itself."
+    }
+  },
+  {
+    "id": "blockchain",
+    "sw": "blockchain",
+    "en": "blockchain",
+    "definition": {
+      "sw": "Daftari la pamoja la miamala yote ya Bitcoin, linalohifadhiwa na nodi kote duniani.",
+      "en": "The shared record of every Bitcoin transaction, kept by nodes around the world."
+    }
+  },
+  {
+    "id": "block",
+    "sw": "bloku",
+    "en": "block",
+    "definition": {
+      "sw": "Kundi la miamala linaloongezwa kwenye blockchain takriban kila dakika 10.",
+      "en": "A batch of transactions added to the blockchain about every 10 minutes."
+    }
+  },
+  {
+    "id": "mining",
+    "sw": "uchimbaji",
+    "en": "mining",
+    "definition": {
+      "sw": "Kazi ya kompyuta zinazoshindana kuongeza bloku inayofuata na kulipwa bitcoin mpya na ada.",
+      "en": "Computers competing to add the next block, paid in new bitcoin and fees."
+    }
+  },
+  {
+    "id": "halving",
+    "sw": "upunguzaji nusu",
+    "en": "halving",
+    "definition": {
+      "sw": "Kila bloku 210,000 (takriban miaka minne), zawadi ya bitcoin mpya kwa wachimbaji hupungua nusu.",
+      "en": "Every 210,000 blocks (about four years) the new-bitcoin reward for miners is cut in half."
+    }
+  },
+  {
+    "id": "transaction",
+    "sw": "muamala",
+    "en": "transaction",
+    "definition": {
+      "sw": "Ujumbe uliotiwa sahihi unaohamisha bitcoin kutoka kwa matokeo ya zamani kwenda kwa wamiliki wapya.",
+      "en": "A signed message that moves bitcoin from old outputs to new owners."
+    }
+  },
+  {
+    "id": "utxo",
+    "sw": "UTXO",
+    "en": "UTXO",
+    "definition": {
+      "sw": "Matokeo ya muamala ambayo bado hayajatumika: kipande cha bitcoin unachoweza kutumia.",
+      "en": "Unspent transaction output: a piece of bitcoin you can spend."
+    }
+  },
+  {
+    "id": "fee",
+    "sw": "ada",
+    "en": "fee",
+    "definition": {
+      "sw": "Kiasi kidogo unacholipa ili muamala wako uingizwe kwenye bloku au upite kwenye Lightning.",
+      "en": "A small amount you pay to get your transaction into a block or routed over Lightning."
+    }
+  },
+  {
+    "id": "confirmation",
+    "sw": "uthibitisho",
+    "en": "confirmation",
+    "definition": {
+      "sw": "Muamala unapoingizwa kwenye bloku hupata uthibitisho mmoja; kila bloku inayofuata huongeza mmoja.",
+      "en": "A transaction gets one confirmation when it enters a block; each later block adds another."
+    }
+  },
+  {
+    "id": "mempool",
+    "sw": "mempool",
+    "en": "mempool",
+    "definition": {
+      "sw": "Foleni ya miamala inayosubiri kuingizwa kwenye bloku.",
+      "en": "The queue of transactions waiting to get into a block."
+    }
+  },
+  {
+    "id": "volatility",
+    "sw": "kupanda na kushuka kwa bei",
+    "en": "volatility",
+    "definition": {
+      "sw": "Jinsi bei inavyobadilika haraka na kwa kiasi kikubwa, juu au chini.",
+      "en": "How quickly and how far a price moves, up or down."
+    }
+  },
+  {
+    "id": "inflation",
+    "sw": "mfumuko wa bei",
+    "en": "inflation",
+    "definition": {
+      "sw": "Bei za bidhaa kupanda kwa muda, hivyo pesa ile ile inanunua vitu vichache.",
+      "en": "Prices rising over time, so the same money buys less."
+    }
+  },
+  {
+    "id": "chama",
+    "sw": "chama",
+    "en": "chama",
+    "definition": {
+      "sw": "Kikundi cha watu wanaoweka akiba au kuwekeza pamoja kwa sheria walizokubaliana.",
+      "en": "A group of people who save or invest together under rules they agreed on."
+    }
+  },
+  {
+    "id": "scam",
+    "sw": "utapeli",
+    "en": "scam",
+    "definition": {
+      "sw": "Hila ya kukudanganya ili utoe pesa au siri zako.",
+      "en": "A trick to fool you into handing over money or secrets."
+    }
+  },
+  {
+    "id": "phishing",
+    "sw": "hadaa ya mtandaoni",
+    "en": "phishing",
+    "definition": {
+      "sw": "Ujumbe au tovuti bandia inayojifanya kuwa huduma halali ili kuiba siri zako.",
+      "en": "A fake message or website pretending to be a real service to steal your secrets."
+    }
+  },
+  {
+    "id": "whitepaper",
+    "sw": "karatasi nyeupe",
+    "en": "whitepaper",
+    "definition": {
+      "sw": "Waraka wa kurasa tisa wa Satoshi Nakamoto (2008) ulioeleza Bitcoin kwa mara ya kwanza.",
+      "en": "Satoshi Nakamoto's nine-page paper (2008) that first described Bitcoin."
+    }
+  },
+  {
+    "id": "exchange",
+    "sw": "soko la kubadilishia",
+    "en": "exchange",
+    "definition": {
+      "sw": "Kampuni inayokuuzia au kukununulia bitcoin kwa shilingi; kwa kawaida ni mtunzaji.",
+      "en": "A company that sells you bitcoin for shillings or buys it from you; usually a custodian."
+    }
+  },
+  {
+    "id": "qr-code",
+    "sw": "msimbo wa QR",
+    "en": "QR code",
+    "definition": {
+      "sw": "Mraba wa vitone unaosomwa na kamera ya simu, mara nyingi una anwani au ankara.",
+      "en": "A square of dots a phone camera can read, often holding an address or invoice."
+    }
+  },
+  {
+    "id": "backup",
+    "sw": "nakala ya akiba",
+    "en": "backup",
+    "definition": {
+      "sw": "Nakala ya maneno yako ya siri iliyohifadhiwa mahali salama ili urejeshe pochi.",
+      "en": "A copy of your seed phrase kept somewhere safe so you can restore your wallet."
+    }
+  },
+  {
+    "id": "open-source",
+    "sw": "programu huria",
+    "en": "open source",
+    "definition": {
+      "sw": "Programu ambayo msimbo wake uko wazi kwa yeyote kusoma, kukagua na kuboresha.",
+      "en": "Software whose code anyone can read, check and improve."
+    }
+  },
+  {
+    "id": "pull-request",
+    "sw": "pull request",
+    "en": "pull request",
+    "definition": {
+      "sw": "Pendekezo la mabadiliko kwenye mradi wa GitHub, linalokaguliwa kabla ya kuunganishwa.",
+      "en": "A proposed change to a GitHub project, reviewed before it is merged."
+    }
+  },
+  {
+    "id": "regtest",
+    "sw": "regtest",
+    "en": "regtest",
+    "definition": {
+      "sw": "Mtandao binafsi wa majaribio wa Bitcoin unaoudhibiti, unaochimba bloku papo hapo.",
+      "en": "A private Bitcoin test network you control, where blocks are mined instantly."
+    }
+  },
+  {
+    "id": "descriptor",
+    "sw": "descriptor",
+    "en": "descriptor",
+    "definition": {
+      "sw": "Maelezo mafupi yanayoeleza ni anwani zipi pochi inamiliki na jinsi ya kuzitumia.",
+      "en": "A short description of which addresses a wallet owns and how to spend them."
+    }
+  },
+  {
+    "id": "htlc",
+    "sw": "HTLC",
+    "en": "HTLC",
+    "definition": {
+      "sw": "Mkataba wa hashi wenye kufuli la muda: malipo yanayofunguliwa tu kwa siri sahihi kabla ya muda kuisha.",
+      "en": "Hash time-locked contract: a payment that unlocks only with the right secret before a deadline."
+    }
+  },
+  {
+    "id": "preimage",
+    "sw": "preimage",
+    "en": "preimage",
+    "definition": {
+      "sw": "Siri ambayo hashi yake ni hashi ya malipo. Kuifichua ndiko kunathibitisha kwamba malipo yamefika.",
+      "en": "The secret whose hash is the payment hash. Revealing it proves the payment arrived."
+    }
+  },
+  {
+    "id": "onion-routing",
+    "sw": "upitishaji wa kitunguu",
+    "en": "onion routing",
+    "definition": {
+      "sw": "Kufunga maelekezo ya malipo kwa safu za usimbaji, ili kila nodi ijue hatua inayofuata tu.",
+      "en": "Wrapping payment instructions in layers of encryption so each node only learns the next hop."
+    }
+  },
+  {
+    "id": "gossip",
+    "sw": "gossip",
+    "en": "gossip",
+    "definition": {
+      "sw": "Ujumbe ambao nodi hupeana kuhusu chaneli na nodi zilizopo, ili kila moja ijenge ramani ya mtandao.",
+      "en": "Messages nodes pass on about existing channels and nodes, so each can build a map of the network."
+    }
+  },
+  {
+    "id": "liquidity",
+    "sw": "ukwasi",
+    "en": "liquidity",
+    "definition": {
+      "sw": "Kiasi kinachoweza kutumwa (ukwasi wa kutoka) au kupokelewa (ukwasi wa kuingia) kwenye chaneli.",
+      "en": "How much can be sent (outbound) or received (inbound) over a channel."
+    }
+  },
+  {
+    "id": "commitment-transaction",
+    "sw": "muamala wa ahadi",
+    "en": "commitment transaction",
+    "definition": {
+      "sw": "Muamala uliotiwa sahihi unaoonyesha salio la sasa la chaneli; kila malipo hutengeneza mpya.",
+      "en": "A signed transaction holding a channel's current balances; every payment makes a new one."
+    }
+  },
+  {
+    "id": "force-close",
+    "sw": "kufunga kwa nguvu",
+    "en": "force close",
+    "definition": {
+      "sw": "Kufunga chaneli peke yako kwa kuchapisha muamala wa ahadi; pesa zako zinasubiri kufuli la muda.",
+      "en": "Closing a channel alone by publishing a commitment transaction; your funds wait for a timelock."
+    }
+  },
+  {
+    "id": "probing",
+    "sw": "kupima kwa majaribio",
+    "en": "probing",
+    "definition": {
+      "sw": "Kutuma malipo yasiyoweza kukamilika ili kujua kama njia ina ukwasi wa kutosha.",
+      "en": "Sending payments that cannot complete to learn whether a route has enough liquidity."
+    }
+  },
+  {
+    "id": "bolt11",
+    "sw": "BOLT11",
+    "en": "BOLT11",
+    "definition": {
+      "sw": "Kiwango cha ankara za Lightning zinazoanza na lnbc (au lnbcrt kwenye regtest).",
+      "en": "The standard for Lightning invoices that start with lnbc (or lnbcrt on regtest)."
+    }
+  },
+  {
+    "id": "gateway",
+    "sw": "lango",
+    "en": "gateway",
+    "definition": {
+      "sw": "Nodi ya Lightning inayounganisha shirikisho la Fedimint na mtandao wa Lightning.",
+      "en": "A Lightning node that connects a Fedimint federation to the Lightning Network."
+    }
+  }
+]

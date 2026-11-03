@@ -1,0 +1,120 @@
+---
+title: "Kujenga programu ndogo ya Bitsacco"
+description: "Jenga sanduku dogo la michango la Lightning linalofaa simu, linalogeuza anwani ya Lightning kuwa ankara, likijaribiwa kwa seva ya kuiga bila pesa halisi."
+level: intermediate
+minutes: 90
+objectives:
+  - Eleza mtiririko wa anwani ya Lightning na LNURL-pay hatua kwa hatua
+  - Andika kitendakazi kinachogeuza anwani ya Lightning na kiasi kuwa ankara
+  - Fuata sheria zinazofanya programu ndogo iwe salama kwa watumiaji wa Bitsacco
+resources:
+  - title: "lnaddrd: Bitsacco's Lightning Address server"
+    url: "https://github.com/bitsacco/lnaddrd"
+    kind: tool
+    language: en
+  - title: "LNURL specifications (LUD-06 payRequest, LUD-16 Lightning Address)"
+    url: "https://github.com/lnurl/luds"
+    kind: docs
+    language: en
+  - title: "Bitsacco mini apps"
+    url: "https://bitsacco.com/mini-apps"
+    kind: community
+    language: en
+reflection:
+  - "Ni ukaguzi gani ungeongeza kabla ya kumwonyesha mtumiaji ankara?"
+  - "Programu ndogo kwa ajili ya chama chako ingefanya nini?"
+source:
+  type: original
+terms:
+  - lightning
+  - invoice
+  - address
+---
+
+Bitsacco inaeleza programu zake ndogo kama programu zinazoungana kwa urahisi na malipo ya Bitcoin na Lightning. Katika somo hili unajenga moja ya rahisi na yenye manufaa zaidi: sanduku la michango ambapo mwanachama anachagua kiasi na kupata ankara ya kulipa anwani ya Lightning kama `mama-mboga@bitsacco.com`.
+
+<Callout type="warning" title="Rasimu: thibitisha na watunzaji wa Bitsacco">
+Jinsi programu ndogo zinavyoorodheshwa, kuwekwa na kuthibitishwa ndani ya Bitsacco bado haijawekwa hadharani. Somo hili linafundisha mtiririko wa malipo, ambao ni kiwango huria. Uliza kwenye jumuiya ya Bitsacco kuhusu maelezo ya sasa ya kuunganisha kabla ya kuchapisha.
+</Callout>
+
+## Hatua ya 1: Mtiririko wa anwani ya Lightning
+
+Anwani ya Lightning ni `jina@kikoa`. Bitsacco huendesha [lnaddrd](https://github.com/bitsacco/lnaddrd), seva huria ya anwani za Lightning iliyoandikwa kwa Rust. Nyuma ya kila anwani kuna itifaki ya LNURL-pay:
+
+1. Pakua `https://kikoa/.well-known/lnurlp/jina`.
+2. Seva hujibu kwa JSON: `tag` ni `payRequest`, pamoja na URL ya `callback`, `minSendable` na `maxSendable` (kwa **millisats**) na `metadata`.
+3. Ita `callback?amount=<millisats>`.
+4. Seva hujibu kwa `{ "pr": "lnbc..." }`: <Term id="invoice" /> ya BOLT11.
+5. Onyesha ankara kama msimbo wa QR; pochi ya mlipaji huilipa.
+
+**Umemaliza ukiweza:** kusema kwa nini kiasi katika hatua ya 3 kinazidishwa kwa 1,000.
+
+## Hatua ya 2: Seva ya kuiga kwa maabara yako
+
+Usijaribu kamwe kwa pesa halisi. Hifadhi hii kama `mock-lnurl.mjs` na uiendeshe kwa `node mock-lnurl.mjs`:
+
+```js
+import http from "node:http";
+
+http
+  .createServer((req, res) => {
+    const url = new URL(req.url, "http://localhost:8787");
+    res.setHeader("content-type", "application/json");
+    res.setHeader("access-control-allow-origin", "*");
+    if (url.pathname === "/.well-known/lnurlp/alice") {
+      return res.end(JSON.stringify({
+        tag: "payRequest",
+        callback: "http://localhost:8787/callback/alice",
+        minSendable: 1000,
+        maxSendable: 1000000000,
+        metadata: JSON.stringify([["text/plain", "Tip Alice"]]),
+      }));
+    }
+    if (url.pathname === "/callback/alice") {
+      const msats = Number(url.searchParams.get("amount"));
+      return res.end(JSON.stringify({ pr: `lnbcrt${msats / 1000}n1pmockinvoice`, routes: [] }));
+    }
+    res.statusCode = 404;
+    res.end(JSON.stringify({ status: "ERROR", reason: "not found" }));
+  })
+  .listen(8787, () => console.log("mock LNURL server on http://localhost:8787"));
+```
+
+## Hatua ya 3: Kutoka anwani hadi ankara
+
+```ts
+export async function invoiceFor(address: string, sats: number, base?: string): Promise<string> {
+  const [name, domain] = address.split("@");
+  if (!name || !domain) throw new Error("Not a Lightning Address");
+  const origin = base ?? `https://${domain}`;
+  const meta = await (await fetch(`${origin}/.well-known/lnurlp/${name}`)).json();
+  if (meta.tag !== "payRequest") throw new Error("Not a pay request");
+  const msats = sats * 1000;
+  if (msats < meta.minSendable || msats > meta.maxSendable) throw new Error("Amount out of range");
+  const cb = new URL(meta.callback);
+  cb.searchParams.set("amount", String(msats));
+  const res = await (await fetch(cb)).json();
+  if (!res.pr) throw new Error(res.reason ?? "No invoice returned");
+  return res.pr;
+}
+```
+
+Kijaribu dhidi ya seva ya kuiga kwa `invoiceFor("alice@localhost", 100, "http://localhost:8787")`.
+
+## Hatua ya 4: Sanduku la michango
+
+Jenga ukurasa mmoja wenye vitufe vitatu vya kiasi (sats 100, 500, 1,000), sehemu ya kiasi unachochagua mwenyewe, na eneo linaloonyesha ankara kama maandishi na kama msimbo wa QR. Iwe nyepesi: hakuna haja ya mfumo mkubwa.
+
+## Sheria za programu ndogo
+
+- **Usishike kamwe funguo wala pesa.** Pochi ya mtumiaji mwenyewe ndiyo inalipa; programu yako inaonyesha ombi tu.
+- **Onyesha kiasi kwa uwazi** kwa sats, na onyesha maelezo kabla ya malipo.
+- **Kiswahili na Kiingereza** tangu siku ya kwanza.
+- **Ndogo na ya haraka** kwenye simu ya bei nafuu na mtandao wa polepole.
+- **Eleza hitilafu kwa lugha rahisi**: "Anwani hii haipokei malipo kwa sasa," si orodha ndefu ya makosa ya programu.
+
+## Ushahidi wa maabara
+
+- Kitendakazi chako cha `invoiceFor` na jaribio linaloonyesha kinarudisha ankara kutoka kwa seva ya kuiga.
+- Jaribio linaloonyesha kinakataa kiasi kilicho chini ya `minSendable`.
+- Picha ya skrini ya sanduku lako la michango kwenye skrini ya ukubwa wa simu.

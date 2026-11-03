@@ -1,0 +1,36 @@
+[
+  {
+    "id": "whitepaper-sw",
+    "title": { "sw": "Bitcoin: Mfumo wa Pesa Taslimu wa Kielektroniki wa Rika-kwa-Rika", "en": "Bitcoin: A Peer-to-Peer Electronic Cash System (Kiswahili)" },
+    "author": "Satoshi Nakamoto",
+    "language": "sw",
+    "url": "https://bitsacco.com/bitcoin-sw.pdf",
+    "sizeBytes": 908278,
+    "licence": "As published",
+    "note": { "sw": "Karatasi nyeupe ya Bitcoin (2008), kwa Kiswahili.", "en": "The Bitcoin whitepaper (2008), in Kiswahili." }
+  },
+  {
+    "id": "whitepaper-en",
+    "title": { "sw": "Bitcoin: A Peer-to-Peer Electronic Cash System (Kiingereza)", "en": "Bitcoin: A Peer-to-Peer Electronic Cash System" },
+    "author": "Satoshi Nakamoto",
+    "language": "en",
+    "url": "https://bitsacco.com/bitcoin-en.pdf",
+    "sizeBytes": 184292,
+    "licence": "As published",
+    "note": { "sw": "Karatasi nyeupe ya Bitcoin (2008), kwa Kiingereza.", "en": "The original Bitcoin whitepaper (2008)." }
+  },
+  {
+    "id": "kujifunza-bitcoin",
+    "title": { "sw": "Kujifunza Bitcoin: Kuprogramu Blockchain Huria", "en": "Kujifunza Bitcoin (Mastering Bitcoin in Kiswahili)" },
+    "author": "Andreas M. Antonopoulos & David A. Harding",
+    "language": "sw",
+    "url": "https://bitsacco.com/kujifunza-bitcoin-sw.pdf",
+    "sizeBytes": 7549747,
+    "licence": "CC BY-SA 4.0",
+    "credit": "comwanga",
+    "note": {
+      "sw": "Toleo la Kiswahili la Mastering Bitcoin (toleo la 3). Kitabu kirefu kinachoambatana na masomo yote.",
+      "en": "The Kiswahili edition of Mastering Bitcoin (3rd edition). The long-form companion to every lesson."
+    }
+  }
+]

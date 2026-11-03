@@ -1,0 +1,1 @@
+{ "base": "funded", "channels": [{ "from": "alice", "to": "bob", "sats": 1000000, "push": 300000 }] }

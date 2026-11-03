@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+"""lncli for the lab: targets the node chosen in the lesson (JIFUNZE_NODE)."""
+import os
+import sys
+
+from jifunze_lab.cli import CliTargetError, lncli_args, target_node
+
+try:
+    args = lncli_args(target_node("alice"))
+except CliTargetError as e:
+    print(e, file=sys.stderr)
+    sys.exit(e.code)
+os.execv("/opt/lnd/lncli", ["lncli", *args, *sys.argv[1:]])

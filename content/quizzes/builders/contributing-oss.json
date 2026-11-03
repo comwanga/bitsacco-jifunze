@@ -1,0 +1,49 @@
+{
+  "lesson": "contributing-oss",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Kabla ya kuanza kufanyia kazi tatizo, unapaswa kufanya nini?", "en": "Before you start work on an issue, what should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kuandika maoni kwenye tatizo kueleza mpango wako", "en": "Comment on the issue with your plan" } },
+        { "id": "b", "label": { "sw": "Kufungua mapendekezo matano kwa wakati mmoja", "en": "Open five pull requests at once" } },
+        { "id": "c", "label": { "sw": "Kubadilisha faili zote za mradi", "en": "Change every file in the project" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Huzuia kazi kurudiwa na humpa mtunzaji nafasi ya kukuongoza.", "en": "It avoids duplicate work and lets a maintainer guide you." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Pendekezo zuri la mabadiliko lina sifa gani?", "en": "What makes a good pull request?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Wazo moja, maelezo ya nini, kwa nini na jinsi lilivyokaguliwa", "en": "One idea, with what, why and how it was checked" } },
+        { "id": "b", "label": { "sw": "Mabadiliko mengi yasiyohusiana", "en": "Many unrelated changes" } },
+        { "id": "c", "label": { "sw": "Hakuna maelezo kabisa", "en": "No description at all" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Mapendekezo madogo na yaliyoelezwa vizuri hukaguliwa haraka.", "en": "Small, well-described PRs get reviewed quickly." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "CI imeshindwa kwenye pendekezo lako. Ufanye nini?", "en": "CI failed on your pull request. What should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kusoma kumbukumbu, kurekebisha na kusukuma tena", "en": "Read the log, fix it and push again" } },
+        { "id": "b", "label": { "sw": "Kuwaomba wakaguzi wapuuze", "en": "Ask reviewers to ignore it" } },
+        { "id": "c", "label": { "sw": "Kufunga pendekezo bila kusema chochote", "en": "Close the PR without a word" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Wakaguzi hutarajia ujenzi uliopita kabla ya kukagua.", "en": "Reviewers expect a green build before they review." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Masomo ya Jifunze yako chini ya leseni gani?", "en": "Which licence covers Jifunze lessons?" },
+      "options": [
+        { "id": "a", "label": { "sw": "CC BY-SA 4.0", "en": "CC BY-SA 4.0" } },
+        { "id": "b", "label": { "sw": "Haki zote zimehifadhiwa", "en": "All rights reserved" } },
+        { "id": "c", "label": { "sw": "Hakuna leseni", "en": "No licence" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Msimbo ni MIT; masomo ni CC BY-SA 4.0, kama Kujifunza Bitcoin.", "en": "Code is MIT; lessons are CC BY-SA 4.0, like Kujifunza Bitcoin." }
+    }
+  ]
+}

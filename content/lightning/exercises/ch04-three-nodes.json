@@ -1,0 +1,17 @@
+{
+  "id": "ch04-three-nodes",
+  "lesson": "node-software",
+  "node": "alice",
+  "tab": "cli",
+  "profile": "full",
+  "title": {
+    "sw": "Amri moja, programu tatu za nodi",
+    "en": "One question, three node programs"
+  },
+  "starter": {
+    "cli": "# Each implementation has its own CLI. Ask each node for its alias.\nJIFUNZE_NODE=alice lncli getinfo | jq .alias\nJIFUNZE_NODE=bob lightning-cli getinfo | jq .alias\nJIFUNZE_NODE=erin eclair-cli getinfo | jq .alias"
+  },
+  "solution": {
+    "cli": "JIFUNZE_NODE=alice lncli getinfo | jq .alias\nJIFUNZE_NODE=bob lightning-cli getinfo | jq .alias\nJIFUNZE_NODE=erin eclair-cli getinfo | jq .alias"
+  }
+}

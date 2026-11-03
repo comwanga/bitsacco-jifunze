@@ -1,0 +1,16 @@
+{
+  "id": "ch09-coop-close",
+  "lesson": "channel-operation",
+  "node": "alice",
+  "tab": "cli",
+  "title": {
+    "sw": "Funga chaneli kwa ushirikiano",
+    "en": "Close a channel cooperatively"
+  },
+  "starter": {
+    "cli": "BOB=$(JIFUNZE_NODE=bob lightning-cli getinfo | jq -r .id)\nPOINT=$(lncli listchannels | jq -r --arg b \"$BOB\" '.channels[] | select(.remote_pubkey==$b) | .channel_point' | head -1)\necho \"Closing $POINT\"\nlncli closechannel --chan_point \"$POINT\"\nbitcoin-cli -generate 6"
+  },
+  "solution": {
+    "cli": "BOB=$(JIFUNZE_NODE=bob lightning-cli getinfo | jq -r .id)\nPOINT=$(lncli listchannels | jq -r --arg b \"$BOB\" '.channels[] | select(.remote_pubkey==$b) | .channel_point' | head -1)\nlncli closechannel --chan_point \"$POINT\"\nbitcoin-cli -generate 6\nsleep 3\nlncli closedchannels | jq '.channels[] | {remote_pubkey, close_type}'"
+  }
+}

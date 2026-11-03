@@ -1,0 +1,105 @@
+---
+title: "Developer environment and a local regtest lab"
+description: "Run a private Bitcoin network on your own computer, mine blocks on demand, and fund a test wallet in minutes."
+level: beginner
+minutes: 45
+objectives:
+  - Start a disposable regtest node with Bitcoin Core
+  - Create a wallet, mine blocks and explain coinbase maturity
+  - Reset your lab cleanly between experiments
+resources:
+  - title: "Kujifunza Bitcoin, chapter 3: Bitcoin Core, the reference implementation"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "Bitcoin Core downloads"
+    url: "https://bitcoincore.org/en/download/"
+    kind: tool
+    language: en
+  - title: "Bitcoin Core: testing applications with regtest"
+    url: "https://developer.bitcoin.org/examples/testing.html"
+    kind: docs
+    language: en
+  - title: "Polar: one-click Lightning networks for local testing"
+    url: "https://lightningpolar.com/"
+    kind: tool
+    language: en
+    note: "Optional now; you will use it in the Lightning lesson."
+reflection:
+  - "Explain regtest to a teammate without jargon. What problem does it solve?"
+  - "What could go wrong if you tested your code against mainnet instead?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - regtest
+  - node
+  - block
+  - mining
+  - wallet
+---
+
+<Term id="regtest" /> is a private Bitcoin network that only you can see. Mining is instant, coins are free, and mistakes cost nothing. Every lesson in this path uses it as your lab.
+
+## Step 1: Three networks, one program
+
+The same Bitcoin Core program can join three kinds of network. Think of a driving school:
+
+- **Mainnet** is the highway: real traffic, real money, real consequences. You don't learn here.
+- **Testnet and signet** are a shared practice track. Other learners are on it too, and you wait for its blocks like everyone else.
+- **Regtest** is your own empty car park. Nobody else is there, and a block appears the moment you ask for one.
+
+Two programs do the work. `bitcoind` is the node itself, running in the background, and `bitcoin-cli` is how you talk to it. Everything the node knows lives in its data directory, so deleting that folder gives you a brand-new chain.
+
+One rule will surprise you in Step 3: a miner's reward can't be spent until 100 more blocks are built on top of it. Bitcoin calls this **coinbase maturity**.
+
+**Done when:** you can say, in your own words, why your first test coins only become spendable after 101 blocks.
+
+## Step 2: Install and start a node
+
+Install Bitcoin Core from the official download page, or use a Docker image you trust. Then:
+
+```bash
+bitcoind -regtest -daemon -fallbackfee=0.0001
+bitcoin-cli -regtest getblockchaininfo
+```
+
+**Expected:** JSON with `"chain": "regtest"` and `"blocks": 0`.
+
+<Callout type="tip" title="Save typing">
+Add `alias bcli="bitcoin-cli -regtest"` to your shell profile. The rest of this path writes the full command so it works for everyone.
+</Callout>
+
+**Done when:** the node answers `getblockchaininfo`.
+
+## Step 3: Mine, fund and check
+
+```bash
+bitcoin-cli -regtest createwallet "alice"
+ADDR=$(bitcoin-cli -regtest -rpcwallet=alice getnewaddress)
+bitcoin-cli -regtest generatetoaddress 101 "$ADDR"
+bitcoin-cli -regtest -rpcwallet=alice getbalance
+```
+
+**Expected:** a balance of `50.00000000`. You mined 101 <Term id="block">blocks</Term>, but only the first block's reward has matured.
+
+Try `generatetoaddress 1` again and check the balance. Can you predict the new number before you look?
+
+**Done when:** you can explain why the balance after 101 blocks is 50, not 5,050.
+
+## Step 4: Reset
+
+```bash
+bitcoin-cli -regtest stop
+rm -rf ~/.bitcoin/regtest   # on macOS: ~/Library/Application Support/Bitcoin/regtest
+```
+
+Starting from a clean datadir makes experiments repeatable, which is exactly what you want for automated tests later.
+
+## Lab evidence
+
+Save these in a notes file; the final project asks for them:
+
+- The output of `getblockchaininfo` showing `"chain": "regtest"`.
+- Your balance after mining 101 blocks, and after one more.
+- One sentence on what surprised you.

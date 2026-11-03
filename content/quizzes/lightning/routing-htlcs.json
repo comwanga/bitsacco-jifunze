@@ -1,0 +1,145 @@
+{
+  "lesson": "routing-htlcs",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "HTLC inafunguliwa kwa nini?",
+        "en": "What unlocks an HTLC?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Preimage sahihi kabla ya muda kuisha",
+            "en": "The right preimage before the deadline"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Nenosiri la benki",
+            "en": "A bank password"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Sahihi ya mchimbaji",
+            "en": "A miner's signature"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Hashi + kufuli la muda = HTLC.",
+        "en": "Hash + time lock = HTLC."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kwa nini kufuli za muda hupungua kuelekea Dina?",
+        "en": "Why do time locks shrink towards Dina?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Ili kuokoa nafasi",
+            "en": "To save space"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Hazipungui",
+            "en": "They don't"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ili kila nodi ipate muda wa kudai baada ya inayofuata",
+            "en": "So each node has time to claim after the next one"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Bob lazima adai kutoka kwa Alice baada ya Chan kudai kutoka kwake.",
+        "en": "Bob must claim from Alice after Chan claims from him."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Malipo yakishindwa katikati, nini kinatokea?",
+        "en": "If a payment fails halfway, what happens?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Dina analipwa nusu",
+            "en": "Dina gets half"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "HTLC zote zinafutwa; hakuna anayepoteza",
+            "en": "Every HTLC is cancelled; nobody loses"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Bob anabaki na pesa",
+            "en": "Bob keeps the money"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Malipo yote yanatokea, au hakuna.",
+        "en": "All of it happens, or none of it."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "sha256(preimage) inapaswa kulingana na nini?",
+        "en": "What should sha256(preimage) equal?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Hashi ya malipo kwenye ankara",
+            "en": "The payment hash in the invoice"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Anwani ya Dina",
+            "en": "Dina's address"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kiasi",
+            "en": "The amount"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Hiyo ndiyo inafanya preimage kuwa risiti.",
+        "en": "That's what makes the preimage a receipt."
+      }
+    }
+  ]
+}

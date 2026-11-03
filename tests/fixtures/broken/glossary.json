@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sats",
+    "sw": "sats",
+    "en": "sats",
+    "definition": {
+      "sw": "Kipande kidogo cha bitcoin.",
+      "en": "The smallest unit of bitcoin."
+    }
+  },
+  {
+    "id": "seed-phrase",
+    "sw": "maneno ya siri",
+    "en": "seed phrase",
+    "definition": {
+      "sw": "Maneno 12 au 24 yanayorejesha pochi.",
+      "en": "12 or 24 words that restore a wallet."
+    }
+  },
+  {
+    "id": "phishing",
+    "sw": "hadaa ya mtandaoni",
+    "en": "phishing",
+    "definition": {
+      "sw": "Ujumbe bandia.",
+      "en": "A fake message."
+    }
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "lesson": "next-steps",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Karatasi nyeupe ya Bitcoin iliandikwa na nani?", "en": "Who wrote the Bitcoin whitepaper?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Satoshi Nakamoto", "en": "Satoshi Nakamoto" } },
+        { "id": "b", "label": { "sw": "Benki Kuu ya Kenya", "en": "The Central Bank of Kenya" } },
+        { "id": "c", "label": { "sw": "Bitsacco", "en": "Bitsacco" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Satoshi Nakamoto aliichapisha mwaka 2008.", "en": "Satoshi Nakamoto published it in 2008." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Ni kipi kati ya hivi unaweza kushiriki kwa usalama?", "en": "Which of these can you share safely?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Maneno ya siri", "en": "Seed phrase" } },
+        { "id": "b", "label": { "sw": "Anwani", "en": "Address" } },
+        { "id": "c", "label": { "sw": "Ufunguo binafsi", "en": "Private key" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Anwani ni ya kupokea pesa. Maneno ya siri na ufunguo binafsi ni siri milele.", "en": "An address is for receiving money. Seed phrases and private keys stay secret forever." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Ukibadilisha simu, unahamishaje alama zako za maendeleo ya Jifunze?", "en": "If you change phones, how do you move your Jifunze progress ticks?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Zinahamia zenyewe kwenye akaunti yako", "en": "They move automatically to your account" } },
+        { "id": "b", "label": { "sw": "Pakua faili ya maendeleo, kisha ilete kwenye simu mpya", "en": "Download the progress file, then import it on the new phone" } },
+        { "id": "c", "label": { "sw": "Haziwezi kuhamishwa", "en": "They can't be moved" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Jifunze haina akaunti; maendeleo yako yako kwenye kifaa chako tu.", "en": "Jifunze has no accounts; your progress lives only on your device." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Njia bora ya kukumbuka ulichojifunza ni ipi?", "en": "What is the best way to remember what you learned?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kumfundisha mtu mwingine", "en": "Teaching someone else" } },
+        { "id": "b", "label": { "sw": "Kutokufikiria tena", "en": "Never thinking about it again" } },
+        { "id": "c", "label": { "sw": "Kupiga picha ya maneno yako ya siri", "en": "Photographing your seed phrase" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Ukiweza kueleza wazo kwa maneno yako, umelielewa.", "en": "If you can explain an idea in your own words, you understand it." }
+    }
+  ]
+}

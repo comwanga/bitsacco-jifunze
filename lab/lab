@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# Jifunze Lightning lab. Regtest only: nothing here touches real bitcoin.
+#
+#   ./lab up [--full]        start the lab (--full also starts Erin, an Eclair node)
+#   ./lab pair [--raw]       show the pairing code to paste into the lesson page
+#   ./lab reset [--hard] <lesson>   set up a lesson's starting channels (--hard: wipe the chain first)
+#   ./lab doctor             check this computer can run the lab
+#   ./lab logs [service]     follow logs
+#   ./lab down               stop everything (keeps data); ./lab down -v also deletes it
+set -euo pipefail
+cd "$(dirname "$0")"
+set -a
+# shellcheck disable=SC1091
+. ./versions.env
+set +a
+
+dc() { docker compose -f compose.yml --profile lite --profile full "$@"; }
+dcp() { local p=$1; shift; docker compose -f compose.yml --profile "$p" "$@"; }
+say() { printf '\033[1m%s\033[0m\n' "$*"; }
+
+btc() { dc exec -T bitcoind bitcoin-cli -regtest -rpcuser=jifunze -rpcpassword=jifunze "$@"; }
+
+wait_for() { # wait_for <seconds> <description> <command...>
+  local secs=$1 what=$2; shift 2
+  for _ in $(seq "$secs"); do
+    if "$@" >/dev/null 2>&1; then return 0; fi
+    sleep 1
+  done
+  echo "Timed out waiting for $what. Run ./lab logs to see why. / Muda umeisha ukisubiri $what." >&2
+  return 1
+}
+
+ensure_wallet() {
+  btc loadwallet "$1" >/dev/null 2>&1 || btc createwallet "$1" false false "" false true true >/dev/null 2>&1 || true
+}
+
+current_profile() { dc exec -T lab cat /lab/state/profile 2>/dev/null || echo lite; }
+
+cmd_up() {
+  local profile=lite
+  if [[ ${1:-} == "--full" ]]; then profile=full; fi
+  say "Starting the Jifunze lab ($profile profile)…"
+  if [[ $profile == lite ]]; then dc stop erin >/dev/null 2>&1 || true; fi
+  dcp "$profile" up -d --build bitcoind
+  wait_for 60 bitcoind btc getblockchaininfo
+  ensure_wallet lab
+  if [[ $profile == full ]]; then
+    ensure_wallet erin
+    # Eclair refuses to start while its bitcoind wallet has locked coins (left by an interrupted open).
+    btc -rpcwallet=erin lockunspent true >/dev/null 2>&1 || true
+  fi
+  dcp "$profile" up -d --build --remove-orphans
+  dc exec -T lab sh -c "echo $profile > /lab/state/profile"
+  say "Waiting for the Lightning nodes…"
+  wait_for 120 "the nodes" dc exec -T lab python -m jifunze_lab.health
+  say "Lab is ready. Pairing code / Msimbo wa kuunganisha:"
+  cmd_pair
+  echo "Paste it into the lab bar on any Lightning lesson. / Ubandike kwenye upau wa maabara wa somo lolote la Lightning."
+}
+
+cmd_pair() {
+  if [[ ${1:-} == "--raw" ]]; then
+    dc exec -T lab python -m jifunze_lab.bridge --token --raw
+  else
+    dc exec -T lab python -m jifunze_lab.bridge --token
+  fi
+}
+
+cmd_reset() {
+  local hard=no
+  if [[ ${1:-} == "--hard" ]]; then hard=yes; shift; fi
+  local lesson=${1:-route}
+  if [[ $hard == yes ]]; then
+    local profile
+    profile=$(current_profile)
+    say "Wiping the regtest chain and all channels…"
+    dc down -v
+    if [[ $profile == full ]]; then cmd_up --full; else cmd_up; fi
+  fi
+  dc exec -T lab python -m jifunze_lab.scenario "$lesson"
+}
+
+cmd_doctor() {
+  local ok=yes
+  check() { if [[ $1 == pass ]]; then echo "  ✓ $2"; else echo "  ✗ $2"; echo "    → $3"; ok=no; fi; }
+  say "Checking this computer for the Jifunze lab…"
+  if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+    check pass "Docker is running"
+  else
+    check fail "Docker is running" "Install Docker Desktop (Windows: with the WSL2 backend) or Docker Engine, and start it."
+  fi
+  if docker compose version >/dev/null 2>&1; then check pass "Docker Compose v2"; else check fail "Docker Compose v2" "Update Docker; 'docker compose' (with a space) must work."; fi
+  local mem_gb=0
+  if [[ -r /proc/meminfo ]]; then mem_gb=$(awk '/MemTotal/ {printf "%d", $2/1024/1024}' /proc/meminfo)
+  elif command -v sysctl >/dev/null 2>&1; then mem_gb=$(( $(sysctl -n hw.memsize 2>/dev/null || echo 0) / 1024 / 1024 / 1024 )); fi
+  if (( mem_gb >= 6 )); then check pass "Memory: ${mem_gb} GB"; else check fail "Memory: ${mem_gb} GB" "The lite lab needs about 2 GB free; 8 GB total is recommended. Close other apps or use GitHub Codespaces."; fi
+  local free_gb
+  free_gb=$(df -Pk . | awk 'NR==2 {printf "%d", $4/1024/1024}')
+  if (( free_gb >= 6 )); then check pass "Free disk: ${free_gb} GB"; else check fail "Free disk: ${free_gb} GB" "Images need about 6 GB."; fi
+  if (exec 3<>/dev/tcp/127.0.0.1/7777) 2>/dev/null; then
+    if docker compose -f compose.yml ps --status running lab 2>/dev/null | grep -q lab; then check pass "Port 7777 (the lab is already running)"; else check fail "Port 7777 is free" "Another program uses port 7777. Stop it first."; fi
+  else
+    check pass "Port 7777 is free"
+  fi
+  if grep -qi microsoft /proc/version 2>/dev/null; then check pass "Running inside WSL2"; fi
+  if [[ ${OS:-} == "Windows_NT" ]]; then check fail "Shell" "On Windows, run ./lab inside WSL2 (Ubuntu), not Git Bash or PowerShell."; fi
+  [[ $ok == yes ]] && say "All good. Run ./lab up" || { say "Fix the items marked ✗, then run ./lab doctor again."; return 1; }
+}
+
+case "${1:-help}" in
+  up) shift; cmd_up "$@" ;;
+  down) shift; dc down "$@" ;;
+  pair) shift; cmd_pair "$@" ;;
+  reset) shift; cmd_reset "$@" ;;
+  doctor) cmd_doctor ;;
+  logs) shift; dc logs -f "$@" ;;
+  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' ;;
+esac

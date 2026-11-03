@@ -1,0 +1,55 @@
+---
+title: "Gossip and the channel graph"
+description: "How every node learns the map of the network from its peers, and what that map contains. Read Alice's graph in Python."
+level: intermediate
+minutes: 35
+objectives:
+  - Name the three gossip messages and what each announces
+  - Explain why channels are announced only after they are confirmed
+  - Read the channel graph from a node and count its nodes and channels
+resources:
+  - title: "Mastering the Lightning Network, chapter 11: Gossip and the Channel Graph"
+    url: "https://github.com/lnbook/lnbook/blob/develop/11_gossip_channel_graph.asciidoc"
+    kind: book
+    language: en
+  - title: "lngraph.py from the book's code"
+    url: "https://github.com/lnbook/lnbook/tree/develop/code/lngraph"
+    kind: tool
+    language: en
+reflection:
+  - "The graph shows capacities but not balances. Why does Lightning keep balances private?"
+  - "What could a node learn about you from the public graph alone?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - gossip
+  - channel
+  - node
+---
+
+To find a route to Dina, Alice needs a map: which <Term id="node">nodes</Term> exist and which <Term id="channel">channels</Term> connect them. Nobody publishes that map. Every node builds its own from <Term id="gossip" />, messages it hears from its peers and passes on.
+
+## Three gossip messages
+
+| Message | Announces | Signed by |
+| --- | --- | --- |
+| `channel_announcement` | A channel exists between two nodes, with proof it is funded on-chain | Both nodes and both funding keys |
+| `node_announcement` | A node's alias, colour, addresses and features | The node |
+| `channel_update` | One direction's fee policy, time lock and whether it is enabled | The node on that side |
+
+A channel is announced only after its funding transaction has six confirmations. That stops nodes from spamming the map with channels that don't exist: anyone can check the funding output on the blockchain.
+
+## Capacity, not balance
+
+The graph shows each channel's **capacity**, the funding amount, but never how it's split between the two sides. Balances change with every payment and would reveal who paid whom. This is why senders sometimes try a route and fail: the map says the channel is big enough, but the balance on the needed side isn't.
+
+## Read Alice's map
+
+<Exercise id="ch11-graph" />
+
+Your counts should match the scenario: four nodes and three channels in a line. The book's `lngraph.py` does the same thing on the real network, where the graph holds many thousands of nodes.

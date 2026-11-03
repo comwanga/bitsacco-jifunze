@@ -1,0 +1,145 @@
+{
+  "lesson": "wire-protocol",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Ujumbe wa init ni aina gani?",
+        "en": "What type number is the init message?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "16",
+            "en": "16"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "1",
+            "en": "1"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "256",
+            "en": "256"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "0x0010 = 16.",
+        "en": "0x0010 = 16."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Nodi ipokee biti witiri ya kipengele isiyoijua. Ifanye nini?",
+        "en": "A node sees an unknown odd feature bit. What should it do?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kukatisha muunganisho",
+            "en": "Disconnect"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kufunga chaneli zote",
+            "en": "Close all channels"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kuipuuza",
+            "en": "Ignore it"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Ni sawa kuwa witiri: biti witiri ni hiari.",
+        "en": "It's OK to be odd: odd bits are optional."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Na biti shufwa isiyojulikana?",
+        "en": "And an unknown even feature bit?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kuongeza ada",
+            "en": "Raise fees"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kukatisha muunganisho",
+            "en": "Disconnect"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Kuipuuza",
+            "en": "Ignore it"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Biti shufwa inamaanisha kipengele kinahitajika.",
+        "en": "An even bit means the feature is required."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "TLV inasimama kwa nini?",
+        "en": "What does TLV stand for?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Aina, urefu, thamani",
+            "en": "Type, length, value"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Muda, kiungo, uthibitisho",
+            "en": "Time, link, verification"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Tokeni, kikomo, toleo",
+            "en": "Token, limit, version"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Rekodi za TLV zinaruhusu itifaki kukua.",
+        "en": "TLV records let the protocol grow."
+      }
+    }
+  ]
+}

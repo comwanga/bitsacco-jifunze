@@ -1,0 +1,16 @@
+{
+  "id": "ch08-preimage",
+  "lesson": "routing-htlcs",
+  "node": "alice",
+  "tab": "python",
+  "title": {
+    "sw": "Thibitisha siri (preimage)",
+    "en": "Check the preimage"
+  },
+  "starter": {
+    "python": "import hashlib\nfrom jifunze_lab import lnd\n\npaid = [p for p in lnd(\"alice\").payments() if p[\"status\"] == \"SUCCEEDED\"]\nlast = paid[-1]\nprint(\"payment hash:\", last[\"payment_hash\"])\nprint(\"preimage:    \", last[\"payment_preimage\"])\n# TODO: hash the preimage with SHA-256 and print whether it equals the payment hash,\n# in the form:  match: True\n"
+  },
+  "solution": {
+    "python": "import hashlib\nfrom jifunze_lab import lnd\n\npaid = [p for p in lnd(\"alice\").payments() if p[\"status\"] == \"SUCCEEDED\"]\nlast = paid[-1]\ndigest = hashlib.sha256(bytes.fromhex(last[\"payment_preimage\"])).hexdigest()\nprint(\"payment hash:\", last[\"payment_hash\"])\nprint(\"sha256(preimage):\", digest)\nprint(\"match:\", digest == last[\"payment_hash\"])\n"
+  }
+}

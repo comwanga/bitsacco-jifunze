@@ -1,0 +1,9 @@
+{
+  "id": "ch02-dina-invoice",
+  "lesson": "getting-started",
+  "title": { "sw": "Dina anatengeneza ankara", "en": "Dina creates an invoice" },
+  "node": "dina",
+  "tab": "cli",
+  "starter": { "cli": "lncli addinvoice --amt 50000" },
+  "solution": { "cli": "lncli addinvoice --amt 50000" }
+}

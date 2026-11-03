@@ -1,0 +1,56 @@
+---
+title: "Uendeshaji wa chaneli na kupitisha malipo"
+description: "Njia mbili za kumaliza chaneli: kufunga kwa ushirikiano kunakomaliza mara moja, na kufunga kwa nguvu ambapo kufuli la muda linakusubirisha. Fanya zote mbili."
+level: intermediate
+minutes: 40
+objectives:
+  - Eleza tofauti kati ya kufunga kwa ushirikiano na kufunga kwa nguvu
+  - Funga chaneli ya Alice na Bob kwa ushirikiano
+  - Funga chaneli ya Dina na Chan kwa nguvu na utazame kufuli la muda
+resources:
+  - title: "Mastering the Lightning Network, chapter 9: Channel Operation and Payment Forwarding"
+    url: "https://github.com/lnbook/lnbook/blob/develop/09_channel_operation.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 5: on-chain transaction handling"
+    url: "https://github.com/lightning/bolts/blob/master/05-onchain.md"
+    kind: docs
+    language: en
+reflection:
+  - "Ni lini nodi isingekuwa na chaguo lingine isipokuwa kufunga kwa nguvu?"
+  - "Kwa nini kufunga kwa nguvu kunagharimu ada zaidi kuliko kufunga kwa ushirikiano?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - force-close
+  - commitment-transaction
+  - htlc
+---
+
+Chaneli ikiwa wazi, nodi mbili zinaendelea kuongeza na kuondoa <Term id="htlc" /> na kutia sahihi ahadi mpya: huko ndiko kupitisha malipo. Mapema au baadaye, chaneli inaisha.
+
+## Kufunga kwa ushirikiano
+
+Nodi zote mbili zinakubaliana salio la mwisho na kutia sahihi **muamala mmoja wa kufunga** unaolipa kila upande moja kwa moja. Hakuna kufuli za muda, ada ni ndogo na imekubaliwa, na wote wanapata pesa zao mara inapothibitishwa. Hivi ndivyo chaneli *inavyopaswa* kuisha.
+
+<Exercise id="ch09-coop-close" />
+
+## Kufunga kwa nguvu
+
+Upande mwingine ukiwa haupo hewani, haujibu au una tabia mbaya, nodi inaweza <Term id="force-close" />: inachapisha <Term id="commitment-transaction" /> wake wa hivi karibuni peke yake. Kisha:
+
+- upande mwingine unalipwa mara moja,
+- tokeo la mchapishaji mwenyewe linasubiri nyuma ya kufuli lake la muda (`blocks_til_maturity`), na
+- HTLC zozote zilizo njiani zinamalizwa kwenye blockchain, kila moja na muda wake wa mwisho.
+
+<Exercise id="ch09-force-close" />
+
+Pesa za Dina sasa zinaonekana kama `limbo_balance` pamoja na idadi ya bloku zilizobaki. Kwenye regtest unaweza kuzichimba ziishe; kwenye mainnet kusubiri huko kunaweza kuchukua siku moja au zaidi.
+
+<Callout type="warning" title="Baada ya somo hili">
+Chaneli hizi mbili sasa zimefungwa. Kitufe cha **Anza somo upya** cha zoezi lolote kinafungua tena chaneli ambazo somo linalofuata linahitaji.
+</Callout>

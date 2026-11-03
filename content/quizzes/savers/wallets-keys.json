@@ -1,0 +1,49 @@
+{
+  "lesson": "wallets-keys",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Pochi ya Bitcoin inahifadhi nini hasa?", "en": "What does a Bitcoin wallet really store?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Sarafu za bitcoin zenyewe", "en": "The bitcoin coins themselves" } },
+        { "id": "b", "label": { "sw": "Funguo zinazokuwezesha kutumia bitcoin yako", "en": "The keys that let you spend your bitcoin" } },
+        { "id": "c", "label": { "sw": "Nakala ya akaunti yako ya benki", "en": "A copy of your bank account" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Bitcoin iko kwenye blockchain. Pochi inashika funguo tu.", "en": "Bitcoin lives on the blockchain. The wallet only holds the keys." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Ni kipi unaweza kumpa mtu kwa usalama ili akulipe?", "en": "What can you safely give someone so they can pay you?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Anwani yako", "en": "Your address" } },
+        { "id": "b", "label": { "sw": "Maneno yako ya siri", "en": "Your seed phrase" } },
+        { "id": "c", "label": { "sw": "Ufunguo wako binafsi", "en": "Your private key" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Anwani ni kama nambari ya M-Pesa: ni salama kuishiriki.", "en": "An address is like an M-Pesa number: it is safe to share." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Mtu kwenye WhatsApp anasema ni \"huduma kwa wateja\" na anaomba maneno yako ya siri ili akusaidie. Ufanye nini?", "en": "Someone on WhatsApp says they are \"customer support\" and asks for your seed phrase to help you. What should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kuyatuma, kwa sababu anataka kusaidia", "en": "Send them, because they want to help" } },
+        { "id": "b", "label": { "sw": "Kutuma nusu ya maneno tu", "en": "Send only half of the words" } },
+        { "id": "c", "label": { "sw": "Kukataa: ni utapeli", "en": "Refuse: it is a scam" } }
+      ],
+      "answer": "c",
+      "explanation": { "sw": "Hakuna huduma halali inayoomba maneno ya siri. Hata nusu ya maneno inamsaidia mwizi.", "en": "No real support ever asks for a seed phrase. Even half the words helps a thief." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Nakala bora ya maneno ya siri ni ipi?", "en": "What is the best backup of a seed phrase?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Picha kwenye simu yako", "en": "A photo on your phone" } },
+        { "id": "b", "label": { "sw": "Karatasi iliyoandikwa kwa mkono, mahali salama", "en": "A handwritten paper, kept somewhere safe" } },
+        { "id": "c", "label": { "sw": "Ujumbe uliojitumia kwenye WhatsApp", "en": "A WhatsApp message to yourself" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Chochote kilicho mtandaoni au kwenye simu kinaweza kuibiwa au kuvuja.", "en": "Anything online or on a phone can be stolen or leaked." }
+    }
+  ]
+}

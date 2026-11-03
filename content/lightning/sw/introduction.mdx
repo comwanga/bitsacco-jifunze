@@ -1,0 +1,59 @@
+---
+title: "Utangulizi: kwa nini mtandao wa Lightning upo"
+description: "Bitcoin inamaliza; Lightning inasogeza. Tatizo ambalo Lightning inatatua, jinsi inavyohifadhi mfumo wa uaminifu wa Bitcoin, na inachokugharimu."
+level: beginner
+minutes: 15
+objectives:
+  - Eleza kwa nini Bitcoin peke yake inapata shida na malipo madogo ya mara kwa mara
+  - Eleza Lightning kama chaneli za malipo juu ya Bitcoin, bila mtu wa kati wa kuaminiwa
+  - Taja mambo mawili ambayo Lightning inawaomba watumiaji wake
+resources:
+  - title: "Mastering the Lightning Network, chapter 1: Introduction"
+    url: "https://github.com/lnbook/lnbook/blob/develop/01_introduction.asciidoc"
+    kind: book
+    language: en
+  - title: "Kujifunza Bitcoin, sura ya 14: matumizi ya tabaka la pili"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+reflection:
+  - "Ni malipo gani ya kila siku usingeyafanya kamwe moja kwa moja kwenye blockchain, na kwa nini?"
+  - "Inamaanisha nini kwa mfumo wa malipo kuwa 'bila kuhitaji uaminifu', na je, Lightning iko hivyo kikamilifu?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - lightning
+  - channel
+  - block
+  - fee
+---
+
+Bitcoin huongeza <Term id="block" /> takriban kila dakika kumi, na kila bloku ina nafasi ndogo. Watu wengi wakitaka kulipa kwa wakati mmoja, <Term id="fee">ada</Term> hupanda. Hilo ni sawa kwa akiba au malipo makubwa, lakini hakuna anayetaka kusubiri dakika kumi na kulipa ada kubwa kwa kikombe cha chai.
+
+## Chaneli za malipo
+
+<Term id="lightning">Mtandao wa Lightning</Term> unatatua hili kwa **chaneli za malipo**. Watu wawili hufunga bitcoin kwenye tokeo la pamoja kwenye blockchain mara moja. Baada ya hapo, wanaweza kulipana mara elfu kwa kubadilishana jumbe zilizotiwa sahihi, bila kugusa blockchain kabisa. Wakimaliza, hufunga <Term id="channel" /> na salio la mwisho huandikwa kwenye blockchain.
+
+Chaneli huungana. Kama Alice ana chaneli na Bob, na Bob ana moja na Chan, Alice anaweza kumlipa Chan kupitia Bob, na Bob hawezi kuiba pesa njiani. Mtandao huo wa chaneli ndio mtandao wa Lightning.
+
+## Kisichobadilika
+
+Lightning haiongezi benki wala kampuni katikati. Kila chaneli inalindwa na sheria za Bitcoin zenyewe: mtu akidanganya, upande mwingine unaweza kuthibitisha kwenye blockchain na kuchukua pesa. Unabaki na funguo zako.
+
+## Lightning inachokuomba
+
+- **Kuwa hewani.** Nodi yako lazima itazame blockchain ili mtu asifunge chaneli kwa salio la zamani. (Walinzi wa mtandao, yaani watchtowers, wanaweza kukufanyia hivi.)
+- **Kusimamia ukwasi.** Unaweza kutuma tu kilicho upande wako wa chaneli, na kupokea tu kilicho upande mwingine.
+- **Kukubali ugumu kidogo.** Chaneli hufunguliwa, hufungwa na zinahitaji kusawazishwa. Njia hii inafundisha jinsi.
+
+## Kutana na maabara
+
+Njia hii inafuata *Mastering the Lightning Network*, na wahusika wake wanaishi kwenye kompyuta yako: **Alice**, **Bob**, **Chan** na **Dina**, nodi nne halisi za Lightning kwenye mtandao binafsi wa majaribio. Kuanzia somo linalofuata utawapa amri na kutazama malipo yakisonga.
+
+<Callout type="tip" title="Unahitaji kompyuta">
+Kusoma kunawezekana kwenye simu yoyote. Mazoezi kuanzia somo la 2 yanahitaji kompyuta (Windows yenye WSL2, macOS au Linux) yenye Docker na kumbukumbu ya takriban GB 8.
+</Callout>

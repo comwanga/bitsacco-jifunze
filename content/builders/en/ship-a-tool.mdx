@@ -1,0 +1,78 @@
+---
+title: "Project: ship a small Lightning or Fedimint tool"
+description: "Your capstone. Pick a brief, build it on regtest or a mock, publish it as open source, and get it reviewed by the Bitsacco community."
+level: intermediate
+minutes: 600
+objectives:
+  - Plan, build and test a small Bitcoin tool from a written brief
+  - Publish it as open source with a README in Kiswahili and English
+  - Present it to the community and act on a reviewer's feedback
+resources:
+  - title: "Bitsacco on GitHub"
+    url: "https://github.com/bitsacco"
+    kind: community
+    language: en
+  - title: "Polar"
+    url: "https://lightningpolar.com/"
+    kind: tool
+    language: en
+  - title: "Fedimint source code"
+    url: "https://github.com/fedimint/fedimint"
+    kind: tool
+    language: en
+reflection:
+  - "What did you cut from your first plan, and why?"
+  - "What did your reviewer notice that you had missed?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - regtest
+  - lightning
+  - open-source
+---
+
+This is where the path comes together: a small, real tool, built in public and reviewed by people who will use it. Plan for about two weeks of evenings. A finished small tool beats an unfinished big one.
+
+## Step 1: Pick a brief
+
+| Brief | What it does | Builds on |
+| --- | --- | --- |
+| **Chama tip jar** | The mini-app from lesson 6, finished: amount buttons, QR invoices, Kiswahili and English, error messages in plain words | Lightning Address, LNURL-pay |
+| **UTXO explainer** | A command-line tool that lists a regtest wallet's UTXOs and explains, in plain language, which would be spent for a given payment and what the change would be | UTXOs, RPC |
+| **Offline sats calculator** | A page that converts shillings to sats and back from a price the user types in, works offline, and shows the volatility warning from the savers path | PWA, sats |
+| **Federation guide** | A step-by-step guide, with diagrams, for a chama running a test Fedimint federation on regtest, in both languages | Fedimint |
+
+You may propose your own, as long as it fits the rules below.
+
+## Step 2: Rules
+
+- Runs on <Term id="regtest" />, signet or a mock only. **No real funds, no real seed phrases.**
+- Never asks for, stores or transmits a seed phrase or private key.
+- Published as <Term id="open-source" /> with a licence (MIT or similar) and a README in Kiswahili and English.
+- Has automated tests for its core logic, and they run in CI.
+
+## Step 3: Build in small steps
+
+1. Write a one-paragraph plan in the README: who it's for, what it does, what it won't do.
+2. Build the smallest version that works end to end.
+3. Add tests, then the second language, then polish.
+4. Ask a friend who has never seen it to use it on their phone. Watch, don't help, and write down where they got stuck.
+
+## Done when
+
+- [ ] The README explains the tool in Kiswahili and English, with setup steps that work on a fresh machine.
+- [ ] Tests pass in CI.
+- [ ] It works on a phone-sized screen, or in a terminal 80 columns wide for CLI tools.
+- [ ] Someone else has used it from the README alone.
+- [ ] Your lab evidence from lessons 1 to 6 is linked, showing the skills you built on.
+
+<Callout type="tip" title="Share it, then improve it">
+Post your repository or pull request in the Bitsacco community and ask for a reviewer. Treat the first review as the start, not the finish: make the changes, reply to each comment, and ask for a second look. Tools that survive review can become real Bitsacco mini-apps.
+</Callout>
+
+## Lab evidence
+
+- The link to your repository and its passing CI run.
+- Your reviewer's feedback and the commits where you acted on it.
+- A two-minute screen recording or a short written walk-through.

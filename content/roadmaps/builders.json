@@ -1,0 +1,44 @@
+{
+  "id": "builders",
+  "title": { "sw": "Bitcoin kwa Wajenzi", "en": "Bitcoin for Builders" },
+  "tagline": {
+    "sw": "Kwa wasanidi programu wanaotaka kujenga kwa Bitcoin, Lightning na Fedimint, na kuchangia Bitsacco.",
+    "en": "For developers who want to build on Bitcoin, Lightning and Fedimint, and contribute to Bitsacco."
+  },
+  "description": {
+    "sw": "Kutoka maabara yako ya regtest hadi miamala, funguo, Lightning na Fedimint, kisha jenga programu ndogo na uchangie programu huria. Unahitaji kujua kutumia terminal na lugha moja ya programu.",
+    "en": "From your own regtest lab to transactions, keys, Lightning and Fedimint, then build a mini-app and contribute to open source. You should be comfortable with a terminal and one programming language."
+  },
+  "sections": [
+    {
+      "id": "maabara",
+      "title": { "sw": "Maabara", "en": "Lab" },
+      "lessons": [{ "slug": "dev-environment-regtest" }]
+    },
+    {
+      "id": "itifaki",
+      "title": { "sw": "Itifaki", "en": "Protocol" },
+      "lessons": [
+        { "slug": "utxos-transactions", "prerequisites": ["dev-environment-regtest"] },
+        { "slug": "keys-addresses-descriptors", "prerequisites": ["utxos-transactions"] }
+      ]
+    },
+    {
+      "id": "lightning-na-fedimint",
+      "title": { "sw": "Lightning na Fedimint", "en": "Lightning and Fedimint" },
+      "lessons": [
+        { "slug": "lightning-basics", "prerequisites": ["utxos-transactions"] },
+        { "slug": "fedimint-basics", "prerequisites": ["lightning-basics"] }
+      ]
+    },
+    {
+      "id": "jenga-na-changia",
+      "title": { "sw": "Jenga na changia", "en": "Build and contribute" },
+      "lessons": [
+        { "slug": "bitsacco-mini-app", "prerequisites": ["lightning-basics"] },
+        { "slug": "contributing-oss" },
+        { "slug": "ship-a-tool", "prerequisites": ["bitsacco-mini-app", "contributing-oss"] }
+      ]
+    }
+  ]
+}

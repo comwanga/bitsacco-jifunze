@@ -1,0 +1,62 @@
+---
+title: "Maombi ya malipo ya Lightning"
+description: "Tenganisha ankara: sehemu inayosomeka na binadamu yenye kiasi, sehemu zenye lebo ndani yake, na sahihi. Andika kisimbuzi cha kiasi."
+level: intermediate
+minutes: 35
+objectives:
+  - Taja sehemu za ankara ya BOLT11
+  - Badilisha kiasi na kizidishi cha ankara kuwa sats
+  - Eleza kile ofa za BOLT 12 zinaongeza
+resources:
+  - title: "Mastering the Lightning Network, chapter 15: Lightning Payment Requests"
+    url: "https://github.com/lnbook/lnbook/blob/develop/15_payment_requests.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 11: invoice protocol for Lightning payments"
+    url: "https://github.com/lightning/bolts/blob/master/11-payment-encoding.md"
+    kind: docs
+    language: en
+reflection:
+  - "Kwa nini ankara ya BOLT11 imekusudiwa kulipwa mara moja tu?"
+  - "Duka lingefaidika nini na ofa inayotumika tena badala ya ankara mpya kwa kila mauzo?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - bolt11
+  - invoice
+  - preimage
+---
+
+Kufikia sasa umebandika ankara nyingi. <Term id="invoice">Ankara</Term> ya <Term id="bolt11" /> ni mfuatano wa bech32 wenye sehemu tatu:
+
+```text
+lnbcrt500u 1 pj9x…(data)…  (sahihi)
+└── hrp ─┘ ↑ └─ sehemu zenye lebo ─┘
+     kitenganishi
+```
+
+## Sehemu inayosomeka na binadamu (hrp)
+
+- `ln`: Lightning.
+- `bc` mainnet, `tb` testnet, `tbs` signet, `bcrt` regtest.
+- **Kiasi** cha hiari pamoja na **kizidishi**: `m` mili (10⁻³ BTC), `u` mikro (10⁻⁶), `n` nano (10⁻⁹), `p` piko (10⁻¹²).
+
+Kwa hiyo `lnbcrt500u` inamaanisha 500 × 10⁻⁶ BTC = BTC 0.0005 = sats 50,000. Kitenganishi ni `1` ya **mwisho** kwenye mfuatano; data ya bech32 haina kamwe `1`.
+
+## Sehemu zenye lebo
+
+Baada ya muhuri wa muda, data ina sehemu zenye lebo: `p` hashi ya malipo (hashi ya <Term id="preimage" />), `d` maelezo, `x` muda wa kuisha, `c` kufuli la muda la mwisho, `s` siri ya malipo, `r` vidokezo vya njia kwa chaneli binafsi, na `9` biti za vipengele. Ankara inaishia na sahihi ya Dina, ambayo pia inafichua ufunguo wake wa umma.
+
+## Simbua kiasi
+
+<Exercise id="ch15-decode" />
+
+Ukaguzi unajaribu `amount_sats` yako kwenye aina kadhaa za ankara: kiasi cha mikro, mili na nano kwenye mainnet na regtest.
+
+## Zaidi ya BOLT11: ofa
+
+Ankara za BOLT 11 ni za mara moja na zinabeba kila kitu katika mfuatano mmoja. **Ofa za BOLT 12** zinatumika tena: duka linachapisha ofa moja, na pochi ya kila mlipaji inapata ankara mpya kupitia Lightning yenyewe. Hilo linaruhusu kurudisha pesa, malipo ya kujirudia na faragha zaidi kwa mpokeaji.

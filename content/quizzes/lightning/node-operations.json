@@ -1,0 +1,145 @@
+{
+  "lesson": "node-operations",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Ada kwa sats 100,000 kupitia nodi ya sat 1 + ppm 100 ni ngapi?",
+        "en": "What is the fee for 100,000 sats through a node charging 1 sat + 100 ppm?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Sats 11",
+            "en": "11 sats"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Sats 101",
+            "en": "101 sats"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Sats 1",
+            "en": "1 sat"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "1 + 100,000 × 100 / 1,000,000 = 11.",
+        "en": "1 + 100,000 × 100 / 1,000,000 = 11."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Ada kubwa mno zinasababisha nini?",
+        "en": "What happens if your fees are far too high?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Unapata zaidi kila mara",
+            "en": "You always earn more"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Chaneli inafungwa",
+            "en": "The channel closes"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Walipaji wanapita njia nyingine",
+            "en": "Senders route around you"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Kutafuta njia huchagua njia nafuu.",
+        "en": "Pathfinding prefers cheaper routes."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Nakala tuli ya chaneli (SCB) inafanya nini baada ya maafa?",
+        "en": "What does a static channel backup do after a disaster?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Inafuta pochi",
+            "en": "It deletes the wallet"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Inawaomba wenzako wafunge chaneli ili upate pesa",
+            "en": "It asks peers to close the channels so you get your funds"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Inarejesha chaneli zikiwa wazi",
+            "en": "It restores the channels open"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Pesa zinarudi kwenye blockchain; chaneli zenyewe haziendelei.",
+        "en": "Funds return on-chain; the channels themselves don't continue."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Kwa nini usirejeshe hifadhidata ya zamani ya nodi?",
+        "en": "Why shouldn't you restore an old node database?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Inaweza kuchapisha hali iliyobatilishwa na ukapoteza chaneli nzima",
+            "en": "It can broadcast a revoked state and lose the whole channel"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ni polepole tu",
+            "en": "It's just slow"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Hakuna tatizo",
+            "en": "There's no problem"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Upande mwingine unaweza kuadhibu hali ya zamani.",
+        "en": "The other side can punish an old state."
+      }
+    }
+  ]
+}

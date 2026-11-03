@@ -1,0 +1,49 @@
+{
+  "lesson": "saving-together",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Ni tabia ipi inayofanya chama kifanye kazi vizuri?", "en": "Which habit makes a chama work well?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Sheria wazi zilizokubaliwa kabla ya mchango wa kwanza", "en": "Clear rules agreed before the first contribution" } },
+        { "id": "b", "label": { "sw": "Mtu mmoja anayeshika pesa zote bila kumbukumbu", "en": "One person holding all the money with no records" } },
+        { "id": "c", "label": { "sw": "Kutokutana kamwe", "en": "Never meeting" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Sheria wazi, kumbukumbu na udhibiti wa pamoja ndizo nguzo za chama.", "en": "Clear rules, records and shared control are a chama's pillars." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Katika multisig ya 2 kati ya 3, utoaji unahitaji nini?", "en": "In a 2-of-3 multisig, what does a withdrawal need?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Sahihi ya kiongozi yeyote mmoja", "en": "One signature from any official" } },
+        { "id": "b", "label": { "sw": "Sahihi za viongozi wawili kati ya watatu", "en": "Signatures from two of the three officials" } },
+        { "id": "c", "label": { "sw": "Idhini ya Benki Kuu", "en": "Approval from the Central Bank" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Hakuna kiongozi mmoja anayeweza kutoa pesa peke yake.", "en": "No single official can withdraw money alone." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Kwa nini chama kiamue mapema kama kinahesabu kwa shilingi au sats?", "en": "Why should a chama decide in advance whether it counts in shillings or sats?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kwa sababu bei ya sats kwa shilingi hubadilika", "en": "Because the shilling price of sats changes" } },
+        { "id": "b", "label": { "sw": "Kwa sababu sats haziwezi kugawanywa", "en": "Because sats can't be divided" } },
+        { "id": "c", "label": { "sw": "Haijalishi kamwe", "en": "It never matters" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Bila uamuzi huo, mwanachama anayeondoka baada ya bei kubadilika anaweza kusababisha mabishano.", "en": "Without that decision, a member leaving after the price moves can cause a dispute." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Hatari kuu ya kuacha mweka hazina mmoja ashike maneno yote ya siri ni ipi?", "en": "What is the main risk of one treasurer holding the only seed phrase?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Mtu mmoja anaweza kupoteza au kuchukua kila kitu", "en": "One person can lose or take everything" } },
+        { "id": "b", "label": { "sw": "Malipo yanakuwa ya haraka mno", "en": "Payments become too fast" } },
+        { "id": "c", "label": { "sw": "Hakuna hatari", "en": "There is no risk" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Udhibiti wa pamoja kupitia multisig au shirikisho hupunguza hatari hii.", "en": "Shared control through multisig or a federation reduces this risk." }
+    }
+  ]
+}

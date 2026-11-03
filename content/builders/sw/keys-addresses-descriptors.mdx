@@ -1,0 +1,101 @@
+---
+title: "Funguo, anwani na descriptor"
+description: "Kutoka nambari ya siri hadi anwani ya bc1: jinsi funguo, pochi za HD na descriptor zinavyoungana, ukitumia pochi yako ya regtest."
+level: beginner
+minutes: 45
+objectives:
+  - Eleza uhusiano wa ufunguo binafsi, ufunguo wa umma na anwani
+  - Tambua aina kuu za anwani kwa kiambishi chake
+  - Soma descriptor ya pochi na utengeneze anwani kutoka kwake
+resources:
+  - title: "Kujifunza Bitcoin, sura ya 4 na 5: funguo, anwani na kurejesha pochi"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "Bitcoin Core: descriptors"
+    url: "https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md"
+    kind: docs
+    language: en
+reflection:
+  - "Kwa nini pochi iliyorejeshwa kutoka kwa maneno ya siri inaweza kupata anwani zake zote za zamani?"
+  - "Descriptor inaiambia pochi ya kutazama tu nini ambacho orodha ya anwani haiambii?"
+source:
+  type: original
+terms:
+  - private-key
+  - public-key
+  - address
+  - seed-phrase
+  - descriptor
+---
+
+Kila anwani ya Bitcoin uliyowahi kuona ilianza kama nambari ya bahati nasibu. Somo hili linafuata nambari hiyo hadi kwenye mfuatano wa `bc1`, kisha linaonyesha jinsi maneno ya siri moja yanavyotengeneza mamilioni ya anwani ambazo pochi inaweza kuzipata tena kila wakati.
+
+## Hatua ya 1: Maneno muhimu
+
+| Neno | Maana yake |
+| --- | --- |
+| <Term id="private-key">Ufunguo binafsi</Term> | Nambari ya siri ya biti 256 |
+| <Term id="public-key">Ufunguo wa umma</Term> | Nukta kwenye mkunjo wa secp256k1, inayohesabiwa kutoka kwa ufunguo binafsi; haiwezi kurudishwa nyuma |
+| <Term id="address">Anwani</Term> | Usimbaji wa hati ya kufunga, kwa kawaida kutoka kwa hashi ya ufunguo wa umma |
+| Pochi ya HD (BIP32) | Hutengeneza mti mzima wa funguo kutoka ufunguo mkuu mmoja |
+| <Term id="seed-phrase">Maneno ya siri</Term> (BIP39) | Maneno yanayosimba mbegu kuu |
+| <Term id="descriptor">Descriptor</Term> | Mfuatano unaosema hasa ni hati zipi pochi inazitazama na jinsi ya kuzitumia |
+
+## Hatua ya 2: Aina za anwani kwa kiambishi
+
+| Kiambishi (mainnet) | Regtest | Aina | Maelezo |
+| --- | --- | --- | --- |
+| `1...` | `m...` / `n...` | P2PKH (ya zamani) | Ya kwanza kabisa, ada kubwa zaidi |
+| `3...` | `2...` | P2SH | Mara nyingi hufunika multisig au SegWit |
+| `bc1q...` | `bcrt1q...` | P2WPKH (SegWit v0) | Chaguo la kawaida |
+| `bc1p...` | `bcrt1p...` | P2TR (Taproot) | Mpya zaidi; sahihi za Schnorr |
+
+```bash
+bitcoin-cli -regtest -rpcwallet=alice getnewaddress "" bech32
+bitcoin-cli -regtest -rpcwallet=alice getnewaddress "" bech32m
+```
+
+**Umemaliza ukiweza:** kusema kila moja ya anwani zako mbili mpya ni aina gani kwa kiambishi chake tu.
+
+## Hatua ya 3: Soma descriptor za pochi yako
+
+Pochi za kisasa za Bitcoin Core ni pochi za descriptor.
+
+```bash
+bitcoin-cli -regtest -rpcwallet=alice listdescriptors
+```
+
+Utaona vipengele kama:
+
+```text
+wpkh([d34db33f/84h/1h/0h]tpubDC.../0/*)#checksum
+```
+
+Isome kutoka kushoto kwenda kulia:
+
+- `wpkh(...)`: pay-to-witness-public-key-hash, kwa hiyo anwani za `bcrt1q`.
+- `[d34db33f/84h/1h/0h]`: alama ya ufunguo mkuu na njia ya BIP84 (lengo 84, aina ya sarafu 1 kwa mitandao ya majaribio, akaunti 0).
+- `tpubDC...`: ufunguo wa umma uliopanuliwa wa akaunti hiyo.
+- `/0/*`: tawi la kupokea, kila nambari. `/1/*` ni tawi la chenji.
+
+## Hatua ya 4: Tengeneza anwani mwenyewe
+
+Nakili descriptor moja ya `wpkh(...)` pamoja na checksum yake, kisha:
+
+```bash
+bitcoin-cli -regtest deriveaddresses "wpkh([...]tpub.../0/*)#checksum" "[0,2]"
+bitcoin-cli -regtest -rpcwallet=alice getaddressinfo "<anwani ya kwanza>"
+```
+
+**Unachotarajia:** anwani ya kwanza iliyotengenezwa inalingana na moja ambayo pochi yako tayari imetoa, na `getaddressinfo` inaonyesha `hdkeypath` ile ile.
+
+<Callout type="warning" title="Ya umma haimaanishi haina madhara">
+Ufunguo wa umma uliopanuliwa (`xpub`/`tpub`) hauwezi kutumia pesa, lakini unafichua kila anwani katika akaunti, na hivyo historia yako yote na salio. Ushiriki tu na zana unazoziamini.
+</Callout>
+
+## Ushahidi wa maabara
+
+- Anwani mbili za aina tofauti, zikiwa na majina ya aina zake.
+- Descriptor moja yenye maelezo ya kila sehemu.
+- Matokeo ya `deriveaddresses` yanayolingana na anwani kutoka `getnewaddress`.

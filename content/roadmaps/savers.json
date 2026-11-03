@@ -1,0 +1,37 @@
+{
+  "id": "savers",
+  "title": { "sw": "Bitcoin kwa Wawekaji", "en": "Bitcoin for Savers" },
+  "tagline": {
+    "sw": "Kwa wanachama wa Bitsacco, vikundi vya chama na yeyote anayeanza na Bitcoin.",
+    "en": "For Bitsacco members, chama groups and anyone new to Bitcoin."
+  },
+  "description": {
+    "sw": "Elewa pesa, sats, pochi na funguo, malipo ya Lightning, na jinsi ya kujikinga na matapeli. Hakuna ujuzi wa kiufundi unaohitajika.",
+    "en": "Understand money, sats, wallets and keys, Lightning payments, and how to stay safe from scams. No technical background needed."
+  },
+  "sections": [
+    {
+      "id": "misingi",
+      "title": { "sw": "Misingi", "en": "The basics" },
+      "lessons": [{ "slug": "money-and-bitcoin" }, { "slug": "sats-and-volatility", "prerequisites": ["money-and-bitcoin"] }]
+    },
+    {
+      "id": "pochi-na-funguo",
+      "title": { "sw": "Pochi na funguo", "en": "Wallets and keys" },
+      "lessons": [
+        { "slug": "wallets-keys", "prerequisites": ["money-and-bitcoin"] },
+        { "slug": "custody-and-fedimint", "prerequisites": ["wallets-keys"] }
+      ]
+    },
+    {
+      "id": "kutumia-kwa-usalama",
+      "title": { "sw": "Kutumia kwa usalama", "en": "Using it safely" },
+      "lessons": [{ "slug": "lightning-payments", "prerequisites": ["wallets-keys"] }, { "slug": "scams" }]
+    },
+    {
+      "id": "pamoja",
+      "title": { "sw": "Pamoja", "en": "Together" },
+      "lessons": [{ "slug": "saving-together", "prerequisites": ["custody-and-fedimint"] }, { "slug": "next-steps" }]
+    }
+  ]
+}

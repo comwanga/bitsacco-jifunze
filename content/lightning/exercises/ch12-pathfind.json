@@ -1,0 +1,16 @@
+{
+  "id": "ch12-pathfind",
+  "lesson": "pathfinding",
+  "node": "alice",
+  "tab": "python",
+  "title": {
+    "sw": "Tafuta njia yenye ada ndogo",
+    "en": "Find the cheapest route"
+  },
+  "starter": {
+    "python": "import heapq\nfrom jifunze_lab import lnd\n\n\ndef fee_msat(policy: dict, amount_msat: int) -> int:\n    base = int(policy.get(\"fee_base_msat\", 0))\n    rate = int(policy.get(\"fee_rate_milli_msat\", 0))\n    return base + amount_msat * rate // 1_000_000\n\n\ndef edges_from(graph: dict) -> dict:\n    \"\"\"pubkey -> list of (neighbour pubkey, policy for sending from pubkey).\"\"\"\n    out: dict = {}\n    for e in graph[\"edges\"]:\n        for a, b, pol in ((e[\"node1_pub\"], e[\"node2_pub\"], e.get(\"node1_policy\")), (e[\"node2_pub\"], e[\"node1_pub\"], e.get(\"node2_policy\"))):\n            if pol and not pol.get(\"disabled\"):\n                out.setdefault(a, []).append((b, pol))\n    return out\n\n\ndef find_route(graph: dict, source: str, target: str, amount_msat: int) -> list[str]:\n    \"\"\"Return the list of pubkeys from source to target with the lowest total fee.\"\"\"\n    # TODO: Dijkstra. Start with heap = [(0, source, [source])] and pop the cheapest path each time.\n    return []\n\n\nalice = lnd(\"alice\")\ngraph = alice.graph()\ndina = lnd(\"dina\").pubkey\nnames = {n[\"pub_key\"]: n.get(\"alias\") for n in graph[\"nodes\"]}\nroute = find_route(graph, alice.pubkey, dina, 10_000_000)\nprint(\" -> \".join(names.get(p, p[:8]) for p in route))\n"
+  },
+  "solution": {
+    "python": "import heapq\nfrom jifunze_lab import lnd\n\n\ndef fee_msat(policy: dict, amount_msat: int) -> int:\n    base = int(policy.get(\"fee_base_msat\", 0))\n    rate = int(policy.get(\"fee_rate_milli_msat\", 0))\n    return base + amount_msat * rate // 1_000_000\n\n\ndef edges_from(graph: dict) -> dict:\n    out: dict = {}\n    for e in graph[\"edges\"]:\n        for a, b, pol in ((e[\"node1_pub\"], e[\"node2_pub\"], e.get(\"node1_policy\")), (e[\"node2_pub\"], e[\"node1_pub\"], e.get(\"node2_policy\"))):\n            if pol and not pol.get(\"disabled\"):\n                out.setdefault(a, []).append((b, pol))\n    return out\n\n\ndef find_route(graph: dict, source: str, target: str, amount_msat: int) -> list[str]:\n    adj = edges_from(graph)\n    heap = [(0, source, [source])]\n    seen = set()\n    while heap:\n        cost, node, path = heapq.heappop(heap)\n        if node == target:\n            return path\n        if node in seen:\n            continue\n        seen.add(node)\n        for nxt, pol in adj.get(node, []):\n            if nxt not in seen:\n                hop_fee = 0 if node == source else fee_msat(pol, amount_msat)\n                heapq.heappush(heap, (cost + hop_fee, nxt, path + [nxt]))\n    return []\n\n\nalice = lnd(\"alice\")\ngraph = alice.graph()\ndina = lnd(\"dina\").pubkey\nnames = {n[\"pub_key\"]: n.get(\"alias\") for n in graph[\"nodes\"]}\nroute = find_route(graph, alice.pubkey, dina, 10_000_000)\nprint(\" -> \".join(names.get(p, p[:8]) for p in route))\n"
+  }
+}

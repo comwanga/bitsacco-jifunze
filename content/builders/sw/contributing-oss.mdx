@@ -1,0 +1,82 @@
+---
+title: "Kuchangia programu huria za Bitsacco"
+description: "Kutoka kupata tatizo hadi pendekezo la mabadiliko lililounganishwa: utaratibu, adabu na ukaguzi, ukifanya mazoezi kwenye hazina za Bitsacco zenyewe, ikiwemo hii."
+level: intermediate
+minutes: 60
+objectives:
+  - Tafuta tatizo linalofaa mwanzoni na uelewe sheria za mradi za kuchangia
+  - Fanya badiliko dogo lenye lengo moja kwenye tawi na ufungue pendekezo la mabadiliko lililo wazi
+  - Jibu ukaguzi wa msimbo na uhakikishe CI inapita
+resources:
+  - title: "Bitsacco on GitHub"
+    url: "https://github.com/bitsacco"
+    kind: community
+    language: en
+  - title: "Bitcoin Core contributing guide"
+    url: "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md"
+    kind: docs
+    language: en
+reflection:
+  - "Nini kinachofanya pendekezo la mabadiliko liwe rahisi kukaguliwa na mtunzaji mwenye shughuli nyingi?"
+  - "Ungejibuje maoni ya ukaguzi usiyokubaliana nayo?"
+source:
+  type: original
+terms:
+  - open-source
+  - pull-request
+---
+
+Miradi ya <Term id="open-source" /> hukua kwa badiliko moja dogo na la uangalifu kwa wakati. Msimbo wa Bitsacco uko github.com/bitsacco: tovuti na programu ndogo kwa TypeScript (`bitsacco/bitsacco`), seva ya anwani za Lightning kwa Rust (`bitsacco/lnaddrd`), na jukwaa hili la kujifunzia. Kila badiliko huwafikia watumiaji tu kupitia <Term id="pull-request" /> iliyokaguliwa na CI iliyopita.
+
+## Hatua ya 1: Tafuta kitu kinachofaa kufanywa
+
+1. Soma README ya mradi na `CONTRIBUTING.md` kwanza. Zinakueleza jinsi ya kujenga, kujaribu na kupanga msimbo.
+2. Tafuta matatizo yenye lebo `good first issue` au `help wanted`, au yale unayoweza kuyarudia mwenyewe.
+3. Andika maoni kwenye tatizo kabla ya kuanza: "Ningependa kulifanyia kazi; huu ndio mpango wangu." Huzuia kazi kurudiwa.
+
+Kwa Jifunze, michango mizuri ya kwanza ni kusahihisha herufi, kuboresha sentensi ya Kiswahili, kuongeza neno kwenye kamusi, au kutafsiri somo.
+
+**Umemaliza ukiweza:** kuwa umechagua tatizo na mtunzaji anajua unalifanyia kazi.
+
+## Hatua ya 2: Fanya badiliko
+
+```bash
+gh repo fork bitsacco/jifunze --clone
+cd jifunze
+git switch -c fix/wallets-keys-wording
+npm ci
+# hariri content/savers/sw/wallets-keys.mdx
+npm run validate
+npm run check
+git commit -am "content(savers): clarify seed phrase backup wording in Kiswahili"
+git push -u origin fix/wallets-keys-wording
+```
+
+Kila pendekezo liwe na **wazo moja**. Andika ujumbe wa commit ili mtu atakayesoma historia baada ya mwaka mmoja aelewe kwa nini.
+
+## Hatua ya 3: Fungua pendekezo lililo wazi
+
+Maelezo mazuri hujibu maswali matatu:
+
+| Swali | Mfano |
+| --- | --- |
+| Nini kimebadilika? | Nimeandika upya hatua ya 2 ya orodha ya nakala ya akiba kwenye somo la Kiswahili. |
+| Kwa nini? | "Usiyaandike mtandaoni" ilikuwa na utata; wasomaji walidhani inamaanisha mitandao ya kijamii tu. |
+| Lilikaguliwaje? | `npm run validate` inapita; mkaguzi wa Kiswahili amesoma maneno mapya. |
+
+Unganisha tatizo kwa `Closes #123`. Ongeza picha za skrini kwa badiliko lolote linaloonekana.
+
+## Hatua ya 4: Ukaguzi na CI
+
+- CI ikishindwa, soma kumbukumbu zake, rekebisha, kisha sukuma tena; usiwaombe wakaguzi kuangalia ujenzi uliofeli.
+- Jibu kila maoni ya ukaguzi, hata kama ni "Nimefanya katika abc123". Usipokubaliana, eleza kwa nini kwa ushahidi na ubaki na adabu.
+- Kagua mapendekezo ya watu wengine pia. Kusoma msimbo ndiyo njia ya haraka zaidi ya kujifunza mradi.
+
+<Callout type="tip" title="Leseni ni muhimu">
+Msimbo wa Jifunze ni MIT na masomo ni CC BY-SA 4.0. Kwa kufungua pendekezo kwenye `content/`, unakubali somo lako au tafsiri yako itolewe chini ya CC BY-SA. Usinakili kamwe maandishi usiyo na haki ya kuyashiriki.
+</Callout>
+
+## Ushahidi wa maabara
+
+- Kiungo cha pendekezo lako la mabadiliko (kwa Jifunze, hazina nyingine ya Bitsacco, au nakala ya mazoezi).
+- Maelezo ya pendekezo lako, yakiwa na nini, kwa nini na jinsi lilivyokaguliwa.

@@ -1,0 +1,121 @@
+---
+title: "Building a Bitsacco mini-app"
+description: "Build a small, mobile-first Lightning tip jar that turns a Lightning Address into an invoice, tested against a mock server with no real money."
+level: intermediate
+minutes: 90
+objectives:
+  - Explain the Lightning Address and LNURL-pay flow step by step
+  - Write a function that turns a Lightning Address and an amount into an invoice
+  - Follow the rules that keep a mini-app safe for Bitsacco users
+resources:
+  - title: "lnaddrd: Bitsacco's Lightning Address server"
+    url: "https://github.com/bitsacco/lnaddrd"
+    kind: tool
+    language: en
+  - title: "LNURL specifications (LUD-06 payRequest, LUD-16 Lightning Address)"
+    url: "https://github.com/lnurl/luds"
+    kind: docs
+    language: en
+  - title: "Bitsacco mini apps"
+    url: "https://bitsacco.com/mini-apps"
+    kind: community
+    language: en
+reflection:
+  - "Which checks would you add before showing an invoice to a user?"
+  - "What would a mini-app for your own chama do?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - lightning
+  - invoice
+  - address
+---
+
+Bitsacco describes its mini apps as small apps that "integrate seamlessly with Bitcoin and Lightning payments". In this lesson you build one of the simplest and most useful: a tip jar where a member chooses an amount and gets an invoice to pay a Lightning Address such as `mama-mboga@bitsacco.com`.
+
+<Callout type="warning" title="Draft: confirm with Bitsacco maintainers">
+How mini-apps are listed, embedded and authenticated inside Bitsacco isn't public yet. This lesson teaches the payment flow, which is an open standard. Ask in the Bitsacco community for the current integration details before you publish.
+</Callout>
+
+## Step 1: The Lightning Address flow
+
+A Lightning Address is `name@domain`. Bitsacco runs [lnaddrd](https://github.com/bitsacco/lnaddrd), an open-source Lightning Address server written in Rust. Behind every address is the LNURL-pay protocol:
+
+1. Fetch `https://domain/.well-known/lnurlp/name`.
+2. The server replies with JSON: `tag` is `payRequest`, plus a `callback` URL, `minSendable` and `maxSendable` (in **millisats**) and `metadata`.
+3. Call `callback?amount=<millisats>`.
+4. The server replies with `{ "pr": "lnbc..." }`: a BOLT11 <Term id="invoice" />.
+5. Show the invoice as a QR code; the payer's wallet pays it.
+
+**Done when:** you can say why the amount in step 3 is multiplied by 1,000.
+
+## Step 2: A mock server for your lab
+
+Never test against real money. Save this as `mock-lnurl.mjs` and run it with `node mock-lnurl.mjs`:
+
+```js
+import http from "node:http";
+
+http
+  .createServer((req, res) => {
+    const url = new URL(req.url, "http://localhost:8787");
+    res.setHeader("content-type", "application/json");
+    res.setHeader("access-control-allow-origin", "*");
+    if (url.pathname === "/.well-known/lnurlp/alice") {
+      return res.end(JSON.stringify({
+        tag: "payRequest",
+        callback: "http://localhost:8787/callback/alice",
+        minSendable: 1000,
+        maxSendable: 1000000000,
+        metadata: JSON.stringify([["text/plain", "Tip Alice"]]),
+      }));
+    }
+    if (url.pathname === "/callback/alice") {
+      const msats = Number(url.searchParams.get("amount"));
+      return res.end(JSON.stringify({ pr: `lnbcrt${msats / 1000}n1pmockinvoice`, routes: [] }));
+    }
+    res.statusCode = 404;
+    res.end(JSON.stringify({ status: "ERROR", reason: "not found" }));
+  })
+  .listen(8787, () => console.log("mock LNURL server on http://localhost:8787"));
+```
+
+## Step 3: Address to invoice
+
+```ts
+export async function invoiceFor(address: string, sats: number, base?: string): Promise<string> {
+  const [name, domain] = address.split("@");
+  if (!name || !domain) throw new Error("Not a Lightning Address");
+  const origin = base ?? `https://${domain}`;
+  const meta = await (await fetch(`${origin}/.well-known/lnurlp/${name}`)).json();
+  if (meta.tag !== "payRequest") throw new Error("Not a pay request");
+  const msats = sats * 1000;
+  if (msats < meta.minSendable || msats > meta.maxSendable) throw new Error("Amount out of range");
+  const cb = new URL(meta.callback);
+  cb.searchParams.set("amount", String(msats));
+  const res = await (await fetch(cb)).json();
+  if (!res.pr) throw new Error(res.reason ?? "No invoice returned");
+  return res.pr;
+}
+```
+
+Test it against the mock with `invoiceFor("alice@localhost", 100, "http://localhost:8787")`.
+
+## Step 4: The tip jar
+
+Build a single page with three amount buttons (100, 500, 1,000 sats), a field for a custom amount, and an area that shows the invoice as text and as a QR code. Keep it light: no framework is needed.
+
+## Rules for a mini-app
+
+- **Never hold keys or funds.** The user's own wallet pays; your app only shows a request.
+- **Show amounts clearly** in sats, and show the description before payment.
+- **Kiswahili and English** from day one.
+- **Small and fast** on a low-end phone and a slow connection.
+- **Handle errors in plain words**: "This address isn't accepting payments right now," not a stack trace.
+
+## Lab evidence
+
+- Your `invoiceFor` function and a test showing it returns an invoice from the mock.
+- A test showing it rejects an amount below `minSendable`.
+- A screenshot of your tip jar on a phone-sized screen.

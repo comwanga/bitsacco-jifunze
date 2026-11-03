@@ -1,0 +1,145 @@
+{
+  "lesson": "gossip-channel-graph",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Ujumbe upi unatangaza sera ya ada ya upande mmoja wa chaneli?",
+        "en": "Which message announces one direction's fee policy?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "channel_update",
+            "en": "channel_update"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "node_announcement",
+            "en": "node_announcement"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "init",
+            "en": "init"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Kila upande unatuma channel_update yake.",
+        "en": "Each side sends its own channel_update."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kwa nini chaneli zinatangazwa tu baada ya uthibitisho 6?",
+        "en": "Why are channels announced only after 6 confirmations?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Ili kuchelewesha malipo",
+            "en": "To slow payments down"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ni desturi tu",
+            "en": "It's just custom"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ili yeyote athibitishe kuwa imefadhiliwa kweli",
+            "en": "So anyone can verify it's really funded"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Inazuia kujaza ramani chaneli bandia.",
+        "en": "It stops the map being spammed with fake channels."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "Ramani ya chaneli inaonyesha nini?",
+        "en": "What does the channel graph show?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Historia ya malipo",
+            "en": "Payment history"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Uwezo wa chaneli, si salio la kila upande",
+            "en": "Channel capacity, not each side's balance"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Salio la kila mtu",
+            "en": "Everyone's balance"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Salio linabaki la faragha.",
+        "en": "Balances stay private."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Ramani ya maabara ina nodi na chaneli ngapi?",
+        "en": "How many nodes and channels does the lab's graph have?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Nodi 4, chaneli 3",
+            "en": "4 nodes, 3 channels"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Nodi 3, chaneli 4",
+            "en": "3 nodes, 4 channels"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Nodi 1, chaneli 1",
+            "en": "1 node, 1 channel"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Alice → Bob → Chan → Dina.",
+        "en": "Alice → Bob → Chan → Dina."
+      }
+    }
+  ]
+}

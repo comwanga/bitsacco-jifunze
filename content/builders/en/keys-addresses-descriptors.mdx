@@ -1,0 +1,102 @@
+---
+title: "Keys, addresses and descriptors"
+description: "From a secret number to a bc1 address: how keys, HD wallets and output descriptors fit together, explored with your regtest wallet."
+level: beginner
+minutes: 45
+objectives:
+  - Explain how a private key, public key and address relate
+  - Recognise the main address types by their prefix
+  - Read a wallet descriptor and derive addresses from it
+resources:
+  - title: "Kujifunza Bitcoin, chapters 4 and 5: keys, addresses and wallet recovery"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "Bitcoin Core: descriptors"
+    url: "https://github.com/bitcoin/bitcoin/blob/master/doc/descriptors.md"
+    kind: docs
+    language: en
+reflection:
+  - "Why can a wallet restored from a seed phrase find all its old addresses?"
+  - "What does a descriptor tell a watch-only wallet that a list of addresses doesn't?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - private-key
+  - public-key
+  - address
+  - seed-phrase
+  - descriptor
+---
+
+Every Bitcoin address you have ever seen started life as a random number. This lesson follows that number all the way to a `bc1` string, then shows how one seed phrase produces millions of addresses that a wallet can always find again.
+
+## Step 1: Key terms
+
+| Term | What it means |
+| --- | --- |
+| <Term id="private-key">Private key</Term> | A 256-bit secret number |
+| <Term id="public-key">Public key</Term> | A point on the secp256k1 curve, computed from the private key; you can't reverse it |
+| <Term id="address">Address</Term> | An encoding of a locking script, usually built from a hash of the public key |
+| HD wallet (BIP32) | Derives a whole tree of keys from one master key |
+| <Term id="seed-phrase">Seed phrase</Term> (BIP39) | Words that encode the master seed |
+| <Term id="descriptor">Descriptor</Term> | A string that says exactly which scripts a wallet watches and how to spend them |
+
+## Step 2: Address types by prefix
+
+| Prefix (mainnet) | Regtest | Type | Notes |
+| --- | --- | --- | --- |
+| `1...` | `m...` / `n...` | P2PKH (legacy) | Oldest, largest fees |
+| `3...` | `2...` | P2SH | Often wraps multisig or SegWit |
+| `bc1q...` | `bcrt1q...` | P2WPKH (SegWit v0) | Common default |
+| `bc1p...` | `bcrt1p...` | P2TR (Taproot) | Newest; Schnorr signatures |
+
+```bash
+bitcoin-cli -regtest -rpcwallet=alice getnewaddress "" bech32
+bitcoin-cli -regtest -rpcwallet=alice getnewaddress "" bech32m
+```
+
+**Done when:** you can say which type each of your two new addresses is from its prefix alone.
+
+## Step 3: Read your wallet's descriptors
+
+Modern Bitcoin Core wallets are descriptor wallets.
+
+```bash
+bitcoin-cli -regtest -rpcwallet=alice listdescriptors
+```
+
+You'll see entries like:
+
+```text
+wpkh([d34db33f/84h/1h/0h]tpubDC.../0/*)#checksum
+```
+
+Read it left to right:
+
+- `wpkh(...)`: pay-to-witness-public-key-hash, so `bcrt1q` addresses.
+- `[d34db33f/84h/1h/0h]`: the master key fingerprint and the BIP84 derivation path (purpose 84, coin type 1 for test networks, account 0).
+- `tpubDC...`: the extended public key for that account.
+- `/0/*`: the receive branch, every index. `/1/*` is the change branch.
+
+## Step 4: Derive addresses yourself
+
+Copy one `wpkh(...)` descriptor including its checksum, then:
+
+```bash
+bitcoin-cli -regtest deriveaddresses "wpkh([...]tpub.../0/*)#checksum" "[0,2]"
+bitcoin-cli -regtest -rpcwallet=alice getaddressinfo "<first address>"
+```
+
+**Expected:** the first derived address matches one your wallet already handed out, and `getaddressinfo` shows the same `hdkeypath`.
+
+<Callout type="warning" title="Public is not harmless">
+An extended public key (`xpub`/`tpub`) can't spend, but it reveals every address in the account, and so your whole history and balance. Share it only with tools you trust.
+</Callout>
+
+## Lab evidence
+
+- Two addresses of different types, labelled by type.
+- One descriptor with each part annotated.
+- `deriveaddresses` output matching an address from `getnewaddress`.

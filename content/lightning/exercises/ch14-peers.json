@@ -1,0 +1,16 @@
+{
+  "id": "ch14-peers",
+  "lesson": "encrypted-transport",
+  "node": "alice",
+  "tab": "cli",
+  "title": {
+    "sw": "Tazama miunganisho iliyosimbwa",
+    "en": "Look at the encrypted connections"
+  },
+  "starter": {
+    "cli": "# Every peer connection is encrypted with the Noise protocol before any Lightning message is sent.\nlncli listpeers | jq '.peers[] | {pub_key, address, bytes_sent, bytes_recv}'"
+  },
+  "solution": {
+    "cli": "lncli listpeers | jq '.peers[] | {pub_key, address, bytes_sent, bytes_recv}'"
+  }
+}

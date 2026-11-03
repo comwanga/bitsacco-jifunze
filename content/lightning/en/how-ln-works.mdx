@@ -1,0 +1,61 @@
+---
+title: "How the Lightning Network works"
+description: "Open a channel yourself, confirm it on-chain, and pay through it, to see the three moves every channel makes: open, update, close."
+level: beginner
+minutes: 45
+objectives:
+  - Explain how a funding transaction creates a channel
+  - Open and confirm a channel from Alice to Bob
+  - Pay over the new channel and explain what changed on each side
+resources:
+  - title: "Mastering the Lightning Network, chapter 3: How the Lightning Network Works"
+    url: "https://github.com/lnbook/lnbook/blob/develop/03_how_ln_works.asciidoc"
+    kind: book
+    language: en
+reflection:
+  - "Why does a channel need confirmations before it can be used?"
+  - "After Alice paid Bob, how could Bob ever pay Alice back over the same channel?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - channel
+  - multisig
+  - commitment-transaction
+  - confirmation
+  - liquidity
+---
+
+Every <Term id="channel" /> lives through three moves.
+
+1. **Open.** One side sends bitcoin to a 2-of-2 <Term id="multisig" /> output that needs both signatures to spend. This *funding transaction* is an ordinary Bitcoin transaction.
+2. **Update.** For each payment, both sides sign a new <Term id="commitment-transaction" /> that splits the funds differently. Nobody broadcasts it: it just sits ready, and the old one is revoked.
+3. **Close.** When they are done, the latest split goes on-chain, either together (a cooperative close) or by one side alone.
+
+Only moves 1 and 3 touch the blockchain. Everything in between is just messages.
+
+## Step 1: Alice opens a channel to Bob
+
+Alice needs Bob's node id (his public key) and his address on the network. Then she funds 500,000 sats:
+
+<Exercise id="ch03-open-channel" />
+
+The output includes a `funding_txid`. The channel exists, but it is **pending**: the funding transaction is in the mempool, not yet in a block.
+
+## Step 2: Confirm it
+
+On regtest you are the miner. Six blocks give the funding transaction six <Term id="confirmation">confirmations</Term>, and the channel becomes active:
+
+<Exercise id="ch03-mine" />
+
+## Step 3: Bob gets paid
+
+Bob runs c-lightning, so his invoice command is different, and c-lightning counts in *millisatoshis*. Make the invoice on Bob, then pay it from Alice:
+
+<Exercise id="ch03-pay-bob" />
+
+Alice opened the channel with all 500,000 sats on her side. After paying 20,000 sats, Bob has 20,000 on his side and can now pay her back. That balance on each side is the channel's <Term id="liquidity" />.

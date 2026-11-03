@@ -1,0 +1,145 @@
+{
+  "lesson": "how-ln-works",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "sw": "Muamala wa ufadhili unalipa kwenye tokeo la aina gani?",
+        "en": "What kind of output does a funding transaction pay to?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Multisig ya 2 kati ya 2",
+            "en": "A 2-of-2 multisig"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Anwani ya Bob peke yake",
+            "en": "Bob's address alone"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ankara",
+            "en": "An invoice"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Sahihi zote mbili zinahitajika kuutumia.",
+        "en": "Both signatures are needed to spend it."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "sw": "Kwa nini tunachimba bloku 6 baada ya kufungua chaneli?",
+        "en": "Why mine 6 blocks after opening a channel?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Ili kupata ada",
+            "en": "To earn fees"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Ili kufuta chaneli",
+            "en": "To delete the channel"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Ili muamala wa ufadhili uthibitishwe na chaneli iwe hai",
+            "en": "So the funding transaction confirms and the channel becomes active"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "sw": "Chaneli inasubiri hadi ufadhili uthibitishwe.",
+        "en": "A channel waits until its funding is confirmed."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "sw": "c-lightning inahesabu kiasi cha ankara kwa nini?",
+        "en": "What unit does c-lightning use for invoice amounts?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Shilingi",
+            "en": "Shillings"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Millisatoshi",
+            "en": "Millisatoshis"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "BTC",
+            "en": "BTC"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "sw": "Sats 20,000 = msat 20,000,000.",
+        "en": "20,000 sats = 20,000,000 msat."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "sw": "Baada ya Alice kumlipa Bob sats 20,000, Bob anaweza kufanya nini?",
+        "en": "After Alice pays Bob 20,000 sats, what can Bob do?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "sw": "Kumlipa Alice hadi sats 20,000 kupitia chaneli hiyo",
+            "en": "Pay Alice back up to 20,000 sats over that channel"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "sw": "Kufunga chaneli ya Alice peke yake bila ruhusa yoyote na kuchukua yote",
+            "en": "Close the channel and take everything"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "sw": "Hakuna",
+            "en": "Nothing"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "sw": "Sasa ana ukwasi upande wake.",
+        "en": "He now has liquidity on his side."
+      }
+    }
+  ]
+}

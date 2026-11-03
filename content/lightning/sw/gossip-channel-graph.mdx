@@ -1,0 +1,54 @@
+---
+title: "Gossip na ramani ya chaneli"
+description: "Jinsi kila nodi inavyojifunza ramani ya mtandao kutoka kwa wenzake, na ramani hiyo ina nini. Soma ramani ya Alice kwa Python."
+level: intermediate
+minutes: 35
+objectives:
+  - Taja jumbe tatu za gossip na kile kila moja inatangaza
+  - Eleza kwa nini chaneli zinatangazwa tu baada ya kuthibitishwa
+  - Soma ramani ya chaneli kutoka kwa nodi na uhesabu nodi na chaneli zake
+resources:
+  - title: "Mastering the Lightning Network, chapter 11: Gossip and the Channel Graph"
+    url: "https://github.com/lnbook/lnbook/blob/develop/11_gossip_channel_graph.asciidoc"
+    kind: book
+    language: en
+  - title: "lngraph.py from the book's code"
+    url: "https://github.com/lnbook/lnbook/tree/develop/code/lngraph"
+    kind: tool
+    language: en
+reflection:
+  - "Ramani inaonyesha uwezo lakini si salio. Kwa nini Lightning inaficha salio?"
+  - "Nodi ingeweza kujua nini kukuhusu kutoka kwa ramani ya umma peke yake?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - gossip
+  - channel
+  - node
+---
+
+Ili kupata njia ya kwenda kwa Dina, Alice anahitaji ramani: ni <Term id="node">nodi</Term> zipi zipo na ni <Term id="channel">chaneli</Term> zipi zinaziunganisha. Hakuna anayechapisha ramani hiyo. Kila nodi inajenga yake kutoka kwa <Term id="gossip" />, jumbe inazosikia kutoka kwa wenzake na kuzipitisha.
+
+## Jumbe tatu za gossip
+
+| Ujumbe | Unatangaza | Umetiwa sahihi na |
+| --- | --- | --- |
+| `channel_announcement` | Chaneli ipo kati ya nodi mbili, na ushahidi kwamba imefadhiliwa kwenye blockchain | Nodi zote mbili na funguo zote mbili za ufadhili |
+| `node_announcement` | Jina la nodi, rangi, anwani zake na vipengele vyake | Nodi yenyewe |
+| `channel_update` | Sera ya ada ya upande mmoja, kufuli la muda, na kama iko wazi | Nodi ya upande huo |
+
+Chaneli inatangazwa tu baada ya muamala wake wa ufadhili kupata uthibitisho sita. Hilo linazuia nodi kujaza ramani chaneli zisizokuwepo: yeyote anaweza kukagua tokeo la ufadhili kwenye blockchain.
+
+## Uwezo, si salio
+
+Ramani inaonyesha **uwezo** wa kila chaneli, yaani kiasi cha ufadhili, lakini kamwe si jinsi kilivyogawanywa kati ya pande mbili. Salio hubadilika kwa kila malipo na lingefichua nani alimlipa nani. Ndiyo maana walipaji wakati mwingine hujaribu njia na kushindwa: ramani inasema chaneli ni kubwa vya kutosha, lakini salio la upande unaohitajika halitoshi.
+
+## Soma ramani ya Alice
+
+<Exercise id="ch11-graph" />
+
+Hesabu zako zinapaswa kulingana na hali ya somo: nodi nne na chaneli tatu kwa mstari. `lngraph.py` ya kitabu inafanya vivyo hivyo kwenye mtandao halisi, ambapo ramani ina maelfu mengi ya nodi.

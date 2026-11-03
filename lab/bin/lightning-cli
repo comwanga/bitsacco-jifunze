@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+"""lightning-cli for the lab, talking to Bob or Chan over c-lightning's RPC socket."""
+import json
+import sys
+
+from jifunze_lab.cli import CliTargetError, parse_cli_args, target_node, wrong_cli
+from jifunze_lab.nodes import nodes
+
+name = target_node("bob")
+node = nodes().get(name)
+if node is None or node.impl != "cln":
+    e: CliTargetError = wrong_cli("lightning-cli", name)
+    print(e, file=sys.stderr)
+    sys.exit(e.code)
+
+from pyln.client import LightningRpc, RpcError  # noqa: E402
+
+method, params = parse_cli_args(sys.argv[1:])
+try:
+    result = LightningRpc(node.cln_socket).call(method, params)
+except RpcError as err:
+    print(json.dumps(err.error, indent=2), file=sys.stderr)
+    sys.exit(1)
+print(json.dumps(result, indent=2))

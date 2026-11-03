@@ -1,0 +1,18 @@
+{
+  "id": "savers",
+  "title": { "sw": "Bitcoin kwa Wawekaji", "en": "Bitcoin for Savers" },
+  "tagline": { "sw": "Misingi", "en": "Basics" },
+  "description": { "sw": "Maelezo", "en": "Description" },
+  "sections": [
+    {
+      "id": "basics",
+      "title": { "sw": "Misingi", "en": "Basics" },
+      "lessons": [{ "slug": "alpha" }, { "slug": "beta", "prerequisites": ["alpha"] }]
+    },
+    {
+      "id": "more",
+      "title": { "sw": "Zaidi", "en": "More" },
+      "lessons": [{ "slug": "gamma" }]
+    }
+  ]
+}

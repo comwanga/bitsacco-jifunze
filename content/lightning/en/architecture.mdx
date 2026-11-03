@@ -1,0 +1,60 @@
+---
+title: "Lightning Network architecture"
+description: "A map of the whole protocol, layer by layer, so every later lesson has a place to fit."
+level: intermediate
+minutes: 20
+objectives:
+  - Name the layers of the Lightning protocol from the network up to payments
+  - Place channels, routing, gossip, onions and invoices on that map
+  - Find the BOLT that specifies each part
+resources:
+  - title: "Mastering the Lightning Network, chapter 6: Lightning Network Architecture"
+    url: "https://github.com/lnbook/lnbook/blob/develop/06_lightning_architecture.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT specifications"
+    url: "https://github.com/lightning/bolts"
+    kind: docs
+    language: en
+reflection:
+  - "Which layer would you change to make payments more private, and which to make them cheaper?"
+  - "Why does it help that each layer is specified separately?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+translationOf: sw
+terms:
+  - onion-routing
+  - gossip
+  - invoice
+---
+
+The book draws Lightning as a stack. Each layer relies only on the one below it, like the floors of a building. Read it from the bottom up:
+
+| Layer | What it does | Lessons | BOLTs |
+| --- | --- | --- | --- |
+| **Network connection** | Encrypted, authenticated links between nodes | 14 | 8 |
+| **Messaging** | The format of every message on the wire | 13 | 1 |
+| **Peer-to-peer** | Channel announcements and updates, the <Term id="gossip" /> | 11 | 7 |
+| **Routing** | Finding a path and sending it in layers, by <Term id="onion-routing" /> | 10, 12 | 4 |
+| **Payment channels** | Funding, commitments, HTLCs, closing | 7, 8, 9 | 2, 3, 5 |
+| **Payments** | What users see: an <Term id="invoice" />, an amount, a receipt | 15 | 11 |
+
+Underneath it all sits **Bitcoin**, which enforces the channels.
+
+## Why layers
+
+Layers let developers improve one part without rewriting the rest. A new invoice format (like BOLT 12 offers) doesn't change how channels are funded. A faster pathfinding algorithm doesn't change the wire format.
+
+They also make debugging possible. When a payment fails, you ask: was it the connection, gossip (the sender didn't know a channel), routing (no path with enough liquidity), or the channel itself?
+
+## How to use this map
+
+Keep this table open as you go. From here on, each lesson zooms into one row. There is no lab in this chapter; it is the map for the next ten.
+
+<Callout type="tip" title="Read a BOLT">
+Open BOLT 1 on GitHub and read just its introduction. Specifications are shorter and more readable than people expect, and the book cites them throughout.
+</Callout>

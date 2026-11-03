@@ -1,0 +1,57 @@
+---
+title: "Upitishaji wa kitunguu"
+description: "Jinsi kila nodi kwenye njia inavyojua majirani zake tu: jenga na umenye kitunguu cha kuchezea kwa Python, kisha ukilinganishe na muundo halisi wa Sphinx."
+level: intermediate
+minutes: 45
+objectives:
+  - Eleza kile kila hatua inaweza na isichoweza kuona katika malipo ya kitunguu
+  - Jenga usimbaji wa tabaka na uumenye hatua kwa hatua
+  - Taja kile vitunguu halisi vya Lightning vinaongeza, yaani ukubwa usiobadilika, siri za pamoja na HMAC
+resources:
+  - title: "Mastering the Lightning Network, chapter 10: Onion Routing"
+    url: "https://github.com/lnbook/lnbook/blob/develop/10_onion_routing.asciidoc"
+    kind: book
+    language: en
+  - title: "BOLT 4: onion routing protocol"
+    url: "https://github.com/lightning/bolts/blob/master/04-onion-routing.md"
+    kind: docs
+    language: en
+reflection:
+  - "Chan anapitisha malipo kwa Dina. Je, Chan anaweza kujua kama Dina ndiye mpokeaji wa mwisho?"
+  - "Kwa nini kila kitunguu lazima kiwe na ukubwa ule ule, njia ikiwa ndefu au fupi?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - onion-routing
+  - node
+---
+
+Alice anapomlipa Dina kupitia Bob na Chan, Bob anahitaji kujua apeleke malipo wapi baadaye, lakini si kwamba yanaenda kwa Dina. <Term id="onion-routing">Upitishaji wa kitunguu</Term> unaipa kila <Term id="node" /> kile inachohitaji tu, si zaidi.
+
+## Tabaka, kama kitunguu
+
+Alice anaijua njia yote. Anajenga ujumbe kwa tabaka, kuanzia la ndani kabisa:
+
+1. Tabaka la **Dina**: "wewe ndiye hatua ya mwisho; kiasi ni 21,000."
+2. Limefungwa ndani ya tabaka la **Chan**: "pitisha 21,000 kwa Dina."
+3. Limefungwa ndani ya tabaka la **Bob**: "pitisha 21,001 kwa Chan."
+
+Kila tabaka limesimbwa kwa ufunguo ambao hatua hiyo tu inaweza kuupata. Bob anamenya tabaka lake, anasoma "pitisha kwa Chan", na anapitisha kilichobaki, ambacho kwake ni baiti zinazoonekana za bahati nasibu. Chan anamenya linalofuata. Tabaka la Dina tu ndilo linasema "ni lako".
+
+## Jenga kitunguu cha kuchezea
+
+Kitu halisi kinatumia siri za pamoja za mkunjo wa elliptiki na ChaCha20; chetu kinatumia mtiririko wa SHA-256. Wazo la tabaka ni lile lile. Jaza `wrap` na `peel`:
+
+<Exercise id="ch10-toy-onion" />
+
+Ukaguzi unaendesha vitendakazi vyako kwa funguo na jumbe za bahati nasibu, na kuhakikisha ujumbe unaonekana tu baada ya tabaka la mwisho.
+
+## Vitunguu halisi vinaongeza nini (Sphinx)
+
+- **Ukubwa usiobadilika.** Kila kitunguu ni baiti 1,366, kimejazwa vijazio, ili hatua isiweze kuhesabu hatua zilizobaki.
+- **Siri ya pamoja kwa kila hatua.** Alice anatumia ufunguo mpya wa muda kwa kila malipo; kila hatua inapata siri yake kwa ECDH, na ufunguo unafichwa kila hatua ili hatua zisiweze kuunganisha kitunguu zilichopokea na zinachokipitisha.
+- **HMAC.** Kila tabaka lina alama ya uadilifu. Kitunguu kilichoharibiwa kinakataliwa, na hitilafu inasafiri kurudi kwa Alice ikiwa imesimbwa, tabaka kwa tabaka.

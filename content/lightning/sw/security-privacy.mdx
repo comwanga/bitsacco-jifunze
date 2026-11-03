@@ -1,0 +1,58 @@
+---
+title: "Usalama na faragha ya mtandao wa Lightning"
+description: "Mshambuliaji anaweza kujua au kuharibu nini: pima salio lililofichwa la njia mwenyewe, kisha upitie mashambulizi ya kuziba, ya ada na kinga zake."
+level: intermediate
+minutes: 45
+objectives:
+  - Eleza jinsi kupima kwa majaribio kunavyofichua salio ambalo gossip inaficha
+  - Tafuta kikomo cha njia kwa utafutaji wa nusu-nusu ukitumia malipo bandia
+  - Eleza kuziba chaneli na mashambulizi mengine, pamoja na kinga kuu
+resources:
+  - title: "Mastering the Lightning Network, chapter 16: Security and Privacy of the Lightning Network"
+    url: "https://github.com/lnbook/lnbook/blob/develop/16_security_privacy_ln.asciidoc"
+    kind: book
+    language: en
+  - title: "Kujifunza Bitcoin, sura ya 13: usalama wa Bitcoin"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+reflection:
+  - "Kama yeyote anaweza kupima salio lako, hiyo inamaanisha nini kwa faragha ya duka?"
+  - "Kwa nini mashambulizi ya kuziba ni magumu kuzuia bila kufanya malipo halali yagharimu zaidi?"
+source:
+  type: adapted
+  from: "Mastering the Lightning Network"
+  url: "https://github.com/lnbook/lnbook"
+  licence: "CC BY-SA 4.0"
+  credit: "Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt"
+terms:
+  - probing
+  - htlc
+  - liquidity
+---
+
+Lightning imeundwa kuwa ya faragha: salio halisambazwi kwa gossip, na vitunguu vinaficha walipaji na wapokeaji. Lakini faragha hapa ni ya kiwango fulani, na nodi yenye udadisi au uadui ina mbinu zake.
+
+## Kupima kwa majaribio
+
+Alice anaweza kumtumia Dina malipo yenye hashi ya malipo ya **bahati nasibu**. Hayawezi kukamilika kamwe, kwa sababu hakuna anayejua preimage. Tazama jinsi yanavyoshindwa:
+
+- Yakimfikia Dina, anasema "sijui malipo haya" (`incorrect_payment_details`).
+- Chaneli njiani ikiwa ndogo mno, nodi inasema hivyo mapema.
+
+Kwa hiyo kila kushindwa kunajibu swali la ndiyo au hapana: je, kiasi hiki kinaweza kupita? Ukiuliza maswali ya kutosha unajua salio la chaneli. Huo ndio <Term id="probing" />.
+
+<Exercise id="ch16-probe" />
+
+Utafutaji wako wa nusu-nusu unapaswa kufikia ndani ya sats 20,000 za kikomo halisi cha njia, bila kulipa sat hata moja.
+
+## Mashambulizi mengine
+
+- **Kuziba chaneli.** Mshambuliaji anajitumia malipo mengi na hayamalizi kamwe, akijaza nafasi za HTLC za chaneli (483 kwa kila upande) au kufunga <Term id="liquidity" /> hadi kufuli za muda ziishe. Kinga zinazopendekezwa ni pamoja na ada za awali na sifa za wenzako.
+- **Kuchezea ada na kufuli za muda.** Mshambuliaji anaweza kujaribu kufanya <Term id="htlc" /> iishe muda kabla haijadaiwa kwenye blockchain wakati ada ziko juu. Matokeo ya nanga (anchor outputs) yanaruhusu nodi kuongeza ada kwenye miamala yao ya kufunga.
+- **Kuvuja kwa faragha.** Chaneli za umma za nodi yako, majina na matokeo ya ufadhili kwenye blockchain yanaweza kuunganishwa nawe. Chaneli binafsi, huduma za kitunguu (Tor) na uchaguzi makini wa sarafu husaidia.
+- **Mashambulizi ya kutenganisha.** Nodi inayolishwa na wenzake wanaodhibitiwa na mshambuliaji inaweza kuonyeshwa picha bandia ya mnyororo. Unganisha na nodi kadhaa halali za Bitcoin.
+
+<Callout type="scam" title="Hatari za kila siku kwanza">
+Kwa watumiaji wengi hatari kubwa bado ni zile za kawaida: maneno ya siri yaliyovuja, programu bandia ya pochi, au "wakala wa huduma" asiye halali. Njia ya wawekaji inazieleza.
+</Callout>

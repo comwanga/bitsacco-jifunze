@@ -1,0 +1,16 @@
+{
+  "id": "ch02-dina-invoice",
+  "lesson": "getting-started",
+  "node": "dina",
+  "tab": "cli",
+  "title": {
+    "sw": "Dina anatengeneza ankara",
+    "en": "Dina creates an invoice"
+  },
+  "starter": {
+    "cli": "# Dina sells coffee. She asks for 50,000 sats.\nlncli addinvoice --amt 50000 --memo \"kahawa\""
+  },
+  "solution": {
+    "cli": "lncli addinvoice --amt 50000 --memo \"kahawa\""
+  }
+}

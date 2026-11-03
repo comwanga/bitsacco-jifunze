@@ -1,0 +1,16 @@
+{
+  "id": "ch15-decode",
+  "lesson": "payment-requests",
+  "node": "dina",
+  "tab": "python",
+  "title": {
+    "sw": "Soma kiasi ndani ya ankara",
+    "en": "Read the amount inside an invoice"
+  },
+  "starter": {
+    "python": "from jifunze_lab import lnd\n\nMULTIPLIER = {\"m\": 10**-3, \"u\": 10**-6, \"n\": 10**-9, \"p\": 10**-12}\n\n\ndef amount_sats(invoice: str) -> int:\n    \"\"\"Read the amount from the human-readable part, e.g. lnbcrt500u1... -> 50000 sats.\"\"\"\n    hrp = invoice[: invoice.rfind(\"1\")]\n    # TODO: strip the 'lnbc' / 'lnbcrt' prefix, split the number from the multiplier letter,\n    # and convert bitcoin to sats (1 BTC = 100,000,000 sats).\n    return 0\n\n\ninvoice = lnd(\"dina\").addinvoice(50000, \"kitabu\")[\"payment_request\"]\nprint(invoice[:30], \"...\")\nprint(\"my decoder:\", amount_sats(invoice), \"sats\")\nprint(\"lnd says: \", lnd(\"dina\").decode(invoice)[\"num_satoshis\"], \"sats\")\n"
+  },
+  "solution": {
+    "python": "from jifunze_lab import lnd\n\nMULTIPLIER = {\"m\": 10**-3, \"u\": 10**-6, \"n\": 10**-9, \"p\": 10**-12}\n\n\ndef amount_sats(invoice: str) -> int:\n    hrp = invoice[: invoice.rfind(\"1\")]\n    for prefix in (\"lnbcrt\", \"lntbs\", \"lntb\", \"lnbc\"):\n        if hrp.startswith(prefix):\n            amount = hrp[len(prefix):]\n            break\n    if amount and amount[-1] in MULTIPLIER:\n        btc = int(amount[:-1]) * MULTIPLIER[amount[-1]]\n    else:\n        btc = int(amount or 0)\n    return round(btc * 100_000_000)\n\n\ninvoice = lnd(\"dina\").addinvoice(50000, \"kitabu\")[\"payment_request\"]\nprint(\"my decoder:\", amount_sats(invoice), \"sats\")\nprint(\"lnd says: \", lnd(\"dina\").decode(invoice)[\"num_satoshis\"], \"sats\")\n"
+  }
+}

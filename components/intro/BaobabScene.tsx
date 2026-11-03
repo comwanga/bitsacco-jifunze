@@ -16,7 +16,7 @@ export function BaobabScene({ lang }: { lang: Lang }) {
       className="mbuyu"
       viewBox="0 0 1200 400"
       preserveAspectRatio="xMidYMid slice"
-      role="img"
+      role="group" // not "img": an image's children are hidden, and the branch labels are links
       aria-label={t(lang, "sceneLabel")}
     >
       <defs>

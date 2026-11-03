@@ -6,3 +6,5 @@ out/
 next-env.d.ts
 __pycache__/
 *.pyc
+test-results/
+playwright-report/

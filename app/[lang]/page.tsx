@@ -35,7 +35,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <p className="mt-4 max-w-xl text-lg text-[#e3d5c5]">{t(lang, "heroLead")}</p>
           <a
             href="#njia"
-            className="mt-7 inline-flex rounded-full bg-sun px-6 py-3 text-base font-bold text-white shadow-[0_4px_18px_rgba(255,88,0,.35)] hover:bg-[#e94f00]"
+            className="mt-7 inline-flex rounded-full bg-sun-deep px-6 py-3 text-base font-bold text-white shadow-[0_4px_18px_rgba(255,88,0,.35)] hover:bg-[#b83c00]"
           >
             {t(lang, "startLearning")}
           </a>

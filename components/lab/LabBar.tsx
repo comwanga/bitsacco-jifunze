@@ -67,7 +67,7 @@ export function LabBar({ lang }: { lang: Lang }) {
             spellCheck={false}
             className="w-44 rounded-lg border border-[#362c25] bg-[#1e1916] px-3 py-1.5 font-mono tracking-wider uppercase"
           />
-          <button type="submit" disabled={busy || code.trim().length < 12} className="rounded-full bg-sun px-4 py-1.5 font-semibold text-white disabled:opacity-40">
+          <button type="submit" disabled={busy || code.trim().length < 12} className="rounded-full bg-sun-deep px-4 py-1.5 font-semibold text-white disabled:opacity-40">
             {t(lang, "labPair")}
           </button>
           <details className="text-xs text-[#b3a597]">

@@ -101,7 +101,7 @@ export default async function RoadmapPage({ params }: Params) {
           <p className="mt-2 text-[#d9cbbb]">{t(lang, r.id === "savers" ? "whatsNextSavers" : "whatsNextBuilders")}</p>
           <p className="mt-4 flex flex-wrap gap-3">
             {r.id === "builders" && (
-              <Link href={`/${lang}/${r.id}/${last}/`} className="rounded-full bg-sun px-5 py-2.5 font-semibold text-white">
+              <Link href={`/${lang}/${r.id}/${last}/`} className="rounded-full bg-sun-deep px-5 py-2.5 font-semibold text-white">
                 {lessons.get(last)!.frontmatter.title}
               </Link>
             )}

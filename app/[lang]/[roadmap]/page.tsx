@@ -30,7 +30,6 @@ export default async function RoadmapPage({ params }: Params) {
   const lessons = new Map(slugs.map((s) => [s, getLesson(r.id, s, lang)]));
   const minutes = [...lessons.values()].reduce((m, x) => m + x.frontmatter.minutes, 0);
   const last = slugs[slugs.length - 1];
-  let n = 0;
 
   return (
     <>
@@ -55,7 +54,7 @@ export default async function RoadmapPage({ params }: Params) {
             </h2>
             <ol className="mt-4 space-y-2">
               {section.lessons.map((entry) => {
-                n += 1;
+                const n = slugs.indexOf(entry.slug) + 1;
                 const lesson = lessons.get(entry.slug)!;
                 const fm = lesson.frontmatter;
                 return (

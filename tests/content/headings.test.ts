@@ -25,6 +25,11 @@ describe("extractHeadings", () => {
   test("repeated headings get unique ids", () => {
     expect(extractHeadings("## Jaribu\n\ntext\n\n## Jaribu\n\n## Jaribu\n").map((h) => h.id)).toEqual(["jaribu", "jaribu-2", "jaribu-3"]);
   });
+  test("duplicate suffixes cannot collide with another heading's natural slug", () => {
+    const body = "## Jaribu\n\n## Jaribu\n\n## Jaribu 2\n\n## Jaribu\n\n## Jaribu 3\n";
+    expect(extractHeadings(body).map((h) => h.id)).toEqual(["jaribu", "jaribu-2", "jaribu-2-2", "jaribu-3", "jaribu-3-2"]);
+    expect(extractHeadings("## Jaribu\n\n## Jaribu 2\n\n## Jaribu\n").map((h) => h.id)).toEqual(["jaribu", "jaribu-2", "jaribu-3"]);
+  });
   test("ignores lines inside code fences", () => {
     expect(extractHeadings("```md\n## Si kichwa\n```\n\n## Kichwa halisi\n").map((h) => h.text)).toEqual(["Kichwa halisi"]);
   });
@@ -42,10 +47,10 @@ describe("extractHeadings", () => {
 describe("rendered lessons carry the heading ids", () => {
   test("every id from extractHeadings is on the page, in order", async () => {
     const body =
-      "## Kazi tatu za pesa\n\nMaandishi.\n\n### Hatua ya 1: Mfumo wa UTXO\n\n```sh\n## not a heading\n```\n\n## Jaribu\n\n## Jaribu\n";
+      "## Kazi tatu za pesa\n\nMaandishi.\n\n### Hatua ya 1: Mfumo wa UTXO\n\n```sh\n## not a heading\n```\n\n## Jaribu\n\n## Jaribu\n\n## Jaribu 2\n";
     const html = renderToStaticMarkup(await renderLessonBody(body, "sw", []));
     const ids = [...html.matchAll(/<h[23] id="([^"]+)"/g)].map((m) => m[1]);
     expect(ids).toEqual(extractHeadings(body).map((h) => h.id));
-    expect(ids).toEqual(["kazi-tatu-za-pesa", "hatua-ya-1-mfumo-wa-utxo", "jaribu", "jaribu-2"]);
+    expect(ids).toEqual(["kazi-tatu-za-pesa", "hatua-ya-1-mfumo-wa-utxo", "jaribu", "jaribu-2", "jaribu-2-2"]);
   });
 });

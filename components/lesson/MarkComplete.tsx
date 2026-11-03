@@ -10,7 +10,7 @@ export function MarkComplete({ lessonKey, lang }: { lessonKey: LessonKey; lang: 
   return (
     <div className="my-8">
       {doneAt ? (
-        <p className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 font-semibold text-white" aria-live="polite">
+        <p className="inline-flex items-center gap-2 rounded-full bg-teal-700 px-5 py-2.5 font-semibold text-white" aria-live="polite">
           <span aria-hidden="true">✓</span> {t(lang, "markedComplete")}
         </p>
       ) : (

@@ -31,18 +31,22 @@ function textOf(node: Node): string {
 function collect(tree: Node): { node: Node; heading: Heading }[] {
   const out: { node: Node; heading: Heading }[] = [];
   const seen = new Map<string, number>();
+  const used = new Set<string>();
   const walk = (node: Node) => {
     if (node.type === "heading" && (node.depth === 2 || node.depth === 3)) {
       const text = textOf(node).replace(/\s+/g, " ").trim();
       const base = slugify(text);
-      const n = (seen.get(base) ?? 0) + 1;
+      let n = (seen.get(base) ?? 0) + 1;
+      let id = n === 1 ? base : `${base}-${n}`;
+      while (used.has(id)) id = `${base}-${++n}`;
       seen.set(base, n);
+      used.add(id);
       out.push({
         node,
         heading: {
           depth: node.depth,
           text,
-          id: n === 1 ? base : `${base}-${n}`,
+          id,
         },
       });
       return;

@@ -15,3 +15,17 @@ for (const path of PAGES) {
     expect(bad, bad.join("\n")).toEqual([]);
   });
 }
+
+test("completed lesson status has accessible contrast in both languages", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "markup is shared by both projects");
+  await page.addInitScript(() => localStorage.setItem("jifunze:progress:v1", JSON.stringify({
+    app: "bitsacco-jifunze", version: 1,
+    lessons: { "savers/money-and-bitcoin": { completedAt: "2026-11-01T10:00:00.000Z" } },
+  })));
+  for (const lang of ["sw", "en"]) {
+    await page.goto(`/${lang}/savers/money-and-bitcoin/`);
+    await expect(page.getByText(lang === "sw" ? "Umemaliza somo hili" : "Lesson finished")).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+  }
+});

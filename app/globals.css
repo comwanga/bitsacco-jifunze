@@ -13,6 +13,7 @@
   --color-teal-900: #134e4a;
   --color-brand: #008080;
   --color-sun: #ff5800;
+  --color-sun-deep: #c94400; /* white text on this passes 4.5:1 */
   --color-btc: #f7931a;
   --color-night: #1b2550;
   --color-dusk: #5a3767;
@@ -175,4 +176,9 @@ body {
   .lesson-body a {
     color: var(--color-teal-400);
   }
+}
+
+/* Headings land below the sticky phone menu bar when reached from the table of contents. */
+.lesson-body :is(h2, h3) {
+  scroll-margin-top: 4rem;
 }

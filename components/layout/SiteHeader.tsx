@@ -5,7 +5,8 @@ import { LanguageSwitch } from "./LanguageSwitch";
 
 export function SiteHeader({ lang }: { lang: Lang }) {
   const nav = [
-    { href: `/${lang}/#njia`, label: t(lang, "navPaths") },
+    { href: `/${lang}/learn/`, label: t(lang, "navPaths") },
+    { href: `/${lang}/lightning/`, label: t(lang, "navLabs") },
     { href: `/${lang}/library/`, label: t(lang, "navLibrary") },
     { href: `/${lang}/glossary/`, label: t(lang, "navGlossary") },
     { href: `/${lang}/progress/`, label: t(lang, "navProgress") },

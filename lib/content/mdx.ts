@@ -4,6 +4,7 @@ import * as runtime from "react/jsx-runtime";
 import remarkGfm from "remark-gfm";
 import { makeMdxComponents, type LessonContext } from "../../components/mdx/components.tsx";
 import type { Lang } from "../i18n.ts";
+import { remarkHeadingIds } from "./headings.ts";
 import type { GlossaryTerm } from "./schemas.ts";
 
 /** Exercise ids used in a lesson body, in order. */
@@ -18,6 +19,6 @@ export async function renderLessonBody(
   glossary: GlossaryTerm[],
   ctx?: LessonContext,
 ): Promise<ReactElement> {
-  const { default: Content } = await evaluate(body, { ...runtime, remarkPlugins: [remarkGfm] });
+  const { default: Content } = await evaluate(body, { ...runtime, remarkPlugins: [remarkGfm, remarkHeadingIds] });
   return createElement(Content, { components: makeMdxComponents(lang, glossary, ctx) });
 }

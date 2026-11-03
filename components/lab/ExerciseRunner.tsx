@@ -187,7 +187,7 @@ export function ExerciseRunner({
           type="button"
           onClick={() => void doRun()}
           disabled={!ready || needsFull || busy !== null}
-          className="rounded-full bg-sun px-4 py-1.5 text-sm font-bold text-white disabled:opacity-40"
+          className="rounded-full bg-sun-deep px-4 py-1.5 text-sm font-bold text-white disabled:opacity-40"
         >
           ▶ {busy === "run" ? t(lang, "labRunning") : t(lang, "labRun")}
         </button>

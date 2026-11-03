@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CourseNav } from "@/components/lesson/CourseNav";
+import { LessonShell } from "@/components/lesson/LessonShell";
 import { MarkComplete } from "@/components/lesson/MarkComplete";
+import { Toc } from "@/components/lesson/Toc";
 import { KeyTerms, Objectives, PrevNext, Reflection, Resources, SourceCredit } from "@/components/lesson/LessonParts";
 import { Quiz } from "@/components/quiz/Quiz";
 import { flatLessons, getGlossary, getLesson, getQuiz, getRoadmap, listRoadmaps } from "@/lib/content/load";
+import { extractHeadings } from "@/lib/content/headings";
 import { exerciseIds, renderLessonBody } from "@/lib/content/mdx";
 import { LazyLabBar } from "@/components/lab/LabIslands";
 import type { RoadmapId } from "@/lib/content/schemas";
@@ -42,9 +46,13 @@ export default async function LessonPage({ params }: Params) {
   const neighbour = (s: string | undefined) =>
     s ? { href: `/${lang}/${roadmap.id}/${s}/`, title: getLesson(roadmap.id, s, lang).frontmatter.title } : undefined;
   const section = roadmap.sections.find((s) => s.lessons.some((x) => x.slug === slug))!;
+  const titles = Object.fromEntries(order.map((s) => [s, getLesson(roadmap.id, s, lang).frontmatter.title]));
+  const course = <CourseNav roadmap={roadmap} lang={lang} current={slug} titles={titles} />;
+  const toc = <Toc headings={extractHeadings(lesson.body)} lang={lang} contentLang={lesson.servedLang} next={neighbour(order[i + 1])} />;
 
   return (
-    <article className={`mx-auto px-4 pt-6 pb-16 ${ids.length ? "max-w-[84ch]" : "max-w-[68ch]"}`} lang={lesson.servedLang}>
+    <LessonShell lang={lang} course={course} toc={toc}>
+      <article className={`mx-auto w-full px-4 pt-6 pb-16 ${ids.length ? "max-w-[84ch]" : "max-w-[68ch]"}`} lang={lesson.servedLang}>
       {ids.length > 0 && (
         <div lang={lang}>
           <LazyLabBar lang={lang} />
@@ -91,6 +99,7 @@ export default async function LessonPage({ params }: Params) {
           <Quiz
             lessonKey={key}
             lang={lang}
+            completesLesson={ids.length === 0}
             questions={quizFile.questions.map((q) => ({
               id: q.id,
               prompt: q.prompt[lang],
@@ -110,6 +119,7 @@ export default async function LessonPage({ params }: Params) {
       <div lang={lang}>
         <PrevNext lang={lang} prev={neighbour(order[i - 1])} next={neighbour(order[i + 1])} />
       </div>
-    </article>
+      </article>
+    </LessonShell>
   );
 }

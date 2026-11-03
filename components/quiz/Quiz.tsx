@@ -4,6 +4,7 @@ import { useState } from "react";
 import { t, type Lang } from "@/lib/i18n";
 import type { LessonKey } from "@/lib/progress/model";
 import { useProgress } from "@/lib/progress/useProgress";
+import { quizPassed } from "@/lib/quiz/score";
 
 export type QuizQuestion = {
   id: string;
@@ -13,8 +14,8 @@ export type QuizQuestion = {
   explanation: string;
 };
 
-export function Quiz({ lessonKey, lang, questions }: { lessonKey: LessonKey; lang: Lang; questions: QuizQuestion[] }) {
-  const { progress, quiz } = useProgress();
+export function Quiz({ lessonKey, lang, questions, completesLesson }: { lessonKey: LessonKey; lang: Lang; questions: QuizQuestion[]; completesLesson: boolean }) {
+  const { progress, quiz, complete } = useProgress();
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -38,6 +39,7 @@ export function Quiz({ lessonKey, lang, questions }: { lessonKey: LessonKey; lan
     }
     setFinished(true);
     quiz(lessonKey, correct, questions.length);
+    if (completesLesson && quizPassed(correct, questions.length)) complete(lessonKey);
   }
 
   function retry() {

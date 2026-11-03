@@ -1,11 +1,10 @@
 import Link from "next/link";
+import { ContinueLearning } from "@/components/home/ContinueLearning";
+import { PathCard } from "@/components/home/PathCard";
 import { BaobabScene } from "@/components/intro/BaobabScene";
-import { RoadmapProgress } from "@/components/roadmap/RoadmapProgress";
 import { flatLessons, getLesson, listRoadmaps } from "@/lib/content/load";
 import { t, type DictKey, type Lang } from "@/lib/i18n";
 import { introScript } from "@/lib/intro/shouldPlay";
-
-const BRANCH: Record<string, DictKey> = { savers: "branchSavers", builders: "branchBuilders", lightning: "branchLightning" };
 
 const LOOP: [DictKey, DictKey][] = [
   ["loop1Title", "loop1Body"],
@@ -16,17 +15,22 @@ const LOOP: [DictKey, DictKey][] = [
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
-  const paths = listRoadmaps().map((r) => {
-    const slugs = flatLessons(r);
-    const lessons = slugs.map((s) => getLesson(r.id, s, lang));
-    return { r, slugs, lessons, minutes: lessons.reduce((m, l) => m + l.frontmatter.minutes, 0) };
-  });
+  const paths = listRoadmaps().map((r) => ({
+    r,
+    lessons: flatLessons(r).map((slug) => {
+      const fm = getLesson(r.id, slug, lang).frontmatter;
+      return { slug, title: fm.title, minutes: fm.minutes, level: fm.level };
+    }),
+  }));
+  const order = paths.map(({ r, lessons }) => ({ id: r.id, slugs: lessons.map((l) => l.slug) }));
+  const titles = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.title])));
+  const pathTitles = Object.fromEntries(paths.map(({ r }) => [r.id, r.title[lang]]));
 
   return (
     <>
       <section className="bg-earth">
         <script dangerouslySetInnerHTML={{ __html: introScript() }} />
-        <div className="h-[clamp(380px,58svh,640px)] bg-night">
+        <div className="h-[clamp(300px,46svh,560px)] bg-night md:h-[clamp(400px,62svh,640px)]">
           <BaobabScene lang={lang} />
         </div>
         <div className="hero-copy mx-auto max-w-6xl px-4 pt-2 pb-14 text-[#fbf1e1]">
@@ -35,10 +39,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <p className="mt-4 max-w-xl text-lg text-[#e3d5c5]">{t(lang, "heroLead")}</p>
           <a
             href="#njia"
-            className="mt-7 inline-flex rounded-full bg-sun px-6 py-3 text-base font-bold text-white shadow-[0_4px_18px_rgba(255,88,0,.35)] hover:bg-[#e94f00]"
+            className="mt-7 inline-flex rounded-full bg-sun-deep px-6 py-3 text-base font-bold text-white shadow-[0_4px_18px_rgba(255,88,0,.35)] hover:bg-[#b83c00]"
           >
             {t(lang, "startLearning")}
           </a>
+          <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} />
         </div>
       </section>
 
@@ -47,39 +52,23 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <h2 id="njia-title" className="sr-only">
             {t(lang, "pathsTitle")}
           </h2>
-          <div className="grid gap-12 md:grid-cols-2 md:gap-10">
-            {paths.map(({ r, slugs, lessons, minutes }) => (
-              <article key={r.id} className="relative pl-6">
-                <span
-                  aria-hidden="true"
-                  className="absolute top-1 bottom-0 left-0 w-[3px] rounded-full bg-gradient-to-b from-dawn via-ember/70 to-transparent"
-                />
-                <p className="text-sm font-semibold text-dawn">{t(lang, BRANCH[r.id])}</p>
-                <h3 className="mt-1 text-2xl font-bold text-white sm:text-3xl">{r.title[lang]}</h3>
-                <p className="mt-2 max-w-prose text-[#d9cbbb]">{r.description[lang]}</p>
-                <p className="mt-2 text-sm text-[#b9a896]">
-                  {slugs.length} {t(lang, "lessons")}, {minutes} {t(lang, "minutes")}
-                </p>
-                <ol className="mt-4 space-y-1.5 text-[15px] text-[#e9ddcf]">
-                  {lessons.map((l, i) => (
-                    <li key={l.slug} className="flex gap-3">
-                      <span className="w-5 shrink-0 text-right text-[#9c8a78] tabular-nums">{i + 1}</span>
-                      <Link prefetch={false} href={`/${lang}/${r.id}/${l.slug}/`} className="hover:text-white hover:underline">
-                        {l.frontmatter.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
-                <RoadmapProgress roadmap={r.id} slugs={slugs} lang={lang} />
-                <Link
-                  href={`/${lang}/${r.id}/`}
-                  className="mt-6 inline-flex rounded-full border border-dawn/60 px-5 py-2.5 font-semibold text-dawn hover:bg-dawn hover:text-earth"
-                >
-                  {t(lang, "openPath")}: {r.title[lang]}
-                </Link>
-              </article>
+          <div className="grid gap-12 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
+            {paths.map(({ r, lessons }) => (
+              <PathCard key={r.id} roadmap={r} lessons={lessons} lang={lang} />
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-earth px-4 py-12 text-[#f3e9dc]" aria-labelledby="labs-title">
+        <div className="mx-auto max-w-6xl">
+          <h2 id="labs-title" className="text-xl font-bold text-white sm:text-2xl">
+            {t(lang, "labsTitle")}
+          </h2>
+          <p className="mt-2 max-w-2xl text-[#d9cbbb]">{t(lang, "labsBody")}</p>
+          <Link href={`/${lang}/lightning/`} className="mt-4 inline-block font-semibold text-dawn underline-offset-4 hover:underline">
+            {t(lang, "labsCta")}
+          </Link>
         </div>
       </section>
 

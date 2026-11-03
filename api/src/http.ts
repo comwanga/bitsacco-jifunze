@@ -30,13 +30,25 @@ export type Ctx = {
 export type Reply = { status: number; json?: unknown; redirect?: string; setCookies?: string[] };
 
 export type LogLine = { method: string; route: string; status: number; ms: number; accountId?: string };
-export type Deps = { cfg: Config; sql: Sql; readSession: ReadSession; log?: (line: LogLine) => void };
+export type ErrorLogLine = { method: string; route: string; name: string; stack: string };
+export type Deps = {
+  cfg: Config;
+  sql: Sql;
+  readSession: ReadSession;
+  log?: (line: LogLine) => void;
+  logError?: (line: ErrorLogLine) => void;
+};
 
-export const SESSION_COOKIE = "jifunze_session";
+export const SESSION_COOKIE = "__Host-jf_session";
+export const PREAUTH_COOKIE = "__Host-jf_preauth";
 export const MAX_BODY_BYTES = 16 * 1024;
 
 function defaultLog(line: LogLine): void {
   console.info(JSON.stringify(line));
+}
+
+function defaultLogError(line: ErrorLogLine): void {
+  console.error(JSON.stringify(line));
 }
 
 function setSecurityHeaders(res: ServerResponse): void {
@@ -143,6 +155,7 @@ function isJsonContentType(value: string | undefined): boolean {
 export function createServer(routes: Route[], deps: Deps): Server {
   const { cfg, sql, readSession } = deps;
   const log = deps.log ?? defaultLog;
+  const logError = deps.logError ?? defaultLogError;
 
   return createHttpServer((req, res) => {
     const started = Date.now();
@@ -160,7 +173,12 @@ export function createServer(routes: Route[], deps: Deps): Server {
         return;
       }
       if (err instanceof ApiError) sendError(res, err.status, err.code);
-      else sendError(res, 500, "internal");
+      else {
+        // Method and route template only: never bodies, headers, cookies, query or IP.
+        const e = err instanceof Error ? err : new Error(String(err));
+        logError({ method: req.method ?? "", route: routeTemplate, name: e.name, stack: e.stack ?? e.message });
+        sendError(res, 500, "internal");
+      }
     });
 
     async function handle(): Promise<void> {

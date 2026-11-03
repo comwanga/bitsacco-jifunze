@@ -158,6 +158,64 @@ describe("api pipeline", () => {
   });
 });
 
+describe("cookies and error logging", () => {
+  it("passes the __Host-jf_session cookie value to readSession, not the old name", async () => {
+    const seen: (string | undefined)[] = [];
+    const srv = await startServer([healthRoute], {
+      readSession: async (_sql, v) => {
+        seen.push(v);
+        return null;
+      },
+    });
+    try {
+      await fetch(`${srv.base}/api/health`, { headers: { Cookie: "__Host-jf_session=fake-token-1" } });
+      await fetch(`${srv.base}/api/health`, { headers: { Cookie: "jifunze_session=fake-token-2" } });
+      expect(seen).toEqual(["fake-token-1", undefined]);
+    } finally {
+      await srv.close();
+    }
+  });
+
+  it("logs unexpected errors with name, stack, method and route only", async () => {
+    const lines: unknown[] = [];
+    const srv = await startServer(
+      [
+        {
+          method: "POST",
+          path: "/api/fail/:id",
+          auth: "public",
+          handler: async () => {
+            throw new TypeError("db exploded");
+          },
+        },
+      ],
+      { logError: (l) => lines.push(l) },
+    );
+    try {
+      const r = await fetch(`${srv.base}/api/fail/abc?code=fake-query-code`, {
+        method: "POST",
+        headers: { ...post, Cookie: "__Host-jf_session=fake-cookie-value" },
+        body: JSON.stringify({ secret: "fake-body-value" }),
+      });
+      expect(r.status).toBe(500);
+      const text = await r.text();
+      expect(JSON.parse(text).error.code).toBe("internal");
+      expect(text).not.toContain("db exploded");
+      expect(lines).toHaveLength(1);
+      const out = JSON.stringify(lines[0]);
+      expect(out).toContain("TypeError");
+      expect(out).toContain("db exploded");
+      expect(out).toContain("/api/fail/:id");
+      expect(out).not.toContain("fake-cookie-value");
+      expect(out).not.toContain("fake-body-value");
+      expect(out).not.toContain("fake-query-code");
+      expect(out).not.toContain("abc");
+    } finally {
+      await srv.close();
+    }
+  });
+});
+
 describe("loadConfig", () => {
   it("throws listing missing keys and no values", () => {
     const env = { SITE_ORIGIN: "https://jifunze.test", GITHUB_CLIENT_SECRET: "fake-super-secret-value" };

@@ -1,4 +1,4 @@
-# Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 3)
+# Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 3.1)
 
 **Status.** Revision 2's architecture is **approved in principle** (maintainer review, 2026-11-04). This revision 3:
 - applies that review's corrections: the recovery-flow conditions (F5), the visibility semantics and HTML indexing (E2), and documentation consistency;
@@ -6,7 +6,13 @@
 
 The investigation evidence is in [`spikes/2026-11-04-phase-3`](../spikes/2026-11-04-phase-3/README.md).
 
-**Application implementation remains blocked.** It waits for approval of revision 3's recovery and privacy designs and the other open items in section I.
+**Revision 3.1** (2026-11-04) records the final approvals of F5, E2 and the NIP-46 connection policy, with their conditions:
+- unlisted-link leak protection and tests that privacy changes take effect immediately (E2);
+- NIP-46 relay validation and route-scoped CSP tests (F3);
+- concurrency tests for identity replacement (F5);
+- a release gate (H3).
+
+**Implementation starts** when this PR is merged and the test GitHub App is available (section I), with Increment 2a first.
 
 Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practise → Build → Contribute → Grow).
 
@@ -17,7 +23,7 @@ Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practis
 | ID | Decision | Maintainer outcome | How this revision applies it |
 |---|---|---|---|
 | D1 | Homepage polish onto `main` | **Approved** | **Done.** PR #5 merged as `254e757`; `main` now equals the reviewed polish tree, and CI is green. Phase 3 starts from this `main` |
-| D2 | Architecture | **Approved in principle** (revision 2) | Static learning site, same-origin Node API, PostgreSQL and the nginx `/api` proxy. Profiles are never generated statically; nginx checks visibility with the API before serving any profile HTML (E2) |
+| D2 | Architecture | **Approved** | Static learning site, same-origin Node API, PostgreSQL and the nginx `/api` proxy. **E2 approved**: nginx checks visibility before serving public profile HTML, profile data is live, and there is no extra caching layer. Revision 3.1 adds the unlisted-link and immediate-effect safeguards |
 | D2-nav | Navigation | **Approved** | Paths · Labs · Builders · Resources, plus language and account (section B) |
 | D3 | Hosting and domain | **Provisional** | `jifunze.bitsacco.com` is the proposed domain until DNS and hosting are confirmed. Requirements, costs, deploys, secrets, backups and recovery are in section E5. Nothing is provisioned |
 | D4 | GitHub App ownership | **Conditionally approved**; test App **approved** | Development uses an isolated test App on a personal account, with no permissions; the maintainer provides its credentials separately. Secrets never go in chat, the repo, screenshots or logs. Long term: the Bitsacco org, after admin authorisation |
@@ -25,9 +31,9 @@ Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practis
 | D6 | Nostr | **Approved with mobile requirements** | NIP-07 first; NIP-46 is the primary Android path, subject to interop and security assessment; NIP-55 is evaluated (section F3) |
 | D7 | Directory membership | **Approved** | Only signed-up users who publish appear |
 | D8 | Images | **Approved** | GitHub avatars only, from one allowlisted host; no Nostr images; generated fallback avatar |
-| D9 | Recovery | **Foundation conditionally approved** (codes, HMAC storage, atomic use, restricted sessions, a second identity, a removal procedure) | Revision 3 addresses the four conditions: same-provider replacement, a code-only input with non-enumerating rate limits, unpublication kept separate from deletion with an evidence bar for each, and inactivity unlisting **deferred**. The full flow and its tests are in F5; awaiting approval |
+| D9 | Recovery | **Approved** (F5, revision 3) | Includes concurrency tests for replacement (F5). Administrative removal needs **legal review before general release**, and deletion keeps strong evidence and two-maintainer approval |
 | D10 | Ecosystem registry | **Approved** | A curated, broad, reviewable registry with no score (section G5) |
-| D11 | API dependencies | **Provisionally approved**; `nostr-tools` **approved with conditions** | API: `postgres`, `@noble/curves`, `@noble/hashes`, `zod`, and a minimal router with tests for its boundaries. Client: `nostr-tools` **2.25.2**, only for NIP-46, only on the sign-in route, loaded on demand (F3) |
+| D11 | API dependencies | **Provisionally approved**; `nostr-tools` and the sign-in page's `connect-src 'self' wss:` **approved with conditions** | API: `postgres`, `@noble/curves`, `@noble/hashes`, `zod`, and a minimal router with tests for its boundaries. Client: `nostr-tools` **2.25.2**, NIP-46 only, loaded after explicit activation on the Nostr sign-in page only, with the relay validation and resource rules in F3 |
 | D12 | Translation review | **Approved in principle** | No reviewers named yet. New terminology is tracked as **pending review** and not released as reviewed (section H2) |
 | D13 | Retention | **Approved** | Security events kept 90 days; sessions and challenges purged daily; covered by tests (section F6) |
 
@@ -94,7 +100,7 @@ Rasilimali ▾ = Maktaba · Kamusi · Mazoezi · Maendeleo (a native <details>, 
 | `/{lang}/account/` (signin, welcome, settings, signout) | static shell plus `/api` data | `noindex`; never cached by the service worker |
 | `/{lang}/community/` | static shell plus a live list from `/api/public/builders` | Search and filters run in a route-local island |
 | `/{lang}/community/{handle}/` | **static shell plus live data**, served only after nginx confirms the profile is public | Public profiles |
-| `/{lang}/community/u/{token}/` | the same shell, gated by an unguessable link token; HTML sent with `X-Robots-Tag: noindex, nofollow` | Unlisted profiles (E2) |
+| `/{lang}/community/unlisted/#k={token}` | a fixed, data-free shell; the **token is in the URL fragment**, so it never reaches any server; HTML sent with `X-Robots-Tag: noindex, nofollow` | Unlisted profiles (E2, revision 3.1) |
 
 ---
 
@@ -179,7 +185,7 @@ Browser ── https://jifunze.bitsacco.com (proposed, D3) ──┐
 | Visibility | In directory | Reachable at | Indexing |
 |---|---|---|---|
 | **Public** | yes | `/{lang}/community/{handle}/` | indexable |
-| **Unlisted** | no | **only** `/{lang}/community/u/{token}/` (32-byte random token, resettable); the handle URL returns 404 | `X-Robots-Tag: noindex, nofollow` on the **HTML** response |
+| **Unlisted** | no | **only** `/{lang}/community/unlisted/#k={token}` (32-byte random token, resettable); the handle URL returns 404 | `X-Robots-Tag: noindex, nofollow` on the **HTML** response; the fragment is never sent to servers |
 | **Private** | no | nowhere; every public URL returns 404 | n/a |
 
 Revision 2 is corrected here on two points:
@@ -204,20 +210,36 @@ location ~ ^/(sw|en)/community/[a-z0-9-]+/$ {          # public profiles
   include /etc/nginx/snippets/security-headers.conf;
   try_files /$1/community/profile/index.html =404;
 }
-location ~ ^/(sw|en)/community/u/[A-Za-z0-9_-]{43}/$ {  # unlisted profiles
-  auth_request /_visibility;                  # 204 only if the token matches an unlisted profile, else 403
-  error_page 403 =404 /404.html;
-  error_page 500 502 503 504 =503 /offline/index.html;
-  add_header X-Robots-Tag "noindex, nofollow" always;
-  add_header Cache-Control "no-store" always;
-  include /etc/nginx/snippets/security-headers.conf;
-  try_files /$1/community/profile/index.html =404;
-}
+# Unlisted shell: no data, token only in #fragment. Exact-match locations take priority over the
+# regex above, and "unlisted" is a reserved handle, so it never reaches the public-profile check.
+location = /sw/community/unlisted/ { include /etc/nginx/snippets/unlisted-shell.conf; }
+location = /en/community/unlisted/ { include /etc/nginx/snippets/unlisted-shell.conf; }
+# unlisted-shell.conf:
+#   add_header X-Robots-Tag "noindex, nofollow" always;
+#   add_header Cache-Control "no-store" always;
+#   include /etc/nginx/snippets/security-headers.conf;   # includes Referrer-Policy: no-referrer
+#   try_files $uri/index.html =404;
 ```
 
 - **Real status codes.** Private, deleted or unknown profiles get a **real HTTP 404**, not a soft 200 shell, so crawlers drop them and nothing about them is served.
 - **Fails closed.** `auth_request` only accepts 2xx (allow) or 401/403 (deny), and turns any other answer into an error. So the API answers **403** for not-visible, which nginx maps to 404. If the API is down, nginx returns **503**: the shell is not served, and crawlers see "temporarily unavailable" rather than a 404 that would drop public profiles.
-- **Data is never in the HTML.** The shell is identical for every profile; the data comes from `GET /api/public/builders/{handle}` or `…/u/{token}`, under the same visibility rules.
+- **Data is never in the HTML.** The shell is identical for every profile; the data comes from the API under the same visibility rules:
+  - public profiles: `GET /api/public/builders/{handle}`;
+  - unlisted profiles: `POST /api/public/builders/unlisted` with `{ "token": … }` in the body.
+
+**Unlisted-link leak protection** (revision 3.1). Verified current state: the site sends `Referrer-Policy: no-referrer` on every response, and has no analytics or third-party scripts. nginx's default access log does record full request URIs, so a token in the path would have been logged. Therefore:
+
+1. **The token lives in the URL fragment** (`#k=…`). Browsers never send fragments to servers, so it can't appear in nginx or API access logs, proxies or CDNs, and fragments are always removed from referrers.
+   - The shell reads `location.hash`, then immediately calls `history.replaceState` to remove the fragment from the address bar and history entry.
+   - It sends the token in a POST body, which the API never logs.
+   - Messaging apps that build link previews fetch the URL without the fragment, so they see only a generic page.
+2. **`Referrer-Policy: no-referrer`** stays on every response, including the community shells and `/api/*`. A test asserts the header on those routes.
+3. **No analytics or third-party scripts** on community or account pages. The CSP already forbids them (`script-src 'self'` plus hashes), and a test asserts that no external script source appears in those pages' CSP.
+4. **Logs:**
+   - The API logs method, route **template** (for example `/api/public/builders/:handle`), status and latency only: never bodies, tokens, cookies or full IP addresses.
+   - nginx logs for `/api/` use a format without `$http_referer`.
+   - Retention is 14 days (F6).
+5. **The unlisted endpoint** compares sha256(token) through an indexed lookup and returns an identical 404 for invalid tokens. It is rate-limited per IP (60 per 10 minutes), though a 256-bit token can't be guessed.
 - **Caching:**
   - **Every** `/api/*` response gets `Cache-Control: no-store` and `X-Robots-Tag: noindex`.
   - Profile HTML gets `Cache-Control: no-store`.
@@ -237,12 +259,25 @@ location ~ ^/(sw|en)/community/u/[A-Za-z0-9_-]{43}/$ {  # unlisted profiles
 - Link previews show generic Jifunze metadata.
 - Without JavaScript, the shell says it needs JavaScript.
 
+**Immediate effect, including reuse of an old link** (revision 3.1). Every view fetches live data with `no-store`. The shell also listens for `pageshow` with `event.persisted`: when the browser restores a page from its back/forward cache, the shell **re-fetches before showing anything**, so a cached page in memory can't show data that has since been withdrawn.
+
 **Tests, written before profiles are implemented (Increment 3 gate):**
+- **Immediate effect, for HTML and API, in one browser session:**
+  - open a public profile, set it private in another session, then reload the **same URL** → HTML 404 and API 404;
+  - navigate away and press **Back** → the restored page re-fetches and shows "not available";
+  - open an unlisted link, reset its token, then reuse the **old link** → the API returns 404 and the page shows "not available";
+  - switch unlisted → private → the token link fails;
+  - switch private → public → the handle URL works at once;
+  - delete the account → every link fails.
+- **Leak protection:**
+  - nginx and API access logs from a test run contain no unlisted token (a log scan in CI);
+  - `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex, nofollow` are present on the unlisted shell;
+  - the fragment is removed from the address bar after load.
 - **Status codes:**
   - public → HTML 200, and the API returns data;
   - set private → HTML **404** on the next request;
-  - set unlisted → the handle URL 404s, and the token URL returns 200 with `X-Robots-Tag: noindex, nofollow` on the HTML;
-  - reset the token → the old token 404s;
+  - set unlisted → the handle URL 404s, and the unlisted shell returns 200 with `X-Robots-Tag: noindex, nofollow` and no data in its HTML;
+  - reset the token → the old token's API call 404s;
   - delete the account → 404;
   - unknown handle → an identical 404.
 - **The API down:** profile URLs return 503 and never serve the shell.
@@ -252,6 +287,7 @@ location ~ ^/(sw|en)/community/u/[A-Za-z0-9_-]{43}/$ {  # unlisted profiles
 ### E3. Database schema (changes from revision 1)
 
 - **`profiles`:** unchanged, including the default `visibility 'private'`. The snapshot fields are removed.
+  - Reserved handles (revision 3.1) are refused by a check constraint and by the API: `unlisted`, `profile`, `new`, `edit`, `settings`, `api` and `admin`. This stops a handle from colliding with a fixed community route.
 - **`contributions` is split** so distinct events are never collapsed (correction 3):
 
 ```sql
@@ -331,7 +367,8 @@ create table admin_actions (                    -- section F5: every manual remo
 
     Every other route answers 403 `recovery_scope`.
 - `GET /api/internal/visibility` is **internal only**: an nginx `auth_request` subrequest that reads `X-Original-URI`. The public `location /api/` blocks `/api/internal/` with a 404. It returns **204** when visible and **403** otherwise (`auth_request` treats any other status as an error).
-- `POST /api/me/profile/unlisted-link` resets the unlisted token and returns the new link once.
+- `POST /api/public/builders/unlisted` takes `{ token }` in the body. It returns the profile only for an unlisted profile with a matching token, and an identical 404 otherwise. Rate-limited.
+- `POST /api/me/profile/unlisted-link` resets the unlisted token and returns the new `#k=` link once.
 - `POST /api/me/recovery-codes` (re-auth ≤ 10 min) returns 10 new codes **once** and invalidates the old ones.
 - The rest is unchanged: every non-GET request needs an exact `Origin` and the `X-Jifunze: 1` header, every response carries `Cache-Control: no-store`, and the account always comes from the session.
 
@@ -450,6 +487,35 @@ No signer app is named as supported until it passes.
   - A pasted `bunker://` URI names the signer's relays, so the **sign-in page alone** gets `connect-src 'self' wss:`. Every other page keeps `connect-src 'self'`.
   - The session cookie is HttpOnly and the page holds no private data, so the wider policy exposes nothing new. This is listed for approval in section I.
 
+**Conditions on the approved connection policy** (revision 3.1):
+- **Activation and scope.**
+  - The NIP-46 client loads only after the learner explicitly chooses "Use a signer app".
+  - `connect-src 'self' wss:` is emitted **only** in the CSP of `/{lang}/account/signin/` (a `nostrSignin` flag in `scripts/postbuild.ts`, like the existing `lab` flag).
+- **Relay URL validation** runs before any connection:
+  - at most **5** relays, each at most **256** characters;
+  - parsed with `URL`; protocol must be exactly `wss:`;
+  - no `username` or `password`;
+  - the host must be a DNS name or a public IP literal. These are rejected:
+    - `localhost` and `*.localhost`, `*.local`, `*.internal`;
+    - IPv4 in 0.0.0.0/8, 10/8, 100.64/10, 127/8, 169.254/16, 172.16/12, 192.168/16 and 224/4 and above;
+    - IPv6 `::`, `::1`, fc00::/7, fe80::/10, IPv4-mapped private ranges and multicast;
+  - no whitespace or control characters; ports allowed.
+  - The same validation applies to relays from `bunker://` URIs and from `switch_relays` responses.
+- **Known limitation.** A browser page can't see where a DNS name resolves, so validation can't stop a public name that points at a private address. The protections there are:
+  - browsers' own private-network restrictions;
+  - the fact that the page sends only NIP-44-encrypted messages carrying no secrets.
+
+  This is documented, not claimed as solved.
+- **Resources.** Sockets close and keys and request state are dropped on success, cancel, error, 120 s timeout or navigation (`pagehide`). Nothing is written to `localStorage`, `sessionStorage`, IndexedDB or cookies.
+- **Identity.** It comes from the remote signer's `get_public_key` response. The final login event is still verified on the server under F2, so a lying client gains nothing.
+- **Tests:**
+  - **CSP scope:** a build test enumerates every exported HTML file and asserts that `wss:` appears **only** in the sign-in pages' CSP, and that every other page keeps its previous `connect-src`;
+  - **relay validation:** one fixture per rejected class, plus valid cases;
+  - **resources:** in-memory state and sockets are gone after cancel or timeout (Playwright, using a fake relay);
+  - **activation:** the initial load of the sign-in page doesn't fetch the NIP-46 module;
+  - **loading:** no third-party script is ever loaded.
+- **Release gate.** NIP-46 ships only after the Android-phone and two-independent-signer interop checks. These checks don't block 2a, 2b or 2d.
+
 **Never:** asking for an `nsec`, an input field that would accept one, or keeping an ephemeral key beyond its attempt.
 
 ### F4. Account linking
@@ -532,6 +598,15 @@ Unchanged from revision 1:
   - same-provider replacement swaps the identity in one transaction;
   - replacing with an identity linked elsewhere gives 409 and leaves both accounts unchanged;
   - replacement keeps `unique(account_id, provider)` and `unique(provider, provider_uid)`.
+- **Concurrency and conflicts** (revision 3.1):
+  - two concurrent replacements of the same provider on one account → exactly one commits (`select … for update` on the account's identity row inside the transaction), and the other gets `409 replace_conflict`;
+  - concurrent replacement plus sign-in with the old identity → the old identity's sessions are revoked, and a sign-in with it after commit fails;
+  - two accounts racing to link the same new identity → `unique(provider, provider_uid)` lets exactly one win, and the loser gets `409 identity_in_use` with its account unchanged;
+  - linking an identity already associated with another account (sequential case) → 409, neither account changed.
+- **Expiry and reuse:**
+  - an expired recovery session (after 15 minutes), or one revoked by a later sign-in, gets 401 on every route, including a replacement callback that completes after expiry;
+  - a `replace` challenge can't be reused, and isn't valid for `signin` or `link`;
+  - a recovery code already consumed fails, including when two requests present it at the same moment.
 - **Admin actions:**
   - unpublish makes HTML and API 404 at once and is reversible;
   - delete requires two approvals and cascades every table.
@@ -645,6 +720,26 @@ Each increment is its own PR from an up-to-date `main` (`254e757` or later). Eve
 | 5 | Dashboard and learning sync | Dashboard, explicit progress merge, projects, Builder Journey | 3 and 4 merged | Deterministic merge; local data never lost; offline and import/export regressions pass |
 | 6 | Hardening | Security review against section F, auth-failure and offline suites, low-end Android pass, operations runbook (E5) | 5 merged | Evidence report; no open Critical or Important findings |
 
+**Order after this PR merges:**
+1. **2a:** API foundation, GitHub sign-in, sessions, recovery.
+2. **2b:** NIP-07.
+3. **2d:** linking and settings.
+4. **3:** profiles and community.
+5. **5:** dashboard.
+
+Then:
+- **2c (NIP-46)** is built when ready, but **released** only after the interop gate.
+- **4 (GitHub contributions)** doesn't start until the installation-token investigation (G4) has actually been run and its outcome approved.
+
+### H3. Release gate (every increment)
+
+Nothing is released unless all of these hold:
+- **Localization:** every new string exists in Kiswahili and English (parity tests pass), and terminology still pending review is marked as such.
+- **Security boundaries:** every security boundary in the increment is covered by a test that ran in CI; any boundary not yet verified is listed as such in the PR.
+- **Budgets:** the JS budgets pass, and the measured JS change on learning pages is reported in the PR.
+- **Phase 1 and 2:** the existing behaviour still passes (the full Playwright suite plus the lab job).
+- **Admin removal:** for auth releases, the administrative removal procedure has had legal review before **general** release (F5).
+
 ### H2. Bilingual work (correction 5, D12)
 
 - **Language preference:**
@@ -669,10 +764,11 @@ Each increment is its own PR from an up-to-date `main` (`254e757` or later). Eve
 | # | Item | Owner | Blocks |
 |---|---|---|---|
 | 1 | ~~Merge PR #5~~ **Done** (`254e757`) | Maintainer | n/a |
-| 2 | Approve revision 3's recovery flow (F5) and visibility mechanism (E2) | Maintainer | 2a and 3 |
-| 3 | Provide the test GitHub App credentials (no permissions, personal account) through a secure channel | Maintainer | 2a and G4 |
+| 2 | ~~Approve F5 and E2~~ **Approved**. Review revision 3.1's unlisted-link change (token in the URL fragment, E2) | Maintainer | 3 |
+| 0 | Review and merge the Phase 3 design PR (#6) | Maintainer | All implementation |
+| 3 | Provide the test GitHub App credentials (no permissions, personal account) through a secure channel, never in chat, commits, screenshots or logs | Maintainer | 2a and G4 |
 | 4 | Run the G4 installation-token check; if it fails, bring back the evidence and the smallest alternative. No stored user tokens | Claude runs it; maintainer decides | 4 |
-| 5 | Approve `connect-src 'self' wss:` on the sign-in page only, for NIP-46 bunkers (F3) | Maintainer | 2c |
+| 5 | ~~Approve the sign-in page's `wss:` policy~~ **Approved with conditions** (F3) | n/a | n/a |
 | 6 | An Android phone and two independent NIP-46 signers for interop testing | Maintainer or volunteer | 2c release (not 2a or 2b) |
 | 7 | DNS for `jifunze.bitsacco.com` and a staging host | Maintainer | Deployment |
 | 8 | Appoint Kiswahili reviewers (Kenya and Tanzania); legal review of the removal procedure (F5) | Maintainer and Bitsacco | Release of affected terminology and auth |

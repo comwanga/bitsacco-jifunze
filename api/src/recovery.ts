@@ -60,6 +60,8 @@ export async function issueCodes(sql: Sql, cfg: Config, accountId: string): Prom
   const codes = generateCodes();
   const setId = randomUUID();
   await sql.begin(async (tx) => {
+    // Serialise concurrent regenerations for one account so exactly one set survives.
+    await tx`select id from accounts where id = ${accountId} for update`;
     await tx`delete from recovery_codes where account_id = ${accountId}`;
     for (const c of codes) {
       await tx`
@@ -128,8 +130,8 @@ export function recoveryRoutes(
     body: z.object({ code: z.string().max(256) }).strict(),
     handler: async ({ body, ip, sql, cfg }) => {
       // Limits first, before any normalisation or lookup. Only per-source limits ever block.
-      if (!limiter.hit(ip)) throw new ApiError(429, "rate_limited");
-      const flooded = flood.note();
+      const allowed = limiter.hit(ip);
+      const flooded = flood.note(); // refused attempts count toward volume too
       if (flooded !== null) {
         try {
           await logEvent(sql, null, "recovery_flood", { count: String(flooded) });
@@ -137,6 +139,8 @@ export function recoveryRoutes(
           // The alert must never turn into a failure for the caller.
         }
       }
+
+      if (!allowed) throw new ApiError(429, "rate_limited");
 
       const normalised = normaliseCode((body as { code: string }).code);
       const accountId = normalised ? await consumeCode(sql, cfg, normalised) : null;

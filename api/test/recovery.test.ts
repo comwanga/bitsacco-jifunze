@@ -6,6 +6,7 @@ import type { Config } from "../src/config.ts";
 import { connect, migrate } from "../src/db.ts";
 import { githubRoutes, GITHUB_START_RULE } from "../src/github-routes.ts";
 import { createServer } from "../src/http.ts";
+import { clientIp } from "../src/http.ts";
 import { Limiter, perIp, slash24 } from "../src/ratelimit.ts";
 import { generateCodes, hashCode, issueCodes, normaliseCode, recoveryRoutes } from "../src/recovery.ts";
 import { createSession, meRoute, readSession } from "../src/sessions.ts";
@@ -214,8 +215,8 @@ describe("recovery limits", () => {
   it("IPv6 addresses in one /64 share a limit, and different /64s in one /48 share only the network limit", async () => {
     await withApi(async (base) => {
       for (let i = 0; i < 5; i++) expect(await status(base, `2001:db8:1:1::${i + 1}`)).toBe(401);
-      expect(await status(base, "2001:db8:1:1::ff")).toBe(429); // 6th in the /64; network count 6
-      for (let i = 2; i <= 15; i++) expect(await status(base, `2001:db8:1:${i}::1`)).toBe(401); // network count 20
+      expect(await status(base, "2001:db8:1:1::ff")).toBe(429); // 6th in the /64: refused, so it does not count against the network
+      for (let i = 2; i <= 16; i++) expect(await status(base, `2001:db8:1:${i}::1`)).toBe(401); // network count 20
       expect(await status(base, "2001:db8:1:99::1")).toBe(429); // 21st in the /48
       expect(await status(base, "2001:db8:2:1::1")).toBe(401); // another /48
     });
@@ -240,6 +241,74 @@ describe("recovery limits", () => {
       expect((await rec(base, code, "100.64.9.9")).status).toBe(200);
     });
   }, 60_000);
+});
+
+describe("refused requests and shared limits", () => {
+  const status = async (base: string, ip: string) => (await rec(base, "ABCD-EFGH-IJKL-MNOP", ip)).status;
+
+  it("a blocked IP does not drain its /24: a neighbour still gets 401, not 429", async () => {
+    await withApi(async (base) => {
+      for (let i = 0; i < 25; i++) await status(base, "198.51.100.7");
+      expect(await status(base, "198.51.100.8")).toBe(401);
+    });
+  });
+
+  it("the same holds for IPv6 within one /48", async () => {
+    await withApi(async (base) => {
+      for (let i = 0; i < 25; i++) await status(base, "2001:db8:1:1::7");
+      expect(await status(base, "2001:db8:1:2::8")).toBe(401);
+    });
+  });
+
+  it("a refused request still counts toward flood volume", async () => {
+    await withApi(async (base) => {
+      for (let i = 0; i < 310; i++) await status(base, "198.51.100.7");
+      expect(await sql`select 1 from security_events where event = 'recovery_flood'`).toHaveLength(1);
+    });
+  }, 60_000);
+});
+
+describe("concurrent regeneration", () => {
+  it("two concurrent issueCodes leave exactly one live set, and only its codes work", async () => {
+    const a = await newAccount();
+    const [x, y] = await Promise.all([issueCodes(sql, cfgV1(), a), issueCodes(sql, cfgV1(), a)]);
+    const rows = await sql`select distinct set_id from recovery_codes where account_id = ${a}`;
+    expect(rows).toHaveLength(1);
+    expect(await sql`select 1 from recovery_codes where account_id = ${a} and used_at is null`).toHaveLength(10);
+    // Exactly one of the two returned sets matches what is stored.
+    const live = await sql<{ code_hash: Buffer }[]>`select code_hash from recovery_codes where account_id = ${a}`;
+    const hashes = new Set(live.map((r) => r.code_hash.toString("hex")));
+    const matches = (set: string[]) => set.filter((c) => hashes.has(hashCode(FAKE_V1, normaliseCode(c)!).toString("hex"))).length;
+    expect([matches(x), matches(y)].sort()).toEqual([0, 10]);
+  });
+});
+
+describe("canonical client IPs", () => {
+  it("mapped IPv4 spellings share keys with plain IPv4", () => {
+    for (const f of [perIp, slash24]) {
+      expect(f("::FFFF:1.2.3.4")).toBe(f("1.2.3.4"));
+      expect(f("0:0:0:0:0:ffff:1.2.3.4")).toBe(f("1.2.3.4"));
+      expect(f("::ffff:102:304")).toBe(f("1.2.3.4"));
+    }
+    expect(perIp("::ffff:1.2.3.4")).toBe("1.2.3.4");
+    expect(perIp("::ffff:1.2.3.4")).not.toBe(perIp("::ffff:1.2.3.5"));
+    expect(slash24("::FFFF:1.2.3.4")).toBe("1.2.3.0/24");
+  });
+
+  it("embedded-IPv4 IPv6 gets the right /64 and /48; casing does not matter", () => {
+    expect(perIp("1::2:3:4:5:1.2.3.4")).toBe("1:0:2:3::/64");
+    expect(slash24("1::2:3:4:5:1.2.3.4")).toBe("1:0:2::/48");
+    expect(perIp("2001:DB8:1:2::9")).toBe(perIp("2001:db8:1:2::9"));
+    expect(slash24("2001:DB8:1:2::9")).toBe(slash24("2001:db8:1:2::9"));
+    expect(perIp("64:ff9b::1.2.3.4")).toBe("64:ff9b:0:0::/64");
+  });
+
+  it("clientIp normalises the chosen address", () => {
+    expect(clientIp("127.0.0.1", "::FFFF:1.2.3.4")).toBe("1.2.3.4");
+    expect(clientIp("127.0.0.1", "0:0:0:0:0:ffff:1.2.3.4")).toBe("1.2.3.4");
+    expect(clientIp("127.0.0.1", "2001:DB8::1")).toBe("2001:db8::1");
+    expect(clientIp("::ffff:198.51.100.7", undefined)).toBe("198.51.100.7");
+  });
 });
 
 describe("recovery sessions", () => {

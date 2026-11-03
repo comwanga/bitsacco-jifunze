@@ -2,6 +2,7 @@ import { createServer as createHttpServer, type IncomingMessage, type Server, ty
 import { isIP } from "node:net";
 import type { ZodType } from "zod";
 import type { Config } from "./config.ts";
+import { normaliseIp } from "./ratelimit.ts";
 import { ApiError, MESSAGES, type ErrorCode } from "./errors.ts";
 
 export type Sql = import("postgres").Sql;
@@ -72,8 +73,8 @@ function isPrivateAddress(addr: string): boolean {
 /** The client IP: X-Real-IP only when the socket peer is loopback or private (our proxy), else the socket. */
 export function clientIp(remote: string | undefined, realIp: string | undefined): string {
   const socketIp = remote ?? "";
-  if (realIp && isPrivateAddress(socketIp) && isIP(realIp.trim()) !== 0) return realIp.trim();
-  return socketIp;
+  if (realIp && isPrivateAddress(socketIp) && isIP(realIp.trim()) !== 0) return normaliseIp(realIp.trim());
+  return normaliseIp(socketIp);
 }
 
 function parseCookies(header: string | undefined): Record<string, string> {

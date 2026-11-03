@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  test: { environment: "node", include: ["api/test/**/*.test.ts"] },
+  // API tests share one PostgreSQL database, so files run one after another.
+  test: { environment: "node", include: ["api/test/**/*.test.ts"], fileParallelism: false },
 });

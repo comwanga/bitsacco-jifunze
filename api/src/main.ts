@@ -1,10 +1,13 @@
-import postgres from "postgres";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadConfig } from "./config.ts";
+import { connect, migrate } from "./db.ts";
 import { createServer, type ReadSession } from "./http.ts";
 import { routes } from "./routes.ts";
 
 const cfg = loadConfig(process.env);
-const sql = postgres(cfg.databaseUrl);
+const sql = connect(cfg.databaseUrl);
+await migrate(sql, join(dirname(fileURLToPath(import.meta.url)), "..", "migrations"));
 
 // Sessions arrive in a later task; until then every request is anonymous.
 const readSession: ReadSession = async () => null;

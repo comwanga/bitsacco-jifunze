@@ -44,3 +44,15 @@ export async function startServer(
       }),
   };
 }
+
+export function testDatabaseUrl(): string {
+  const url = process.env.TEST_DATABASE_URL;
+  if (!url) {
+    throw new Error("TEST_DATABASE_URL is not set; API database tests need a PostgreSQL test database");
+  }
+  return url;
+}
+
+export async function resetTestDb(sql: Sql): Promise<void> {
+  await sql.unsafe("drop schema public cascade; create schema public;");
+}

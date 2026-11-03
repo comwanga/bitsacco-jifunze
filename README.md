@@ -1,9 +1,10 @@
 # Bitsacco Jifunze
 
-A free, Kiswahili-first Bitcoin learning platform with two roadmaps:
+A free, Kiswahili-first Bitcoin learning platform with three roadmaps:
 
 - **Bitcoin kwa Wawekaji** (Bitcoin for Savers), for Bitsacco members, chama groups and anyone new to Bitcoin.
 - **Bitcoin kwa Wajenzi** (Bitcoin for Builders), for developers building on Bitcoin, Lightning and Fedimint.
+- **Lightning kwa Wajenzi** (Lightning for Builders), all 17 chapters of *Mastering the Lightning Network*, simplified, with a live lab: an in-page CLI/Python editor that runs against regtest Lightning nodes in Docker on your laptop. See [lab/README.md](lab/README.md).
 
 Every lesson ships in Kiswahili and English. There are no accounts and no backend: the site is a static export. Progress lives in the reader's browser and can be exported to a file and imported on another phone. Lessons opened once stay readable offline.
 
@@ -72,7 +73,19 @@ public/                service worker, web app manifest, icons, logo
 docker/                nginx config and security headers
 ```
 
+## The Lightning lab
+
+```bash
+cd lab
+./lab doctor && ./lab up      # four regtest nodes + the bridge on 127.0.0.1:7777
+./lab pair                    # paste the code into the lab bar on any Lightning lesson
+```
+
+Lessons with exercises load a small lazy island (the editor) and get a CSP that allows `connect-src` to the local bridge and to Codespaces. Every exercise has a model solution and a check; CI starts the lab and runs them all (`lab/tests/smoke_solutions.py`).
+
 ## Known gaps
+
+- **Eclair in the lab.** Eclair 0.12–0.13 crashed in its native secp256k1 library when signing channel messages under Docker Desktop on Windows, so Eclair runs as a fifth node (Erin) instead of Chan, as the book has it. Revisit when a fixed Eclair image is out.
 
 - **JavaScript budget.** The spec asks for under 100 KB of compressed JavaScript per page. The React 19 and Next.js 16 runtime alone is about 130 KB gzip (pages measure about 141 KB gzip, about 120 KB brotli), so this stack can't meet the target. CI enforces a 150 KB ceiling to catch regressions. Deciding between accepting this and changing the framework is open.
 - **Review.** All 16 lessons are drafts written for review. They have no `lastReviewed` date, so the reader shows a draft notice. Each needs a Kiswahili reviewer and a technical reviewer before launch.

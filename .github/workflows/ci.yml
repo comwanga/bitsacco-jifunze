@@ -40,3 +40,24 @@ jobs:
         run: npm run validate
       - name: Build (includes CSP, link check and performance budget)
         run: npm run build
+
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate the compose file
+        run: docker compose -f lab/compose.yml --profile lite --profile full config -q
+      - name: Build the lab image
+        run: docker compose -f lab/compose.yml build lab
+      - name: Lab unit tests
+        run: docker run --rm -v "$PWD:/repo" -w /repo/lab -e PYTHONPATH=/repo/lab jifunze/lab:local python -m unittest discover tests
+      - name: Start the lab (lite profile)
+        run: lab/lab up
+      - name: Run every exercise's model solution and its check
+        run: JIFUNZE_LAB_TOKEN="$(lab/lab pair --raw)" python3 lab/tests/smoke_solutions.py --lite
+      - name: Node logs
+        if: failure()
+        run: docker compose -f lab/compose.yml --profile lite --profile full logs --tail 200

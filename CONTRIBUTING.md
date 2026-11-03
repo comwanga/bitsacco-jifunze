@@ -83,3 +83,13 @@ Lessons explain how things work. They must never give financial or investment ad
 ## Code
 
 Keep client JavaScript small: the site must work on low-end Android phones over 3G. Run `npm run build` and check the budget table before opening a PR that adds client code.
+
+## Adding a Lightning lab exercise
+
+1. In the lesson (`content/lightning/{sw,en}/<slug>.mdx`), add `<Exercise id="chNN-short-name" />` where it belongs.
+2. Create `content/lightning/exercises/chNN-short-name.json` with `id`, `lesson` (the slug), bilingual `title`, `node` (`alice`, `bob`, `chan`, `dina`, `erin` or `none`), `tab` (`cli` or `python`), optional `"profile": "full"`, a `starter` for the tab, and a working `solution`.
+3. Add a check in `lab/jifunze_lab/checks/` and register it in that module's `CHECKS`. A check returns results with bilingual labels. Prefer checking node state over matching output.
+4. Make sure the lesson has a scenario in `lab/scenarios/<slug>.json` (usually `{ "base": "route" }`).
+5. With the lab up, run `JIFUNZE_LAB_TOKEN="$(lab/lab pair --raw)" python3 lab/tests/smoke_solutions.py --only chNN-short-name`. CI runs every exercise this way.
+
+`npm run validate` (rule 6) fails if an `<Exercise>` has no file, its `lesson` doesn't match, it has no starter for its tab, or it has no check.

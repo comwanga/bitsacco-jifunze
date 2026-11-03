@@ -117,7 +117,8 @@ function validateLessonFile(
     }
   }
   if (lang === "sw") {
-    const prose = stripCode(body).replace(/<Term[^>]*\/>/g, "");
+    // Tag names and attributes (e.g. <Term id="node">, <Callout type="scam">) are not prose.
+    const prose = stripCode(body).replace(/<\/?[A-Za-z][^>]*>/g, " ");
     for (const g of glossary) {
       if (g.en.toLowerCase() === g.sw.toLowerCase()) continue;
       const re = new RegExp(`(^|[^\\p{L}])${escapeRegExp(g.en)}(?=$|[^\\p{L}])`, "iu");

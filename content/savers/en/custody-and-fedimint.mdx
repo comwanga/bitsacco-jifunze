@@ -1,0 +1,70 @@
+---
+title: "Self-custody vs custodial vs Fedimint ecash"
+description: "Who holds the keys? Compare holding them yourself, letting a company hold them, and a community federation that holds them together."
+level: beginner
+minutes: 15
+objectives:
+  - Describe custodial wallets, self-custody and Fedimint federations
+  - Name one strength and one risk of each
+  - "Ask the right question of any Bitcoin service: who holds the keys?"
+resources:
+  - title: "Fedimint"
+    url: "https://fedimint.org"
+    kind: docs
+    language: en
+  - title: "Kujifunza Bitcoin, chapter 7: authorization and multisig"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+reflection:
+  - "For the money you hold today, who holds the keys, and what happens if they disappear?"
+  - "Which people in your community would you trust as guardians, and why?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - custodial
+  - self-custody
+  - fedimint
+  - federation
+  - guardian
+  - ecash
+  - multisig
+---
+
+Every way of holding bitcoin answers one question: **who holds the keys?** The answer decides who can spend the money, who can freeze it, and what happens if something goes wrong.
+
+## 1. Someone else holds them: custodial
+
+With a <Term id="custodial" />, a company such as an <Term id="exchange" /> holds the keys for you. You log in with a password, like a bank. It is easy, and if you forget your password they can help.
+
+But the company can freeze your account, be hacked, or close down. Bitcoiners say: "Not your keys, not your coins."
+
+## 2. You hold them: self-custody
+
+With <Term id="self-custody" />, your own wallet holds the keys and you keep the seed phrase. Nobody can freeze your money or spend it without you.
+
+But nobody can rescue you either. Lose the seed phrase, or let a thief see it, and the money is gone.
+
+## 3. Your community holds them: Fedimint
+
+<Term id="fedimint" /> sits between the two. A group of trusted people, called <Term id="guardian">guardians</Term>, run a <Term id="federation" /> together. The bitcoin is locked with <Term id="multisig" />, so most guardians must agree before any of it can move; no single guardian can run away with it.
+
+Members hold <Term id="ecash" />, digital notes backed by the federation's bitcoin. Ecash is easy to use and private: the guardians can't see who paid whom. It works a lot like a chama, where members already trust their officials, but with the rules enforced by software.
+
+The risk: if most guardians collude, are hacked or go offline together, members can lose access.
+
+| | Custodial | Self-custody | Fedimint |
+| --- | --- | --- | --- |
+| Who holds keys | A company | You | Several guardians together |
+| Can be frozen | Yes | No | Only if most guardians agree |
+| If you lose your phone | Company restores access | Your seed phrase restores it | The federation still holds your ecash |
+| Main risk | The company fails or freezes you | You lose your seed phrase | Most guardians fail together |
+
+<Callout type="warning" title="Ask before you deposit">
+Before you use any Bitcoin service, ask: who holds the keys, how many of them, and what happens if they disappear? If nobody can answer clearly, be careful.
+</Callout>
+
+## Try it
+
+Make a list of every place you keep money: M-Pesa, a bank, a SACCO, a chama box, any Bitcoin app. For each one, write who holds the keys and what would happen if they shut down tomorrow.

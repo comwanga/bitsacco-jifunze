@@ -1,21 +1,55 @@
 {
   "id": "savers",
-  "title": { "sw": "W", "en": "S" },
-  "tagline": { "sw": "W", "en": "S" },
-  "description": { "sw": "W", "en": "S" },
+  "title": {
+    "sw": "W",
+    "en": "S"
+  },
+  "tagline": {
+    "sw": "W",
+    "en": "S"
+  },
+  "description": {
+    "sw": "W",
+    "en": "S"
+  },
   "sections": [
     {
       "id": "all",
-      "title": { "sw": "Yote", "en": "All" },
+      "title": {
+        "sw": "Yote",
+        "en": "All"
+      },
       "lessons": [
-        { "slug": "only-en" },
-        { "slug": "no-objectives" },
-        { "slug": "missing-file" },
-        { "slug": "bad-prereq", "prerequisites": ["ghost"] },
-        { "slug": "adapted-no-licence" },
-        { "slug": "bad-terms" },
-        { "slug": "no-review" },
-        { "slug": "bad-url" }
+        {
+          "slug": "only-en"
+        },
+        {
+          "slug": "no-objectives"
+        },
+        {
+          "slug": "missing-file"
+        },
+        {
+          "slug": "bad-prereq",
+          "prerequisites": [
+            "ghost"
+          ]
+        },
+        {
+          "slug": "adapted-no-licence"
+        },
+        {
+          "slug": "bad-terms"
+        },
+        {
+          "slug": "no-review"
+        },
+        {
+          "slug": "bad-url"
+        },
+        {
+          "slug": "tag-attrs"
+        }
       ]
     }
   ]

@@ -1,0 +1,50 @@
+{
+  "lesson": "money-and-bitcoin",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Ipi kati ya hizi ni moja ya kazi tatu za pesa?", "en": "Which of these is one of the three jobs of money?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Hifadhi ya thamani", "en": "Store of value" } },
+        { "id": "b", "label": { "sw": "Kuhakikisha faida", "en": "Guaranteeing a profit" } },
+        { "id": "c", "label": { "sw": "Kutolipa ada kamwe", "en": "Never paying fees" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Pesa ni chombo cha kubadilishana, hifadhi ya thamani na kipimo cha thamani.", "en": "Money is a medium of exchange, a store of value and a unit of account." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Nani hutoa shilingi ya Kenya?", "en": "Who issues the Kenyan shilling?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Safaricom", "en": "Safaricom" } },
+        { "id": "b", "label": { "sw": "Benki Kuu ya Kenya", "en": "The Central Bank of Kenya" } },
+        { "id": "c", "label": { "sw": "SACCO yoyote", "en": "Any SACCO" } },
+        { "id": "d", "label": { "sw": "Satoshi Nakamoto", "en": "Satoshi Nakamoto" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Benki Kuu hutoa shilingi na huamua kiasi chake. M-Pesa na benki hutunza rekodi tu.", "en": "The Central Bank issues the shilling and decides how much exists. M-Pesa and banks only keep records." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Bitcoin ngapi zitakazowahi kuwepo?", "en": "How many bitcoin will ever exist?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Hazina kikomo", "en": "There is no limit" } },
+        { "id": "b", "label": { "sw": "Takriban milioni 21", "en": "About 21 million" } },
+        { "id": "c", "label": { "sw": "Kiasi wachimbaji wanachoamua kila mwaka", "en": "Whatever miners decide each year" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Kikomo cha takriban milioni 21 kimeandikwa kwenye sheria ambazo kila nodi hukagua.", "en": "The limit of about 21 million is written into the rules that every node checks." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Nani hutunza daftari la Bitcoin (blockchain)?", "en": "Who keeps Bitcoin's record (the blockchain)?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Benki moja nchini Marekani", "en": "One bank in the United States" } },
+        { "id": "b", "label": { "sw": "Maelfu ya kompyuta duniani ambazo yeyote anaweza kuendesha", "en": "Thousands of computers worldwide that anyone can run" } },
+        { "id": "c", "label": { "sw": "Bitsacco", "en": "Bitsacco" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Nodi kote duniani hutunza nakala ile ile na hukagua kila malipo.", "en": "Nodes around the world keep the same copy and check every payment." }
+    }
+  ]
+}

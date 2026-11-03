@@ -1,0 +1,60 @@
+---
+title: "Lightning payments: sending and receiving sats"
+description: "Fast, cheap payments for everyday amounts. Learn how invoices work, how to receive and send, and what to check before you pay."
+level: beginner
+minutes: 12
+objectives:
+  - Explain when to use Lightning instead of an on-chain payment
+  - Read an invoice and find its amount, description and expiry
+  - Check a payment request safely before you pay
+resources:
+  - title: "Lightning Network"
+    url: "https://lightning.network"
+    kind: article
+    language: en
+reflection:
+  - "Which payments in your week would suit Lightning, and which would suit an on-chain payment?"
+  - "What would you say to a shopkeeper who wants to accept sats but is afraid of fake QR codes?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - lightning
+  - invoice
+  - qr-code
+  - fee
+  - confirmation
+  - channel
+---
+
+Otieno sells chapati near a matatu stage. A customer wants to pay 50 shillings in sats. Waiting ten minutes for a block, and paying a <Term id="fee" /> larger than the chapati, makes no sense. This is what the <Term id="lightning" /> is for.
+
+## On-chain or Lightning?
+
+An on-chain payment is written straight into the blockchain. It gets its first <Term id="confirmation" /> when it enters a block, about every 10 minutes, and its fee depends on how busy the network is. It suits large or long-term amounts.
+
+Lightning is a network built on top of Bitcoin. Payments travel through <Term id="channel">channels</Term> between Lightning nodes and arrive in seconds, usually for a fee of a few sats. It suits small, everyday payments.
+
+## Invoices
+
+To receive on Lightning, your wallet makes an <Term id="invoice" />: a payment request, usually shown as a <Term id="qr-code" />. The text form is long and starts with `lnbc`. An invoice contains:
+
+- **the amount** in sats,
+- **a description**, such as "2 chapati, Otieno's",
+- **an expiry time**, often about an hour, after which it can't be paid.
+
+Each invoice is meant to be paid once. Many wallets also offer a **Lightning address** that looks like an email, such as `otieno@example.com`, which can receive many payments.
+
+## Receiving and sending
+
+**To receive:** open your wallet, tap Receive, enter the amount, and show the QR code or share the invoice.
+
+**To send:** tap Send or Scan, scan the QR code, then **read the amount and description before you confirm**.
+
+<Callout type="scam" title="Lightning payments are final">
+There is no reversing a Lightning payment. Check the amount every time. A scammer can stick their own QR code over a shop's poster, so if the description or name looks wrong, ask before paying.
+</Callout>
+
+## Try it
+
+Next time you see any payment QR code, at a shop, on a poster or in a message, stop and say out loud: "Who am I paying, how much, and for what?" If you already use a Lightning wallet, ask a friend for an invoice of 10 sats and find the amount, description and expiry before you pay it.

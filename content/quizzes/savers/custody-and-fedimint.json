@@ -1,0 +1,49 @@
+{
+  "lesson": "custody-and-fedimint",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Kwenye pochi ya mtunzaji, nani anashika funguo?", "en": "In a custodial wallet, who holds the keys?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Wewe", "en": "You" } },
+        { "id": "b", "label": { "sw": "Kampuni au mtu mwingine", "en": "A company or another person" } },
+        { "id": "c", "label": { "sw": "Hakuna", "en": "Nobody" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Mtunzaji anashika funguo kwa niaba yako, kama benki.", "en": "A custodian holds the keys for you, like a bank." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Hatari kuu ya kujitunzia ni ipi?", "en": "What is the main risk of self-custody?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kampuni inaweza kuzuia akaunti yako", "en": "A company can freeze your account" } },
+        { "id": "b", "label": { "sw": "Ukipoteza maneno ya siri, hakuna anayeweza kukuokoa", "en": "If you lose your seed phrase, nobody can rescue you" } },
+        { "id": "c", "label": { "sw": "Walinzi wanaweza kuona malipo yako", "en": "Guardians can see your payments" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Udhibiti kamili unakuja na wajibu kamili.", "en": "Full control comes with full responsibility." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Katika shirikisho la Fedimint, bitcoin inaweza kusonga lini?", "en": "In a Fedimint federation, when can the bitcoin move?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Mlinzi yeyote mmoja akiamua", "en": "When any one guardian decides" } },
+        { "id": "b", "label": { "sw": "Walinzi wengi wakikubaliana", "en": "When most guardians agree" } },
+        { "id": "c", "label": { "sw": "Kamwe", "en": "Never" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Multisig inahitaji sahihi za walinzi wengi, kwa hiyo hakuna mmoja anayeweza kutoroka na pesa.", "en": "Multisig needs signatures from most guardians, so no single one can run off with the money." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Swali gani muhimu zaidi kuuliza kuhusu huduma yoyote ya Bitcoin?", "en": "What is the most important question to ask about any Bitcoin service?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Nani anashika funguo?", "en": "Who holds the keys?" } },
+        { "id": "b", "label": { "sw": "Nembo yao ina rangi gani?", "en": "What colour is their logo?" } },
+        { "id": "c", "label": { "sw": "Wanaahidi faida kiasi gani?", "en": "How much profit do they promise?" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Anayeshika funguo ndiye anayedhibiti pesa. Ahadi za faida ni ishara ya hatari.", "en": "Whoever holds the keys controls the money. Promises of profit are a warning sign." }
+    }
+  ]
+}

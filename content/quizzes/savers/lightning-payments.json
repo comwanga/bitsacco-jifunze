@@ -1,0 +1,49 @@
+{
+  "lesson": "lightning-payments",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Malipo ya Lightning yanafaa zaidi kwa nini?", "en": "What are Lightning payments best suited for?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Malipo madogo ya kila siku yanayohitaji kufika haraka", "en": "Small everyday payments that need to arrive fast" } },
+        { "id": "b", "label": { "sw": "Kuhifadhi maneno ya siri", "en": "Storing your seed phrase" } },
+        { "id": "c", "label": { "sw": "Kupata faida ya uhakika", "en": "Earning a guaranteed profit" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Lightning ni ya haraka na ada zake ni ndogo, kwa hiyo inafaa kiasi kidogo.", "en": "Lightning is fast with tiny fees, so it suits small amounts." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Ankara ya Lightning ina nini?", "en": "What does a Lightning invoice contain?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Maneno ya siri ya mpokeaji", "en": "The receiver's seed phrase" } },
+        { "id": "b", "label": { "sw": "Kiasi, maelezo na muda wa kuisha", "en": "An amount, a description and an expiry time" } },
+        { "id": "c", "label": { "sw": "Nambari ya kitambulisho cha mlipaji", "en": "The payer's ID number" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Ankara ni ombi la malipo: kiasi gani, kwa nini, na hadi lini.", "en": "An invoice is a payment request: how much, what for, and until when." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Ukilipa ankara isiyo sahihi kwa Lightning, nini hutokea?", "en": "If you pay the wrong Lightning invoice, what happens?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Benki inarudisha pesa", "en": "The bank sends the money back" } },
+        { "id": "b", "label": { "sw": "Malipo ni ya mwisho; hayawezi kurudishwa", "en": "The payment is final; it can't be reversed" } },
+        { "id": "c", "label": { "sw": "Yanarudi yenyewe baada ya saa moja", "en": "It returns by itself after an hour" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Ndiyo maana unakagua kiasi na maelezo kila mara kabla ya kuthibitisha.", "en": "That's why you check the amount and description every time before confirming." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Unaona msimbo wa QR uliobandikwa juu ya bango la duka. Ufanye nini?", "en": "You see a QR code stuck over a shop's poster. What should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kulipa haraka kabla haujaisha", "en": "Pay quickly before it expires" } },
+        { "id": "b", "label": { "sw": "Kumuuliza mwenye duka kabla ya kulipa", "en": "Ask the shopkeeper before paying" } },
+        { "id": "c", "label": { "sw": "Kulipa mara mbili ili kuwa na uhakika", "en": "Pay twice to be sure" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Matapeli hubandika misimbo yao juu ya ile halali. Thibitisha kwanza.", "en": "Scammers stick their own codes over real ones. Check first." }
+    }
+  ]
+}

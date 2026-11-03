@@ -1,0 +1,49 @@
+{
+  "lesson": "scams",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Ipi kati ya hizi ni ishara ya hatari ya utapeli?", "en": "Which of these is a red flag for a scam?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Faida ya uhakika kila wiki", "en": "A guaranteed return every week" } },
+        { "id": "b", "label": { "sw": "Programu inayokuonyesha anwani yako", "en": "An app that shows you your address" } },
+        { "id": "c", "label": { "sw": "Rafiki anayekueleza bitcoin ni nini", "en": "A friend explaining what bitcoin is" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Hakuna anayeweza kuhakikisha faida kwa bitcoin. Ahadi hiyo ni ishara kubwa ya utapeli.", "en": "Nobody can guarantee a return on bitcoin. That promise is a major scam signal." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Mtu anayejiita msimamizi wa Bitsacco anakuomba utume sats kwanza ili upokee mara mbili. Ufanye nini?", "en": "Someone calling themselves a Bitsacco admin asks you to send sats first to receive double. What should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kutuma kiasi kidogo kujaribu", "en": "Send a small amount to test it" } },
+        { "id": "b", "label": { "sw": "Kukataa na kuonya chama chako", "en": "Refuse and warn your chama" } },
+        { "id": "c", "label": { "sw": "Kumpa PIN yako badala yake", "en": "Give them your PIN instead" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "\"Tuma kwanza upokee zaidi\" daima ni utapeli, hata kwa kiasi kidogo.", "en": "\"Send first to receive more\" is always a scam, even for a small amount." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Umetapeliwa. Mtu anajitolea kukurudishia bitcoin yako kwa ada. Ufanye nini?", "en": "You've been scammed. Someone offers to recover your bitcoin for a fee. What should you do?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kulipa ada haraka", "en": "Pay the fee quickly" } },
+        { "id": "b", "label": { "sw": "Kupuuza; huo ni utapeli mwingine", "en": "Ignore it; it is another scam" } },
+        { "id": "c", "label": { "sw": "Kumpa maneno yako ya siri ili afuatilie", "en": "Give them your seed phrase so they can trace it" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Malipo ya Bitcoin hayarudishwi. \"Huduma za kurejesha\" huwalenga waliotapeliwa tayari.", "en": "Bitcoin payments can't be reversed. \"Recovery services\" target people who were already scammed." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Maneno yako ya siri yalionekana na mtu mwingine. Hatua ya kwanza ni ipi?", "en": "Your seed phrase was seen by someone else. What is the first step?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kuhamisha pesa zilizobaki kwenye pochi mpya yenye maneno mapya", "en": "Move the remaining funds to a new wallet with a new seed phrase" } },
+        { "id": "b", "label": { "sw": "Kubadilisha picha ya wasifu wako", "en": "Change your profile photo" } },
+        { "id": "c", "label": { "sw": "Kusubiri kuona kama wataiba", "en": "Wait to see if they steal it" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Maneno yaliyoonekana hayawezi kufanywa siri tena. Pochi mpya tu ndiyo salama.", "en": "Exposed words can't be made secret again. Only a new wallet is safe." }
+    }
+  ]
+}

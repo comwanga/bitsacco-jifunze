@@ -65,6 +65,10 @@ describe("rule 5: glossary consistency (warnings)", () => {
   test("English term used in a Kiswahili lesson is a warning, once, ignoring code blocks", () => {
     expect(find(5, "warning", "sw/bad-terms.mdx", /maneno ya siri/)).toHaveLength(1);
   });
+  test("tag names and attributes are not prose: <Term id=...>children</Term> and Callout type don't warn", () => {
+    expect(find(5, "warning", "sw/bad-terms.mdx", /"phishing"|"seed phrase".*maneno/)).toHaveLength(1);
+    expect(issues.filter((i) => i.rule === 5 && i.file.includes("tag-attrs"))).toEqual([]);
+  });
   test("rule 5 never produces errors", () => {
     expect(issues.filter((i) => i.rule === 5 && i.level === "error")).toHaveLength(0);
   });

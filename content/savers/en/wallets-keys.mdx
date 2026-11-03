@@ -1,0 +1,69 @@
+---
+title: "Wallets, keys and seed phrases"
+description: "A wallet doesn't hold coins; it holds keys. Learn what you can share, what you must never share, and how to back up your seed phrase."
+level: beginner
+minutes: 15
+objectives:
+  - Explain what a wallet really stores
+  - Tell the difference between an address you can share and a private key or seed phrase you must never share
+  - Make a safe paper backup of a seed phrase
+resources:
+  - title: "Kujifunza Bitcoin, chapters 4 and 5: keys, addresses and wallet recovery"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+    note: "The Kiswahili edition of Mastering Bitcoin (7.2 MB PDF)."
+  - title: "Secure your wallet (bitcoin.org)"
+    url: "https://bitcoin.org/en/secure-your-wallet"
+    kind: article
+    language: en
+reflection:
+  - "Explain to a friend, without using the word 'key', why your seed phrase is more important than your phone."
+  - "Where in your home would a paper backup be safe from fire, water, children and visitors?"
+source:
+  type: original
+translationOf: sw
+terms:
+  - wallet
+  - private-key
+  - public-key
+  - address
+  - seed-phrase
+  - backup
+---
+
+When Achieng lost her phone, she panicked: "My bitcoin is gone!" It wasn't. Her bitcoin was never inside the phone. Because she had written down twelve words on paper, she installed the wallet app on a new phone, typed the words in, and everything came back.
+
+## What a wallet really stores
+
+Your bitcoin lives on the <Term id="blockchain" />, the shared record kept by nodes around the world. A <Term id="wallet" /> is an app or device that stores the **keys** that let you spend it.
+
+- A <Term id="private-key" /> is a secret number. It signs your payments, like a signature on a cheque that nobody can forge.
+- A <Term id="public-key" /> is made from the private key. From it, the wallet makes an <Term id="address" />, which is what you give people so they can pay you.
+
+| Thing | Like | Share it? |
+| --- | --- | --- |
+| Address | Your M-Pesa number | Yes |
+| Private key | Your signature and PIN together | Never |
+| Seed phrase | The master copy of every key | Never |
+
+## The seed phrase
+
+Most wallets show you 12 or 24 ordinary words when you first set them up. This <Term id="seed-phrase" /> can recreate every key the wallet will ever make. **Whoever knows these words owns the money**, on any phone, anywhere, forever. There is no customer care that can reset it.
+
+<Callout type="scam" title="Nobody real will ever ask for your words">
+No wallet company, no Bitsacco staff member and no "support agent" will ever ask for your seed phrase or private key. Anyone who asks is trying to steal from you.
+</Callout>
+
+## Making a good backup
+
+A <Term id="backup" /> is only useful if it survives and stays secret:
+
+1. Write the words **on paper**, in order, with their numbers. Check every word twice.
+2. Never photograph them, never type them into WhatsApp, email or notes, and never store them in the cloud.
+3. Keep the paper somewhere safe from fire, water and curious eyes. Some people keep a second copy in a different trusted place.
+4. Before saving much, test it: restore the wallet from the words with a small amount in it.
+
+## Try it
+
+Practise with **pretend** words, not a real wallet. Open any book, pick 12 random words, and write them in order on a card with their numbers. Hide the card. In a week, find it and read the words back. Was it easy to find? Was every word readable? Then tear it up.

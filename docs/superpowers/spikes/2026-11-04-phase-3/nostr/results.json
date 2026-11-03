@@ -1,0 +1,132 @@
+[
+  {
+    "name": "BIP-340 vectors: verify() agrees with expected result",
+    "pass": true,
+    "detail": "19/19"
+  },
+  {
+    "name": "Relay events: NIP-01 id recomputed",
+    "pass": true,
+    "detail": "200/200 (content with escaped chars: 102)"
+  },
+  {
+    "name": "Relay events: signatures valid",
+    "pass": true,
+    "detail": "200/200"
+  },
+  {
+    "name": "Serializer keeps U+0001 verbatim (JSON.stringify would escape it)",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "NIP-98 accepts a correct login",
+    "pass": true,
+    "detail": "ok"
+  },
+  {
+    "name": "NIP-98 rejects a replay of a used challenge",
+    "pass": true,
+    "detail": "challenge_invalid"
+  },
+  {
+    "name": "NIP-98 rejects wrong kind (22242)",
+    "pass": true,
+    "detail": "wrong_kind"
+  },
+  {
+    "name": "NIP-98 rejects non-empty content",
+    "pass": true,
+    "detail": "content_not_empty"
+  },
+  {
+    "name": "NIP-98 rejects a tampered created_at (id mismatch)",
+    "pass": true,
+    "detail": "bad_id"
+  },
+  {
+    "name": "NIP-98 rejects a forged signature",
+    "pass": true,
+    "detail": "bad_sig"
+  },
+  {
+    "name": "NIP-98 rejects another key's signature",
+    "pass": true,
+    "detail": "bad_sig"
+  },
+  {
+    "name": "NIP-98 rejects an event 61s old",
+    "pass": true,
+    "detail": "stale"
+  },
+  {
+    "name": "NIP-98 rejects an event 61s in the future",
+    "pass": true,
+    "detail": "stale"
+  },
+  {
+    "name": "NIP-98 rejects a URL for another site",
+    "pass": true,
+    "detail": "wrong_url"
+  },
+  {
+    "name": "NIP-98 rejects a URL with an extra query",
+    "pass": true,
+    "detail": "wrong_url"
+  },
+  {
+    "name": "NIP-98 rejects two u tags",
+    "pass": true,
+    "detail": "wrong_url"
+  },
+  {
+    "name": "NIP-98 rejects method GET",
+    "pass": true,
+    "detail": "wrong_method"
+  },
+  {
+    "name": "NIP-98 rejects a payload hash for a different body",
+    "pass": true,
+    "detail": "wrong_payload"
+  },
+  {
+    "name": "NIP-98 rejects an unknown challenge",
+    "pass": true,
+    "detail": "challenge_invalid"
+  },
+  {
+    "name": "NIP-98 rejects an expired challenge",
+    "pass": true,
+    "detail": "challenge_invalid"
+  },
+  {
+    "name": "NIP-98 rejects a challenge bound to another browser",
+    "pass": true,
+    "detail": "challenge_invalid"
+  },
+  {
+    "name": "NIP-98 rejects a wrong nonce",
+    "pass": true,
+    "detail": "challenge_invalid"
+  },
+  {
+    "name": "NIP-98 rejects a malformed header",
+    "pass": true,
+    "detail": "bad_json"
+  },
+  {
+    "name": "NIP-98 rejects a missing header",
+    "pass": true,
+    "detail": "missing_auth"
+  },
+  {
+    "name": "NIP-98 rejects uppercase hex id",
+    "pass": true,
+    "detail": "bad_shape"
+  },
+  {
+    "name": "Atomic consumption: 20 concurrent requests, exactly 1 accepted",
+    "pass": true,
+    "detail": "1 accepted, 19 rejected"
+  }
+]

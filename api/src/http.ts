@@ -233,9 +233,8 @@ export function createServer(routes: Route[], deps: Deps): Server {
       if (session) accountId = session.accountId;
       if (route.auth !== "public") {
         if (!session) throw new ApiError(401, "unauthenticated");
-        if (route.auth === "full" && session.scope === "recovery" && !route.recoveryAllowed) {
-          throw new ApiError(403, "recovery_scope");
-        }
+        // A recovery session reaches only routes that opt in, whether auth is "full" or "any".
+        if (session.scope === "recovery" && !route.recoveryAllowed) throw new ApiError(403, "recovery_scope");
       }
 
       // 7. handler

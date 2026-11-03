@@ -20,6 +20,8 @@ const routes: Route[] = [
   },
   { method: "GET", path: "/api/things/:id", auth: "public", handler: async (c) => ({ status: 200, json: c.params }) },
   { method: "GET", path: "/api/private", auth: "full", handler: async () => ({ status: 200, json: {} }) },
+  { method: "GET", path: "/api/any", auth: "any", handler: async () => ({ status: 200, json: {} }) },
+  { method: "GET", path: "/api/any-ok", auth: "any", recoveryAllowed: true, handler: async () => ({ status: 200, json: {} }) },
   {
     method: "POST",
     path: "/api/echo",
@@ -121,6 +123,20 @@ describe("api pipeline", () => {
     const r = await fetch(`${s.base}/api/private`);
     expect(r.status).toBe(401);
     expect((await json(r)).error.code).toBe("unauthenticated");
+  });
+
+  it('a recovery session is 403 recovery_scope on an auth "any" route without recoveryAllowed, and allowed with it', async () => {
+    const rec = await startServer(routes, {
+      readSession: async () => ({ tokenHash: Buffer.alloc(32), accountId: "a", scope: "recovery", reauthAt: new Date() }),
+    });
+    try {
+      const r = await fetch(`${rec.base}/api/any`);
+      expect(r.status).toBe(403);
+      expect((await json(r)).error.code).toBe("recovery_scope");
+      expect((await fetch(`${rec.base}/api/any-ok`)).status).toBe(200);
+    } finally {
+      await rec.close();
+    }
   });
 
   it("a handler throw -> 500 internal with no stack trace", async () => {

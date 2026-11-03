@@ -1,4 +1,5 @@
 import type { Route } from "./http.ts";
+import { logoutRoute, meRoute } from "./sessions.ts";
 
 export const healthRoute: Route = {
   method: "GET",
@@ -7,4 +8,4 @@ export const healthRoute: Route = {
   handler: async () => ({ status: 200, json: { ok: true } }),
 };
 
-export const routes: Route[] = [healthRoute];
+export const routes: Route[] = [healthRoute, meRoute, logoutRoute];

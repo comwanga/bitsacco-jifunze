@@ -2,8 +2,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadConfig } from "./config.ts";
 import { connect, errorCode, migrate, MigrationError } from "./db.ts";
-import { createServer, type ReadSession } from "./http.ts";
+import { createServer } from "./http.ts";
 import { routes } from "./routes.ts";
+import { purgeExpired, readSession } from "./sessions.ts";
 
 const cfg = loadConfig(process.env);
 let sql: ReturnType<typeof connect>;
@@ -23,8 +24,16 @@ try {
   process.exit(1);
 }
 
-// Sessions arrive in a later task; until then every request is anonymous.
-const readSession: ReadSession = async () => null;
+// Purge once at boot and daily. Log counts only, never the error object.
+async function purge(): Promise<void> {
+  try {
+    console.info(JSON.stringify({ event: "purged", ...(await purgeExpired(sql)) }));
+  } catch (err) {
+    console.error(JSON.stringify({ event: "purge_failed", code: errorCode(err) }));
+  }
+}
+await purge();
+setInterval(() => void purge(), 24 * 60 * 60 * 1000).unref();
 
 const server = createServer(routes, { cfg, sql, readSession });
 server.listen(cfg.port, () => {

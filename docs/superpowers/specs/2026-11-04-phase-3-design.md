@@ -1,11 +1,12 @@
-# Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 2)
+# Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 3)
 
-**Status.** The product direction has **conditional design approval** (maintainer review, 2026-11-04). This revision:
-- records the decisions;
-- applies the five required corrections;
-- adds findings from the investigations in [`spikes/2026-11-04-phase-3`](../spikes/2026-11-04-phase-3/README.md).
+**Status.** Revision 2's architecture is **approved in principle** (maintainer review, 2026-11-04). This revision 3:
+- applies that review's corrections: the recovery-flow conditions (F5), the visibility semantics and HTML indexing (E2), and documentation consistency;
+- pins the NIP-46 client dependency (F3).
 
-**Increment 2 has not started.** It is gated on the open items in section I.
+The investigation evidence is in [`spikes/2026-11-04-phase-3`](../spikes/2026-11-04-phase-3/README.md).
+
+**Application implementation remains blocked.** It waits for approval of revision 3's recovery and privacy designs and the other open items in section I.
 
 Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practise → Build → Contribute → Grow).
 
@@ -16,17 +17,17 @@ Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practis
 | ID | Decision | Maintainer outcome | How this revision applies it |
 |---|---|---|---|
 | D1 | Homepage polish onto `main` | **Approved** | **Done.** PR #5 merged as `254e757`; `main` now equals the reviewed polish tree, and CI is green. Phase 3 starts from this `main` |
-| D2 | Architecture | **Approved with conditions** | Static learning site, same-origin Node API, PostgreSQL and the nginx `/api` proxy. **Public profiles are no longer generated statically** (section E2): privacy is enforced at request time |
+| D2 | Architecture | **Approved in principle** (revision 2) | Static learning site, same-origin Node API, PostgreSQL and the nginx `/api` proxy. Profiles are never generated statically; nginx checks visibility with the API before serving any profile HTML (E2) |
 | D2-nav | Navigation | **Approved** | Paths · Labs · Builders · Resources, plus language and account (section B) |
 | D3 | Hosting and domain | **Provisional** | `jifunze.bitsacco.com` is the proposed domain until DNS and hosting are confirmed. Requirements, costs, deploys, secrets, backups and recovery are in section E5. Nothing is provisioned |
-| D4 | GitHub App ownership | **Conditionally approved** | Long term: the Bitsacco org, after admin authorisation. Development: an isolated test App on a personal account. No org settings changed |
+| D4 | GitHub App ownership | **Conditionally approved**; test App **approved** | Development uses an isolated test App on a personal account, with no permissions; the maintainer provides its credentials separately. Secrets never go in chat, the repo, screenshots or logs. Long term: the Bitsacco org, after admin authorisation |
 | D5 | No user-token storage | **Approved** | Tokens are used once for `GET /user` and discarded. Installation-token coverage is **unverified** (investigation 4 needs the test App). If it fails, this goes back for review; encrypted storage is **not** adopted automatically (section G4) |
 | D6 | Nostr | **Approved with mobile requirements** | NIP-07 first; NIP-46 is the primary Android path, subject to interop and security assessment; NIP-55 is evaluated (section F3) |
 | D7 | Directory membership | **Approved** | Only signed-up users who publish appear |
 | D8 | Images | **Approved** | GitHub avatars only, from one allowlisted host; no Nostr images; generated fallback avatar |
-| D9 | Recovery | **Requires revision** | One-time recovery codes plus a second identity. Lost-access deletion and unpublication obligations are covered. Presented for approval in section F5 |
+| D9 | Recovery | **Foundation conditionally approved** (codes, HMAC storage, atomic use, restricted sessions, a second identity, a removal procedure) | Revision 3 addresses the four conditions: same-provider replacement, a code-only input with non-enumerating rate limits, unpublication kept separate from deletion with an evidence bar for each, and inactivity unlisting **deferred**. The full flow and its tests are in F5; awaiting approval |
 | D10 | Ecosystem registry | **Approved** | A curated, broad, reviewable registry with no score (section G5) |
-| D11 | API dependencies | **Provisionally approved** | `postgres`, `@noble/curves`, `@noble/hashes`, `zod`. `nostr-tools` is proposed only for the NIP-46 client on the sign-in route (section F3). The router is minimal, with explicit tests for its boundaries |
+| D11 | API dependencies | **Provisionally approved**; `nostr-tools` **approved with conditions** | API: `postgres`, `@noble/curves`, `@noble/hashes`, `zod`, and a minimal router with tests for its boundaries. Client: `nostr-tools` **2.25.2**, only for NIP-46, only on the sign-in route, loaded on demand (F3) |
 | D12 | Translation review | **Approved in principle** | No reviewers named yet. New terminology is tracked as **pending review** and not released as reviewed (section H2) |
 | D13 | Retention | **Approved** | Security events kept 90 days; sessions and challenges purged daily; covered by tests (section F6) |
 
@@ -34,7 +35,7 @@ Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practis
 
 ## A. Repository assessment (verified 2026-11-04)
 
-- **`main` = `ee7b35b`**: v1, Phase 1, Phase 2, the review fixes and the CI prefetch fix. CI is green.
+- **`main` = `254e757`** (verified 2026-11-04; CI green): v1, Phase 1, Phase 2, the review fixes, the CI prefetch fix and the homepage polish.
 - **The homepage polish** (PR #4) landed on `feat/phase-2-ux` after that branch had merged. **PR #5** brought exactly those 21 files to `main`:
   - It merged as `254e757`, and `main`'s tree is byte-identical to the reviewed `88ca787`.
   - CI on `main`: success. On the PR: check passed (121 unit tests, 148 browser tests, 52 skipped), lab passed, and the simulation budget measured 142.375 KB.
@@ -92,7 +93,8 @@ Rasilimali ▾ = Maktaba · Kamusi · Mazoezi · Maendeleo (a native <details>, 
 |---|---|---|
 | `/{lang}/account/` (signin, welcome, settings, signout) | static shell plus `/api` data | `noindex`; never cached by the service worker |
 | `/{lang}/community/` | static shell plus a live list from `/api/public/builders` | Search and filters run in a route-local island |
-| `/{lang}/community/{handle}/` | **static shell plus live data** from `/api/public/builders/{handle}` | nginx maps any handle to one shell per language (section E2) |
+| `/{lang}/community/{handle}/` | **static shell plus live data**, served only after nginx confirms the profile is public | Public profiles |
+| `/{lang}/community/u/{token}/` | the same shell, gated by an unguessable link token; HTML sent with `X-Robots-Tag: noindex, nofollow` | Unlisted profiles (E2) |
 
 ---
 
@@ -117,8 +119,8 @@ These are revision 1's journeys, with the corrections applied.
    - `/{lang}/community/` → a profile → evidence links to GitHub.
    - Viewing needs a connection. The page says so offline instead of showing a stale copy.
 6. **Learner who lost access.**
-   - Sign in with a recovery code, which gives a restricted session. From there they link a new identity or delete the account.
-   - With no code and no identity left: there is a documented removal-request path (section F5).
+   - Sign in with a recovery code, which gives a restricted 15-minute session. From there they can **replace** the lost identity (same provider or the other one), regenerate codes, export, or delete the account.
+   - With no code and no identity left: emergency unpublication on reasonable evidence; deletion only on strong evidence (section F5).
 
 ---
 
@@ -141,7 +143,12 @@ Revision 1's wireframes (sign-in, directory, profile, dashboard, settings and Gi
 ```
 
 - **Settings** gains a recovery-codes block: "Misimbo 8 kati ya 10 imebaki · Tengeneza upya" (8 of 10 codes left · Regenerate). Regenerating requires re-authentication and invalidates the old set.
-- **Profile visibility control** carries an honest note: "Ukiufanya binafsi, unaacha kuonekana mara moja kwenye Jifunze. Nakala ambazo watu walishapakua kwenye vifaa vyao hatuwezi kuzifuta." (When you make it private, it stops showing on Jifunze immediately. We can't delete copies people already downloaded to their own devices.)
+- **Visibility control** has three options:
+  - Umma / Public: in the directory and at its link.
+  - Bila kuorodheshwa / Unlisted: only at a private link, which can be reset.
+  - Binafsi / Private: nowhere.
+
+  It carries an honest note: "Ukiufanya binafsi, unaacha kuonekana mara moja kwenye Jifunze. Nakala ambazo watu walishapakua kwenye vifaa vyao hatuwezi kuzifuta." (When you make it private, it stops showing on Jifunze immediately. We can't delete copies people already downloaded to their own devices.)
 
 ---
 
@@ -165,50 +172,82 @@ Browser ── https://jifunze.bitsacco.com (proposed, D3) ──┐
 - **API:** `node:http` plus a small router (D11). Every route declares its method, auth requirement and zod schema in one table. Unknown routes return 404 and wrong methods 405. A test enumerates the table and asserts that every non-public route rejects a request without a session. Errors are generic outside and detailed only in logs, with no tokens or bodies.
 - **Background sync** is an in-process loop under `pg_try_advisory_lock`. There is no queue.
 
-### E2. Public-profile publication and privacy (correction 2)
+### E2. Profile visibility, indexing and privacy
 
-**Revision 1 is rejected for privacy.** Static pages built from snapshots can outlive an unpublish in four ways:
-- a failed or delayed rebuild leaves the old file served;
-- a CDN keeps the old response;
-- old container images still contain the page;
-- the current service worker keeps a copy and serves it offline (investigation 2).
+**Visibility semantics** (maintainer-defined):
 
-**The mechanism: one static shell plus live data.**
+| Visibility | In directory | Reachable at | Indexing |
+|---|---|---|---|
+| **Public** | yes | `/{lang}/community/{handle}/` | indexable |
+| **Unlisted** | no | **only** `/{lang}/community/u/{token}/` (32-byte random token, resettable); the handle URL returns 404 | `X-Robots-Tag: noindex, nofollow` on the **HTML** response |
+| **Private** | no | nowhere; every public URL returns 404 | n/a |
 
-1. **One shell per language.** `out/{lang}/community/profile/index.html` is built once and contains no builder data.
-   - nginx: `location ~ ^/(sw|en)/community/[a-z0-9-]+/$ { try_files /$1/community/profile/index.html =404; }`
-   - The CSP stays hash-based.
-2. **Data is fetched live.** The shell reads the handle from the URL and fetches `GET /api/public/builders/{handle}`.
-   - The API answers from the database at request time.
-   - Anything that is not `visibility='public'`, a deleted account, or an unknown handle returns **404** with the same body, so the response doesn't reveal whether a private profile exists.
-   - Unlisted profiles return 200 with `X-Robots-Tag: noindex`.
-3. **Every `/api/*` response** carries `Cache-Control: no-store` plus `Vary: Cookie`, and the API never sets public cache headers. If a CDN is added later, it must pass `/api/*` through; that is a written deployment requirement (section E5) and a test asserts the headers.
-4. **Service worker changes:**
-   - (a) Never handle `/api/*`.
-   - (b) Don't cache navigations under `/{lang}/account/`. Under `/{lang}/community/`, only the data-free shell may be cached; data never is.
-   - (c) **Delete a cached navigation when the network returns 404 or 410.** This fixes the stale-copy behaviour found in investigation 2, for every page.
-5. **Directory:** `GET /api/public/builders` uses the same rules and is never cached.
+Revision 2 is corrected here on two points:
+- It put `X-Robots-Tag` only on the JSON API. That doesn't control indexing of the profile's **HTML URL**.
+- It let the static shell return 200 for any handle.
 
-**What we can and cannot promise:**
-- **We can:** when a builder makes their profile private, or deletes their account, Jifunze stops serving it on the next request, with no rebuild and no cache to purge.
-- **We cannot recall copies already downloaded** to someone's device, as with any web page. We don't promise that, and the settings copy says so.
+**Mechanism.** nginx asks the API before serving profile HTML. The shipped image is nginx 1.30.6, built with `--with-http_auth_request_module` (verified).
 
-**Trade-off.** Profile content renders in the browser:
-- Search engines that run JavaScript still index it.
-- Link previews show generic Jifunze metadata rather than the builder's name.
-- Without JavaScript, the shell says it needs JavaScript and links to the directory.
+```nginx
+location = /_visibility {                      # internal subrequest only
+  internal;
+  proxy_pass http://api:3001/api/internal/visibility;
+  proxy_pass_request_body off;
+  proxy_set_header Content-Length "";
+  proxy_set_header X-Original-URI $request_uri;  # the profile path being requested
+}
+location ~ ^/(sw|en)/community/[a-z0-9-]+/$ {          # public profiles
+  auth_request /_visibility;                  # API: 204 if visibility='public', else 403
+  error_page 403 =404 /404.html;               # not visible -> a real 404
+  error_page 500 502 503 504 =503 /offline/index.html;  # API down -> fail closed with 503
+  add_header Cache-Control "no-store" always;
+  include /etc/nginx/snippets/security-headers.conf;
+  try_files /$1/community/profile/index.html =404;
+}
+location ~ ^/(sw|en)/community/u/[A-Za-z0-9_-]{43}/$ {  # unlisted profiles
+  auth_request /_visibility;                  # 204 only if the token matches an unlisted profile, else 403
+  error_page 403 =404 /404.html;
+  error_page 500 502 503 504 =503 /offline/index.html;
+  add_header X-Robots-Tag "noindex, nofollow" always;
+  add_header Cache-Control "no-store" always;
+  include /etc/nginx/snippets/security-headers.conf;
+  try_files /$1/community/profile/index.html =404;
+}
+```
 
-If richer link previews are wanted later, the API can serve a per-profile `<head>` subset. That is a separate decision.
+- **Real status codes.** Private, deleted or unknown profiles get a **real HTTP 404**, not a soft 200 shell, so crawlers drop them and nothing about them is served.
+- **Fails closed.** `auth_request` only accepts 2xx (allow) or 401/403 (deny), and turns any other answer into an error. So the API answers **403** for not-visible, which nginx maps to 404. If the API is down, nginx returns **503**: the shell is not served, and crawlers see "temporarily unavailable" rather than a 404 that would drop public profiles.
+- **Data is never in the HTML.** The shell is identical for every profile; the data comes from `GET /api/public/builders/{handle}` or `…/u/{token}`, under the same visibility rules.
+- **Caching:**
+  - **Every** `/api/*` response gets `Cache-Control: no-store` and `X-Robots-Tag: noindex`.
+  - Profile HTML gets `Cache-Control: no-store`.
+  - If a CDN is ever added, it must pass `/api/*` and `/{lang}/community/*` through uncached. That is a deployment requirement with a header check.
+- **Service worker:**
+  - (a) Never handle `/api/*`.
+  - (b) Navigations under `/{lang}/account/` and `/{lang}/community/` are **network-only**: never cached, with the offline page shown when there's no connection.
+  - (c) Delete a cached navigation when the network returns 404 or 410. This fixes the stale-copy behaviour from investigation 2 for every page.
+- **Directory:** `GET /api/public/builders` lists only `visibility='public'`. The directory page (`/{lang}/community/`) is indexable, but its data is never cached.
+- **Sitemap:** the static sitemap lists the directory page only. Profile URLs are discoverable through the directory, and are not listed until a dynamic sitemap is separately approved.
+
+**What we can and cannot promise.**
+- **We can:** a change to private or unlisted, a link-token reset, or an account deletion takes effect on the **next request**. Jifunze keeps no server or cache copy.
+- **We cannot recall copies already downloaded to someone's device.** The settings copy says so.
+
+**Trade-off.** Content renders in the browser:
+- Link previews show generic Jifunze metadata.
+- Without JavaScript, the shell says it needs JavaScript.
 
 **Tests, written before profiles are implemented (Increment 3 gate):**
-- publish → 200 with data;
-- set private → 404 on the very next request;
-- delete the account → 404;
-- unknown handle → an identical 404;
-- `no-store` on every `/api` response;
-- the service worker's caches contain no `/api` response after browsing profiles;
-- a 404 navigation evicts its cached copy;
-- offline on a profile shows the needs-connection state, not stale data.
+- **Status codes:**
+  - public → HTML 200, and the API returns data;
+  - set private → HTML **404** on the next request;
+  - set unlisted → the handle URL 404s, and the token URL returns 200 with `X-Robots-Tag: noindex, nofollow` on the HTML;
+  - reset the token → the old token 404s;
+  - delete the account → 404;
+  - unknown handle → an identical 404.
+- **The API down:** profile URLs return 503 and never serve the shell.
+- **Headers:** `no-store` on every profile HTML and `/api` response.
+- **Service worker:** no `/api` or community response in any cache after browsing; a 404 evicts a cached copy; offline on a profile shows the offline page.
 
 ### E3. Database schema (changes from revision 1)
 
@@ -249,12 +288,25 @@ create table review_submissions (               -- one row per review, never mer
   primary key (account_id, review_github_id)
 );
 
-create table recovery_codes (                   -- D9 proposal, section F5
+create table recovery_codes (                   -- section F5
+  code_hash bytea primary key,                  -- HMAC-SHA256(pepper_vN, normalised code); globally unique, so the code alone finds the account
+  pepper_version smallint not null,
   account_id uuid not null references accounts(id) on delete cascade,
-  code_hash bytea not null,                     -- HMAC-SHA256(server pepper, code)
+  set_id uuid not null,                         -- regenerating replaces the whole set
   created_at timestamptz not null default now(),
-  used_at timestamptz,
-  primary key (account_id, code_hash)
+  used_at timestamptz
+);
+
+alter table profiles
+  add column unlisted_token_hash bytea unique;  -- sha256 of the 32-byte link token; set while visibility='unlisted'
+
+create table admin_actions (                    -- section F5: every manual removal action
+  id bigserial primary key,
+  account_id uuid,                              -- null after deletion
+  action text not null check (action in ('unpublish','restore','delete')),
+  evidence text not null,                       -- what was verified (no secrets, no copies of IDs)
+  approved_by text[] not null,                  -- maintainer handles; deletion requires two
+  at timestamptz not null default now()
 );
 ```
 
@@ -267,14 +319,19 @@ create table recovery_codes (                   -- D9 proposal, section F5
 
 - `GET /api/public/snapshot` is **removed**, and so is the build token.
 - `GET /api/public/builders/{handle}` is now the profile source. It returns 404 for anything not public.
-- `POST /api/auth/recovery` (`{ code }`, rate-limited) creates a session with `scope='recovery'`. That session may only:
-  - list identities;
-  - link a new identity;
-  - regenerate codes;
-  - export data;
-  - delete the account.
+- `POST /api/auth/recovery`. Input is `{ code }` **only**, with no handle or account id, so the endpoint can't be used to test whether an account exists (F5).
+  - Success creates a session with `scope='recovery'`.
+  - Any failure returns the same `401 recovery_invalid` with no detail.
+  - The recovery session may only:
+    - list identities;
+    - **replace** an identity (`POST /api/me/identities/{provider}/replace/start`, then the provider flow with `purpose='replace'`);
+    - regenerate codes;
+    - export data;
+    - delete the account.
 
-  Every other route answers 403 `recovery_scope`.
+    Every other route answers 403 `recovery_scope`.
+- `GET /api/internal/visibility` is **internal only**: an nginx `auth_request` subrequest that reads `X-Original-URI`. The public `location /api/` blocks `/api/internal/` with a 404. It returns **204** when visible and **403** otherwise (`auth_request` treats any other status as an error).
+- `POST /api/me/profile/unlisted-link` resets the unlisted token and returns the new link once.
 - `POST /api/me/recovery-codes` (re-auth ≤ 10 min) returns 10 new codes **once** and invalidates the old ones.
 - The rest is unchanged: every non-GET request needs an exact `Origin` and the `X-Jifunze: 1` header, every response carries `Cache-Control: no-store`, and the account always comes from the session.
 
@@ -377,7 +434,23 @@ These become the API's permanent unit tests, using the BIP-340 CSV, recorded rel
 
 No signer app is named as supported until it passes.
 
-**Never:** asking for an `nsec`, an input field that would accept one, or storing the client's ephemeral NIP-46 key beyond the attempt.
+**The `nostr-tools` dependency** (approved with conditions):
+- **Version:** pinned to **2.25.2** (released 2026-09-04, Unlicense).
+  - Its dependencies are `@noble/curves`, `@noble/hashes` and `@noble/ciphers` (audited), `@scure/base`, `@scure/bip32` and `@scure/bip39`, and `nostr-wasm`.
+  - The newest release, 2.25.5, came out on 2026-11-02, too recent to pin.
+  - Before 2c starts, the pinned version gets an advisory check (`npm audit` plus the GitHub advisory database) and a review of the `nip46` and `nip44` modules' changelog since the previous pin.
+- **Isolation:**
+  - It's imported **only** as `nostr-tools/nip46` (with `nip44`), through a dynamic `import()` that runs after the learner chooses "Use a signer app". It's never in the shared or sign-in initial bundle.
+  - The sign-in page's initial JS is measured with and without that path.
+- **Keys:**
+  - The NIP-46 client keypair is created in memory for one attempt and dropped on success, cancel, timeout (120 s) or navigation. It's never written to storage.
+  - The identity is the pubkey from the remote signer's **`get_public_key`** response, and the final login event is still verified on the server under F2.
+- **CSP:**
+  - NIP-46 needs WebSocket connections to relays. Client-initiated `nostrconnect://` uses a short curated relay list.
+  - A pasted `bunker://` URI names the signer's relays, so the **sign-in page alone** gets `connect-src 'self' wss:`. Every other page keeps `connect-src 'self'`.
+  - The session cookie is HttpOnly and the page holds no private data, so the wider policy exposes nothing new. This is listed for approval in section I.
+
+**Never:** asking for an `nsec`, an input field that would accept one, or keeping an ephemeral key beyond its attempt.
 
 ### F4. Account linking
 
@@ -387,31 +460,82 @@ Unchanged from revision 1:
 - An identity already linked to another account returns 409 `identity_in_use`, with no merge.
 - Nothing is ever merged on usernames, emails, bios or metadata.
 
-### F5. Account recovery (D9): proposal for approval
+### F5. Account recovery (D9): revised for the four conditions
 
-**Goal:** someone who loses one way in can get back in, with no email or password.
+**Approved foundation:**
+- ten single-use codes;
+- HMAC storage;
+- atomic consumption;
+- short restricted recovery sessions;
+- encouragement to link both providers;
+- a documented removal procedure.
 
-1. **Recovery codes.**
-   - Ten single-use codes, each 16 base32 characters (80 bits), shown in groups of four, for example `K7QM-2XPA-9DTR-4HWE`.
-   - They're shown **once**, at account creation, with a required "I've saved them" step. They can be regenerated in settings after re-authentication.
-   - Stored as `HMAC-SHA256(pepper_vN, normalised code)`, so a database leak alone can't test guesses offline. 80 bits is also far beyond guessing online.
-   - Using one: `POST /api/auth/recovery` → a **restricted session** (`scope='recovery'`, 15 minutes) → link a new identity or delete the account. The code is consumed atomically, like a challenge.
-   - **Rate limits:** 5 attempts per 15 minutes per IP, plus 20 per hour globally per account handle.
-   - It's logged as a security event and shown on the dashboard: "Msimbo wa kurejesha ulitumika {date}" (A recovery code was used on {date}).
-2. **A second identity.** Linking both GitHub and Nostr is recommended at setup and in settings. Either one can recover the account.
-3. **Rules that stay:**
-   - The last identity can't be removed.
-   - Regenerating codes and deleting the account require re-authentication within 10 minutes. A recovery session counts as re-authenticated for deletion only.
+**Codes**
+- Ten codes, each 16 base32 characters (80 bits), shown in groups of four, for example `K7QM-2XPA-9DTR-4HWE`.
+- They're shown **once**, at account creation, with a required "I've saved them" step. They can be regenerated after re-authentication, which replaces the whole set.
+- Stored as `HMAC-SHA256(pepper_vN, normalised code)`, which is **globally unique** (`code_hash` primary key). A database leak alone can't test guesses.
 
-**Limitations and security implications:**
-- A stolen code set is equivalent to a stolen identity. The mitigations are single use, rate limits, the dashboard notice and immediate regeneration.
-- With **no email**, there is no channel to warn the owner when a code is used elsewhere. They see it only at their next sign-in.
-- Someone who loses every identity **and** every code can't get their account back.
+**Using a code: input contract and abuse protection (condition 2)**
+- `POST /api/auth/recovery` takes `{ code }` **only**. Revision 2 proposed per-handle limits, which would have needed a handle in the input and let anyone test whether a handle exists; that is withdrawn.
+- **Lookup:** normalise (upper-case, strip `-` and spaces, check the alphabet), compute the HMAC, then one indexed lookup. Wrong or used codes and wrong-format input all return the same `401 recovery_invalid` after the same work, so there's no oracle.
+- **Atomic consumption:** `update recovery_codes set used_at = now() where code_hash = $1 and used_at is null returning account_id`.
+- **Rate limits, applied before lookup:**
+  - **per IP:** 5 attempts per 15 minutes;
+  - **per /24 network:** 20 per hour;
+  - **global:** 300 per hour, and above that every attempt returns 429.
 
-**Obligations when access is truly lost:**
-- **Unpublish on request.** A person can ask, through a documented maintainer contact, to have a profile taken down. Maintainers act on reasonable evidence: for GitHub, the request comes from that GitHub account's own public channel, such as an issue opened by that login. The action is an audited admin CLI command that sets `visibility='private'` and logs `admin_unpublish`.
-- **Deletion on request** follows the same evidence rule.
-- **Inactivity safeguard:** public profiles with no sign-in for 18 months become **unlisted**: still reachable, but out of the directory. The builder sees this at their next sign-in. Nothing is deleted automatically.
+  At 80 bits, even the global ceiling running for a century gives a negligible chance of guessing any code. The limits exist to stop noise and denial of service.
+- **Logging:** every failure counts in a security event (no code is stored), and a global spike raises an operator alert.
+
+**The recovery session and replacing an identity (condition 1)**
+- A successful code gives a session with `scope='recovery'`, valid 15 minutes.
+  - On entry, **all other sessions** of the account are revoked.
+  - The dashboard later shows "A recovery code was used on {date}" and suggests regenerating codes.
+- **Replacing an identity**, even with the same provider:
+  1. The user chooses "Replace GitHub" or "Replace Nostr".
+  2. The API creates a challenge with `purpose='replace'`, bound to the recovery session, the target provider and the pre-auth cookie.
+  3. The provider flow runs as for sign-in: GitHub OAuth with PKCE, or Nostr as in F2.
+  4. On success, **one transaction**:
+     - checks the new `(provider, provider_uid)` is not linked to **another** account (409 `identity_in_use` if it is);
+     - deletes the account's existing identity for that provider;
+     - inserts the new one;
+     - writes a security event.
+
+  `unique(account_id, provider)` holds at every point, so legitimate recovery is always possible. If the new identity is the same as the old one (for example, someone regained their GitHub account), the step is a no-op success.
+- **A full, freshly re-authenticated session** may also replace an identity. For example, someone who still has Nostr can swap GitHub accounts.
+- **The last identity** still can't be removed without a replacement.
+
+**Removal when access is truly lost (condition 3).** These are two different actions:
+
+| Action | Effect | Reversible | Evidence required | Approval |
+|---|---|---|---|---|
+| **Emergency unpublication** | `visibility='private'`, the unlisted token cleared; data kept | yes: the owner can republish after signing in | *Reasonable evidence*: a request from a linked identity's public channel (an issue opened by that GitHub login, a note signed by that npub); or a credible report of impersonation, harassment or exposed personal data | one maintainer; logged in `admin_actions`; the owner sees a notice at next sign-in |
+| **Account deletion** | Cascading delete of all rows | **no** | *Strong evidence*: proof of control of a linked identity at the time of the request, either a GitHub-authenticated request through the app or a Nostr event signed by the linked pubkey for a maintainer-issued challenge. Or a legal obligation reviewed by Bitsacco | **two** maintainers; logged with `account_id` nulled after deletion |
+
+- **Without strong evidence,** only unpublication is done. Data-protection law (for example Kenya's Data Protection Act 2019 and Tanzania's Personal Data Protection Act 2022) may impose further duties. The procedure gets **legal review by Bitsacco before general release**.
+- **Admin actions** are a CLI against the API with a separate admin credential. There is no web admin UI in Phase 3.
+
+**Deferred (condition 4):** automatic unlisting after inactivity is not part of the authentication release.
+
+**Security tests (written with Increment 2a)**
+- **Codes:**
+  - each code works once;
+  - the 21st of 20 concurrent uses of one code still gives exactly one success;
+  - regenerating invalidates the whole previous set;
+  - the same 401 comes back for an unknown code, a used code, a malformed code and an empty input.
+- **Rate limits:** per IP, per /24 and global, each returning 429, with no account identifier accepted or echoed.
+- **The recovery session:**
+  - it revokes other sessions;
+  - it gets 403 on every route outside its allowlist;
+  - it expires at 15 minutes.
+- **Replacement:**
+  - same-provider replacement swaps the identity in one transaction;
+  - replacing with an identity linked elsewhere gives 409 and leaves both accounts unchanged;
+  - replacement keeps `unique(account_id, provider)` and `unique(provider, provider_uid)`.
+- **Admin actions:**
+  - unpublish makes HTML and API 404 at once and is reversible;
+  - delete requires two approvals and cascades every table.
+- **Logging:** security events contain no codes, tokens or full IP addresses.
 
 ### F6. Retention (D13): tested
 
@@ -544,14 +668,14 @@ Each increment is its own PR from an up-to-date `main` (`254e757` or later). Eve
 
 | # | Item | Owner | Blocks |
 |---|---|---|---|
-| 1 | ~~Review and merge PR #5~~ **Done** (`254e757`) | Maintainer | n/a |
-| 2 | Approve the recovery design (F5) | Maintainer | 2a |
-| 3 | Create a **test GitHub App** on a personal account (no permissions), and share its id, client id and secret, installation id and private key through a secure channel, not in chat | Maintainer | 2a (sign-in development) and G4 (installation-token check) |
-| 4 | Run the G4 check (`installation-search.mjs`) and decide on (a), (b) or (c) if it fails | Claude runs it; maintainer decides | 4 |
-| 5 | Approve `nostr-tools` for the NIP-46 client only (D11) | Maintainer | 2c |
-| 6 | Arrange an Android device and two NIP-46 signers for interop testing | Maintainer or volunteer | 2c release |
-| 7 | Confirm DNS control for `jifunze.bitsacco.com` and a staging host | Maintainer | Deployment (not development) |
-| 8 | Appoint Kiswahili reviewers (Kenya and Tanzania) | Maintainer | Release of new terminology |
+| 1 | ~~Merge PR #5~~ **Done** (`254e757`) | Maintainer | n/a |
+| 2 | Approve revision 3's recovery flow (F5) and visibility mechanism (E2) | Maintainer | 2a and 3 |
+| 3 | Provide the test GitHub App credentials (no permissions, personal account) through a secure channel | Maintainer | 2a and G4 |
+| 4 | Run the G4 installation-token check; if it fails, bring back the evidence and the smallest alternative. No stored user tokens | Claude runs it; maintainer decides | 4 |
+| 5 | Approve `connect-src 'self' wss:` on the sign-in page only, for NIP-46 bunkers (F3) | Maintainer | 2c |
+| 6 | An Android phone and two independent NIP-46 signers for interop testing | Maintainer or volunteer | 2c release (not 2a or 2b) |
+| 7 | DNS for `jifunze.bitsacco.com` and a staging host | Maintainer | Deployment |
+| 8 | Appoint Kiswahili reviewers (Kenya and Tanzania); legal review of the removal procedure (F5) | Maintainer and Bitsacco | Release of affected terminology and auth |
 
 ### Risks
 

@@ -19,7 +19,7 @@ export function siteNav(lang: Lang): NavItem[] {
   ];
 }
 
-/** One compact row that stays pinned while scrolling: brand left, navigation, language switch right. */
+/** One compact row pinned by CSS while scrolling: brand on the left, navigation and language switch grouped on the right. */
 export function SiteHeader({ lang }: { lang: Lang }) {
   return (
     <header data-site-header className="site-header sticky top-0 z-40 h-[var(--header-h)] border-b border-white/10 bg-night text-white">
@@ -29,7 +29,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       >
         {t(lang, "skipToContent")}
       </a>
-      <div className="mx-auto flex h-full max-w-6xl items-center gap-8 px-4 sm:px-6">
+      <div className="mx-auto flex h-full max-w-[96rem] items-center gap-6 px-4 sm:px-6 lg:px-8">
         <BrandLockup lang={lang} />
         <HeaderNav items={siteNav(lang)} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
           <LanguageSwitch lang={lang} />

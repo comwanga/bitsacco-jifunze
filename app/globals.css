@@ -67,26 +67,6 @@ html {
   scroll-padding-top: calc(var(--header-h) + 0.75rem);
 }
 
-/* The header keeps one height; scrolling only adds a shadow and an edge, so nothing below it moves. */
-@supports (animation-timeline: scroll()) {
-  .site-header {
-    animation: header-lift linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 96px;
-  }
-}
-
-@keyframes header-lift {
-  from {
-    border-bottom-color: transparent;
-    box-shadow: 0 0 0 0 rgb(6 9 28 / 0);
-  }
-  to {
-    border-bottom-color: rgb(255 255 255 / 0.1);
-    box-shadow: 0 10px 24px -12px rgb(6 9 28 / 0.6);
-  }
-}
-
 body {
   background: var(--bg);
   color: var(--fg);

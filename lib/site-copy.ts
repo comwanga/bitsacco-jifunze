@@ -15,7 +15,8 @@ const en = {
   footerLearning: "Learning",
   footerResources: "Resources",
   footerProject: "Project",
-  navPractice: "Practice",
+  footerLab: "Lightning lab",
+  footerPractice: "Practice simulations",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -33,7 +34,8 @@ const sw: SiteCopy = {
   footerLearning: "Kujifunza",
   footerResources: "Rasilimali",
   footerProject: "Mradi",
-  navPractice: "Mazoezi",
+  footerLab: "Maabara ya Lightning",
+  footerPractice: "Mazoezi ya Bitcoin",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

@@ -1,0 +1,193 @@
+import { createHmac, randomBytes, randomUUID } from "node:crypto";
+import { z } from "zod";
+import type { Config } from "./config.ts";
+import { logEvent } from "./accounts.ts";
+import { ApiError } from "./errors.ts";
+import type { Route, Sql } from "./http.ts";
+import { Limiter, perIp, slash24 } from "./ratelimit.ts";
+import { createSession, revokeOtherSessions } from "./sessions.ts";
+
+/*
+ * Single-use recovery codes. A code is 16 characters of base32 (80 bits), shown in
+ * four groups of four. Only HMAC-SHA256(pepper, normalised code) is stored, with the
+ * pepper version, so the pepper can be rotated without invalidating issued codes.
+ * Plaintext is returned once by issueCodes and never stored or logged.
+ */
+
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+const CODES_PER_SET = 10;
+const CODE_LENGTH = 16;
+
+function oneCode(): string {
+  // 10 random bytes = 80 bits = 16 groups of 5 bits; each group maps straight onto a base32 character.
+  let acc = 0;
+  let bits = 0;
+  let out = "";
+  for (const byte of randomBytes(10)) {
+    acc = (acc << 8) | byte;
+    bits += 8;
+    while (bits >= 5) {
+      out += ALPHABET[(acc >>> (bits - 5)) & 31];
+      bits -= 5;
+    }
+    acc &= (1 << bits) - 1;
+  }
+  return `${out.slice(0, 4)}-${out.slice(4, 8)}-${out.slice(8, 12)}-${out.slice(12, 16)}`;
+}
+
+export function generateCodes(): string[] {
+  const set = new Set<string>();
+  while (set.size < CODES_PER_SET) set.add(oneCode());
+  return [...set];
+}
+
+export function normaliseCode(input: unknown): string | null {
+  if (typeof input !== "string" || input.length > 64) return null;
+  const n = input.toUpperCase().replace(/[-\s]/g, "");
+  if (n.length !== CODE_LENGTH) return null;
+  for (const ch of n) if (!ALPHABET.includes(ch)) return null;
+  return n;
+}
+
+export function hashCode(pepper: Buffer, normalised: string): Buffer {
+  return createHmac("sha256", pepper).update(normalised).digest();
+}
+
+/** Replaces the account's whole set in one transaction and returns the new plaintext codes. */
+export async function issueCodes(sql: Sql, cfg: Config, accountId: string): Promise<string[]> {
+  const pepper = cfg.peppers.get(cfg.currentPepper);
+  if (!pepper) throw new Error("current recovery pepper is not configured");
+  const codes = generateCodes();
+  const setId = randomUUID();
+  await sql.begin(async (tx) => {
+    await tx`delete from recovery_codes where account_id = ${accountId}`;
+    for (const c of codes) {
+      await tx`
+        insert into recovery_codes (code_hash, pepper_version, account_id, set_id)
+        values (${hashCode(pepper, normaliseCode(c)!)}, ${cfg.currentPepper}, ${accountId}, ${setId})`;
+    }
+    await tx`update accounts set recovery_codes_issued_at = now()
+      where id = ${accountId} and recovery_codes_issued_at is null`;
+  });
+  return codes;
+}
+
+/** Atomically marks the matching unused code as used (checked under every pepper version); returns its account. */
+export async function consumeCode(sql: Sql, cfg: Config, normalised: string): Promise<string | null> {
+  const hashes = [...cfg.peppers.values()].map((p) => hashCode(p, normalised));
+  const rows = await sql<{ account_id: string }[]>`
+    update recovery_codes set used_at = now()
+    where code_hash = any(${sql.array(hashes, 17)}) and used_at is null
+    returning account_id`;
+  return rows[0]?.account_id ?? null;
+}
+
+const FLOOD_THRESHOLD = 300;
+const HOUR_MS = 3_600_000;
+
+/** Blocks only per source: 5 per 15 minutes per IP (/64 for IPv6), 20 per hour per /24 (/48 for IPv6). */
+export const RECOVERY_RULES = [
+  { name: "recovery-ip", key: perIp, limit: 5, windowMs: 900_000 },
+  { name: "recovery-net", key: slash24, limit: 20, windowMs: HOUR_MS },
+];
+
+/** Counts every attempt; the first one past the threshold in an hour is reported once. Never blocks. */
+export class FloodWatch {
+  private windowEnd = 0;
+  private count = 0;
+  private reported = false;
+  private readonly now: () => number;
+  constructor(now: () => number = Date.now) {
+    this.now = now;
+  }
+  /** Returns the count when this call should write the hourly alert, else null. */
+  note(): number | null {
+    const t = this.now();
+    if (t >= this.windowEnd) {
+      this.windowEnd = t + HOUR_MS;
+      this.count = 0;
+      this.reported = false;
+    }
+    this.count += 1;
+    if (this.count > FLOOD_THRESHOLD && !this.reported) {
+      this.reported = true;
+      return this.count;
+    }
+    return null;
+  }
+}
+
+export function recoveryRoutes(
+  limiter: Limiter = new Limiter(RECOVERY_RULES),
+  flood: FloodWatch = new FloodWatch(),
+): Route[] {
+  const redeem: Route = {
+    method: "POST",
+    path: "/api/auth/recovery",
+    auth: "public",
+    body: z.object({ code: z.string().max(256) }).strict(),
+    handler: async ({ body, ip, sql, cfg }) => {
+      // Limits first, before any normalisation or lookup. Only per-source limits ever block.
+      if (!limiter.hit(ip)) throw new ApiError(429, "rate_limited");
+      const flooded = flood.note();
+      if (flooded !== null) {
+        try {
+          await logEvent(sql, null, "recovery_flood", { count: String(flooded) });
+        } catch {
+          // The alert must never turn into a failure for the caller.
+        }
+      }
+
+      const normalised = normaliseCode((body as { code: string }).code);
+      const accountId = normalised ? await consumeCode(sql, cfg, normalised) : null;
+      if (!accountId) throw new ApiError(401, "recovery_invalid");
+
+      await revokeOtherSessions(sql, accountId);
+      const { cookie } = await createSession(sql, accountId, "recovery");
+      await logEvent(sql, accountId, "recovery_code_used");
+      const [acct] = await sql<{ preferred_lang: string }[]>`
+        select preferred_lang from accounts where id = ${accountId}`;
+      const lang = acct?.preferred_lang === "en" ? "en" : "sw";
+      return { status: 200, json: { redirect: `/${lang}/account/recovery/` }, setCookies: [cookie] };
+    },
+  };
+
+  const initial: Route = {
+    method: "POST",
+    path: "/api/me/recovery-codes/initial",
+    auth: "full",
+    handler: async ({ sql, cfg, session }) => {
+      const id = session!.accountId;
+      // Claim first so two racing first calls cannot both be shown a set.
+      const claimed = await sql`
+        update accounts set recovery_codes_issued_at = now()
+        where id = ${id} and recovery_codes_issued_at is null returning 1`;
+      if (claimed.length === 0) throw new ApiError(409, "codes_already_issued");
+      try {
+        return { status: 200, json: { codes: await issueCodes(sql, cfg, id) } };
+      } catch (e) {
+        await sql`update accounts set recovery_codes_issued_at = null where id = ${id}`;
+        throw e;
+      }
+    },
+  };
+
+  const regenerate: Route = {
+    method: "POST",
+    path: "/api/me/recovery-codes",
+    auth: "any",
+    recoveryAllowed: true,
+    handler: async ({ sql, cfg, session }) => {
+      const s = session!;
+      if (s.scope === "full") {
+        // Re-read from the database: a stale copy must not grant access.
+        const fresh = await sql`
+          select 1 from sessions where token_hash = ${s.tokenHash} and reauth_at > now() - interval '10 minutes'`;
+        if (fresh.length === 0) throw new ApiError(403, "reauth_required");
+      }
+      return { status: 200, json: { codes: await issueCodes(sql, cfg, s.accountId) } };
+    },
+  };
+
+  return [redeem, initial, regenerate];
+}

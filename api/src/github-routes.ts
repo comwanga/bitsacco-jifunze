@@ -4,7 +4,7 @@ import { consumeChallenge, createChallenge, peekLang, safeReturn } from "./chall
 import { ApiError, type ErrorCode } from "./errors.ts";
 import { authorizeUrl, githubIdentity } from "./github.ts";
 import { PREAUTH_COOKIE, type Reply, type Route } from "./http.ts";
-import { Limiter } from "./ratelimit.ts";
+import { Limiter, perIp } from "./ratelimit.ts";
 import { createSession, revokeSession } from "./sessions.ts";
 
 type Lang = "sw" | "en";
@@ -13,8 +13,10 @@ const clearPreauth = `${PREAUTH_COOKIE}=; ${COOKIE_ATTRS}; Max-Age=0`;
 const asLang = (v: string | null): Lang | null => (v === "sw" || v === "en" ? v : null);
 const signinError = (lang: Lang, code: ErrorCode): string => `/${lang}/account/signin/?error=${code}`;
 
+export const GITHUB_START_RULE = { name: "github-start-ip", key: perIp, limit: 30, windowMs: 600_000 };
+
 export function githubRoutes(
-  limiter: Limiter = new Limiter([{ name: "github-start-ip", key: (ip) => ip, limit: 30, windowMs: 600_000 }]),
+  limiter: Limiter = new Limiter([GITHUB_START_RULE]),
 ): Route[] {
   const start: Route = {
     method: "GET",

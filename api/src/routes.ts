@@ -1,5 +1,6 @@
 import type { Route } from "./http.ts";
 import { githubRoutes } from "./github-routes.ts";
+import { recoveryRoutes } from "./recovery.ts";
 import { logoutRoute, meRoute } from "./sessions.ts";
 
 export const healthRoute: Route = {
@@ -9,4 +10,4 @@ export const healthRoute: Route = {
   handler: async () => ({ status: 200, json: { ok: true } }),
 };
 
-export const routes: Route[] = [healthRoute, meRoute, logoutRoute, ...githubRoutes()];
+export const routes: Route[] = [healthRoute, meRoute, logoutRoute, ...githubRoutes(), ...recoveryRoutes()];

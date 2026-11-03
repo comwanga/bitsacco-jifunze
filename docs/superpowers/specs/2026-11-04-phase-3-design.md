@@ -12,6 +12,8 @@ The investigation evidence is in [`spikes/2026-11-04-phase-3`](../spikes/2026-11
 - concurrency tests for identity replacement (F5);
 - a release gate (H3).
 
+**Revision 3.2** (2026-11-04) corrects unlisted-link usability: the fragment is **kept**, so refresh, copying and language switching work; unlisted links are documented as bearer credentials; the tests are updated (E2).
+
 **Implementation starts** when this PR is merged and the test GitHub App is available (section I), with Increment 2a first.
 
 Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practise → Build → Contribute → Grow).
@@ -151,7 +153,7 @@ Revision 1's wireframes (sign-in, directory, profile, dashboard, settings and Gi
 - **Settings** gains a recovery-codes block: "Misimbo 8 kati ya 10 imebaki · Tengeneza upya" (8 of 10 codes left · Regenerate). Regenerating requires re-authentication and invalidates the old set.
 - **Visibility control** has three options:
   - Umma / Public: in the directory and at its link.
-  - Bila kuorodheshwa / Unlisted: only at a private link, which can be reset.
+  - Bila kuorodheshwa / Unlisted: only at a private link, which can be reset. It is labelled as working like a key: anyone holding the link can view (E2).
   - Binafsi / Private: nowhere.
 
   It carries an honest note: "Ukiufanya binafsi, unaacha kuonekana mara moja kwenye Jifunze. Nakala ambazo watu walishapakua kwenye vifaa vyao hatuwezi kuzifuta." (When you make it private, it stops showing on Jifunze immediately. We can't delete copies people already downloaded to their own devices.)
@@ -230,7 +232,10 @@ location = /en/community/unlisted/ { include /etc/nginx/snippets/unlisted-shell.
 **Unlisted-link leak protection** (revision 3.1). Verified current state: the site sends `Referrer-Policy: no-referrer` on every response, and has no analytics or third-party scripts. nginx's default access log does record full request URIs, so a token in the path would have been logged. Therefore:
 
 1. **The token lives in the URL fragment** (`#k=…`). Browsers never send fragments to servers, so it can't appear in nginx or API access logs, proxies or CDNs, and fragments are always removed from referrers.
-   - The shell reads `location.hash`, then immediately calls `history.replaceState` to remove the fragment from the address bar and history entry.
+   - The shell reads the token from `location.hash` and **leaves the fragment in place** (revision 3.2). Revision 3.1's `history.replaceState` would have broken refresh, copying and language switching. This means:
+     - **Refresh** reloads the same URL, fragment included, so access continues.
+     - **Copy link:** the address bar holds the complete sharing link, and a "Nakili kiungo / Copy link" button copies `location.href` exactly.
+     - **Language switch:** the shared `LanguageSwitch` builds its link from the path alone, which would drop the fragment. On this page only, the route's own script sets the language link's `href` to the other-language shell plus the current `location.hash`, on load and on `hashchange`. The shared component and every other page are unchanged, so no shared JS is added.
    - It sends the token in a POST body, which the API never logs.
    - Messaging apps that build link previews fetch the URL without the fragment, so they see only a generic page.
 2. **`Referrer-Policy: no-referrer`** stays on every response, including the community shells and `/api/*`. A test asserts the header on those routes.
@@ -240,6 +245,24 @@ location = /en/community/unlisted/ { include /etc/nginx/snippets/unlisted-shell.
    - nginx logs for `/api/` use a format without `$http_referer`.
    - Retention is 14 days (F6).
 5. **The unlisted endpoint** compares sha256(token) through an indexed lookup and returns an identical 404 for invalid tokens. It is rate-limited per IP (60 per 10 minutes), though a 256-bit token can't be guessed.
+6. **No external request carries the token.**
+   - The page loads no third-party resources: the CSP allows only `'self'`, and GitHub avatars by URL, which contain no token.
+   - Outbound links (for example to GitHub PRs) send no referrer.
+   - The fragment stays only in the browser.
+
+**Unlisted links are bearer credentials** (revision 3.2). Anyone who has the link can view the profile while it stays unlisted and the token is unchanged. The link isn't tied to a person or device. Because the fragment is kept, it can also remain in:
+- the viewer's browser history, synced history and bookmarks;
+- chat apps and email where it was shared;
+- the address bar, which browser extensions with "read your browsing history" permission can see.
+
+**Revoking the link:**
+- **Reset link** issues a new token, and the old link stops working on its next request.
+- Switching to **private** stops every link.
+- Neither can erase copies of the link held elsewhere, and neither needs to: an old link no longer grants access.
+
+**What the builder is told.** The settings screen says this in both languages: "Yeyote mwenye kiungo hiki anaweza kuona wasifu wako. Kitunze kama ufunguo; ukikipoteza, tengeneza kipya." (Anyone with this link can see your profile. Keep it like a key; if it leaks, make a new one.)
+
+This is the simplest correct model. There is no persistent storage and no extra authentication: just the link, revocable at any time.
 - **Caching:**
   - **Every** `/api/*` response gets `Cache-Control: no-store` and `X-Robots-Tag: noindex`.
   - Profile HTML gets `Cache-Control: no-store`.
@@ -269,10 +292,18 @@ location = /en/community/unlisted/ { include /etc/nginx/snippets/unlisted-shell.
   - switch unlisted → private → the token link fails;
   - switch private → public → the handle URL works at once;
   - delete the account → every link fails.
+- **Unlisted-link usability** (revision 3.2):
+  - opening a shared `#k=` link shows the profile;
+  - **refresh** shows it again;
+  - **switching** sw→en and en→sw keeps the fragment and shows the profile in the other language;
+  - the language link on every **other** page is unchanged;
+  - **Copy link** puts the exact full URL, fragment included, on the clipboard;
+  - **resetting** the token makes an open tab show "not available" on refresh, while the new link works;
+  - **switching to private** makes the existing link fail on refresh.
 - **Leak protection:**
-  - nginx and API access logs from a test run contain no unlisted token (a log scan in CI);
-  - `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex, nofollow` are present on the unlisted shell;
-  - the fragment is removed from the address bar after load.
+  - across all of the flows above, nginx and API access logs contain no unlisted token (a log scan in CI);
+  - every request the browser makes during those flows, captured in Playwright, has the token only in the body of `POST /api/public/builders/unlisted`: never in a URL, in a `Referer`, or on another host;
+  - `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex, nofollow` are present on the unlisted shell.
 - **Status codes:**
   - public → HTML 200, and the API returns data;
   - set private → HTML **404** on the next request;

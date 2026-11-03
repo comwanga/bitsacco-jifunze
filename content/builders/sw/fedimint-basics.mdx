@@ -1,0 +1,78 @@
+---
+title: "Fedimint: mashirikisho, ecash na walinzi"
+description: "Jinsi kikundi cha walinzi kinavyoweza kushika bitcoin kwa pamoja na kutoa ecash ya faragha, na mahali lango za Lightning zinapoingia."
+level: intermediate
+minutes: 45
+objectives:
+  - Eleza kazi ya shirikisho, mlinzi na lango
+  - Eleza jinsi sahihi zilizofichwa zinavyofanya ecash iwe ya faragha
+  - Pima uaminifu unaohitajika katika shirikisho ukilinganisha na kujitunzia na pochi za mtunzaji
+resources:
+  - title: "Fedimint"
+    url: "https://fedimint.org"
+    kind: docs
+    language: en
+  - title: "Fedimint source code"
+    url: "https://github.com/fedimint/fedimint"
+    kind: tool
+    language: en
+  - title: "Kujifunza Bitcoin, sura ya 14: matumizi ya tabaka la pili"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+    note: "Fedimint yenyewe haijaelezwa kitabuni; sura ya 14 inatoa msingi wa tabaka la pili."
+reflection:
+  - "Ni watu gani katika jumuiya yako wangefaa kuwa walinzi, na ungewaomba waahidi nini?"
+  - "Shirikisho la walinzi wanne lingefanya nini mmoja wao akizimika? Wawili wakizimika?"
+source:
+  type: original
+terms:
+  - fedimint
+  - federation
+  - guardian
+  - ecash
+  - multisig
+---
+
+Njia ya wawekaji ilitambulisha Fedimint kama ulinzi wa kijumuiya. Somo hili linaangalia jinsi inavyofanya kazi ndani, ili uweze kujenga juu yake.
+
+## Hatua ya 1: Sehemu zake
+
+| Sehemu | Kazi |
+| --- | --- |
+| <Term id="guardian">Walinzi</Term> | Huendesha seva za shirikisho, hushika vipande vya funguo na hukubaliana juu ya kila badiliko |
+| <Term id="federation">Shirikisho</Term> | Walinzi wote kwa pamoja: pochi ya <Term id="multisig" /> pamoja na kiwanda cha noti |
+| Noti za <Term id="ecash" /> | Tokeni za mmiliki wanazoshika watumiaji, kila moja ikiwa na thamani maalum ya millisats |
+| Lango | Nodi ya Lightning inayobadilisha ecash kuwa malipo ya Lightning, pande zote mbili |
+| Mteja | Programu ya mtumiaji, inayohifadhi noti za ecash na kuwasiliana na walinzi na malango |
+
+## Hatua ya 2: Makubaliano
+
+Walinzi huendesha makubaliano yanayostahimili hitilafu za Byzantine. Kwa walinzi *n*, shirikisho linaendelea kufanya kazi mradi walio na hitilafu ni chini ya theluthi moja: walinzi wanne wanastahimili mlinzi mmoja mbaya au aliyezimika, saba wanastahimili wawili. Kila amana, utoaji wa noti na utoaji wa pesa hukubaliwa na kiwango kinachohitajika kabla ya kutokea.
+
+**Umemaliza ukiweza:** kusema shirikisho la walinzi 10 linastahimili walinzi wangapi wenye hitilafu. (Jibu: 3.)
+
+## Hatua ya 3: Kwa nini ecash ni ya faragha
+
+Unapotengeneza ecash, programu yako **huficha** noti ya bahati nasibu kabla ya kuituma kwa walinzi waitie sahihi, kama kuiweka kwenye bahasha yenye karatasi ya kunakili ndani. Walinzi hutia sahihi bila kuiona noti. Baadaye, mtu yeyote anapoikomboa, walinzi wanaweza kuhakikisha sahihi yao ni halali lakini hawawezi kuiunganisha na wakati ilipotolewa. Hilo ndilo wazo la zamani la ecash ya Chaum, likiendeshwa na shirikisho badala ya benki moja.
+
+## Hatua ya 4: Pesa kuingia na kutoka
+
+- **Kuingiza (peg-in):** mtumiaji huweka bitcoin kwenye anwani ya multisig ya shirikisho na hupokea thamani ile ile kwa ecash, ukiondoa ada.
+- **Kutoa (peg-out):** mtumiaji hurudisha ecash na shirikisho hulipa kwenye blockchain.
+- **Lightning:** ili kulipa ankara, programu ya mteja humpa lango ecash, nalo hulipa ankara kutoka chaneli zake. Ili kupokea, lango hulipwa kwa Lightning na humpa mtumiaji ecash. Mkataba huhakikisha lango linalipwa tu likikamilisha malipo kweli.
+
+<Callout type="warning" title="Uaminifu umepunguzwa, haujaondolewa">
+Watumiaji wanaamini kwamba walinzi wengi watabaki waaminifu na hewani. Chagueni walinzi wanaojulikana na jumuiya, walio sehemu tofauti, wanaotumia vifaa na waendeshaji tofauti. Fedimint ni nzuri sana kwa kikundi chenye uaminifu tayari, kama chama; si mbadala wa kujitunzia akiba kubwa ya muda mrefu.
+</Callout>
+
+## Maabara
+
+1. Nakili hazina ya Fedimint na usome README yake na orodha ya moduli. Tafuta msimbo wa kiwanda cha noti, pochi ya blockchain na Lightning.
+2. Chora mchoro wa shirikisho la walinzi wanne lenye lango moja, na ufuatilie malipo ya Lightning kutoka ecash ya mtumiaji hadi ankara ya duka.
+3. Ukitaka kuliendesha kwenye kompyuta yako, fuata maelekezo ya maendeleo kwenye nyaraka za hazina hiyo; yanaanzisha shirikisho la majaribio kwenye regtest.
+
+## Ushahidi wa maabara
+
+- Mchoro wako, ukiwa na mitiririko ya kuingiza, ecash na Lightning imeandikwa majina.
+- Ustahimilivu wa hitilafu wa mashirikisho yenye walinzi 4, 7 na 10.

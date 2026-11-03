@@ -1,0 +1,87 @@
+---
+title: "Contributing to Bitsacco open source"
+description: "From finding an issue to a merged pull request: the workflow, the etiquette and the checks, practised on Bitsacco's own repositories, including this one."
+level: intermediate
+minutes: 60
+objectives:
+  - Find a good first issue and understand a project's contribution rules
+  - Make a small, focused change on a branch and open a clear pull request
+  - Respond to code review and keep CI green
+resources:
+  - title: "Bitsacco on GitHub"
+    url: "https://github.com/bitsacco"
+    kind: community
+    language: en
+  - title: "Bitcoin Core contributing guide"
+    url: "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md"
+    kind: docs
+    language: en
+reflection:
+  - "What makes a pull request easy for a busy maintainer to review?"
+  - "How would you respond to review feedback you disagree with?"
+source:
+  type: adapted
+  from: "Pull"
+  url: "https://pullos.dev"
+  licence: "CC BY-SA 4.0"
+  credit: "Adapted from the Pull curriculum, open source discovery, review and PR lessons"
+translationOf: sw
+terms:
+  - open-source
+  - pull-request
+---
+
+<Term id="open-source">Open-source</Term> projects grow one small, careful change at a time. Bitsacco's code lives at github.com/bitsacco: the website and mini-apps in TypeScript (`bitsacco/bitsacco`), a Lightning Address server in Rust (`bitsacco/lnaddrd`), and this learning platform. Every change reaches users only through a reviewed <Term id="pull-request" /> and a green CI run.
+
+## Step 1: Find something worth doing
+
+1. Read the project's README and `CONTRIBUTING.md` first. They tell you how to build, test and format.
+2. Look for issues labelled `good first issue` or `help wanted`, or ones you can reproduce yourself.
+3. Comment on the issue before you start: "I'd like to work on this; here's my plan." It avoids duplicate work.
+
+For Jifunze, great first contributions are fixing a typo, improving a Kiswahili sentence, adding a glossary term, or translating a lesson.
+
+**Done when:** you have chosen an issue and a maintainer knows you're on it.
+
+## Step 2: Make the change
+
+```bash
+gh repo fork bitsacco/jifunze --clone
+cd jifunze
+git switch -c fix/wallets-keys-wording
+npm ci
+# edit content/savers/sw/wallets-keys.mdx
+npm run validate
+npm run check
+git commit -am "content(savers): clarify seed phrase backup wording in Kiswahili"
+git push -u origin fix/wallets-keys-wording
+```
+
+Keep each PR to **one idea**. Write the commit message so that someone reading the history in a year understands why.
+
+## Step 3: Open a clear pull request
+
+A good description answers three questions:
+
+| Question | Example |
+| --- | --- |
+| What changed? | Reworded step 2 of the backup list in the Kiswahili lesson. |
+| Why? | "Usiyaandike mtandaoni" was ambiguous; readers thought it meant only social media. |
+| How was it checked? | `npm run validate` passes; a Kiswahili reviewer read the new wording. |
+
+Link the issue with `Closes #123`. Add screenshots for any visual change.
+
+## Step 4: Review and CI
+
+- If CI fails, read the log, fix it, and push again; don't ask reviewers to look at red builds.
+- Answer every review comment, even if only "Done in abc123". If you disagree, explain why with evidence and stay polite.
+- Review other people's PRs too. Reading code is how you learn a codebase fastest.
+
+<Callout type="tip" title="Licences matter">
+Jifunze code is MIT and lessons are CC BY-SA 4.0. By opening a PR to `content/`, you agree your lesson or translation is released under CC BY-SA. Never copy text you don't have the right to share.
+</Callout>
+
+## Lab evidence
+
+- A link to your pull request (to Jifunze, another Bitsacco repo, or a practice fork).
+- Your PR description, with what, why and how it was checked.

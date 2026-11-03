@@ -1,0 +1,49 @@
+{
+  "lesson": "utxos-transactions",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "UTXO ni nini?", "en": "What is a UTXO?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Salio la akaunti linalotunzwa na benki", "en": "An account balance kept by a bank" } },
+        { "id": "b", "label": { "sw": "Tokeo la muamala ambalo bado halijatumika", "en": "A transaction output that hasn't been spent yet" } },
+        { "id": "c", "label": { "sw": "Aina ya pochi ya simu", "en": "A type of mobile wallet" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Salio lako ni jumla ya UTXO ambazo funguo zako zinaweza kufungua.", "en": "Your balance is the sum of the UTXOs your keys can unlock." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Pembejeo ni BTC 0.6 na 0.5; matokeo ni BTC 0.3 na 0.79. Ada ni kiasi gani?", "en": "Inputs are 0.6 and 0.5 BTC; outputs are 0.3 and 0.79 BTC. What is the fee?" },
+      "options": [
+        { "id": "a", "label": { "sw": "BTC 0.01", "en": "0.01 BTC" } },
+        { "id": "b", "label": { "sw": "BTC 0.1", "en": "0.1 BTC" } },
+        { "id": "c", "label": { "sw": "BTC 1.09", "en": "1.09 BTC" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "1.1 - 1.09 = 0.01. Ada ni kinachobaki kati ya pembejeo na matokeo.", "en": "1.1 - 1.09 = 0.01. The fee is what's left between inputs and outputs." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Kwa nini malipo mengi yana tokeo la pili linalorudi kwa mlipaji?", "en": "Why do most payments have a second output back to the payer?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Ni chenji, kwa sababu UTXO hutumika nzima", "en": "It's change, because UTXOs are spent whole" } },
+        { "id": "b", "label": { "sw": "Ni zawadi ya mchimbaji", "en": "It's the miner's reward" } },
+        { "id": "c", "label": { "sw": "Ni nakala ya akiba", "en": "It's a backup copy" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Kama noti ya 500 kwa malipo ya 300: unarudishiwa chenji.", "en": "Like paying 300 with a 500 note: you get change back." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Muamala uliotumwa lakini bado haujaingia kwenye bloku uko wapi?", "en": "Where is a transaction that was sent but isn't in a block yet?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kwenye mempool", "en": "In the mempool" } },
+        { "id": "b", "label": { "sw": "Kwenye maneno ya siri", "en": "In the seed phrase" } },
+        { "id": "c", "label": { "sw": "Umepotea", "en": "It is lost" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Mempool ni foleni ya miamala inayosubiri kuchimbwa.", "en": "The mempool is the queue of transactions waiting to be mined." }
+    }
+  ]
+}

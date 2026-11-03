@@ -1,0 +1,97 @@
+---
+title: "Lightning: chaneli, ankara na misingi ya kupitisha malipo"
+description: "Jinsi miamala miwili ya Bitcoin inavyoweza kubeba maelfu ya malipo: chaneli, ankara za BOLT11, upitishaji na ukwasi, kwa mtandao wa Polar wa ndani."
+level: intermediate
+minutes: 60
+objectives:
+  - Eleza jinsi chaneli inavyofunguliwa, kutumiwa na kufungwa
+  - Fafanua ankara ya BOLT11 na utaje sehemu zake kuu
+  - Lipa kupitia njia ya nodi tatu na ueleze ukwasi wa kuingia na wa kutoka
+resources:
+  - title: "Kujifunza Bitcoin, sura ya 14: matumizi ya tabaka la pili (chaneli za malipo na Lightning)"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "BOLT specifications"
+    url: "https://github.com/lightning/bolts"
+    kind: docs
+    language: en
+  - title: "Polar"
+    url: "https://lightningpolar.com/"
+    kind: tool
+    language: en
+  - title: "Lightning Network"
+    url: "https://lightning.network"
+    kind: article
+    language: en
+reflection:
+  - "Kwa nini Alice hawezi kupokea malipo kwenye chaneli aliyoifungua akiwa na pesa zote upande wake?"
+  - "Ni sehemu gani za malipo ya Lightning ziko kwenye blockchain, na zipi haziko?"
+source:
+  type: adapted
+  from: "Pull"
+  url: "https://pullos.dev"
+  licence: "CC BY-SA 4.0"
+  credit: "Limetoholewa kutoka mtaala wa Pull, masomo ya Lightning overview, channels na invoices"
+terms:
+  - lightning
+  - channel
+  - invoice
+  - node
+  - multisig
+---
+
+<Term id="lightning">Mtandao wa Lightning</Term> huhamisha malipo nje ya blockchain. Pande mbili hufunga bitcoin kwenye tokeo la pamoja mara moja, kisha husasisha nani anamiliki kiasi gani mara nyingi wapendavyo, na humaliza kwenye blockchain tu wanapomaliza.
+
+## Hatua ya 1: Chaneli kwa hatua tatu
+
+1. **Kufungua.** Alice na Bob hutengeneza muamala wa ufadhili unaolipa kwenye tokeo la <Term id="multisig" /> la 2 kati ya 2. Huchimbwa kama muamala mwingine wowote.
+2. **Kusasisha.** Kwa kila malipo wanatia sahihi *muamala mpya wa ahadi* unaogawanya pesa kwa namna tofauti. Hali za zamani hubatilishwa, kwa hiyo kuchapisha moja kungemruhusu upande mwingine kuchukua kila kitu.
+3. **Kufunga.** Upande wowote huchapisha ahadi ya hivi karibuni, au wote wawili hutia sahihi ufungaji wa ushirikiano. Salio la mwisho huenda kwenye blockchain.
+
+<Term id="channel">Chaneli</Term> ina **uwezo** (kiasi cha ufadhili) uliogawanywa katika ukwasi wa **kutoka** (unachoweza kutuma) na ukwasi wa **kuingia** (unachoweza kupokea).
+
+**Umemaliza ukiweza:** kueleza kwa nini chaneli mpya iliyofadhiliwa na Alice peke yake haiwezi kupokea.
+
+## Hatua ya 2: Upitishaji
+
+Alice hahitaji chaneli na kila mtu. Kama chaneli za Alice→Bob na Bob→Carol zipo, Alice anaweza kumlipa Carol kupitia Bob. HTLC (mikataba ya hashi yenye kufuli la muda) hufanya kila hatua itegemee kufichua siri, yaani **preimage**, kwa hiyo ama njia yote inakamilika au hakuna sehemu inayokamilika. Bob anapata ada ndogo ya upitishaji.
+
+## Hatua ya 3: Ankara
+
+<Term id="invoice">Ankara</Term> ya BOLT11 kama `lnbcrt10u1p...` husimba:
+
+| Sehemu | Maana |
+| --- | --- |
+| `lnbcrt` | Lightning, mtandao wa regtest |
+| `10u` | Kiasi: micro-bitcoin 10 = sats 1,000 |
+| hashi ya malipo | Hashi ya preimage inayofungua malipo |
+| maelezo | Lengo linalosomeka na binadamu |
+| muda wa kuisha | Sekunde hadi isiweze kulipwa |
+| sahihi | Huthibitisha ni <Term id="node" /> ipi iliyoitoa |
+
+## Hatua ya 4: Maabara kwa Polar
+
+1. Sakinisha Polar na utengeneze mtandao wenye nodi tatu za LND: Alice, Bob na Carol.
+2. Uanzishe, kisha chimba bloku chache na umpe Alice pesa kupitia kiolesura cha Polar.
+3. Fungua chaneli za Alice→Bob na Bob→Carol (kwa mfano sats 1,000,000 kila moja). Chimba bloku 6.
+4. Kwa Carol, tengeneza ankara ya sats 10,000. Kwenye terminal ya Alice:
+
+```bash
+lncli decodepayreq <invoice>
+lncli payinvoice <invoice>
+```
+
+**Unachotarajia:** `decodepayreq` inaonyesha kiasi, maelezo na muda wa kuisha; `payinvoice` inafaulu kwa njia inayopitia kwa Bob.
+
+Sasa jaribu kumlipa Alice kutoka kwa Carol. Ikishindikana, tazama salio la ndani na la mbali la kila chaneli na ueleze kwa nini.
+
+<Callout type="tip" title="Regtest tu">
+Polar huendesha kila kitu kwenye regtest. Usielekeze zana za maabara kwenye nodi za mainnet zenye pesa halisi.
+</Callout>
+
+## Ushahidi wa maabara
+
+- Ankara iliyofafanuliwa, ukiwa umeweka alama kwenye kiasi, maelezo na muda wa kuisha.
+- Matokeo ya malipo yaliyofaulu yanayoonyesha njia.
+- Sentensi moja inayoeleza kushindwa (au kufaulu) kwa malipo ya kinyume kwa kutumia dhana ya ukwasi.

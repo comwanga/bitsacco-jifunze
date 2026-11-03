@@ -1,0 +1,49 @@
+{
+  "lesson": "keys-addresses-descriptors",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Kipi kinaweza kuhesabiwa kutoka kwa kingine?", "en": "Which can be computed from which?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Ufunguo wa umma kutoka kwa ufunguo binafsi, si kinyume chake", "en": "The public key from the private key, not the other way round" } },
+        { "id": "b", "label": { "sw": "Ufunguo binafsi kutoka kwa anwani", "en": "The private key from the address" } },
+        { "id": "c", "label": { "sw": "Maneno ya siri kutoka kwa ufunguo wa umma", "en": "The seed phrase from the public key" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Hesabu ya mkunjo wa elliptiki ni ya njia moja tu.", "en": "Elliptic-curve multiplication only works one way." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Anwani ya regtest inayoanza na bcrt1p ni aina gani?", "en": "What type is a regtest address starting with bcrt1p?" },
+      "options": [
+        { "id": "a", "label": { "sw": "P2PKH (ya zamani)", "en": "P2PKH (legacy)" } },
+        { "id": "b", "label": { "sw": "P2TR (Taproot)", "en": "P2TR (Taproot)" } },
+        { "id": "c", "label": { "sw": "P2SH", "en": "P2SH" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "bc1p kwenye mainnet na bcrt1p kwenye regtest ni Taproot (SegWit v1).", "en": "bc1p on mainnet and bcrt1p on regtest are Taproot (SegWit v1)." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Kwenye descriptor wpkh([fp/84h/1h/0h]tpub.../1/*), /1/* inamaanisha nini?", "en": "In the descriptor wpkh([fp/84h/1h/0h]tpub.../1/*), what does /1/* mean?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Tawi la chenji, kila nambari", "en": "The change branch, every index" } },
+        { "id": "b", "label": { "sw": "Anwani moja tu", "en": "Exactly one address" } },
+        { "id": "c", "label": { "sw": "Mainnet", "en": "Mainnet" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "/0/* ni tawi la kupokea; /1/* ni la chenji.", "en": "/0/* is the receive branch; /1/* is change." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Kwa nini usishiriki xpub/tpub ovyo?", "en": "Why shouldn't you share an xpub/tpub freely?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Inafichua anwani zote na historia ya akaunti", "en": "It reveals every address and the account's history" } },
+        { "id": "b", "label": { "sw": "Inamruhusu yeyote kutumia pesa zako", "en": "It lets anyone spend your money" } },
+        { "id": "c", "label": { "sw": "Haina madhara yoyote", "en": "It is completely harmless" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Haiwezi kutumia pesa, lakini inaondoa faragha yako.", "en": "It can't spend, but it removes your privacy." }
+    }
+  ]
+}

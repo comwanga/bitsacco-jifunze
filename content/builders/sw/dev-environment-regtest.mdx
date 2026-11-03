@@ -1,0 +1,107 @@
+---
+title: "Mazingira ya msanidi programu na maabara ya regtest"
+description: "Endesha mtandao binafsi wa Bitcoin kwenye kompyuta yako, chimba bloku unapotaka, na uweke pesa za majaribio kwenye pochi kwa dakika chache."
+level: beginner
+minutes: 45
+objectives:
+  - Anzisha nodi ya regtest ya kutupwa kwa kutumia Bitcoin Core
+  - Tengeneza pochi, chimba bloku na ueleze ukomavu wa coinbase
+  - Safisha maabara yako vizuri kati ya majaribio
+resources:
+  - title: "Kujifunza Bitcoin, sura ya 3: Bitcoin Core, utekelezaji wa marejeleo"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "Bitcoin Core downloads"
+    url: "https://bitcoincore.org/en/download/"
+    kind: tool
+    language: en
+  - title: "Bitcoin Core: testing applications with regtest"
+    url: "https://developer.bitcoin.org/examples/testing.html"
+    kind: docs
+    language: en
+  - title: "Polar: one-click Lightning networks for local testing"
+    url: "https://lightningpolar.com/"
+    kind: tool
+    language: en
+    note: "Si lazima sasa; utaitumia kwenye somo la Lightning."
+reflection:
+  - "Mweleze mwenzako regtest bila maneno magumu. Inatatua tatizo gani?"
+  - "Nini kingeharibika kama ungejaribu msimbo wako kwenye mainnet badala yake?"
+source:
+  type: adapted
+  from: "Pull"
+  url: "https://pullos.dev"
+  licence: "CC BY-SA 4.0"
+  credit: "Limetoholewa kutoka mtaala wa Pull, somo la Regtest Development"
+terms:
+  - regtest
+  - node
+  - block
+  - mining
+  - wallet
+---
+
+<Term id="regtest">Regtest</Term> ni mtandao binafsi wa Bitcoin ambao ni wewe tu unayeuona. Uchimbaji ni wa papo hapo, sarafu ni bure, na makosa hayagharimu chochote. Kila somo katika njia hii linautumia kama maabara yako.
+
+## Hatua ya 1: Maneno muhimu
+
+| Neno | Maana yake | Unapolitumia |
+| --- | --- | --- |
+| **Regtest** | Mnyororo binafsi; unachimba unapotaka | Maabara yako |
+| **Testnet / signet** | Mitandao ya majaribio ya umma | Majaribio ya mara kwa mara na wengine |
+| **Mainnet** | Mtandao halisi, pesa halisi | Si kwa kujifunzia |
+| `bitcoind` / `bitcoin-cli` | Nodi na programu yake ya amri | Kuendesha na kuongoza nodi |
+| **Ukomavu wa coinbase** | Sarafu mpya zinahitaji uthibitisho 100 kabla ya kutumika | Kwa nini unachimba bloku 101 |
+| **Datadir** | Mahali nodi inapohifadhi data | Ifute ili kuanza upya |
+
+**Umemaliza ukiweza:** kueleza ukomavu wa coinbase kwa sentensi moja.
+
+## Hatua ya 2: Sakinisha na uanzishe nodi
+
+Sakinisha Bitcoin Core kutoka ukurasa rasmi wa kupakua, au tumia picha ya Docker unayoiamini. Kisha:
+
+```bash
+bitcoind -regtest -daemon -fallbackfee=0.0001
+bitcoin-cli -regtest getblockchaininfo
+```
+
+**Unachotarajia:** JSON yenye `"chain": "regtest"` na `"blocks": 0`.
+
+<Callout type="tip" title="Punguza kuandika">
+Ongeza `alias bcli="bitcoin-cli -regtest"` kwenye wasifu wa shell yako. Njia hii inaandika amri kamili ili ifanye kazi kwa kila mtu.
+</Callout>
+
+**Umemaliza ukiweza:** kuona nodi ikijibu `getblockchaininfo`.
+
+## Hatua ya 3: Chimba, weka pesa na kagua
+
+```bash
+bitcoin-cli -regtest createwallet "alice"
+ADDR=$(bitcoin-cli -regtest -rpcwallet=alice getnewaddress)
+bitcoin-cli -regtest generatetoaddress 101 "$ADDR"
+bitcoin-cli -regtest -rpcwallet=alice getbalance
+```
+
+**Unachotarajia:** salio la `50.00000000`. Umechimba <Term id="block">bloku</Term> 101, lakini ni zawadi ya bloku ya kwanza tu iliyokomaa.
+
+Jaribu `generatetoaddress 1` tena na ukague salio. Unaweza kutabiri nambari mpya kabla ya kuangalia?
+
+**Umemaliza ukiweza:** kueleza kwa nini salio baada ya bloku 101 ni 50, si 5,050.
+
+## Hatua ya 4: Anza upya
+
+```bash
+bitcoin-cli -regtest stop
+rm -rf ~/.bitcoin/regtest   # kwenye macOS: ~/Library/Application Support/Bitcoin/regtest
+```
+
+Kuanza na datadir safi hufanya majaribio yarudiwe kwa namna ile ile, ambayo ndiyo unayotaka kwa majaribio ya kiotomatiki baadaye.
+
+## Ushahidi wa maabara
+
+Hifadhi haya kwenye faili ya madokezo; mradi wa mwisho utayaomba:
+
+- Matokeo ya `getblockchaininfo` yanayoonyesha `"chain": "regtest"`.
+- Salio lako baada ya kuchimba bloku 101, na baada ya moja zaidi.
+- Sentensi moja kuhusu kilichokushangaza.

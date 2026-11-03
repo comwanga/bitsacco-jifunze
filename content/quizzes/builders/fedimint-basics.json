@@ -1,0 +1,49 @@
+{
+  "lesson": "fedimint-basics",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Shirikisho la walinzi 4 linastahimili walinzi wangapi wenye hitilafu?", "en": "How many faulty guardians can a 4-guardian federation tolerate?" },
+      "options": [
+        { "id": "a", "label": { "sw": "0", "en": "0" } },
+        { "id": "b", "label": { "sw": "1", "en": "1" } },
+        { "id": "c", "label": { "sw": "2", "en": "2" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Chini ya theluthi moja: kwa walinzi 4, ni mmoja tu.", "en": "Fewer than a third: with 4 guardians, that's one." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Kwa nini walinzi hawawezi kuunganisha noti ya ecash na aliyeitengeneza?", "en": "Why can't guardians link an ecash note to whoever minted it?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kwa sababu walitia sahihi noti iliyofichwa", "en": "Because they signed a blinded note" } },
+        { "id": "b", "label": { "sw": "Kwa sababu ecash haina sahihi", "en": "Because ecash has no signature" } },
+        { "id": "c", "label": { "sw": "Kwa sababu walinzi hufuta kumbukumbu kila siku", "en": "Because guardians delete logs every day" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Sahihi zilizofichwa huwaruhusu kuthibitisha noti bila kuiona ilipotolewa.", "en": "Blind signatures let them verify a note without having seen it when it was issued." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Lango (gateway) hufanya nini katika Fedimint?", "en": "What does a gateway do in Fedimint?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Hubadilisha ecash na malipo ya Lightning", "en": "Swaps ecash for Lightning payments" } },
+        { "id": "b", "label": { "sw": "Huchimba bloku", "en": "Mines blocks" } },
+        { "id": "c", "label": { "sw": "Huhifadhi maneno ya siri ya watumiaji", "en": "Stores users' seed phrases" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Lango ni nodi ya Lightning inayounganisha shirikisho na mtandao mpana wa Lightning.", "en": "A gateway is a Lightning node connecting the federation to the wider Lightning Network." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Watumiaji wa shirikisho wanamwamini nani?", "en": "Who do federation users trust?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kwamba walinzi wengi watabaki waaminifu na hewani", "en": "That most guardians stay honest and online" } },
+        { "id": "b", "label": { "sw": "Hawamwamini mtu yeyote kabisa", "en": "Nobody at all" } },
+        { "id": "c", "label": { "sw": "Mlinzi mmoja tu", "en": "Exactly one guardian" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Uaminifu umegawanywa kati ya walinzi wengi, si kuondolewa.", "en": "Trust is spread across many guardians, not removed." }
+    }
+  ]
+}

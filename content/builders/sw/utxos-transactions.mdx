@@ -1,0 +1,97 @@
+---
+title: "UTXO na miamala"
+description: "Bitcoin haina salio la akaunti. Jifunze mfumo wa UTXO, tengeneza malipo yenye chenji, na usome muamala sehemu kwa sehemu kwenye regtest."
+level: beginner
+minutes: 45
+objectives:
+  - Eleza mfumo wa UTXO na jinsi unavyotofautiana na salio la akaunti
+  - Hesabu ada ya muamala kutoka kwa pembejeo na matokeo yake
+  - Tuma, fafanua na uthibitishe muamala kwenye regtest
+resources:
+  - title: "Kujifunza Bitcoin, sura ya 6 na 9: miamala na ada"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "Mastering Bitcoin source (GitHub)"
+    url: "https://github.com/bitcoinbook/bitcoinbook"
+    kind: book
+    language: en
+reflection:
+  - "Kwa nini Bitcoin hutengeneza matokeo ya chenji badala ya kupunguza salio tu?"
+  - "Nini kingetokea kwa muamala ambao matokeo yake yanazidi pembejeo zake?"
+source:
+  type: adapted
+  from: "Pull"
+  url: "https://pullos.dev"
+  licence: "CC BY-SA 4.0"
+  credit: "Limetoholewa kutoka mtaala wa Pull, masomo ya UTXO Model na Transactions"
+terms:
+  - utxo
+  - transaction
+  - fee
+  - confirmation
+  - mempool
+---
+
+M-Pesa hutunza salio moja kwa kila akaunti. Bitcoin haifanyi hivyo. Badala yake, hutunza mkusanyiko wa sarafu tofauti, kila moja ikiwa imefungwa kwa mmiliki. "Salio" lako ni jumla ya sarafu ambazo funguo zako zinaweza kufungua.
+
+## Hatua ya 1: Mfumo wa UTXO
+
+Kila sarafu ni **matokeo ya muamala ambayo hayajatumika**, yaani <Term id="utxo" />. <Term id="transaction">Muamala</Term>:
+
+1. **Hutumia** UTXO moja au zaidi kama pembejeo (sasa zimetumika, zimeondoka milele).
+2. **Huunda** matokeo mapya, kila moja likiwa na kiasi na hati ya kufunga.
+3. Huthibitisha, kwa sahihi, kwamba mtumiaji ana ruhusa ya kufungua kila pembejeo.
+
+Fikiria noti kwenye pochi ya mfukoni. Ili kulipa shilingi 300 kwa noti ya 500, unatoa noti nzima na unarudishiwa 200 kama chenji. Bitcoin hufanya vivyo hivyo: malipo kwa kawaida yana tokeo moja kwa mpokeaji na tokeo moja la **chenji** linalorudi kwako.
+
+<Term id="fee">Ada</Term> haiandikwi popote. Ni kile kinachobaki:
+
+```text
+ada = jumla(pembejeo) - jumla(matokeo)
+```
+
+**Umemaliza ukiweza:** kuhesabu ada kwa pembejeo za BTC 0.6 na 0.5 na matokeo ya BTC 0.3 na 0.79. (Jibu: BTC 0.01.)
+
+## Hatua ya 2: Tazama sarafu zako
+
+Anzisha maabara yako kutoka somo lililopita, kisha:
+
+```bash
+bitcoin-cli -regtest -rpcwallet=alice listunspent
+```
+
+Kila kipengele ni UTXO moja yenye `txid`, `vout` (nambari ya tokeo) na `amount`.
+
+## Hatua ya 3: Mlipe Bob na uufafanue
+
+```bash
+bitcoin-cli -regtest createwallet "bob"
+BOB=$(bitcoin-cli -regtest -rpcwallet=bob getnewaddress)
+TXID=$(bitcoin-cli -regtest -rpcwallet=alice sendtoaddress "$BOB" 1.5)
+bitcoin-cli -regtest getmempoolentry "$TXID"
+RAW=$(bitcoin-cli -regtest -rpcwallet=alice gettransaction "$TXID" | jq -r .hex)
+bitcoin-cli -regtest decoderawtransaction "$RAW"
+```
+
+Kwenye JSON iliyofafanuliwa tafuta `vin` (pembejeo) na `vout` (matokeo). Tokeo moja linamlipa Bob BTC 1.5; jingine ni chenji ya Alice. Muamala unasubiri kwenye <Term id="mempool" />.
+
+<Callout type="tip" title="Huna jq?">
+Endesha `gettransaction` na unakili sehemu ya `hex` kwa mkono, au sakinisha `jq`; ni muhimu katika njia hii yote.
+</Callout>
+
+## Hatua ya 4: Uthibitishe
+
+```bash
+bitcoin-cli -regtest generatetoaddress 1 "$(bitcoin-cli -regtest -rpcwallet=alice getnewaddress)"
+bitcoin-cli -regtest -rpcwallet=bob getbalance
+```
+
+**Unachotarajia:** salio la Bob ni `1.50000000`. Muamala sasa una <Term id="confirmation" /> mmoja.
+
+**Umemaliza ukiweza:** kuonyesha tokeo la chenji kwenye muamala uliofafanuliwa na kuhesabu ada yake.
+
+## Ushahidi wa maabara
+
+- Muamala uliofafanuliwa, ukiwa umeweka alama kwenye tokeo la malipo, tokeo la chenji na hesabu yako ya ada.
+- Salio la Bob kabla na baada ya kuchimba bloku moja.

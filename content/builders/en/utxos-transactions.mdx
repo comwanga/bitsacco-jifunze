@@ -1,0 +1,98 @@
+---
+title: "UTXOs and transactions"
+description: "Bitcoin has no account balances. Learn the UTXO model, build a payment with change, and read a transaction field by field on regtest."
+level: beginner
+minutes: 45
+objectives:
+  - Explain the UTXO model and how it differs from account balances
+  - Work out the fee of a transaction from its inputs and outputs
+  - Send, decode and confirm a transaction on regtest
+resources:
+  - title: "Kujifunza Bitcoin, chapters 6 and 9: transactions and fees"
+    url: "https://bitsacco.com/kujifunza-bitcoin-sw.pdf"
+    kind: book
+    language: sw
+  - title: "Mastering Bitcoin source (GitHub)"
+    url: "https://github.com/bitcoinbook/bitcoinbook"
+    kind: book
+    language: en
+reflection:
+  - "Why does Bitcoin create change outputs instead of just reducing a balance?"
+  - "What would happen to a transaction whose outputs added up to more than its inputs?"
+source:
+  type: adapted
+  from: "Pull"
+  url: "https://pullos.dev"
+  licence: "CC BY-SA 4.0"
+  credit: "Adapted from the Pull curriculum, UTXO Model and Transactions lessons"
+translationOf: sw
+terms:
+  - utxo
+  - transaction
+  - fee
+  - confirmation
+  - mempool
+---
+
+M-Pesa keeps one balance per account. Bitcoin doesn't. Instead, it keeps a set of separate coins, each locked to an owner. Your "balance" is just the sum of the coins your keys can unlock.
+
+## Step 1: The UTXO model
+
+Each coin is an **unspent transaction output**, a <Term id="utxo" />. A <Term id="transaction" />:
+
+1. **Consumes** one or more UTXOs as inputs (they are now spent, gone forever).
+2. **Creates** new outputs, each with an amount and a locking script.
+3. Proves, with a signature, that the spender may unlock each input.
+
+Think of notes in a purse. To pay 300 shillings with a 500 note, you hand over the whole note and get 200 back as change. Bitcoin does the same: a payment usually has one output to the receiver and one **change** output back to you.
+
+The <Term id="fee" /> is never written down. It is whatever is left over:
+
+```text
+fee = sum(inputs) - sum(outputs)
+```
+
+**Done when:** you can compute the fee for inputs of 0.6 and 0.5 BTC and outputs of 0.3 and 0.79 BTC. (Answer: 0.01 BTC.)
+
+## Step 2: Look at your coins
+
+Start your lab from the previous lesson, then:
+
+```bash
+bitcoin-cli -regtest -rpcwallet=alice listunspent
+```
+
+Each entry is one UTXO with a `txid`, a `vout` (output index) and an `amount`.
+
+## Step 3: Pay Bob and decode it
+
+```bash
+bitcoin-cli -regtest createwallet "bob"
+BOB=$(bitcoin-cli -regtest -rpcwallet=bob getnewaddress)
+TXID=$(bitcoin-cli -regtest -rpcwallet=alice sendtoaddress "$BOB" 1.5)
+bitcoin-cli -regtest getmempoolentry "$TXID"
+RAW=$(bitcoin-cli -regtest -rpcwallet=alice gettransaction "$TXID" | jq -r .hex)
+bitcoin-cli -regtest decoderawtransaction "$RAW"
+```
+
+In the decoded JSON find `vin` (the inputs) and `vout` (the outputs). One output pays Bob 1.5 BTC; the other is Alice's change. The transaction is waiting in the <Term id="mempool" />.
+
+<Callout type="tip" title="No jq?">
+Run `gettransaction` and copy the `hex` field by hand, or install `jq`; it is useful throughout this path.
+</Callout>
+
+## Step 4: Confirm it
+
+```bash
+bitcoin-cli -regtest generatetoaddress 1 "$(bitcoin-cli -regtest -rpcwallet=alice getnewaddress)"
+bitcoin-cli -regtest -rpcwallet=bob getbalance
+```
+
+**Expected:** Bob's balance is `1.50000000`. The transaction now has one <Term id="confirmation" />.
+
+**Done when:** you can point to the change output in the decoded transaction and compute its fee.
+
+## Lab evidence
+
+- The decoded transaction, with the payment output, the change output and your fee calculation marked.
+- Bob's balance before and after mining one block.

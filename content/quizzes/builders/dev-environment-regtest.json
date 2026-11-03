@@ -1,0 +1,49 @@
+{
+  "lesson": "dev-environment-regtest",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Regtest ni nini?", "en": "What is regtest?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Mtandao binafsi wa Bitcoin unaoudhibiti mwenyewe", "en": "A private Bitcoin network you control" } },
+        { "id": "b", "label": { "sw": "Mtandao halisi wenye pesa halisi", "en": "The real network with real money" } },
+        { "id": "c", "label": { "sw": "Pochi ya simu", "en": "A mobile wallet" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Kwenye regtest unachimba bloku papo hapo na makosa hayagharimu chochote.", "en": "On regtest you mine blocks instantly and mistakes cost nothing." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Baada ya kuchimba bloku 101 kwenda anwani moja, salio ni kiasi gani?", "en": "After mining 101 blocks to one address, what is the balance?" },
+      "options": [
+        { "id": "a", "label": { "sw": "5,050 BTC", "en": "5,050 BTC" } },
+        { "id": "b", "label": { "sw": "50 BTC", "en": "50 BTC" } },
+        { "id": "c", "label": { "sw": "0 BTC", "en": "0 BTC" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Zawadi ya coinbase inahitaji uthibitisho 100; ni ya bloku ya kwanza tu iliyokomaa.", "en": "Coinbase rewards need 100 confirmations; only the first block's reward has matured." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Amri ipi inaonyesha kwamba nodi yako iko kwenye regtest?", "en": "Which command shows that your node is on regtest?" },
+      "options": [
+        { "id": "a", "label": { "sw": "bitcoin-cli -regtest getblockchaininfo", "en": "bitcoin-cli -regtest getblockchaininfo" } },
+        { "id": "b", "label": { "sw": "bitcoin-cli -regtest stop", "en": "bitcoin-cli -regtest stop" } },
+        { "id": "c", "label": { "sw": "rm -rf ~/.bitcoin/regtest", "en": "rm -rf ~/.bitcoin/regtest" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Matokeo yake yana \"chain\": \"regtest\".", "en": "Its output includes \"chain\": \"regtest\"." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "Kwa nini uanze na datadir safi kati ya majaribio?", "en": "Why start from a clean datadir between experiments?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Ili majaribio yarudiwe kwa namna ile ile", "en": "So experiments are repeatable" } },
+        { "id": "b", "label": { "sw": "Ili kupata bitcoin halisi", "en": "To earn real bitcoin" } },
+        { "id": "c", "label": { "sw": "Ni lazima kila dakika 10", "en": "It is required every 10 minutes" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Pochi na bloku zilizobaki kutoka jaribio la zamani husababisha majaribio yasiyotabirika.", "en": "Leftover wallets and blocks from old runs make tests unpredictable." }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "lesson": "lightning-basics",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Chaneli ya Lightning inafunguliwa vipi?", "en": "How is a Lightning channel opened?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Kwa muamala wa ufadhili kwenda tokeo la multisig la 2 kati ya 2", "en": "With a funding transaction to a 2-of-2 multisig output" } },
+        { "id": "b", "label": { "sw": "Kwa kutuma barua pepe kwa nodi nyingine", "en": "By emailing the other node" } },
+        { "id": "c", "label": { "sw": "Bila muamala wowote wa blockchain", "en": "Without any on-chain transaction" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Kufungua na kufunga ni kwenye blockchain; malipo katikati si kwenye blockchain.", "en": "Opening and closing are on-chain; the payments in between are not." }
+    },
+    {
+      "id": "q2",
+      "prompt": { "sw": "Alice amefungua chaneli ya sats 1,000,000 kwa pesa zake zote. Anaweza kupokea kiasi gani mara moja?", "en": "Alice opened a 1,000,000-sat channel with all her own funds. How much can she receive right away?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Sats 1,000,000", "en": "1,000,000 sats" } },
+        { "id": "b", "label": { "sw": "Sats 0, hana ukwasi wa kuingia", "en": "0 sats; she has no inbound liquidity" } },
+        { "id": "c", "label": { "sw": "Sats 500,000", "en": "500,000 sats" } }
+      ],
+      "answer": "b",
+      "explanation": { "sw": "Pesa zote ziko upande wake, kwa hiyo anaweza kutuma tu hadi atakapotumia baadhi.", "en": "All funds are on her side, so she can only send until she spends some." }
+    },
+    {
+      "id": "q3",
+      "prompt": { "sw": "Kwenye ankara lnbcrt10u1p..., 10u inamaanisha nini?", "en": "In the invoice lnbcrt10u1p..., what does 10u mean?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Micro-bitcoin 10, yaani sats 1,000", "en": "10 micro-bitcoin, which is 1,000 sats" } },
+        { "id": "b", "label": { "sw": "Dakika 10 za kuisha", "en": "10 minutes to expiry" } },
+        { "id": "c", "label": { "sw": "Nodi 10 kwenye njia", "en": "10 nodes on the route" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "u = micro (milioni moja ya bitcoin); sats 100 kila moja.", "en": "u = micro (a millionth of a bitcoin), 100 sats each." }
+    },
+    {
+      "id": "q4",
+      "prompt": { "sw": "HTLC zinahakikisha nini katika malipo yanayopitia nodi kadhaa?", "en": "What do HTLCs guarantee in a multi-hop payment?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Ama njia yote inakamilika, au hakuna sehemu inayokamilika", "en": "Either the whole route settles, or none of it does" } },
+        { "id": "b", "label": { "sw": "Ada ni sifuri kila mara", "en": "Fees are always zero" } },
+        { "id": "c", "label": { "sw": "Malipo yanaweza kurudishwa baadaye", "en": "Payments can be reversed later" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Kila hatua inategemea preimage ile ile, kwa hiyo hakuna nodi ya kati inayoweza kuiba.", "en": "Every hop depends on the same preimage, so no intermediate node can steal." }
+    }
+  ]
+}

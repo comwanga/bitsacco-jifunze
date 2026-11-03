@@ -2,8 +2,10 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 for (const lang of ["sw", "en"]) {
-  test(`tree curriculum and accessible links in ${lang}`, async ({ page }) => {
+  test(`tree curriculum and accessible links in ${lang}`, async ({ page }, info) => {
     test.setTimeout(60000);
+    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: info.project.name === "mobile" ? "dark" : "light" });
+    if (info.project.name === "mobile") await page.setViewportSize({ width: 360, height: 800 });
     for (const [id, count] of [["savers", 8], ["builders", 8], ["lightning", 17]] as const) {
       await page.goto(`/${lang}/tree/${id}/`);
       await expect(page.locator("[data-tree-lesson]")).toHaveCount(count);

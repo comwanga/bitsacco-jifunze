@@ -20,8 +20,8 @@ export function SimulationLoader({ id, lang, c }: SimulationProps & { id: Simula
   async function load() {
     setLoading(true); setError(false);
     try {
-      const module = id === "utxo" ? await import("./UtxoSimulation") : await import("./ChannelSimulation");
-      setComponent(() => module.default);
+      const loadedModule = id === "utxo" ? await import("./UtxoSimulation") : await import("./ChannelSimulation");
+      setComponent(() => loadedModule.default);
     } catch { setError(true); }
     finally { setLoading(false); }
   }
@@ -30,7 +30,7 @@ export function SimulationLoader({ id, lang, c }: SimulationProps & { id: Simula
     {Component ? <Component lang={lang} c={c} /> : <>
       <p role="status" className="mt-2 text-sm text-[var(--muted)]">{loading ? c.loading : ""}</p>
       {error && <p role="alert" className="mt-3">{c.loadError}</p>}
-      <button type="button" disabled={!ready || loading} onClick={load} className="mt-4 rounded-full bg-teal-700 px-5 py-3 font-semibold text-white disabled:opacity-50">{error ? c.retry : c.start}</button>
+      <button type="button" disabled={!ready || loading} onClick={load} className="mt-4 rounded-full bg-teal-700 px-5 py-3 font-semibold text-white">{error ? c.retry : c.start}</button>
       {!ready && <p className="mt-3">{c.noJs}</p>}
     </>}
   </section>;

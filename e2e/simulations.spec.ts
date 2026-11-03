@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { simulationCopy } from "../lib/simulations/copy";
@@ -43,6 +44,8 @@ test("a failed interactive download keeps the explanation and can retry", async 
   await page.goto("http://localhost:4321/en/simulations/utxo/");
   await page.getByRole("button", { name: "Start simulation", exact: true }).click();
   await expect(page.locator('main [role="alert"]')).toContainText("could not load");
+  const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact!))).toEqual([]);
   await expect(page.getByRole("heading", { name: "Worked example", exact: true })).toBeVisible();
   fail = false;
   await page.getByRole("button", { name: "Try loading again", exact: true }).click();

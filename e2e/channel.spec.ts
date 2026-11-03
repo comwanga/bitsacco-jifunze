@@ -4,6 +4,7 @@ import { simulationCopy } from "../lib/simulations/copy";
 for (const lang of ["en", "sw"] as const) test(`channel direction, conservation, errors and reset in ${lang}`, async ({ page }) => {
   const c = simulationCopy[lang];
   await page.goto(`/${lang}/simulations/channel-balances/`);
+  await page.evaluate(() => localStorage.setItem("jifunze:progress:v1", JSON.stringify({ app: "bitsacco-jifunze", version: 1, lessons: { "savers/money-and-bitcoin": { completedAt: "2026-11-03T10:00:00Z" } } })));
   const saved = await page.evaluate(() => localStorage.getItem("jifunze:progress:v1"));
   await page.getByRole("button", { name: c.start, exact: true }).click();
   const sim = page.locator('[data-module="CHANNEL_INTERACTIVE_MODULE"]');

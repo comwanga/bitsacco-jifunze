@@ -40,6 +40,8 @@ jobs:
         run: npm run validate
       - name: Build (includes CSP, link check and performance budget)
         run: npm run build
+      - name: Phase 1 and Phase 2 initial JavaScript budgets
+        run: npm run check:ux-budget
       - name: Install Chromium for browser checks
         run: npx playwright install --with-deps chromium
       - name: Browser checks (smoke, phone layout, offline, accessibility)

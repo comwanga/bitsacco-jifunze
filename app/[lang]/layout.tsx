@@ -4,6 +4,7 @@ import { isLang, LANGS, t, type Lang } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { RegisterSW } from "@/components/pwa/RegisterSW";
 import "../globals.css";
 
 export const dynamicParams = false;
@@ -26,7 +27,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     title: { default: t(l, "siteName"), template: `%s | ${t(l, "siteName")}` },
     description: t(l, "heroLead"),
     alternates: { languages: { sw: "/sw/", en: "/en/" } },
-    icons: { icon: "/logo.svg" },
+    manifest: "/manifest.webmanifest",
+    icons: { icon: "/logo.svg", apple: "/icons/apple-touch-icon.png" },
   };
 }
 
@@ -45,6 +47,7 @@ export default async function LangLayout({
         <SiteHeader lang={lang} />
         <main id="main">{children}</main>
         <SiteFooter lang={lang} />
+        <RegisterSW />
       </body>
     </html>
   );

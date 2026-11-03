@@ -64,7 +64,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                   {lessons.map((l, i) => (
                     <li key={l.slug} className="flex gap-3">
                       <span className="w-5 shrink-0 text-right text-[#9c8a78] tabular-nums">{i + 1}</span>
-                      <Link href={`/${lang}/${r.id}/${l.slug}/`} className="hover:text-white hover:underline">
+                      <Link prefetch={false} href={`/${lang}/${r.id}/${l.slug}/`} className="hover:text-white hover:underline">
                         {l.frontmatter.title}
                       </Link>
                     </li>

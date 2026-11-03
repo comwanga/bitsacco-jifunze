@@ -60,6 +60,7 @@ export default async function RoadmapPage({ params }: Params) {
                 return (
                   <li key={entry.slug}>
                     <Link
+                      prefetch={false}
                       href={`/${lang}/${r.id}/${entry.slug}/`}
                       className="flex gap-4 rounded-xl px-2 py-3 hover:bg-[var(--line)]/40"
                     >

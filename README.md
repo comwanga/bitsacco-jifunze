@@ -85,6 +85,7 @@ Lessons with exercises load a small lazy island (the editor) and get a CSP that 
 
 ## Known gaps
 
+- **Lab egress.** Learner code inside the lab container can reach the internet. An internal-only Docker network would also block the bridge port; only the paired lesson page (or the learner) can run code there.
 - **Eclair in the lab.** Eclair 0.12–0.13 crashed in its native secp256k1 library when signing channel messages under Docker Desktop on Windows, so Eclair runs as a fifth node (Erin) instead of Chan, as the book has it. Revisit when a fixed Eclair image is out.
 
 - **JavaScript budget.** The spec asks for under 100 KB of compressed JavaScript per page. The React 19 and Next.js 16 runtime alone is about 130 KB gzip (pages measure about 141 KB gzip, about 120 KB brotli), so this stack can't meet the target. CI enforces a 150 KB ceiling to catch regressions. Deciding between accepting this and changing the framework is open.

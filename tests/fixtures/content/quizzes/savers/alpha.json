@@ -1,0 +1,15 @@
+{
+  "lesson": "alpha",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": { "sw": "Sat moja ni nini?", "en": "What is one sat?" },
+      "options": [
+        { "id": "a", "label": { "sw": "Bitcoin 0.00000001", "en": "0.00000001 bitcoin" } },
+        { "id": "b", "label": { "sw": "Shilingi moja", "en": "One shilling" } }
+      ],
+      "answer": "a",
+      "explanation": { "sw": "Bitcoin moja ina sats milioni 100.", "en": "One bitcoin is 100 million sats." }
+    }
+  ]
+}

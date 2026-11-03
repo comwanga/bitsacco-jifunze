@@ -1,0 +1,33 @@
+import { expect, test } from "@playwright/test";
+import { simulationCopy } from "../lib/simulations/copy";
+
+for (const lang of ["en", "sw"] as const) test(`UTXO example accounting, errors, reset and progress in ${lang}`, async ({ page }) => {
+  const c = simulationCopy[lang];
+  await page.goto(`/${lang}/simulations/utxo/`);
+  const saved = await page.evaluate(() => localStorage.getItem("jifunze:progress:v1"));
+  await page.getByRole("button", { name: c.start, exact: true }).click();
+  const sim = page.locator('[data-module="UTXO_INTERACTIVE_MODULE"]');
+  await sim.getByRole("checkbox").nth(0).check();
+  await sim.getByRole("checkbox").nth(1).check();
+  await sim.getByLabel(c.recipient, { exact: true }).fill("1.5");
+  await sim.getByRole("button", { name: c.build, exact: true }).click();
+  await expect(sim.getByRole("alert")).toHaveText(c.invalidAmount);
+  await expect(sim.getByLabel(c.recipient, { exact: true })).toHaveValue("1.5");
+  await sim.getByLabel(c.recipient, { exact: true }).fill("7000");
+  await expect(sim.locator("[data-change]")).toContainText("2,500");
+  await sim.getByRole("button", { name: c.build, exact: true }).click();
+  await expect(sim.getByRole("status")).toContainText(c.built);
+  await expect(sim.getByRole("button", { name: c.build, exact: true })).toBeFocused();
+  await expect(sim.getByRole("checkbox").nth(0)).toBeDisabled();
+  await expect(sim.getByRole("checkbox")).toHaveCount(4);
+  await sim.getByRole("checkbox").nth(2).check();
+  await sim.getByRole("checkbox").nth(3).check();
+  await sim.getByLabel(c.recipient, { exact: true }).fill("4000");
+  await sim.getByRole("button", { name: c.build, exact: true }).click();
+  await expect(sim.getByRole("checkbox")).toHaveCount(4);
+  await expect(sim.getByRole("checkbox").nth(3)).toBeDisabled();
+  await sim.getByRole("button", { name: c.reset, exact: true }).click();
+  await expect(sim.getByRole("checkbox")).toHaveCount(3);
+  await expect(sim.getByRole("checkbox").nth(0)).toBeEnabled();
+  expect(await page.evaluate(() => localStorage.getItem("jifunze:progress:v1"))).toBe(saved);
+});

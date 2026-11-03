@@ -36,7 +36,8 @@ test("tree resumes progress and tolerates unavailable storage", async ({ page })
   await page.evaluate(() => localStorage.setItem("jifunze:progress:v1", JSON.stringify({ app: "bitsacco-jifunze", version: 1, lessons: { "savers/money-and-bitcoin": { completedAt: "2026-11-03T10:00:00Z" } } })));
   await page.reload();
   await expect(page.locator("[data-resume]")).toHaveAttribute("href", "/en/savers/sats-and-volatility/");
-  await expect(page.getByRole("heading", { name: /The basics/ })).toContainText("1 / 2");
+  await expect(page.getByRole("heading", { name: "The basics", exact: true })).toBeVisible();
+  await expect(page.locator('[data-section-progress="misingi"]')).toHaveText("1 / 2 done");
   await page.addInitScript(() => Object.defineProperty(window, "localStorage", { get() { throw new DOMException("blocked", "SecurityError"); } }));
   await page.reload();
   await expect(page.locator("[data-tree-lesson]")).toHaveCount(8);

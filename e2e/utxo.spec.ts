@@ -14,6 +14,15 @@ for (const lang of ["en", "sw"] as const) test(`UTXO example accounting, errors,
   await sim.getByRole("button", { name: c.build, exact: true }).click();
   await expect(sim.getByRole("alert")).toHaveText(c.invalidAmount);
   await expect(sim.getByLabel(c.recipient, { exact: true })).toHaveValue("1.5");
+  await expect(sim.getByLabel(c.recipient, { exact: true })).toHaveAttribute("aria-describedby", "utxo-error");
+  await expect(sim.getByLabel(c.fee, { exact: true })).not.toHaveAttribute("aria-describedby", /utxo-error/);
+  await sim.getByLabel(c.recipient, { exact: true }).fill("7000");
+  await sim.getByLabel(c.fee, { exact: true }).fill("-1");
+  await sim.getByRole("button", { name: c.build, exact: true }).click();
+  await expect(sim.getByRole("alert")).toHaveText(c.invalidFee);
+  await expect(sim.getByLabel(c.fee, { exact: true })).toHaveAttribute("aria-describedby", "utxo-error");
+  await expect(sim.getByLabel(c.recipient, { exact: true })).not.toHaveAttribute("aria-describedby", /utxo-error/);
+  await sim.getByLabel(c.fee, { exact: true }).fill("500");
   await sim.getByLabel(c.recipient, { exact: true }).fill("7000");
   await expect(sim.locator("[data-change]")).toContainText("2,500");
   await sim.getByRole("button", { name: c.build, exact: true }).click();

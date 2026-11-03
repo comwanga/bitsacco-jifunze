@@ -39,10 +39,12 @@ export default async function RoadmapPage({ params }: Params) {
       <div className="mx-auto max-w-3xl px-4 py-10">
         {r.sections.map((section) => (
           <section key={section.id} className="mb-10" aria-labelledby={`s-${section.id}`}>
-            <h2 id={`s-${section.id}`} className="text-xl font-bold">
-              {section.title[lang]}
-              <SectionProgress roadmap={r.id} slugs={section.lessons.map((e) => e.slug)} lang={lang} />
-            </h2>
+            <div className="flex flex-wrap items-baseline gap-x-3">
+              <h2 id={`s-${section.id}`} className="text-xl font-bold">
+                {section.title[lang]}
+              </h2>
+              <SectionProgress section={section.id} roadmap={r.id} slugs={section.lessons.map((e) => e.slug)} lang={lang} />
+            </div>
             <ol className="mt-4 space-y-2">
               {section.lessons.map((entry) => {
                 const n = slugs.indexOf(entry.slug) + 1;

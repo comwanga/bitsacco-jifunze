@@ -32,6 +32,10 @@ export default function ChannelSimulation({ c, lang }: SimulationProps) {
     <div aria-hidden="true" className="mt-3 flex h-4 overflow-hidden rounded-full bg-dawn">
       <div className="bg-teal-700" style={{ width: `${state.alice / state.capacity * 100}%` }} />
     </div>
+    <p data-channel-legend aria-hidden="true" className="mt-2 flex justify-between text-xs text-[var(--muted)]">
+      <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-teal-700" />{c.alice}</span>
+      <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-full bg-dawn" />{c.bob}</span>
+    </p>
     <fieldset className="mt-6">
       <legend className="font-bold">{c.direction}</legend>
       <div className="mt-2 flex flex-wrap gap-3">{(["alice", "bob"] as const).map((person) => <label key={person} className="flex items-center gap-2 rounded-xl border border-[var(--line)] px-4 py-3">

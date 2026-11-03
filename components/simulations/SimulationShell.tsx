@@ -27,7 +27,8 @@ export function SimulationShell({ entry, lang }: { entry: SimulationEntry; lang:
       <h2 id="related-lessons" className="text-xl font-bold">{c.related}</h2>
       <ul className="mt-3 space-y-2">{entry.lessons.map((key) => {
         const [roadmap, slug] = key.split("/");
-        return <li key={key}><Link prefetch={false} href={`/${lang}/${key}/`} className="text-teal-700 underline underline-offset-4 dark:text-teal-400">{getLesson(roadmap as RoadmapId, slug, lang).frontmatter.title}</Link></li>;
+        const lesson = getLesson(roadmap as RoadmapId, slug, lang);
+        return <li key={key} lang={lesson.isFallback ? lesson.servedLang : undefined}><Link prefetch={false} href={`/${lang}/${key}/`} className="text-teal-700 underline underline-offset-4 dark:text-teal-400">{lesson.frontmatter.title}</Link></li>;
       })}</ul>
     </nav>
   </div>;

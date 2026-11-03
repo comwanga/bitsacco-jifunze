@@ -19,6 +19,8 @@ export default function UtxoSimulation({ c, lang }: SimulationProps) {
   const preview = previewTransaction(state, request);
   const selectedTotal = state.coins.filter((coin) => coinIds.includes(coin.id)).reduce((sum, coin) => sum + coin.sats, 0);
   const clearFeedback = () => { setError(null); setStatus(""); };
+  // Point the error at the control it is about; "funds" and "overflow" concern all three.
+  const describe = (...kinds: UtxoError[]) => (error && kinds.includes(error) ? "utxo-error" : undefined);
 
   function build() {
     const result = buildTransaction(state, request);
@@ -31,7 +33,7 @@ export default function UtxoSimulation({ c, lang }: SimulationProps) {
   }
 
   return <div data-module="UTXO_INTERACTIVE_MODULE" className="mt-5">
-    <fieldset aria-describedby={error ? "utxo-error" : undefined}>
+    <fieldset aria-describedby={describe("noCoins", "duplicateCoin", "unknownCoin", "spentCoin", "funds", "overflow")}>
       <legend className="font-bold">{c.coins}</legend>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">{state.coins.map((coin, i) => <label key={coin.id} className={`flex items-start gap-3 rounded-xl border-2 p-3 ${coin.spent ? "border-[var(--line)] text-[var(--muted)]" : "border-teal-600/50"}`}>
         <input type="checkbox" checked={coinIds.includes(coin.id)} disabled={coin.spent} onChange={(e) => { setCoinIds(e.target.checked ? [...coinIds, coin.id] : coinIds.filter((id) => id !== coin.id)); clearFeedback(); }} className="mt-1 accent-teal-700" />
@@ -39,8 +41,8 @@ export default function UtxoSimulation({ c, lang }: SimulationProps) {
       </label>)}</div>
     </fieldset>
     <div className="mt-5 grid gap-4 sm:grid-cols-2">
-      <label className="font-semibold">{c.recipient}<input type="text" inputMode="numeric" value={payment} onChange={(e) => { setPayment(e.target.value); clearFeedback(); }} aria-invalid={error === "invalidAmount"} aria-describedby={error ? "utxo-error" : undefined} className={field} /></label>
-      <label className="font-semibold">{c.fee}<input type="text" inputMode="numeric" value={fee} onChange={(e) => { setFee(e.target.value); clearFeedback(); }} aria-invalid={error === "invalidFee"} aria-describedby={error ? "utxo-error" : undefined} className={field} /></label>
+      <label className="font-semibold">{c.recipient}<input type="text" inputMode="numeric" value={payment} onChange={(e) => { setPayment(e.target.value); clearFeedback(); }} aria-invalid={error === "invalidAmount"} aria-describedby={describe("invalidAmount", "funds", "overflow")} className={field} /></label>
+      <label className="font-semibold">{c.fee}<input type="text" inputMode="numeric" value={fee} onChange={(e) => { setFee(e.target.value); clearFeedback(); }} aria-invalid={error === "invalidFee"} aria-describedby={describe("invalidFee", "funds", "overflow")} className={field} /></label>
     </div>
     <section aria-labelledby="utxo-preview" className="mt-5 rounded-xl bg-teal-50 p-4 text-teal-900 dark:bg-teal-900/30 dark:text-teal-50">
       <h3 id="utxo-preview" className="font-bold">{c.preview}</h3>

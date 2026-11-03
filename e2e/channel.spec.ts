@@ -8,6 +8,10 @@ for (const lang of ["en", "sw"] as const) test(`channel direction, conservation,
   const saved = await page.evaluate(() => localStorage.getItem("jifunze:progress:v1"));
   await page.getByRole("button", { name: c.start, exact: true }).click();
   const sim = page.locator('[data-module="CHANNEL_INTERACTIVE_MODULE"]');
+  const legend = sim.locator("[data-channel-legend]");
+  await expect(legend).toBeVisible();
+  await expect(legend).toContainText(c.alice);
+  await expect(legend).toContainText(c.bob);
   await sim.getByRole("button", { name: c.send, exact: true }).click();
   await expect(sim.locator("[data-alice]")).toHaveText("49,000");
   await expect(sim.locator("[data-bob]")).toHaveText("51,000");

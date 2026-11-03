@@ -4,7 +4,7 @@ import { CONTENT_ROOT, getRoadmap, listRoadmaps, flatLessons } from "./load.ts";
 import { ROADMAP_IDS, type RoadmapId } from "./schemas.ts";
 import type { SimulationEntry } from "../simulations/registry.ts";
 
-export type TreeLesson = CatalogEntry & { prerequisites: { slug: string; title: string }[] };
+export type TreeLesson = CatalogEntry & { prerequisites: { slug: string; title: string; contentLang: Lang }[] };
 export type TreeSection = { id: string; title: string; lessons: TreeLesson[] };
 export type TreePath = { id: RoadmapId; title: string; tagline: string; description: string; sections: TreeSection[] };
 
@@ -17,7 +17,7 @@ export function buildTree(lang: Lang, id: string, root = CONTENT_ROOT): TreePath
       ...entries.get(l.slug)!, prerequisites: (l.prerequisites ?? []).map((slug) => {
         const p = entries.get(slug);
         if (!p) throw new Error(`Unknown prerequisite: ${id}/${slug}`);
-        return { slug, title: p.title };
+        return { slug, title: p.title, contentLang: p.contentLang };
       }),
     })) })),
   };

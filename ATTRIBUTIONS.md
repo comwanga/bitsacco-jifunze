@@ -10,10 +10,6 @@ The 17 lessons in `content/lightning/` are adapted, simplified and translated in
 
 The lab in `lab/` runs [Polar](https://github.com/jamaljsr/polar)'s regtest node images (MIT) for Bitcoin Core, LND, Core Lightning and Eclair. The bridge, CLI wrappers, helpers and checks are Jifunze code (MIT).
 
-## Learning-flow inspiration
-
-The capstone and community-review flow at the end of the builders path was inspired by [TheBuidl](https://www.thebuidl.xyz/) cohort programmes (learn, capstone project, mentorship). No TheBuidl material is copied.
-
 ## Kujifunza Bitcoin and the whitepaper
 
 - **Kujifunza Bitcoin: Kuprogramu Blockchain Huria** is the Kiswahili edition of *Mastering Bitcoin* (3rd edition) by Andreas M. Antonopoulos and David A. Harding, translated by comwanga, licensed CC BY-SA 4.0. Lessons link to its chapters rather than copying them.

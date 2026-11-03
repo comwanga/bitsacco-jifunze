@@ -80,8 +80,11 @@ export async function revokeOtherSessions(sql: Sql, accountId: string, keep?: Bu
   return rows.length;
 }
 
-export async function markReauth(sql: Sql, tokenHash: Buffer): Promise<void> {
-  await sql`update sessions set reauth_at = now() where token_hash = ${tokenHash}`;
+/** Sets reauth_at on this one session if it is still live; false means it was revoked or expired meanwhile. */
+export async function markReauth(sql: Sql, tokenHash: Buffer): Promise<boolean> {
+  const rows = await sql`update sessions set reauth_at = now()
+    where token_hash = ${tokenHash} and revoked_at is null and expires_at > now() returning 1`;
+  return rows.length === 1;
 }
 
 /**

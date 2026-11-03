@@ -27,6 +27,8 @@ export type Ctx = {
   session: Session | null;
   cfg: Config;
   sql: Sql;
+  /** Reports an unexpected error the handler turned into a reply: name, stack, method and route template only. */
+  logError: (err: unknown) => void;
 };
 export type Reply = { status: number; json?: unknown; redirect?: string; setCookies?: string[] };
 
@@ -168,6 +170,12 @@ export function createServer(routes: Route[], deps: Deps): Server {
       log(line);
     });
 
+    // Method and route template only: never bodies, headers, cookies, query or IP.
+    const report = (err: unknown): void => {
+      const e = err instanceof Error ? err : new Error(String(err));
+      logError({ method: req.method ?? "", route: routeTemplate, name: e.name, stack: e.stack ?? e.message });
+    };
+
     handle().catch((err: unknown) => {
       if (res.headersSent) {
         res.destroy();
@@ -175,9 +183,7 @@ export function createServer(routes: Route[], deps: Deps): Server {
       }
       if (err instanceof ApiError) sendError(res, err.status, err.code);
       else {
-        // Method and route template only: never bodies, headers, cookies, query or IP.
-        const e = err instanceof Error ? err : new Error(String(err));
-        logError({ method: req.method ?? "", route: routeTemplate, name: e.name, stack: e.stack ?? e.message });
+        report(err);
         sendError(res, 500, "internal");
       }
     });
@@ -214,7 +220,17 @@ export function createServer(routes: Route[], deps: Deps): Server {
         if (raw.length > 0 && !isJsonContentType(req.headers["content-type"])) throw new ApiError(400, "bad_request");
       }
 
-      // 5. zod
+      // 5. session (before the body is parsed, so an anonymous request never reaches validation)
+      const cookies = parseCookies(req.headers.cookie);
+      const session = await readSession(sql, cookies[SESSION_COOKIE]);
+      if (session) accountId = session.accountId;
+      if (route.auth !== "public") {
+        if (!session) throw new ApiError(401, "unauthenticated");
+        // A recovery session reaches only routes that opt in, whether auth is "full" or "any".
+        if (session.scope === "recovery" && !route.recoveryAllowed) throw new ApiError(403, "recovery_scope");
+      }
+
+      // 6. zod
       let body: unknown = undefined;
       if (route.body) {
         let parsed: unknown;
@@ -228,16 +244,6 @@ export function createServer(routes: Route[], deps: Deps): Server {
         body = result.data;
       }
 
-      // 6. session
-      const cookies = parseCookies(req.headers.cookie);
-      const session = await readSession(sql, cookies[SESSION_COOKIE]);
-      if (session) accountId = session.accountId;
-      if (route.auth !== "public") {
-        if (!session) throw new ApiError(401, "unauthenticated");
-        // A recovery session reaches only routes that opt in, whether auth is "full" or "any".
-        if (session.scope === "recovery" && !route.recoveryAllowed) throw new ApiError(403, "recovery_scope");
-      }
-
       // 7. handler
       const reply = await route.handler({
         params,
@@ -248,6 +254,7 @@ export function createServer(routes: Route[], deps: Deps): Server {
         session,
         cfg,
         sql,
+        logError: report,
       });
 
       if (reply.setCookies && reply.setCookies.length > 0) res.setHeader("Set-Cookie", reply.setCookies);

@@ -1,0 +1,17 @@
+name: Lesson idea or correction
+description: Suggest a new lesson, or report a mistake in one
+labels: [content]
+body:
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson (roadmap and slug, or "new")
+      placeholder: savers/wallets-keys
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What should change, and why?
+    validations:
+      required: true

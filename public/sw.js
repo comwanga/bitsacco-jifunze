@@ -1,8 +1,23 @@
 /* Bitsacco Jifunze service worker: offline reading for lessons you have opened. */
+// The build ID changes this file on every deploy, so browsers install the new worker.
 const VERSION = "__BUILD_ID__"; // replaced by scripts/postbuild.ts
-const PAGES = `pages-${VERSION}`;
-const STATIC = `static-${VERSION}`;
-const DATA = `data-${VERSION}`;
+// Cache names are NOT tied to the build: lessons a reader saved must survive site updates.
+// Pages are network-first, so they refresh whenever the reader is online.
+const PAGES = "pages-v1";
+const STATIC = "static-v1";
+const DATA = "data-v1";
+const KEEP = [PAGES, STATIC, DATA];
+const MAX_STATIC = 400; // old hashed chunks pile up across deploys; drop the oldest beyond this
+
+function staleCaches(keys) {
+  return keys.filter((k) => !KEEP.includes(k));
+}
+
+async function trim(cacheName, max) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  await Promise.all(keys.slice(0, Math.max(0, keys.length - max)).map((k) => cache.delete(k)));
+}
 const PRECACHE = [
   "/sw/",
   "/en/",
@@ -40,7 +55,8 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => !k.endsWith(VERSION)).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(staleCaches(keys).map((k) => caches.delete(k))))
+      .then(() => trim(STATIC, MAX_STATIC))
       .then(() => self.clients.claim()),
   );
 });

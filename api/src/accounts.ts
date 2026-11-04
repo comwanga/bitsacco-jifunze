@@ -1,7 +1,7 @@
 import { errorCode } from "./db.ts";
 import { ApiError } from "./errors.ts";
 import type { Session, Sql } from "./http.ts";
-import { createSession, revokeSession } from "./sessions.ts";
+import { createSession, revokeOtherSessions, revokeSession } from "./sessions.ts";
 
 type GithubUser = { id: number; login: string; avatarUrl: string };
 
@@ -69,60 +69,69 @@ export async function signInWithGithub(
 const IDENTITY_UNIQUE = "identities_provider_provider_uid_key";
 
 /**
- * Replaces the account's GitHub identity in ONE transaction, holding the account row:
- *  1. lock the account row without waiting (a concurrent replacement → 409 replace_conflict);
- *  2. if `binding` is given, the initiating session must still be live, of that scope, on this account
- *     (→ 401 unauthenticated), checked under the lock so a revocation cannot slip in before commit;
+ * Replaces the account's GitHub identity. ONE transaction holds the identity change, the revocation of
+ * every session of the account, the fresh full session and the event: all commit or none do.
+ *  1. lock the account row FOR NO KEY UPDATE without waiting (a concurrent replacement → 409
+ *     replace_conflict; inserts that merely reference the account, such as sessions, do not conflict);
+ *  2. if `binding` is given, lock the initiating session row and require it to be live, of that scope,
+ *     on this account (→ 401 unauthenticated). A concurrent revocation of it either committed first (and
+ *     is seen here) or waits for this transaction;
  *  3. (github, gh.id) on another account → 409 identity_in_use, also when a racing account commits it first;
  *  4. gh.id already this account's identity → "unchanged" (handle and avatar refreshed);
- *  5. otherwise delete this account's GitHub identity, insert the new one, log the event.
- * Sessions are not touched here: the caller revokes them after commit.
+ *  5. otherwise delete this account's GitHub identity and insert the new one;
+ *  6. in both outcomes: revoke all the account's sessions, create a fresh full session, log the event.
  */
 export async function replaceGithubIdentity(
   sql: Sql,
   accountId: string,
   gh: GithubUser,
   binding?: { tokenHash: Buffer; scope: Session["scope"] },
-): Promise<"replaced" | "unchanged"> {
+): Promise<{ outcome: "replaced" | "unchanged"; cookie: string }> {
   const uid = String(gh.id);
   const avatar = gh.avatarUrl === "" ? null : gh.avatarUrl;
   try {
     return await sql.begin(async (tx) => {
-      // Bounds every other wait in here (e.g. on the unique index behind a racing insert).
+      // Bounds every other wait in here (the session row lock, the unique index behind a racing insert).
       await tx`set local lock_timeout = '2s'`;
-      const acct = await tx`select id from accounts where id = ${accountId} and deleted_at is null for update nowait`;
+      const acct = await tx`
+        select id from accounts where id = ${accountId} and deleted_at is null for no key update nowait`;
       if (acct.length === 0) throw new ApiError(401, "unauthenticated");
       if (binding) {
         const live = await tx`
           select 1 from sessions
           where token_hash = ${binding.tokenHash} and account_id = ${accountId} and scope = ${binding.scope}
-            and revoked_at is null and expires_at > now()`;
+            and revoked_at is null and expires_at > now()
+          for no key update`;
         if (live.length === 0) throw new ApiError(401, "unauthenticated");
       }
 
       const [owner] = await tx<{ account_id: string }[]>`
         select account_id from identities where provider = 'github' and provider_uid = ${uid}`;
       if (owner && owner.account_id !== accountId) throw new ApiError(409, "identity_in_use");
+      let outcome: "replaced" | "unchanged";
       if (owner) {
         await tx`update identities set handle = ${gh.login}, avatar_url = ${avatar}, last_verified_at = now(), revoked_at = null
           where provider = 'github' and provider_uid = ${uid}`;
-        await logEvent(tx, accountId, "identity_replaced", { provider: "github", outcome: "unchanged" });
-        return "unchanged" as const;
+        outcome = "unchanged";
+      } else {
+        await tx`delete from identities where account_id = ${accountId} and provider = 'github'`;
+        try {
+          await tx`
+            insert into identities (account_id, provider, provider_uid, handle, avatar_url)
+            values (${accountId}, 'github', ${uid}, ${gh.login}, ${avatar})`;
+        } catch (e) {
+          // Another account committed this uid after our check above.
+          const constraint = (e as { constraint_name?: unknown } | null)?.constraint_name;
+          if (errorCode(e) === "23505" && constraint === IDENTITY_UNIQUE) throw new ApiError(409, "identity_in_use");
+          throw e;
+        }
+        outcome = "replaced";
       }
 
-      await tx`delete from identities where account_id = ${accountId} and provider = 'github'`;
-      try {
-        await tx`
-          insert into identities (account_id, provider, provider_uid, handle, avatar_url)
-          values (${accountId}, 'github', ${uid}, ${gh.login}, ${avatar})`;
-      } catch (e) {
-        // Another account committed this uid after our check above.
-        const constraint = (e as { constraint_name?: unknown } | null)?.constraint_name;
-        if (errorCode(e) === "23505" && constraint === IDENTITY_UNIQUE) throw new ApiError(409, "identity_in_use");
-        throw e;
-      }
-      await logEvent(tx, accountId, "identity_replaced", { provider: "github", outcome: "replaced" });
-      return "replaced" as const;
+      await revokeOtherSessions(tx, accountId); // every session, the initiating one included
+      const fresh = await createSession(tx, accountId, "full");
+      await logEvent(tx, accountId, "identity_replaced", { provider: "github", outcome });
+      return { outcome, cookie: fresh.cookie };
     });
   } catch (e) {
     // 55P03 lock_not_available: the NOWAIT row lock, or lock_timeout on any other wait.

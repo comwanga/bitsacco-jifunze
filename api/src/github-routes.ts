@@ -5,7 +5,7 @@ import { ApiError, type ErrorCode } from "./errors.ts";
 import { authorizeUrl, githubIdentity } from "./github.ts";
 import { PREAUTH_COOKIE, SESSION_COOKIE, type Ctx, type Reply, type Route, type Session } from "./http.ts";
 import { Limiter, perIp } from "./ratelimit.ts";
-import { createSession, markReauth, readSession, revokeOtherSessions } from "./sessions.ts";
+import { markReauth, readSession } from "./sessions.ts";
 
 type Lang = "sw" | "en";
 type Purpose = "signin" | "reauth" | "replace";
@@ -168,14 +168,16 @@ async function completeCallback(
     const [linked] = await sql<{ provider_uid: string }[]>`
       select provider_uid from identities where account_id = ${live.accountId} and provider = 'github'`;
     if (!linked || linked.provider_uid !== String(gh.id)) return fail("reauth_mismatch");
-    if (!(await markReauth(sql, live.tokenHash))) return fail("unauthenticated");
-    await logEvent(sql, live.accountId, "reauth", { provider: "github" });
+    // reauth_at and its event commit together.
+    await sql.begin(async (tx) => {
+      if (!(await markReauth(tx, live.tokenHash))) throw new ApiError(401, "unauthenticated");
+      await logEvent(tx, live.accountId, "reauth", { provider: "github" });
+    });
     return { status: 302, redirect: ch.returnTo, setCookies: [clearPreauth] };
   }
 
-  // replace: the transaction re-checks the binding under the account row lock.
-  await replaceGithubIdentity(sql, live.accountId, gh, { tokenHash: live.tokenHash, scope: live.scope });
-  await revokeOtherSessions(sql, live.accountId); // every session, the initiating one included
-  const fresh = await createSession(sql, live.accountId, "full");
-  return { status: 302, redirect: `/${ch.lang}/account/?replaced=github`, setCookies: [fresh.cookie, clearPreauth] };
+  // replace: one transaction re-checks the binding under the row locks, switches the identity,
+  // revokes every session of the account and issues the fresh full session.
+  const { cookie } = await replaceGithubIdentity(sql, live.accountId, gh, { tokenHash: live.tokenHash, scope: live.scope });
+  return { status: 302, redirect: `/${ch.lang}/account/?replaced=github`, setCookies: [cookie, clearPreauth] };
 }

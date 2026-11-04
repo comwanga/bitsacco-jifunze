@@ -273,7 +273,7 @@ describe("replace GitHub identity", () => {
     const [after] = await sql<{ provider_uid: string; handle: string; linked_at: Date }[]>`
       select provider_uid, handle, linked_at from identities where account_id = ${x}`;
     expect(after).toEqual({ provider_uid: "1001", handle: "octo-renamed", linked_at: before!.linked_at });
-    expect(await replaceGithubIdentity(sql, x, { id: 1001, login: "octo", avatarUrl: "" })).toBe("unchanged");
+    expect((await replaceGithubIdentity(sql, x, { id: 1001, login: "octo", avatarUrl: "" })).outcome).toBe("unchanged");
   });
 
   it("replacing with a GitHub id linked to another account → 409 identity_in_use, both accounts unchanged", async () => {
@@ -334,6 +334,54 @@ describe("replace GitHub identity", () => {
       await held.release();
     }
     expect(await githubUids(x)).toEqual(["3003"]);
+  });
+
+  /** Runs `work` in a transaction on its own connection and keeps it open until commit() is called. */
+  async function openTx(work: (tx: typeof sql) => Promise<unknown>): Promise<{ commit: () => Promise<void> }> {
+    let commit!: () => void;
+    const gate = new Promise<void>((r) => (commit = r));
+    let ready!: () => void;
+    const isReady = new Promise<void>((r) => (ready = r));
+    const done = sql.begin(async (tx) => {
+      await work(tx);
+      ready();
+      await gate;
+    });
+    await isReady;
+    return {
+      commit: async () => {
+        commit();
+        await done;
+      },
+    };
+  }
+
+  it("an uncommitted insert referencing the account (FK key-share lock) does not make a replacement conflict", async () => {
+    const x = await accountWith(A);
+    const other = await openTx((tx) => tx`insert into security_events (account_id, event) values (${x}, 'unrelated')`);
+    try {
+      const r = await replaceGithubIdentity(sql, x, { id: 2002, login: "hubot", avatarUrl: "" });
+      expect(r.outcome).toBe("replaced");
+    } finally {
+      await other.commit();
+    }
+    expect(await githubUids(x)).toEqual(["2002"]);
+  });
+
+  it("a revocation of the initiating session racing the replacement serialises on the session row: the replacement sees it and refuses", async () => {
+    const x = await accountWith(A);
+    const rec = await sessionFor(x, "recovery");
+    const revoke = await openTx((tx) => tx`update sessions set revoked_at = now() where token_hash = ${rec.tokenHash}`);
+    const pending = replaceGithubIdentity(sql, x, { id: 2002, login: "hubot", avatarUrl: "" }, {
+      tokenHash: rec.tokenHash,
+      scope: "recovery",
+    }).catch((e: unknown) => e);
+    await untilBlockedOnLock(); // waiting on the session row the revocation holds
+    await revoke.commit();
+    expect(await pending).toMatchObject({ status: 401, code: "unauthenticated" });
+    expect(await githubUids(x)).toEqual(["1001"]);
+    expect(await sql`select 1 from sessions where account_id = ${x}`).toHaveLength(1);
+    expect(await sql`select 1 from security_events where event = 'identity_replaced'`).toHaveLength(0);
   });
 
   it("two accounts racing to take the same new GitHub id → one wins; the loser → 409 identity_in_use, unchanged", async () => {
@@ -577,8 +625,11 @@ describe("replace GitHub identity", () => {
       const before = await snapshot();
       expect((await finish(api, f, init.cookie)).headers.get("location")).toBe(UNAUTH);
       expect(await snapshot()).toEqual(before);
-      const again = await begin(api, `purpose=${kind.purpose}&lang=sw`, init.cookie, kind.user).catch(() => null);
-      expect(again).toBeNull(); // the revoked session cannot even start a new flow
+      // the revoked session cannot even start a new flow
+      const again = await get(`${api.base}/api/auth/github/start?purpose=${kind.purpose}&lang=sw`, init.cookie);
+      expect(again.status).toBe(302);
+      expect(again.headers.get("location")).toBe(UNAUTH);
+      expect(again.headers.getSetCookie()).toHaveLength(0);
       expect(await readSession(sql, valueOf(elsewhere))).not.toBeNull();
     });
 
@@ -670,6 +721,31 @@ describe("replace GitHub identity", () => {
       const out = JSON.stringify(errors);
       for (const secret of [f.state, f.code, valueOf(f.pre), valueOf(rec.cookie)]) expect(out).not.toContain(secret);
     });
+
+    it.each(["B", "A"] as const)(
+      "a failure creating the fresh session during replace (new user %s) rolls back the identity change and the revocations",
+      async (who) => {
+        const api = await startApi();
+        const x = await accountWith(A);
+        const rec = await sessionFor(x, "recovery");
+        const bystander = await sessionFor(x, "full");
+        const f = await begin(api, "purpose=replace&lang=sw", rec.cookie, who === "B" ? B : { ...A, login: "octo-new" });
+        await sql.unsafe(`
+          create function fail_insert() returns trigger language plpgsql as $$ begin raise exception 'injected failure'; end $$;
+          create trigger sessions_fail before insert on sessions for each row execute function fail_insert();`);
+        const before = await snapshot();
+        const res = await finish(api, f, rec.cookie);
+        expect(res.status).toBe(302);
+        expect(res.headers.get("location")).toBe("/sw/account/?error=internal");
+        expect(cookieOf(res, "__Host-jf_preauth")).toBe(CLEAR_PREAUTH);
+        expect(cookieOf(res, "__Host-jf_session")).toBeUndefined();
+        expect(await snapshot()).toEqual(before); // identity, sessions and events all unchanged
+        expect(await githubUids(x)).toEqual(["1001"]);
+        expect(await readSession(sql, valueOf(rec.cookie))).not.toBeNull();
+        expect(await readSession(sql, valueOf(bystander.cookie))).not.toBeNull();
+        expect(errors).toHaveLength(1);
+      },
+    );
 
     it("a session-creation failure during sign-in → 302 with error=internal and no orphan account or identity", async () => {
       const api = await startApi();

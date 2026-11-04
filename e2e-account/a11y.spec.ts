@@ -20,8 +20,9 @@ async function scan(page: Page, label: string): Promise<void> {
   await page.setViewportSize({ width: 1280, height: 800 });
 }
 
-// Each test scans up to seven page states at two widths.
-test.describe.configure({ timeout: 120_000 });
+// Each test scans up to seven page states at two widths. No retries: the recovery test spends 1 of the
+// API's 5 recovery attempts per 15 minutes per IP (see recovery.spec.ts), and a retry would spend another.
+test.describe.configure({ timeout: 120_000, retries: 0 });
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });

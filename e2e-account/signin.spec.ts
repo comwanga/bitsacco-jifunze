@@ -37,20 +37,31 @@ for (const lang of LANGS) {
     expect(session!.path).toBe("/");
     expect(await page.evaluate(() => document.cookie)).not.toContain("jf_session");
 
-    // Opening the sign-out page alone never signs anyone out.
+    const logout = () => requests.filter((r) => r.method === "POST" && r.path === "/api/auth/logout");
+    const hasSession = async () => (await context.cookies()).some((k) => k.name === SESSION_COOKIE);
+
+    // Opening the sign-out page alone never signs anyone out: neither a direct load...
+    await page.goto(`/${lang}/account/signout/`);
+    await expect(page.getByRole("main").getByRole("button", { name: c.signOut, exact: true })).toBeEnabled();
+    await page.waitForLoadState("networkidle");
+    expect(logout()).toHaveLength(0);
+    expect(await hasSession()).toBe(true);
+
+    // ...nor following the account page's Sign out link.
+    await page.goto(`/${lang}/account/`);
+    await expect(page.locator("[data-github-handle]")).toBeVisible();
     await page.getByRole("main").getByRole("link", { name: c.signOut, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/${lang}/account/signout/$`));
     const button = page.getByRole("main").getByRole("button", { name: c.signOut, exact: true });
     await expect(button).toBeEnabled();
     await page.waitForLoadState("networkidle");
-    const logout = () => requests.filter((r) => r.method === "POST" && r.path === "/api/auth/logout");
     expect(logout()).toHaveLength(0);
-    expect((await context.cookies()).some((k) => k.name === SESSION_COOKIE)).toBe(true);
+    expect(await hasSession()).toBe(true);
 
     await button.click();
     await expect(page.getByRole("status").filter({ hasText: c.signedOutDone })).toBeVisible();
     expect(logout()).toHaveLength(1);
-    expect((await context.cookies()).some((k) => k.name === SESSION_COOKIE)).toBe(false);
+    expect(await hasSession()).toBe(false);
 
     await page.goto(`/${lang}/account/`);
     await expect(page.getByText(c.signedOut)).toBeVisible();

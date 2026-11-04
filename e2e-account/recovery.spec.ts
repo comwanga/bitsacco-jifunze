@@ -3,7 +3,9 @@ import { accountCopy, errorText } from "../lib/account-copy";
 import { approve, continueWithGithub, finishWelcome, freshUser, signOut, signUp, submitRecoveryCode, whoAmI } from "./helpers";
 
 // Recovery against the real API and a fake GitHub. The API allows 5 recovery attempts per 15 minutes per IP,
-// and every test here comes from 127.0.0.1, so the specs use as few attempts as they can (4 in all, with a11y).
+// and every test comes from 127.0.0.1. Budget per run: 2 here (sw: use + reuse), 1 here (en), 1 in a11y = 4.
+// No retries for these files: a retry would spend more attempts and could fail as rate_limited instead.
+test.describe.configure({ retries: 0 });
 
 test("sw: a recovery code, Replace GitHub, and a reused code", async ({ page }) => {
   const c = accountCopy.sw;

@@ -23,7 +23,7 @@ const types = {
 // Like the nginx /api/ location: the client's X-Real-IP is replaced, and /api/internal/ is never reachable.
 function proxyApi(req, res, pathname) {
   if (pathname.startsWith("/api/internal/")) {
-    res.writeHead(404).end();
+    res.writeHead(404, { "content-type": "application/json; charset=utf-8" }).end('{"error":{"code":"not_found","message_sw":"Hatukupata ukurasa au kitu ulichotafuta.","message_en":"We could not find what you were looking for."}}');
     return;
   }
   const upstream = http.request(

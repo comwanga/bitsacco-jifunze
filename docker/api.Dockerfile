@@ -5,8 +5,8 @@
 FROM node:24.22.2-alpine3.24 AS deps
 WORKDIR /app/api
 RUN npm install --global npm@12.0.2
-COPY .npmrc ./
-COPY api/package.json api/package-lock.json ./
+# api/.npmrc carries the same hardening as the root one (no git or remote specs, no install scripts).
+COPY api/.npmrc api/package.json api/package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 FROM node:24.22.2-alpine3.24 AS runner

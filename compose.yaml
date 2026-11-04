@@ -1,8 +1,9 @@
 # Local account stack: the site (nginx) on http://localhost:8080, the account API and PostgreSQL.
 #   cp api/.env.example api/.env.local   # then fill it in; it is git-ignored and never committed
 #   docker compose up --build
-# Only the site is published. The API and the database have no host port: the API trusts X-Real-IP only
-# from a private peer, so nginx must be the only way in.
+# A local development stack, not a production boundary. Only the site is published; the API and the
+# database have no host port. The API trusts X-Real-IP from any private peer, and on a Linux host local
+# processes can still reach the api container's address on the (non-internal) egress bridge.
 name: jifunze
 
 services:

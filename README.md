@@ -78,7 +78,9 @@ docker compose up --build            # http://localhost:8080/sw/account/
 ```
 
 - `api/.env.local` is git-ignored and is not sent to Docker builds. Secrets are never committed: compose reads them at run time.
-- Only the site is published, on `127.0.0.1:8080`. The API and the database have no host port.
+- Open `http://localhost:8080`, not `127.0.0.1:8080`: the API checks each POST's origin against `SITE_ORIGIN` (`http://localhost:8080`) and refuses others with `bad_origin`.
+- Only the site is published, on `127.0.0.1:8080`. The API and the database have no host port. This is a local development stack, not a production boundary.
+- nginx logs `/api/` requests without their query strings and suppresses its own `/api/` error lines below `crit`, since they would quote the GitHub callback's code and state. In an outage, read the access log's status and `upstream=` fields and `docker compose logs api`.
 - Sign in locally with Chromium or Firefox. The session cookie is `__Host-` and `Secure`, and Safari/WebKit refuses it on `http://localhost`.
 - The rate limits live in the API's memory, so they reset whenever it restarts.
 - GitHub requires the `redirect_uri` to match a registered callback. Register all three on the GitHub App: `/api/auth/github/callback`, `/api/auth/github/callback/reauth` and `/api/auth/github/callback/replace` (for example `http://localhost:8080/api/auth/github/callback`).

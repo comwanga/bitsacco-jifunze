@@ -183,7 +183,7 @@ const sw: AccountCopy = {
   nostrDeclined: "Umekataa ombi la kusaini, kwa hiyo hujaingia. Unaweza kujaribu tena.",
   nostrFailed: "Hatukuweza kukamilisha kuingia kwa Nostr. Angalia programu yako ya kusaini na muunganisho wako, kisha ujaribu tena.",
   nostrWelcomeLead: "Akaunti yako iko tayari. Hifadhi misimbo hii ya kurejesha sasa mahali salama na pa siri iwapo utapoteza uwezo wa kutumia programu yako ya kusaini ya Nostr.",
-  nostrCodesHelp: "Weka misimbo yako ya kurejesha mahali pa siri. Ukitengeneza misimbo mipya ya kurejesha, misimbo yote ya awali haitatumika tena. Ili utengeneze mipya, toka kisha uingie tena kwa Nostr kwanza. Kubadilisha njia ya kuingia ya Nostr iliyopotea kutapatikana katika sasisho la baadaye.",
+  nostrCodesHelp: "Weka misimbo yako ya kurejesha mahali pa siri. Ukitengeneza misimbo mipya ya kurejesha, misimbo yote ya awali haitatumika tena. Ili utengeneze mipya, toka kisha uingie tena kwa Nostr kwanza. Kubadilisha utambulisho wa Nostr uliopotea kutawezekana katika sasisho lijalo.",
   nostrSignInAgain: "Kwa usalama wako, toka kisha uingie tena kwa Nostr kabla ya kutengeneza misimbo mipya ya kurejesha.",
   useRecoveryCode: "Tumia msimbo wa kurejesha",
   recoveryCodeHelp: "Huwezi tena kuingia kwenye GitHub? Andika mmojawapo wa misimbo ya kurejesha uliyohifadhi. Kila msimbo unatumika mara moja tu.",

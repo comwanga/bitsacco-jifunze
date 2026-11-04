@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { Config } from "./config.ts";
 import { logEvent } from "./accounts.ts";
 import { ApiError } from "./errors.ts";
-import type { Route, Sql } from "./http.ts";
+import type { Route, Session, Sql } from "./http.ts";
 import { Limiter, perIp, slash24 } from "./ratelimit.ts";
 import { createSession, revokeOtherSessions } from "./sessions.ts";
 
@@ -57,20 +57,24 @@ export function hashCode(pepper: Buffer, normalised: string): Buffer {
  * Replaces the account's whole set in one transaction and returns the new plaintext codes.
  * With `initial`, it first claims the account's first set in that same transaction (409 if already claimed),
  * so a failure or a dead process before commit leaves the account unclaimed and able to try again.
+ * With `session`, the requesting session is re-checked inside the transaction (401 if it is no longer live, 403
+ * if a full session's re-auth is stale), so a replace or a redemption that revoked it first wins. Routes always
+ * pass it.
  */
 export async function issueCodes(
   sql: Sql,
   cfg: Config,
   accountId: string,
-  opts: { initial?: boolean } = {},
+  opts: { initial?: boolean; session?: Pick<Session, "tokenHash" | "scope"> } = {},
 ): Promise<string[]> {
   const pepper = cfg.peppers.get(cfg.currentPepper);
   if (!pepper) throw new Error("current recovery pepper is not configured");
   const codes = generateCodes();
   const setId = randomUUID();
   await sql.begin(async (tx) => {
-    // Serialise concurrent regenerations for one account so exactly one set survives.
-    await tx`select id from accounts where id = ${accountId} for update`;
+    // Serialise concurrent regenerations for one account so exactly one set survives, and wait for a replace
+    // in progress. NO KEY: inserts that reference the account (a redemption's session and event) must not block.
+    await tx`select id from accounts where id = ${accountId} for no key update`;
     if (opts.initial) {
       const claimed = await tx`
         update accounts set recovery_codes_issued_at = now()
@@ -78,6 +82,18 @@ export async function issueCodes(
       if (claimed.length === 0) throw new ApiError(409, "codes_already_issued");
     }
     await tx`delete from recovery_codes where account_id = ${accountId}`;
+    if (opts.session) {
+      // After the delete, so locks come in the order a redemption takes them (codes, then sessions). A revocation
+      // that committed first is seen here; one that comes later waits for this commit. A failure rolls back the
+      // delete, so the existing codes stay.
+      const [live] = await tx<{ fresh: boolean }[]>`
+        select (scope = 'recovery' or reauth_at > now() - interval '10 minutes') as fresh from sessions
+        where token_hash = ${opts.session.tokenHash} and account_id = ${accountId} and scope = ${opts.session.scope}
+          and revoked_at is null and expires_at > now()
+        for no key update`;
+      if (!live) throw new ApiError(401, "unauthenticated");
+      if (!opts.initial && !live.fresh) throw new ApiError(403, "reauth_required");
+    }
     for (const c of codes) {
       await tx`
         insert into recovery_codes (code_hash, pepper_version, account_id, set_id)
@@ -236,7 +252,7 @@ export function recoveryRoutes(
     // The claim commits with the codes, so two racing first calls cannot both be shown a set.
     handler: async ({ sql, cfg, session }) => ({
       status: 200,
-      json: { codes: await issueCodes(sql, cfg, session!.accountId, { initial: true }) },
+      json: { codes: await issueCodes(sql, cfg, session!.accountId, { initial: true, session: session! }) },
     }),
   };
 
@@ -245,16 +261,11 @@ export function recoveryRoutes(
     path: "/api/me/recovery-codes",
     auth: "any",
     recoveryAllowed: true,
-    handler: async ({ sql, cfg, session }) => {
-      const s = session!;
-      if (s.scope === "full") {
-        // Re-read from the database: a stale copy must not grant access.
-        const fresh = await sql`
-          select 1 from sessions where token_hash = ${s.tokenHash} and reauth_at > now() - interval '10 minutes'`;
-        if (fresh.length === 0) throw new ApiError(403, "reauth_required");
-      }
-      return { status: 200, json: { codes: await issueCodes(sql, cfg, s.accountId) } };
-    },
+    // The session and, for a full session, its re-auth freshness are checked inside issueCodes's transaction.
+    handler: async ({ sql, cfg, session }) => ({
+      status: 200,
+      json: { codes: await issueCodes(sql, cfg, session!.accountId, { session: session! }) },
+    }),
   };
 
   return [redeem, initial, regenerate];

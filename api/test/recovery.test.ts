@@ -3,6 +3,7 @@ import { createServer as netServer, type AddressInfo } from "node:net";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { replaceGithubIdentity } from "../src/accounts.ts";
 import type { Config } from "../src/config.ts";
 import { connect, migrate } from "../src/db.ts";
 import { githubRoutes, GITHUB_START_RULE } from "../src/github-routes.ts";
@@ -691,5 +692,125 @@ describe("ratelimit helpers", () => {
 
   it("slash24 still groups as before", () => {
     expect(slash24("203.0.113.77")).toBe("203.0.113.0/24");
+  });
+});
+
+describe("issuance re-checks the requesting session inside its transaction", () => {
+  // A trigger holds the other transaction at a known point until the test opens the gate. It waits in a loop,
+  // not on a lock, so the replace's lock_timeout does not apply; the test observes each side's state in
+  // pg_stat_activity instead of sleeping.
+  const gate = (table: string, event: "insert" | "update") =>
+    sql.unsafe(`
+      create table gate (open boolean not null); insert into gate values (false);
+      create function hold() returns trigger language plpgsql as $$
+      begin while not (select open from gate) loop perform pg_sleep(0.01); end loop; return new; end $$;
+      create trigger hold after ${event} on ${table} for each row execute function hold();`);
+  const openGate = () => sql`update gate set open = true`;
+  const until = async (what: string, check: () => Promise<boolean>) => {
+    for (let i = 0; !(await check()); i++) {
+      if (i > 400) throw new Error(`timed out waiting for ${what}`);
+      await new Promise((r) => setTimeout(r, 25));
+    }
+  };
+  const held = async () => (await sql`select 1 from pg_stat_activity where wait_event = 'PgSleep'`).length > 0;
+  const waitingOnLock = async () =>
+    (await sql`select 1 from pg_stat_activity where wait_event_type = 'Lock' and pid <> pg_backend_pid()`).length > 0;
+  const codeHashes = async (a: string) =>
+    (await sql<{ h: string }[]>`select encode(code_hash, 'hex') as h from recovery_codes where account_id = ${a} order by 1`).map(
+      (r) => r.h,
+    );
+  const linked = async (a: string, uid: string) =>
+    sql`insert into identities (account_id, provider, provider_uid, handle) values (${a}, 'github', ${uid}, 'octo')`;
+
+  it("a regeneration waiting behind a replace that revokes its session → 401 unauthenticated, and the existing codes stay", async () => {
+    const a = await newAccount();
+    await linked(a, "1001");
+    await issueCodes(sql, cfgV1(), a);
+    const before = await codeHashes(a);
+    const rec = await createSession(sql, a, "recovery"); // starts the replace
+    const full = await createSession(sql, a, "full"); // regenerates; fresh, as reauth_at starts at creation
+    await gate("identities", "insert"); // the replace holds the account lock and has not yet revoked anything
+    await withApi(async (base) => {
+      const replace = replaceGithubIdentity(sql, a, { id: 2002, login: "hubot", avatarUrl: "" }, { tokenHash: rec.tokenHash, scope: "recovery" });
+      await until("the replace to reach the gate", held);
+      const regen = post(base, "/api/me/recovery-codes", undefined, { cookie: pair(full.cookie) });
+      await until("the regeneration to wait for the account lock", waitingOnLock);
+      await openGate(); // the replace revokes every session, including the regenerating one, and commits
+      expect((await replace).outcome).toBe("replaced");
+      const r = await regen;
+      expect(r.status).toBe(401);
+      expect(await errCode(r)).toBe("unauthenticated");
+      expect(await codeHashes(a)).toEqual(before);
+    });
+  });
+
+  it("the first set requested behind a replace that revokes the session → 401, and the account stays unclaimed", async () => {
+    const a = await newAccount();
+    await linked(a, "1001");
+    const starter = await createSession(sql, a, "full"); // a fresh full session may replace
+    const asker = await createSession(sql, a, "full"); // asks for the first set
+    await gate("identities", "insert");
+    await withApi(async (base) => {
+      const replace = replaceGithubIdentity(sql, a, { id: 2002, login: "hubot", avatarUrl: "" }, { tokenHash: starter.tokenHash, scope: "full" });
+      await until("the replace to reach the gate", held);
+      const first = post(base, "/api/me/recovery-codes/initial", undefined, { cookie: pair(asker.cookie) });
+      await until("the first-set request to wait for the account lock", waitingOnLock);
+      await openGate();
+      expect((await replace).outcome).toBe("replaced");
+      const r = await first;
+      expect(r.status).toBe(401);
+      expect(await errCode(r)).toBe("unauthenticated");
+      const [acct] = await sql`select recovery_codes_issued_at from accounts where id = ${a}`;
+      expect(acct!.recovery_codes_issued_at).toBeNull();
+      expect(await codeHashes(a)).toEqual([]);
+    });
+  });
+
+  it.each([
+    ["its re-auth goes stale", "reauth_at = now() - interval '11 minutes'", 403, "reauth_required"],
+    ["it expires", "expires_at = now() - interval '1 second'", 401, "unauthenticated"],
+  ])("a regeneration whose session %s while it waits for the account lock → refused, and the existing codes stay", async (_, change, status, code) => {
+    const a = await newAccount();
+    await issueCodes(sql, cfgV1(), a);
+    const before = await codeHashes(a);
+    const full = await createSession(sql, a, "full");
+    const holder = await sql.reserve();
+    try {
+      await holder`begin`;
+      await holder`select id from accounts where id = ${a} for no key update`;
+      await withApi(async (base) => {
+        const regen = post(base, "/api/me/recovery-codes", undefined, { cookie: pair(full.cookie) });
+        await until("the regeneration to wait for the account lock", waitingOnLock);
+        await sql.unsafe(`update sessions set ${change} where token_hash = $1`, [full.tokenHash]);
+        await holder`commit`;
+        const r = await regen;
+        expect(r.status).toBe(status);
+        expect(await errCode(r)).toBe(code);
+        expect(await codeHashes(a)).toEqual(before);
+      });
+    } finally {
+      holder.release();
+    }
+  });
+
+  it("a regeneration waiting behind a recovery-code redemption that revokes its session → 401, and the existing codes stay", async () => {
+    const a = await newAccount();
+    const [code] = await issueCodes(sql, cfgV1(), a);
+    const before = await codeHashes(a);
+    const full = await createSession(sql, a, "full");
+    await gate("recovery_codes", "update"); // the redemption has consumed the code and not yet revoked anything
+    await withApi(async (base) => {
+      const redeem = rec(base, code, "198.51.100.1");
+      await until("the redemption to reach the gate", held);
+      const regen = post(base, "/api/me/recovery-codes", undefined, { cookie: pair(full.cookie) });
+      await until("the regeneration to wait on the consumed code", waitingOnLock);
+      await openGate(); // the redemption revokes every other session and commits
+      expect((await redeem).status).toBe(200);
+      const r = await regen;
+      expect(r.status).toBe(401);
+      expect(await errCode(r)).toBe("unauthenticated");
+      expect(await codeHashes(a)).toEqual(before); // the same set; only the redeemed code is now used
+      expect(await sql`select 1 from recovery_codes where account_id = ${a} and used_at is not null`).toHaveLength(1);
+    });
   });
 });

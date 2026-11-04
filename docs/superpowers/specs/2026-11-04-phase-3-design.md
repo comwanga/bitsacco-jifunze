@@ -586,7 +586,9 @@ Unchanged from revision 1:
 
   Global volume above 300 per hour only records one `recovery_flood` security event per hour for operators. At 80 bits, guessing a code is infeasible however many networks an attacker uses. The per-source limits exist to stop noise and denial of service.
 - **Logging (revised in the Increment 2a review):** failed attempts are **not** stored one security-event row each. A row per failure would let an attacker turn guessing into unbounded database writes. Instead:
-  - the API counts outcomes in fixed hourly windows and writes **one** structured log line per window: `{"event":"recovery_attempts_hourly","windowStart","attempts","succeeded","invalid","rateLimited"}`. It holds counts only, never a code, IP address or account. Memory is constant, and the line goes to the application log (14-day retention, F6);
+  - the API counts outcomes in fixed hourly windows and writes **one** structured log line per window: `{"event":"recovery_attempts_hourly","windowStart","attempts","succeeded","invalid","rateLimited"}`. It holds counts only, never a code, IP address or account. Memory is constant, and the line goes to the application log (14-day retention, F6).
+
+    There is no timer: a window's line is written when the first attempt of a later window arrives, so a quiet period delays it, and a restart loses the open window's counts;
   - a global spike still writes one `recovery_flood` security event per hour;
   - each **successful** redemption writes a `recovery_code_used` security event, in the same transaction that consumes the code.
 

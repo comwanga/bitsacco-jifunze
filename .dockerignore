@@ -1,6 +1,10 @@
-node_modules
+**/node_modules
 .next
 out
 .git
 .superpowers
 *.log
+# Local secrets for the account API (compose reads them at run time; no image needs them).
+**/.env.local
+test-results
+playwright-report

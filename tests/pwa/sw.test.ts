@@ -57,3 +57,107 @@ test("offline fallback language follows the URL, defaulting to Kiswahili", () =>
   expect(sw.langOf("/sw/savers/x/")).toBe("sw");
   expect(sw.langOf("/")).toBe("sw");
 });
+
+// ---- Task 8: API bypass, private pages, 404/410 eviction ----
+type Listener = (event: unknown) => void;
+function harness(fetchImpl: (req: unknown, init?: unknown) => Promise<Response>, seed: Record<string, Record<string, Response>> = {}) {
+  let listener: Listener = () => {};
+  const stores: Record<string, Map<string, Response>> = {};
+  const norm = (r: unknown) => (typeof r === "string" ? new URL(r, "http://x").toString() : (r as { url: string }).url);
+  const cacheOf = (name: string) => {
+    if (!stores[name]) {
+      stores[name] = new Map(Object.entries(seed[name] ?? {}).map(([k, v]) => [new URL(k, "http://x").toString(), v]));
+    }
+    const s = stores[name];
+    return {
+      match: async (r: unknown) => s.get(norm(r))?.clone(),
+      put: async (r: unknown, res: Response) => { s.set(norm(r), res); },
+      delete: async (r: unknown) => s.delete(norm(r)),
+      keys: async () => [],
+    };
+  };
+  const cachesFake = {
+    open: async (n: string) => cacheOf(n),
+    match: async (r: unknown) => { for (const n of Object.keys(stores)) { const m = await cacheOf(n).match(r); if (m) return m; } return undefined; },
+    keys: async () => Object.keys(stores),
+    delete: async () => true,
+  };
+  const self = {
+    location: { origin: "http://x" },
+    addEventListener: (name: string, fn: Listener) => { if (name === "fetch") listener = fn; },
+  };
+  const api = new Function("self", "caches", "fetch", `${src}; return { privateNavigation };`)(self, cachesFake, fetchImpl) as { privateNavigation(p: string): boolean };
+  const nav = (p: string, mode = "navigate", headers = new Headers()) => ({ method: "GET", url: `http://x${p}`, mode, headers });
+  async function fire(request: unknown) {
+    let responded: Promise<Response> | undefined;
+    const waits: Promise<unknown>[] = [];
+    listener({ request, respondWith: (p: Promise<Response>) => { responded = p; }, waitUntil: (p: Promise<unknown>) => { waits.push(p); } });
+    const response = responded ? await responded : undefined;
+    await Promise.all(waits);
+    return { intercepted: !!responded, response };
+  }
+  const cached = (name: string) => [...(stores[name]?.keys() ?? [])];
+  return { api, nav, fire, cached, cachesFake, stores };
+}
+
+test("a navigation to /api/auth/github/start is not intercepted", async () => {
+  const h = harness(async () => { throw new Error("must not fetch"); });
+  for (const mode of ["navigate", "cors", "same-origin"]) {
+    for (const method of ["GET", "POST"]) {
+      const r = await h.fire({ ...h.nav("/api/auth/github/start", mode), method });
+      expect(r.intercepted, `${method} ${mode}`).toBe(false);
+    }
+  }
+  expect(h.cached("pages-v1")).toEqual([]);
+});
+
+test("a navigation to /sw/account/ is answered from the network and never put in any cache", async () => {
+  const h = harness(async () => new Response("secret", { status: 200 }));
+  const r = await h.fire(h.nav("/sw/account/"));
+  expect(r.intercepted).toBe(true);
+  expect(await r.response!.text()).toBe("secret");
+  for (const n of Object.keys(h.stores)) expect(h.cached(n), n).toEqual([]);
+});
+
+test("/en/community/x/ behaves the same", async () => {
+  const h = harness(async () => new Response("c", { status: 200 }));
+  const r = await h.fire(h.nav("/en/community/x/"));
+  expect(r.intercepted).toBe(true);
+  expect(await r.response!.text()).toBe("c");
+  for (const n of Object.keys(h.stores)) expect(h.cached(n), n).toEqual([]);
+});
+
+test("a private navigation that fails on the network answers the cached offline page", async () => {
+  const h = harness(async () => { throw new TypeError("offline"); }, { "pages-v1": { "/en/offline/": new Response("offline-en") } });
+  const r = await h.fire(h.nav("/en/account/"));
+  expect(await r.response!.text()).toBe("offline-en");
+});
+
+test("private data files and warming never cache account pages", async () => {
+  const h = harness(async () => new Response("d", { status: 200 }));
+  for (const p of ["/sw/account/index.txt", "/en/community/x/__next.a/b.txt"]) {
+    await h.fire(h.nav(p, "cors"));
+  }
+  for (const n of Object.keys(h.stores)) expect(h.cached(n), n).toEqual([]);
+});
+
+for (const status of [404, 410]) {
+  test(`a cached /en/glossary/ is deleted when the network returns ${status}`, async () => {
+    const h = harness(async () => new Response("gone", { status }), { "pages-v1": { "/en/glossary/": new Response("old") } });
+    const r = await h.fire(h.nav("/en/glossary/?x=1"));
+    expect(r.response!.status).toBe(status);
+    expect(h.cached("pages-v1")).toEqual([]);
+  });
+}
+
+test("a 200 navigation is still cached as before", async () => {
+  const h = harness(async () => new Response("fresh", { status: 200 }));
+  await h.fire(h.nav("/en/glossary/"));
+  expect(h.cached("pages-v1")).toEqual(["http://x/en/glossary/"]);
+});
+
+test("privateNavigation matches account and community paths only", () => {
+  const { api } = harness(async () => new Response(""));
+  for (const p of ["/sw/account", "/sw/account/", "/en/community/a/"]) expect(api.privateNavigation(p), p).toBe(true);
+  for (const p of ["/sw/accounts/", "/sw/learn/"]) expect(api.privateNavigation(p), p).toBe(false);
+});

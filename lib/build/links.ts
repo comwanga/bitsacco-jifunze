@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
+// Refs under /api/ are answered by the account API (api/), not by files in out/.
 export function internalRefs(html: string): string[] {
   const refs: string[] = [];
   for (const m of html.matchAll(/\s(?:href|src)="([^"]*)"/g)) {
     const ref = m[1];
-    if (ref.startsWith("/") && !ref.startsWith("//")) refs.push(ref);
+    if (ref.startsWith("/") && !ref.startsWith("//") && !ref.startsWith("/api/")) refs.push(ref);
   }
   return refs;
 }

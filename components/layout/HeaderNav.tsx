@@ -21,10 +21,23 @@ function Links({ items, className }: { items: NavItem[]; className: string }) {
 }
 
 /**
- * Site navigation. From 1024px the links and the language switch form one group on the right:
- * [brand] ....... [Paths Labs Library Glossary Progress | Language]. Narrower: language switch and a menu.
+ * Site navigation. From 1024px the links, the language switch and the account link form one group on the right:
+ * [brand] ....... [Paths Labs Library Glossary Progress | Language Account]. Narrower: language switch and a menu,
+ * with Account as the menu's last item. The account link is one static link with no session check.
  */
-export function HeaderNav({ items, label, menuLabel, children }: { items: NavItem[]; label: string; menuLabel: string; children: ReactNode }) {
+export function HeaderNav({
+  items,
+  account,
+  label,
+  menuLabel,
+  children,
+}: {
+  items: NavItem[];
+  account: NavItem;
+  label: string;
+  menuLabel: string;
+  children: ReactNode;
+}) {
   return (
     <div className="ml-auto flex items-center gap-2 lg:gap-4">
       <nav aria-label={label} className="hidden lg:block">
@@ -34,6 +47,12 @@ export function HeaderNav({ items, label, menuLabel, children }: { items: NavIte
       </nav>
       <span aria-hidden="true" className="hidden h-6 w-px bg-white/20 lg:block" />
       {children}
+      {/* After the language switch, not before it: the switch stays grouped with the section links. */}
+      <div className="hidden lg:block">
+        <NavLink href={account.href} match={account.match} className={desktopLink}>
+          {account.label}
+        </NavLink>
+      </div>
       <SiteMenu>
         <summary className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-full border border-white/30 px-3.5 text-sm font-semibold text-white hover:bg-white/10 [&::-webkit-details-marker]:hidden">
           <svg viewBox="0 0 20 20" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -48,7 +67,7 @@ export function HeaderNav({ items, label, menuLabel, children }: { items: NavIte
           className="absolute inset-x-0 top-full max-h-[calc(100svh-var(--header-h))] overflow-auto border-t border-white/10 bg-night shadow-[0_16px_32px_-16px_rgb(6_9_28/0.7)]"
         >
           <ul className="mx-auto max-w-[96rem] px-2 py-2 sm:px-4 lg:px-6">
-            <Links items={items} className={menuLink} />
+            <Links items={[...items, account]} className={menuLink} />
           </ul>
         </nav>
       </SiteMenu>

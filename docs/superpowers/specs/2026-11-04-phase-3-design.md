@@ -1,4 +1,4 @@
-# Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 3.1)
+# Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 3.2)
 
 **Status.** Revision 2's architecture is **approved in principle** (maintainer review, 2026-11-04). This revision 3:
 - applies that review's corrections: the recovery-flow conditions (F5), the visibility semantics and HTML indexing (E2), and documentation consistency;
@@ -36,7 +36,7 @@ Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practis
 | D9 | Recovery | **Approved** (F5, revision 3) | Includes concurrency tests for replacement (F5). Administrative removal needs **legal review before general release**, and deletion keeps strong evidence and two-maintainer approval |
 | D10 | Ecosystem registry | **Approved** | A curated, broad, reviewable registry with no score (section G5) |
 | D11 | API dependencies | **Provisionally approved**; `nostr-tools` and the sign-in page's `connect-src 'self' wss:` **approved with conditions** | API: `postgres`, `@noble/curves`, `@noble/hashes`, `zod`, and a minimal router with tests for its boundaries. Client: `nostr-tools` **2.25.2**, NIP-46 only, loaded after explicit activation on the Nostr sign-in page only, with the relay validation and resource rules in F3 |
-| D12 | Translation review | **Approved in principle** | No reviewers named yet. New terminology is tracked as **pending review** and not released as reviewed (section H2) |
+| D12 | Translation review | **Approved in principle** | New terminology is tracked as **pending review** and not released as reviewed (section H2). Increment 2a's account terms were approved on 2026-11-04 by the project maintainer, a native Kiswahili speaker; no other reviewers are named yet |
 | D13 | Retention | **Approved** | Security events kept 90 days; sessions and challenges purged daily; covered by tests (section F6) |
 
 ---
@@ -380,7 +380,10 @@ create table admin_actions (                    -- section F5: every manual remo
 - **`sync_runs`** gains two fields:
   - `coverage jsonb`: per statistic, the date slices requested, `total_count` per slice, items retrieved and whether each slice is complete.
   - `partial boolean`.
-- **Unchanged:** `accounts`, `identities` (`unique(provider, provider_uid)`), `sessions`, `auth_challenges`, `learning_progress` and `security_events`. Sessions gain `scope text check (scope in ('full','recovery'))`.
+- **Unchanged:** `accounts`, `identities` (`unique(provider, provider_uid)`), `sessions`, `auth_challenges`, `learning_progress` and `security_events`.
+  - Sessions gain `scope text check (scope in ('full','recovery'))`.
+  - `auth_challenges` gains `session_token_hash bytea` (Increment 2a review, correction B). A `reauth` or `replace` challenge is bound to the exact session that started it, and its callback must present that same valid session.
+  - Re-authentication must come from the identity already linked to the account (correction A).
 
 ### E4. API contracts (changes from revision 1)
 
@@ -577,12 +580,20 @@ Unchanged from revision 1:
 - **Lookup:** normalise (upper-case, strip `-` and spaces, check the alphabet), compute the HMAC, then one indexed lookup. Wrong or used codes and wrong-format input all return the same `401 recovery_invalid` after the same work, so there's no oracle.
 - **Atomic consumption:** `update recovery_codes set used_at = now() where code_hash = $1 and used_at is null returning account_id`.
 - **Rate limits, applied before lookup:**
-  - **per IP:** 5 attempts per 15 minutes;
-  - **per /24 network:** 20 per hour;
-  - **global:** 300 per hour, and above that every attempt returns 429.
+  - **per IP** (IPv6: per /64): 5 attempts per 15 minutes;
+  - **per /24 network** (IPv6: per /48): 20 per hour;
+  - **no global block** (Increment 2a review, correction C). A shared global ceiling would let one attacker exhaust it and lock every learner out of recovery.
 
-  At 80 bits, even the global ceiling running for a century gives a negligible chance of guessing any code. The limits exist to stop noise and denial of service.
-- **Logging:** every failure counts in a security event (no code is stored), and a global spike raises an operator alert.
+  Global volume above 300 per hour only records one `recovery_flood` security event per hour for operators. At 80 bits, guessing a code is infeasible however many networks an attacker uses. The per-source limits exist to stop noise and denial of service.
+- **Logging (revised in the Increment 2a review):** failed attempts are **not** stored one security-event row each. A row per failure would let an attacker turn guessing into unbounded database writes. Instead:
+  - the API counts outcomes in fixed hourly windows and writes **one** structured log line per window: `{"event":"recovery_attempts_hourly","windowStart","attempts","succeeded","invalid","rateLimited"}`. It holds counts only, never a code, IP address or account. Memory is constant, and the line goes to the application log (14-day retention, F6).
+
+    There is no timer: a window's line is written when the first attempt of a later window arrives, so a quiet period delays it, and a restart loses the open window's counts;
+  - a global spike still writes one `recovery_flood` security event per hour;
+  - each **successful** redemption writes a `recovery_code_used` security event, in the same transaction that consumes the code.
+
+  This replaces the earlier rule that every failure counts in a security event.
+- **Atomic redemption:** consuming the code, revoking the account's other sessions, creating the recovery session and writing `recovery_code_used` are **one transaction**. If any step fails, the code stays unused and nothing else changes. The consumed code row stays locked until commit, so of several simultaneous uses at most one succeeds.
 
 **The recovery session and replacing an identity (condition 1)**
 - A successful code gives a session with `scope='recovery'`, valid 15 minutes.
@@ -620,7 +631,10 @@ Unchanged from revision 1:
   - the 21st of 20 concurrent uses of one code still gives exactly one success;
   - regenerating invalidates the whole previous set;
   - the same 401 comes back for an unknown code, a used code, a malformed code and an empty input.
-- **Rate limits:** per IP, per /24 and global, each returning 429, with no account identifier accepted or echoed.
+- **Rate limits:**
+  - per IP and per /24, each returning 429, with no account identifier accepted or echoed;
+  - exhausting one source never limits another;
+  - global volume only alerts, never blocks.
 - **The recovery session:**
   - it revokes other sessions;
   - it gets 403 on every route outside its allowlist;
@@ -656,6 +670,17 @@ Unchanged from revision 1:
 - **Logs:**
   - no request bodies, tokens, cookies or full IP addresses (a /24 prefix at most);
   - application log retention is 14 days.
+- **Reverse-proxy logs (Increment 2a review):**
+  - nginx access logs record the path, never the query string. That includes requests nginx rejects itself.
+  - Access logs truncate client addresses to /24 (IPv4) or /48 (IPv6).
+  - **Known limitation:** nginx error lines quote the full request line and the full client address, and nginx cannot redact them. They stay on at the normal level, because operators need them in an outage.
+  - The three GitHub callback paths are the only `/api/` URLs carrying secrets (OAuth `code` and `state`), so they alone log errors only at `crit` and above.
+  - Error logs are operator-only, held to the same 14-day retention, and enforced by the host, since Compose bounds size only.
+  - The TLS front proxy's own logs must also leave out the callback query strings. That is a deployment gate item.
+- **Trusted proxy (deployment gate):**
+  - The API never reads `X-Forwarded-For`. It takes `X-Real-IP` only from a private peer, and nginx always overwrites `X-Real-IP` itself.
+  - Behind the production HTTPS proxy, nginx's realip stanza must trust that proxy's address range alone. Otherwise every learner shares one rate-limit bucket.
+  - This is verified against a stand-in proxy (`scripts/check-proxy.sh`). It must be verified again against the real proxy before go-live.
 
 ---
 
@@ -787,6 +812,11 @@ Nothing is released unless all of these hold:
   - verified, synced, partial.
 
   These ship only after review by Kenyan and Tanzanian Kiswahili reviewers (D12, not yet appointed).
+
+  **Increment 2a review, 2026-11-04:**
+  - The project maintainer, a native Kiswahili speaker, reviewed the existing Kiswahili account phrases and the eight terms Increment 2a recorded as pending. Those eight are: sign in, sign out, account, session, recovery code, identity, replace, re-authenticate.
+  - Decision: **approved without wording changes**. `content/terminology-review.json` records the approval.
+  - The approval covers that existing content only. Terms from later increments still go through review before release.
 
 ---
 

@@ -27,7 +27,10 @@ if (inst.status !== 201) { console.error("could not mint installation token:", i
 const itok = inst.body.token;
 console.log("installation token permissions:", JSON.stringify(inst.body.permissions), "repository_selection:", inst.body.repository_selection);
 
-const q = (s) => `/search/issues?q=${encodeURIComponent(s)}&per_page=5`;
+// Every search is limited to public repositories. The reference token is a user token, which can also read that
+// user's private repositories; without is:public the totals differ by exactly those private PRs, which Phase 3
+// must not show anyway.
+const q = (s) => `/search/issues?q=${encodeURIComponent(`${s} is:public`)}&per_page=5`;
 const cases = [
   ["PRs authored (public, any repo)", q(`is:pr author:${SAMPLE_LOGIN}`)],
   ["PRs merged", q(`is:pr is:merged author:${SAMPLE_LOGIN}`)],

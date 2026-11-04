@@ -1,6 +1,6 @@
 import type { Lang } from "./i18n.ts";
 
-// Labels used only by server components (brand lockup, footer, lower home page). Kept out of lib/i18n.ts,
+// Labels used only by server components (brand lockup, header account link, footer, lower home page). Kept out of lib/i18n.ts,
 // whose dictionary is bundled into every page's JavaScript, the same way lib/simulations/copy.ts is.
 const en = {
   brandBy: "by Bitsacco",
@@ -17,6 +17,7 @@ const en = {
   footerProject: "Project",
   footerLab: "Lightning lab",
   footerPractice: "Practice simulations",
+  account: "Account",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -36,6 +37,7 @@ const sw: SiteCopy = {
   footerProject: "Mradi",
   footerLab: "Maabara ya Lightning",
   footerPractice: "Mazoezi ya Bitcoin",
+  account: "Akaunti",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

@@ -1,0 +1,79 @@
+# Throwaway stack for scripts/check-proxy.sh only. Never a deployment.
+#
+#   learners (edge, edge2) ──> front (a stand-in for the HTTPS terminator, plain HTTP here)
+#                                 └─ mid ──> web (docker/nginx.conf, unchanged) ──> api ──> postgres
+#
+# Fixed addresses let the script act as different learners on different networks. Every value here is a
+# throwaway test value; the GitHub app values are never contacted.
+name: jifunze-proxycheck
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pc
+      POSTGRES_DB: pc
+      POSTGRES_PASSWORD: proxy-check-only
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pc -d pc"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    networks: [internal]
+
+  api:
+    build:
+      context: ../..
+      dockerfile: docker/api.Dockerfile
+    environment:
+      PORT: "3001"
+      SITE_ORIGIN: http://localhost:8080
+      DATABASE_URL: postgres://pc:proxy-check-only@postgres:5432/pc
+      GITHUB_CLIENT_ID: proxy-check-not-a-real-app
+      GITHUB_CLIENT_SECRET: proxy-check-not-a-secret
+      GITHUB_OAUTH_BASE: http://127.0.0.1:9
+      GITHUB_API_BASE: http://127.0.0.1:9
+      RECOVERY_PEPPER_V1: ${RECOVERY_PEPPER_V1:?set by scripts/check-proxy.sh}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [internal]
+
+  web:
+    image: nginxinc/nginx-unprivileged:stable-alpine # the site image's base
+    volumes:
+      - ../nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../security-headers.conf:/etc/nginx/snippets/security-headers.conf:ro
+      # realip.conf (trust the front proxy) or no-realip.conf (as committed); chosen by the script.
+      - ${REALIP_CONF:-./no-realip.conf}:/etc/nginx/conf.d/00-realip.conf:ro
+    networks:
+      mid:
+        ipv4_address: 10.231.2.3
+      internal: {}
+
+  front:
+    image: nginxinc/nginx-unprivileged:stable-alpine
+    volumes:
+      - ./front.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [web]
+    networks:
+      edge:
+        ipv4_address: 10.231.1.2
+      edge2:
+        ipv4_address: 10.231.3.2
+      mid:
+        ipv4_address: 10.231.2.2
+
+networks:
+  edge:
+    ipam:
+      config: [{ subnet: 10.231.1.0/24 }]
+  edge2:
+    ipam:
+      config: [{ subnet: 10.231.3.0/24 }]
+  mid:
+    ipam:
+      config: [{ subnet: 10.231.2.0/24 }]
+  internal:
+    internal: true

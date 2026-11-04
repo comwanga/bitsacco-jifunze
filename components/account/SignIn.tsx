@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, dropQueryParams, githubStart, queryParam, safeReturn } from "./api";
 import { ErrorAlert, primaryBtn, secondaryBtn } from "./parts";
+import { NostrSignIn } from "./NostrSignIn";
 
-export function SignIn({ lang }: { lang: Lang }) {
+export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode }) {
   const c = accountCopy[lang];
   // The server-rendered link already works without JavaScript; the browser adds a safe ?return= if one was given.
   const [returnTo, setReturnTo] = useState(`/${lang}/account/`);
@@ -61,10 +62,11 @@ export function SignIn({ lang }: { lang: Lang }) {
     <>
       {pageError && <ErrorAlert lang={lang} code={pageError} />}
       <p className="mt-8">
-        <a href={githubStart("signin", lang, returnTo)} className={primaryBtn}>
+        <a href={githubStart("signin", lang, returnTo)} className={primaryBtn} aria-disabled={busy || undefined} tabIndex={busy ? -1 : undefined} onClick={(e) => { if (busy) e.preventDefault(); }}>
           {c.continueGithub}
         </a>
       </p>
+      <NostrSignIn lang={lang} returnTo={returnTo} disabled={busy} onBusyChange={setBusy} onboarding={onboarding} />
       <details className="mt-8 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5">
         <summary className="cursor-pointer font-semibold">{c.useRecoveryCode}</summary>
         <form method="post" onSubmit={submit} noValidate className="mt-4">

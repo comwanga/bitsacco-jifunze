@@ -94,6 +94,10 @@ export function AccountHome({ lang }: { lang: Lang }) {
       return;
     }
     if (res.code === "reauth_required") {
+      if (load.kind === "me" && !load.me.identities.some((i) => i.provider === "github")) {
+        setCodes({ kind: "error", code: "reauth_required" });
+        return;
+      }
       setFlag(true);
       window.location.assign(githubStart("reauth", lang, `/${lang}/account/`));
       return;
@@ -156,7 +160,8 @@ export function AccountHome({ lang }: { lang: Lang }) {
         <ul className="mt-3 space-y-2">
           {me.identities.map((id) => (
             <li key={`${id.provider}-${id.linkedAt}`}>
-              <span className="font-semibold">{c.github}</span>
+              <span className="font-semibold">{id.provider === "nostr" ? c.nostr : c.github}</span>
+              {id.provider === "nostr" && <span translate="no" className="block break-all font-mono" data-nostr-pubkey>{id.pubkey}</span>}
               {id.handle && (
                 <>
                   {": "}
@@ -177,8 +182,8 @@ export function AccountHome({ lang }: { lang: Lang }) {
         <h2 id="codes-section-heading" className="text-xl font-bold">
           {c.codesSection}
         </h2>
-        {!me.account.recoveryCodesIssued && <p className="mt-2">{c.noCodesYet}</p>}
-        <p className="mt-2 text-[var(--muted)]">{c.newCodesHelp}</p>
+        {!me.account.recoveryCodesIssued && me.identities.some((i) => i.provider === "github") && <p className="mt-2">{c.noCodesYet}</p>}
+        <p className="mt-2 text-[var(--muted)]">{me.identities.some((i) => i.provider === "github") ? c.newCodesHelp : c.nostrCodesHelp}</p>
 
         {codes.kind === "confirm" ? (
           <div ref={confirmRef} tabIndex={-1} className="mt-4 rounded-xl bg-dawn/20 p-4">
@@ -200,7 +205,9 @@ export function AccountHome({ lang }: { lang: Lang }) {
           </p>
         ) : null}
         {/* The button pressed was disabled or removed, so focus goes to the error rather than <body>. */}
-        {codes.kind === "error" && <ErrorAlert lang={lang} code={codes.code} focus />}
+        {codes.kind === "error" && (codes.code === "reauth_required" && !me.identities.some((i) => i.provider === "github")
+          ? <StatusNote focus>{c.nostrSignInAgain}</StatusNote>
+          : <ErrorAlert lang={lang} code={codes.code} focus />)}
         {codes.kind === "done" && <StatusNote focus>{c.newCodesDone}</StatusNote>}
       </section>
       {codes.kind === "shown" && <RecoveryCodes lang={lang} codes={codes.codes} focusOnShow onContinue={() => setCodes({ kind: "done" })} />}

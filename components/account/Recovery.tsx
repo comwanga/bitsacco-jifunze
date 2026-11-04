@@ -64,7 +64,7 @@ export function Recovery({ lang }: { lang: Lang }) {
     <>
       <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.recoveryLead}</p>
 
-      <section aria-labelledby="replace-heading" className={`mt-6 ${card}`}>
+      {github ? <section aria-labelledby="replace-heading" className={`mt-6 ${card}`}>
         <h2 id="replace-heading" className="text-xl font-bold">
           {c.replaceHeading}
         </h2>
@@ -79,7 +79,7 @@ export function Recovery({ lang }: { lang: Lang }) {
             {c.replaceGithub}
           </a>
         </p>
-      </section>
+      </section> : <StatusNote>{c.error_nostr_lifecycle_pending}</StatusNote>}
 
       <section aria-labelledby="recovery-codes-heading" className={`mt-6 ${card}`}>
         <h2 id="recovery-codes-heading" className="text-xl font-bold">

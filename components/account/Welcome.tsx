@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
-import { apiFetch } from "./api";
+import { apiFetch, type ApiErrorCode } from "./api";
 import { ErrorAlert, RecoveryCodes, RetryError, SignedOutPrompt, textLink } from "./parts";
 
-type State = { kind: "loading" } | { kind: "codes"; codes: string[] } | { kind: "signedOut" } | { kind: "issued" } | { kind: "error"; code: string };
+type State = { kind: "loading" } | { kind: "codes"; codes: string[] } | { kind: "signedOut" } | { kind: "issued" } | { kind: "error"; code: ApiErrorCode };
 
 /**
  * A new account lands here once. The API issues the first set of codes exactly once per account (409 after),

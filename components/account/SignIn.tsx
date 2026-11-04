@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
-import { apiFetch, githubStart, queryParam, safeReturn } from "./api";
+import { apiFetch, dropQueryParams, githubStart, queryParam, safeReturn } from "./api";
 import { ErrorAlert, primaryBtn, secondaryBtn } from "./parts";
 
 // The API answers /{lang}/account/recovery/; anything else is not followed.
@@ -26,6 +26,14 @@ export function SignIn({ lang }: { lang: Lang }) {
     setPageError(queryParam("error"));
     setReady(true);
     /* eslint-enable react-hooks/set-state-in-effect */
+    dropQueryParams(["error"]); // shown once; ?return= stays for the link
+
+    // Back after a successful code restores this page from the back/forward cache: re-enable the form.
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setBusy(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
   }, [lang]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {

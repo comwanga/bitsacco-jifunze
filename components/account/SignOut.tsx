@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
-import { apiFetch } from "./api";
-import { primaryBtn, RetryError, StatusNote, textLink } from "./parts";
+import { apiFetch, type ApiErrorCode } from "./api";
+import { ErrorAlert, primaryBtn, StatusNote, textLink } from "./parts";
 
-type State = { kind: "working" } | { kind: "done" } | { kind: "error"; code: string };
+type State = { kind: "idle" } | { kind: "working" } | { kind: "error"; code: ApiErrorCode } | { kind: "done" };
 
-/** Signs out with a fetch POST (never a form: the CSP has form-action 'none'), then says so. */
+/**
+ * Signs out only when the reader presses the button. Opening this page (a link from another site, a reload,
+ * Back, a prerender) never ends a session. The POST is a fetch, never a form: the CSP has form-action 'none'.
+ */
 export function SignOut({ lang }: { lang: Lang }) {
   const c = accountCopy[lang];
-  const [state, setState] = useState<State>({ kind: "working" });
-  const started = useRef(false);
-  const [retried, setRetried] = useState(false);
+  const [state, setState] = useState<State>({ kind: "idle" });
 
   async function signOut() {
     setState({ kind: "working" });
@@ -23,35 +24,33 @@ export function SignOut({ lang }: { lang: Lang }) {
     else setState({ kind: "error", code: res.code });
   }
 
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    void signOut();
-  }, []);
-
-  if (state.kind === "working") return <p role="status" className="mt-6 text-[var(--muted)]">{c.signingOut}</p>;
-  if (state.kind === "error") {
+  if (state.kind === "done") {
     return (
-      <RetryError
-        lang={lang}
-        code={state.code}
-        onRetry={() => {
-          setRetried(true);
-          void signOut();
-        }}
-      />
+      <>
+        {/* The button the reader pressed is gone, so focus moves to the result. */}
+        <StatusNote focus>{c.signedOutDone}</StatusNote>
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <a href={`/${lang}/account/signin/`} className={primaryBtn}>
+            {c.signInAgain}
+          </a>
+          <a href={`/${lang}/`} className={textLink}>
+            {c.keepLearning}
+          </a>
+        </div>
+      </>
     );
   }
+
   return (
     <>
-      {/* After a retry the reader's focus was on the button that just went away, so move it to the result. */}
-      <StatusNote focus={retried}>{c.signedOutDone}</StatusNote>
+      <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.signOutLead}</p>
+      {state.kind === "error" && <ErrorAlert lang={lang} code={state.code} focus />}
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <a href={`/${lang}/account/signin/`} className={primaryBtn}>
-          {c.signInAgain}
-        </a>
-        <a href={`/${lang}/`} className={textLink}>
-          {c.keepLearning}
+        <button type="button" disabled={state.kind === "working"} onClick={() => void signOut()} className={primaryBtn}>
+          {state.kind === "working" ? c.signingOut : c.signOut}
+        </button>
+        <a href={`/${lang}/account/`} className={textLink}>
+          {c.toAccount}
         </a>
       </div>
     </>

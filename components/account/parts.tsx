@@ -15,10 +15,14 @@ export const card = "rounded-2xl border border-[var(--line)] bg-[var(--card)] p-
 const errorBox = "rounded-xl bg-[#fff0e8] p-4 text-[#6b2203] dark:bg-[#3d1a0c] dark:text-[#ffd9c4]";
 const okBox = "rounded-xl bg-teal-50 p-4 text-teal-900 dark:bg-teal-900/30 dark:text-teal-50";
 
-/** A localized error, announced as it appears. */
-export function ErrorAlert({ lang, code, children, id }: { lang: Lang; code: string; children?: ReactNode; id?: string }) {
+/** A localized error, announced as it appears. `focus` moves focus to it, for an error that replaces the control just used. */
+export function ErrorAlert({ lang, code, children, focus = false }: { lang: Lang; code: string; children?: ReactNode; focus?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (focus) ref.current?.focus();
+  }, [focus]);
   return (
-    <div role="alert" id={id} className={`mt-6 ${errorBox}`}>
+    <div ref={ref} role="alert" tabIndex={focus ? -1 : undefined} className={`mt-6 ${errorBox}`}>
       <p>{errorText(lang, code)}</p>
       {children}
     </div>
@@ -47,11 +51,11 @@ export function Loading({ lang }: { lang: Lang }) {
 }
 
 /** What every island shows when /api/me (or another call) answers 401. */
-export function SignedOutPrompt({ lang, code }: { lang: Lang; code?: string }) {
+export function SignedOutPrompt({ lang }: { lang: Lang }) {
   const c = accountCopy[lang];
   return (
     <div className={`mt-6 ${card}`}>
-      <p className="font-semibold">{code ? errorText(lang, code) : c.signedOut}</p>
+      <p className="font-semibold">{c.signedOut}</p>
       <p className="mt-2 text-[var(--muted)]">{c.optional}</p>
       <p className="mt-4">
         <a href={`/${lang}/account/signin/`} className={primaryBtn}>

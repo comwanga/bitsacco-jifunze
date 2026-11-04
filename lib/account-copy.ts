@@ -85,11 +85,11 @@ const en = {
   noCodesYet: "You do not have recovery codes yet. Make a set so you can get back in if you lose access to GitHub.",
   newCodesHelp: "Making new codes stops all your old ones from working. For your safety, GitHub will first ask you to confirm it is you.",
   newCodes: "New recovery codes",
-  newCodesReady: "You have confirmed it is you. Make your new recovery codes now? Your old codes will stop working.",
+  newCodesReady: "Ready to make new recovery codes? Your old codes will stop working as soon as the new ones are made.",
   newCodesConfirm: "Generate new codes now",
   newCodesCancel: "Not now",
   newCodesWorking: "Making new codes…",
-  newCodesDone: "Your new recovery codes are saved. Your old codes no longer work.",
+  newCodesDone: "Your new recovery codes are active. Your old codes no longer work.",
 
   recoveryHeading: "Recover your account",
   recoveryLead: "You signed in with a recovery code. This session ends after 15 minutes and allows only a few steps.",
@@ -100,6 +100,7 @@ const en = {
   recoveryCodesHelp: "The code you just used will not work again. Make a new set so you have codes for next time. All your old codes will stop working.",
   notInRecovery: "You are fully signed in, so there is nothing to recover.",
 
+  signOutLead: "Sign out of your Jifunze account on this device?",
   signingOut: "Signing you out…",
   signedOutDone: "You are signed out. Your lessons and the progress saved on this device are still here.",
   signInAgain: "Sign in again",
@@ -164,7 +165,7 @@ const sw: AccountCopy = {
   downloadCodes: "Pakua (.txt)",
   fileTitle: "Misimbo ya kurejesha ya Bitsacco Jifunze",
   fileNote: "Kila msimbo unatumika mara moja. Weka faili hii mahali pa siri.",
-  savedConfirm: "Nimezihifadhi",
+  savedConfirm: "Nimeihifadhi",
   savedHint: "Weka alama kwenye kisanduku ukishahifadhi misimbo yako.",
   continue: "Endelea",
 
@@ -180,11 +181,11 @@ const sw: AccountCopy = {
   noCodesYet: "Bado huna misimbo ya kurejesha. Tengeneza seti moja ili uweze kurudi ukishindwa kuingia kwenye GitHub.",
   newCodesHelp: "Ukitengeneza misimbo mipya, yote ya zamani itaacha kufanya kazi. Kwa usalama wako, GitHub itakuomba kwanza uthibitishe kuwa ni wewe.",
   newCodes: "Tengeneza misimbo mipya",
-  newCodesReady: "Umethibitisha kuwa ni wewe. Utengeneze misimbo mipya ya kurejesha sasa? Misimbo ya zamani itaacha kufanya kazi.",
+  newCodesReady: "Uko tayari kutengeneza misimbo mipya ya kurejesha? Misimbo ya zamani itaacha kufanya kazi mara tu mipya itakapotengenezwa.",
   newCodesConfirm: "Tengeneza misimbo mipya sasa",
   newCodesCancel: "Si sasa",
   newCodesWorking: "Tunatengeneza misimbo mipya…",
-  newCodesDone: "Misimbo yako mipya imehifadhiwa. Misimbo ya zamani haifanyi kazi tena.",
+  newCodesDone: "Misimbo yako mipya inafanya kazi sasa. Misimbo ya zamani haifanyi kazi tena.",
 
   recoveryHeading: "Rejesha akaunti yako",
   recoveryLead: "Umeingia kwa msimbo wa kurejesha. Kipindi hiki kinaisha baada ya dakika 15 na kinaruhusu hatua chache tu.",
@@ -195,6 +196,7 @@ const sw: AccountCopy = {
   recoveryCodesHelp: "Msimbo uliotumia sasa hivi hautafanya kazi tena. Tengeneza seti mpya ili uwe na misimbo kwa wakati ujao. Misimbo yako yote ya zamani itaacha kufanya kazi.",
   notInRecovery: "Umeingia kikamilifu, kwa hiyo hakuna cha kurejesha.",
 
+  signOutLead: "Ungependa kutoka kwenye akaunti yako ya Jifunze kwenye kifaa hiki?",
   signingOut: "Tunakutoa kwenye akaunti…",
   signedOutDone: "Umetoka kwenye akaunti. Masomo yako na maendeleo yaliyohifadhiwa kwenye kifaa hiki bado yapo.",
   signInAgain: "Ingia tena",

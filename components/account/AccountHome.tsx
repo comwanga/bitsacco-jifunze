@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
-import { apiFetch, type ApiResult, formatDate, githubStart, queryParam, type Me } from "./api";
+import { apiFetch, type ApiErrorCode, type ApiResult, dropQueryParams, formatDate, githubStart, queryParam, type Me } from "./api";
 import { card, ErrorAlert, Loading, primaryBtn, RecoveryCodes, RetryError, secondaryBtn, SignedOutPrompt, SignOutLink, StatusNote } from "./parts";
 
 // Set just before the reader is sent to GitHub to confirm it is them, so the page can offer the new codes on return.
@@ -29,7 +29,7 @@ function setFlag(on: boolean): void {
   }
 }
 
-type Load = { kind: "loading" } | { kind: "signedOut" } | { kind: "error"; code: string } | { kind: "me"; me: Me };
+type Load = { kind: "loading" } | { kind: "signedOut" } | { kind: "error"; code: ApiErrorCode } | { kind: "me"; me: Me };
 
 function toLoad(res: ApiResult<Me>): Load {
   if (res.ok) return { kind: "me", me: res.data };
@@ -41,7 +41,7 @@ type Codes =
   | { kind: "working" }
   | { kind: "shown"; codes: string[] }
   | { kind: "done" }
-  | { kind: "error"; code: string };
+  | { kind: "error"; code: ApiErrorCode };
 
 export function AccountHome({ lang }: { lang: Lang }) {
   const c = accountCopy[lang];
@@ -67,7 +67,15 @@ export function AccountHome({ lang }: { lang: Lang }) {
     if (error) setFlag(false);
     else if (readFlag()) setCodes({ kind: "confirm" });
     /* eslint-enable react-hooks/set-state-in-effect */
+    dropQueryParams(["error", "replaced"]); // shown once; a reload does not repeat the banner
     void apiFetch<Me>("/api/me").then((res) => setLoad(toLoad(res)));
+
+    // Back from GitHub can restore this page from the back/forward cache mid-request: re-enable the button.
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setCodes((s) => (s.kind === "working" ? { kind: "idle" } : s));
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
 
   // Back from confirming with GitHub: move focus to the question the reader came back to answer.
@@ -191,7 +199,8 @@ export function AccountHome({ lang }: { lang: Lang }) {
             </button>
           </p>
         ) : null}
-        {codes.kind === "error" && <ErrorAlert lang={lang} code={codes.code} />}
+        {/* The button pressed was disabled or removed, so focus goes to the error rather than <body>. */}
+        {codes.kind === "error" && <ErrorAlert lang={lang} code={codes.code} focus />}
         {codes.kind === "done" && <StatusNote focus>{c.newCodesDone}</StatusNote>}
       </section>
       {codes.kind === "shown" && <RecoveryCodes lang={lang} codes={codes.codes} focusOnShow onContinue={() => setCodes({ kind: "done" })} />}

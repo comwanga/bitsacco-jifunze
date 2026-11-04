@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
-import { apiFetch, type ApiResult, githubStart, type Me } from "./api";
+import { apiFetch, type ApiErrorCode, type ApiResult, githubStart, type Me } from "./api";
 import { card, ErrorAlert, Loading, primaryBtn, RecoveryCodes, RetryError, secondaryBtn, SignedOutPrompt, SignOutLink, StatusNote, textLink } from "./parts";
 
-type Load = { kind: "loading" } | { kind: "signedOut" } | { kind: "error"; code: string } | { kind: "me"; me: Me };
+type Load = { kind: "loading" } | { kind: "signedOut" } | { kind: "error"; code: ApiErrorCode } | { kind: "me"; me: Me };
 
 function toLoad(res: ApiResult<Me>): Load {
   if (res.ok) return { kind: "me", me: res.data };
   return res.code === "unauthenticated" ? { kind: "signedOut" } : { kind: "error", code: res.code };
 }
-type Codes = { kind: "idle" } | { kind: "working" } | { kind: "shown"; codes: string[] } | { kind: "done" } | { kind: "error"; code: string };
+type Codes = { kind: "idle" } | { kind: "working" } | { kind: "shown"; codes: string[] } | { kind: "done" } | { kind: "error"; code: ApiErrorCode };
 
 /** The restricted 15-minute session after a recovery code: replace GitHub, make new codes, or sign out. */
 export function Recovery({ lang }: { lang: Lang }) {
@@ -93,7 +93,7 @@ export function Recovery({ lang }: { lang: Lang }) {
             </button>
           </p>
         )}
-        {codes.kind === "error" && <ErrorAlert lang={lang} code={codes.code} />}
+        {codes.kind === "error" && <ErrorAlert lang={lang} code={codes.code} focus />}
         {codes.kind === "done" && <StatusNote focus>{c.newCodesDone}</StatusNote>}
       </section>
       {codes.kind === "shown" && <RecoveryCodes lang={lang} codes={codes.codes} focusOnShow onContinue={() => setCodes({ kind: "done" })} />}

@@ -104,8 +104,10 @@ jobs:
         run: npm run e2e:account
       - name: Validate the compose file
         run: docker compose config -q
-      - name: Build the API image
-        run: docker build -f docker/api.Dockerfile .
+      # Builds the API image and runs docker/nginx.conf in front of it: which client address reaches the rate
+      # limiter (realip on and off, forged headers), and that no callback code or state reaches any log.
+      - name: nginx proxy checks (client address, log redaction)
+        run: bash scripts/check-proxy.sh
       - name: Keep browser traces on failure
         if: failure()
         uses: actions/upload-artifact@v4

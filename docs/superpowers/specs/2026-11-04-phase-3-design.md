@@ -668,6 +668,17 @@ Unchanged from revision 1:
 - **Logs:**
   - no request bodies, tokens, cookies or full IP addresses (a /24 prefix at most);
   - application log retention is 14 days.
+- **Reverse-proxy logs (Increment 2a review):**
+  - nginx access logs record the path, never the query string. That includes requests nginx rejects itself.
+  - Access logs truncate client addresses to /24 (IPv4) or /48 (IPv6).
+  - **Known limitation:** nginx error lines quote the full request line and the full client address, and nginx cannot redact them. They stay on at the normal level, because operators need them in an outage.
+  - The three GitHub callback paths are the only `/api/` URLs carrying secrets (OAuth `code` and `state`), so they alone log errors only at `crit` and above.
+  - Error logs are operator-only, held to the same 14-day retention, and enforced by the host, since Compose bounds size only.
+  - The TLS front proxy's own logs must also leave out the callback query strings. That is a deployment gate item.
+- **Trusted proxy (deployment gate):**
+  - The API never reads `X-Forwarded-For`. It takes `X-Real-IP` only from a private peer, and nginx always overwrites `X-Real-IP` itself.
+  - Behind the production HTTPS proxy, nginx's realip stanza must trust that proxy's address range alone. Otherwise every learner shares one rate-limit bucket.
+  - This is verified against a stand-in proxy (`scripts/check-proxy.sh`). It must be verified again against the real proxy before go-live.
 
 ---
 

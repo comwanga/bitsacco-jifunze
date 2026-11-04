@@ -6,9 +6,17 @@
 # processes can still reach the api container's address on the (non-internal) egress bridge.
 name: jifunze
 
+# Bounded, rotated container logs (3 x 10 MB each). Size only: the 14-day age limit is the host's job (README, Logs).
+x-logging: &logging
+  driver: local
+  options:
+    max-size: 10m
+    max-file: "3"
+
 services:
   web:
     build: .
+    logging: *logging
     ports:
       - "127.0.0.1:8080:8080"
     networks: [edge, internal]
@@ -17,6 +25,7 @@ services:
     build:
       context: .
       dockerfile: docker/api.Dockerfile
+    logging: *logging
     env_file:
       - path: api/.env.local # GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, RECOVERY_PEPPER_V1
         required: false # so `docker compose config` works without it; the API names any missing key at boot
@@ -33,6 +42,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    logging: *logging
     environment:
       POSTGRES_USER: jifunze
       POSTGRES_DB: jifunze

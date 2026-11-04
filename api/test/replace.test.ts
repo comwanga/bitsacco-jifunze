@@ -779,4 +779,98 @@ describe("replace GitHub identity", () => {
       expect(e2).toBeInstanceOf(ApiError);
     });
   });
+
+  describe("reauth and replace starts refuse a cross-site navigation (Sec-Fetch-Site)", () => {
+    const startWith = (api: Api, qs: string, cookie: string | undefined, site?: string) =>
+      fetch(`${api.base}/api/auth/github/start?${qs}`, {
+        redirect: "manual",
+        headers: { ...(cookie ? { cookie } : {}), ...(site === undefined ? {} : { "sec-fetch-site": site }) },
+      });
+    const challenges = async () => (await sql`select 1 from auth_challenges`).length;
+
+    async function fullFresh(): Promise<string> {
+      const x = await accountWith(A);
+      return (await sessionFor(x, "full")).cookie; // reauth_at defaults to now(): fresh
+    }
+
+    it.each(["cross-site", "same-site"])("reauth start with Sec-Fetch-Site: %s → bad_origin, no challenge, no cookie", async (site) => {
+      const api = await startApi();
+      const cookie = await fullFresh();
+      const res = await startWith(api, "purpose=reauth&lang=en", cookie, site);
+      expect(res.status).toBe(302);
+      expect(res.headers.get("location")).toBe("/en/account/?error=bad_origin");
+      expect(res.headers.getSetCookie()).toHaveLength(0);
+      expect(await challenges()).toBe(0);
+    });
+
+    it.each(["cross-site", "same-site"])("replace start with Sec-Fetch-Site: %s → bad_origin, no challenge, no cookie (full and recovery sessions)", async (site) => {
+      const api = await startApi();
+      const x = await accountWith(A);
+      for (const scope of ["full", "recovery"] as const) {
+        const { cookie } = await sessionFor(x, scope);
+        const res = await startWith(api, "purpose=replace&lang=sw", cookie, site);
+        expect(res.status).toBe(302);
+        expect(res.headers.get("location")).toBe("/sw/account/?error=bad_origin");
+        expect(res.headers.getSetCookie()).toHaveLength(0);
+      }
+      expect(await challenges()).toBe(0);
+    });
+
+    it.each([["same-origin"], ["none"], [undefined]])("reauth and replace start with Sec-Fetch-Site: %s → allowed as before", async (site) => {
+      const api = await startApi();
+      const cookie = await fullFresh();
+      for (const purpose of ["reauth", "replace"]) {
+        const res = await startWith(api, `purpose=${purpose}&lang=en`, cookie, site);
+        expect(res.status).toBe(302);
+        expect(res.headers.get("location")).toContain("/login/oauth/authorize");
+        expect(cookieOf(res, "__Host-jf_preauth")).toBeDefined();
+      }
+      expect(await challenges()).toBe(2);
+    });
+
+    it("signin start with Sec-Fetch-Site: cross-site → still allowed (external links)", async () => {
+      const api = await startApi();
+      const res = await startWith(api, "purpose=signin&lang=sw", undefined, "cross-site");
+      expect(res.status).toBe(302);
+      expect(res.headers.get("location")).toContain("/login/oauth/authorize");
+      expect(cookieOf(res, "__Host-jf_preauth")).toBeDefined();
+      expect(await challenges()).toBe(1);
+    });
+  });
+
+  describe("replace from a full session re-checks re-auth freshness at the callback", () => {
+    it("re-auth fresh at start but more than 10 minutes old at the callback → reauth_required, nothing changed", async () => {
+      const api = await startApi();
+      const x = await accountWith(A);
+      const full = await sessionFor(x, "full");
+      const bystander = await sessionFor(x, "full");
+      const f = await begin(api, "purpose=replace&lang=en", full.cookie, B); // reauth_at = now(): fresh at start
+      await sql`update sessions set reauth_at = now() - interval '11 minutes' where token_hash = ${full.tokenHash}`;
+      const before = await snapshot();
+      const res = await finish(api, f, full.cookie);
+      expect(res.status).toBe(302);
+      expect(res.headers.get("location")).toBe("/en/account/?error=reauth_required");
+      expect(cookieOf(res, "__Host-jf_preauth")).toBe(CLEAR_PREAUTH);
+      expect(cookieOf(res, "__Host-jf_session")).toBeUndefined();
+      expect(await snapshot()).toEqual(before);
+      expect(await githubUids(x)).toEqual(["1001"]);
+      expect(await readSession(sql, valueOf(full.cookie))).not.toBeNull();
+      expect(await readSession(sql, valueOf(bystander.cookie))).not.toBeNull();
+      await expect(
+        replaceGithubIdentity(sql, x, { id: 2002, login: "hubot", avatarUrl: "" }, { tokenHash: full.tokenHash, scope: "full" }),
+      ).rejects.toMatchObject({ status: 403, code: "reauth_required" });
+      expect(await snapshot()).toEqual(before);
+    });
+
+    it("a recovery-scope replace is unaffected by an old reauth_at", async () => {
+      const api = await startApi();
+      const x = await accountWith(A);
+      const rec = await sessionFor(x, "recovery");
+      const f = await begin(api, "purpose=replace&lang=sw", rec.cookie, B);
+      await sql`update sessions set reauth_at = now() - interval '1 hour' where token_hash = ${rec.tokenHash}`;
+      const res = await finish(api, f, rec.cookie);
+      expect(res.headers.get("location")).toBe("/sw/account/?replaced=github");
+      expect(await githubUids(x)).toEqual(["2002"]);
+    });
+  });
 });

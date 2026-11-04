@@ -90,6 +90,8 @@ jobs:
         run: npm ci
       - name: Install the API
         run: npm ci --prefix api
+      - name: Type-check the API
+        run: npm run api:typecheck
       - name: Audit API production dependencies
         run: npm audit --omit=dev --prefix api --audit-level=low
       - name: API tests (PostgreSQL)

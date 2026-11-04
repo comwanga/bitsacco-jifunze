@@ -83,6 +83,7 @@ docker compose up --build            # http://localhost:8080/sw/account/
 - nginx logs `/api/` requests without their query strings and suppresses its own `/api/` error lines below `crit`, since they would quote the GitHub callback's code and state. In an outage, read the access log's status and `upstream=` fields and `docker compose logs api`.
 - Sign in locally with Chromium or Firefox. The session cookie is `__Host-` and `Secure`, and Safari/WebKit refuses it on `http://localhost`.
 - The rate limits live in the API's memory, so they reset whenever it restarts.
+- Behind an HTTPS front proxy, the commented `set_real_ip_from` / `real_ip_header` / `real_ip_recursive` lines in [`docker/nginx.conf`](docker/nginx.conf) MUST be configured with the proxy's address range before any HTTPS deployment, or every learner shares one rate-limit bucket.
 - GitHub requires the `redirect_uri` to match a registered callback. Register all three on the GitHub App: `/api/auth/github/callback`, `/api/auth/github/callback/reauth` and `/api/auth/github/callback/replace` (for example `http://localhost:8080/api/auth/github/callback`).
 
 ```bash

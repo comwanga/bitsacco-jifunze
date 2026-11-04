@@ -75,7 +75,8 @@ const IDENTITY_UNIQUE = "identities_provider_provider_uid_key";
  *     replace_conflict; inserts that merely reference the account, such as sessions, do not conflict);
  *  2. if `binding` is given, lock the initiating session row and require it to be live, of that scope,
  *     on this account (→ 401 unauthenticated). A concurrent revocation of it either committed first (and
- *     is seen here) or waits for this transaction;
+ *     is seen here) or waits for this transaction. A full session must also have re-authenticated within
+ *     the last 10 minutes (→ 403 reauth_required); a recovery session need not;
  *  3. (github, gh.id) on another account → 409 identity_in_use, also when a racing account commits it first;
  *  4. gh.id already this account's identity → "unchanged" (handle and avatar refreshed);
  *  5. otherwise delete this account's GitHub identity and insert the new one;
@@ -97,12 +98,14 @@ export async function replaceGithubIdentity(
         select id from accounts where id = ${accountId} and deleted_at is null for no key update nowait`;
       if (acct.length === 0) throw new ApiError(401, "unauthenticated");
       if (binding) {
-        const live = await tx`
-          select 1 from sessions
+        const [live] = await tx<{ fresh: boolean }[]>`
+          select (scope = 'recovery' or reauth_at > now() - interval '10 minutes') as fresh from sessions
           where token_hash = ${binding.tokenHash} and account_id = ${accountId} and scope = ${binding.scope}
             and revoked_at is null and expires_at > now()
           for no key update`;
-        if (live.length === 0) throw new ApiError(401, "unauthenticated");
+        if (!live) throw new ApiError(401, "unauthenticated");
+        // Re-checked here, not only at start: the challenge lives 10 more minutes.
+        if (!live.fresh) throw new ApiError(403, "reauth_required");
       }
 
       const [owner] = await tx<{ account_id: string }[]>`

@@ -24,6 +24,8 @@ export type Ctx = {
   body: unknown;
   cookies: Record<string, string>;
   ip: string;
+  /** The Sec-Fetch-Site request header, when the browser sent one. */
+  fetchSite: string | undefined;
   session: Session | null;
   cfg: Config;
   sql: Sql;
@@ -251,6 +253,7 @@ export function createServer(routes: Route[], deps: Deps): Server {
         body,
         cookies,
         ip: clientIp(req.socket.remoteAddress, headerValue(req.headers["x-real-ip"])),
+        fetchSite: headerValue(req.headers["sec-fetch-site"]),
         session,
         cfg,
         sql,

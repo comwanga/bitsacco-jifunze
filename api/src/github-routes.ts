@@ -52,11 +52,17 @@ export function githubRoutes(
     auth: "public",
     // replace must be reachable from a recovery session; the per-purpose rules are enforced below.
     recoveryAllowed: true,
-    handler: async ({ query, ip, sql, cfg, session }) => {
+    handler: async ({ query, ip, fetchSite, sql, cfg, session }) => {
       const lang = asLang(query.get("lang")) ?? "sw";
       if (!limiter.hit(ip)) return { status: 302, redirect: signinError(lang, "rate_limited") };
       const purpose = asPurpose(query.get("purpose"));
       if (!purpose) throw new ApiError(400, "bad_request");
+      // reauth and replace change state (a challenge bound to the session), and SameSite=Lax sends the session
+      // cookie on a top-level cross-site navigation: refuse one when the browser says so. A missing header
+      // (older browsers) is allowed. signin must keep working from external links.
+      if (purpose !== "signin" && fetchSite !== undefined && fetchSite !== "same-origin" && fetchSite !== "none") {
+        return { status: 302, redirect: accountError(lang, "bad_origin") };
+      }
 
       let binding: { accountId: string; sessionTokenHash: Buffer } | undefined;
       if (purpose !== "signin") {

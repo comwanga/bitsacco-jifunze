@@ -1,4 +1,5 @@
-import type { AddressInfo } from "node:net";
+import { spawn } from "node:child_process";
+import { createServer as netServer, type AddressInfo } from "node:net";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
@@ -95,6 +96,109 @@ describe("recovery codes", () => {
       expect(dump).not.toContain(c.replaceAll("-", ""));
     }
     expect(await sql`select 1 from recovery_codes where account_id = ${a} and used_at is null`).toHaveLength(10);
+  });
+
+  describe("the initial claim and its codes are one transaction", () => {
+    const initial = (base: string, cookie: string) => post(base, "/api/me/recovery-codes/initial", undefined, { cookie });
+    const state = async (a: string) => {
+      const [acct] = await sql<{ issued: Date | null }[]>`select recovery_codes_issued_at as issued from accounts where id = ${a}`;
+      const codes = await sql`select 1 from recovery_codes where account_id = ${a}`;
+      return { claimed: acct!.issued !== null, codes: codes.length };
+    };
+
+    it("the API process killed after the claim, while the codes are being inserted, leaves the account unclaimed", async () => {
+      const a = await newAccount();
+      const cookie = pair((await createSession(sql, a, "full")).cookie);
+      const port = await new Promise<number>((resolve) => {
+        const probe = netServer().listen(0, "127.0.0.1", () => {
+          const p = (probe.address() as AddressInfo).port;
+          probe.close(() => resolve(p));
+        });
+      });
+      const child = spawn(process.execPath, [join(dir, "..", "src", "main.ts")], {
+        stdio: "ignore",
+        env: {
+          ...process.env,
+          PORT: String(port),
+          DATABASE_URL: testDatabaseUrl(),
+          SITE_ORIGIN: ORIGIN,
+          GITHUB_CLIENT_ID: "test-only",
+          GITHUB_CLIENT_SECRET: "test-only",
+          RECOVERY_PEPPER_V1: FAKE_V1.toString("base64"),
+        },
+      });
+      const exited = new Promise<void>((r) => child.once("exit", () => r()));
+      try {
+        const base = `http://127.0.0.1:${port}`;
+        for (let i = 0; ; i++) {
+          if ((await fetch(`${base}/api/health`).catch(() => null))?.ok) break;
+          if (i > 100) throw new Error("the API process did not start");
+          await new Promise((r) => setTimeout(r, 100));
+        }
+        // Holds the first code insert open long enough to kill the process in the middle of it.
+        await sql.unsafe(`
+          create function slow_insert() returns trigger language plpgsql as $$ begin perform pg_sleep(30); return new; end $$;
+          create trigger slow_codes before insert on recovery_codes for each row execute function slow_insert();`);
+        const pending = initial(base, cookie).catch(() => null);
+        const sleeping = async () =>
+          (await sql`select pid from pg_stat_activity where wait_event = 'PgSleep' and pid <> pg_backend_pid()`).length;
+        for (let i = 0; (await sleeping()) === 0; i++) {
+          if (i > 100) throw new Error("the code insert never started");
+          await new Promise((r) => setTimeout(r, 50));
+        }
+        child.kill("SIGKILL");
+        await exited;
+        await pending;
+        // The dead process's backend would otherwise sleep on, holding its locks.
+        await sql`select pg_terminate_backend(pid) from pg_stat_activity where wait_event = 'PgSleep' and pid <> pg_backend_pid()`;
+        while ((await sleeping()) > 0) await new Promise((r) => setTimeout(r, 50));
+        await sql.unsafe(`drop trigger slow_codes on recovery_codes`);
+
+        expect(await state(a)).toEqual({ claimed: false, codes: 0 });
+        await withApi(async (b) => {
+          const r = await initial(b, cookie);
+          expect(r.status).toBe(200);
+          expect(((await r.json()) as { codes: string[] }).codes).toHaveLength(10);
+        });
+        expect(await state(a)).toEqual({ claimed: true, codes: 10 });
+      } finally {
+        if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
+      }
+    }, 30_000);
+
+    it("a failure inserting the codes, with no chance to undo the claim afterwards, leaves the account unclaimed", async () => {
+      const a = await newAccount();
+      const cookie = pair((await createSession(sql, a, "full")).cookie);
+      // The insert fails, and any later statement that clears the claim fails too, as it would if the process died.
+      await sql.unsafe(`
+        create function fail_insert() returns trigger language plpgsql as $$ begin raise exception 'injected failure'; end $$;
+        create trigger fail_codes before insert on recovery_codes for each row execute function fail_insert();
+        create function no_unclaim() returns trigger language plpgsql as $$
+        begin
+          if old.recovery_codes_issued_at is not null and new.recovery_codes_issued_at is null then raise exception 'unclaim blocked'; end if;
+          return new;
+        end $$;
+        create trigger no_unclaim before update on accounts for each row execute function no_unclaim();`);
+      await withApi(async (base) => {
+        expect((await initial(base, cookie)).status).toBe(500);
+        expect(await state(a)).toEqual({ claimed: false, codes: 0 });
+        await sql.unsafe(`drop trigger fail_codes on recovery_codes`);
+        const r = await initial(base, cookie);
+        expect(r.status).toBe(200);
+        expect(((await r.json()) as { codes: string[] }).codes).toHaveLength(10);
+        expect(await state(a)).toEqual({ claimed: true, codes: 10 });
+      });
+    });
+
+    it("two racing initial calls: one gets the codes, the other 409, and one set exists", async () => {
+      const a = await newAccount();
+      const cookie = pair((await createSession(sql, a, "full")).cookie);
+      await withApi(async (base) => {
+        const rs = await Promise.all([initial(base, cookie), initial(base, cookie)]);
+        expect(rs.map((r) => r.status).sort()).toEqual([200, 409]);
+        expect(await state(a)).toEqual({ claimed: true, codes: 10 });
+      });
+    });
   });
 
   it("initial codes come back once; the second call → 409", async () => {

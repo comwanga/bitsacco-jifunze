@@ -53,8 +53,17 @@ export function hashCode(pepper: Buffer, normalised: string): Buffer {
   return createHmac("sha256", pepper).update(normalised).digest();
 }
 
-/** Replaces the account's whole set in one transaction and returns the new plaintext codes. */
-export async function issueCodes(sql: Sql, cfg: Config, accountId: string): Promise<string[]> {
+/**
+ * Replaces the account's whole set in one transaction and returns the new plaintext codes.
+ * With `initial`, it first claims the account's first set in that same transaction (409 if already claimed),
+ * so a failure or a dead process before commit leaves the account unclaimed and able to try again.
+ */
+export async function issueCodes(
+  sql: Sql,
+  cfg: Config,
+  accountId: string,
+  opts: { initial?: boolean } = {},
+): Promise<string[]> {
   const pepper = cfg.peppers.get(cfg.currentPepper);
   if (!pepper) throw new Error("current recovery pepper is not configured");
   const codes = generateCodes();
@@ -62,6 +71,12 @@ export async function issueCodes(sql: Sql, cfg: Config, accountId: string): Prom
   await sql.begin(async (tx) => {
     // Serialise concurrent regenerations for one account so exactly one set survives.
     await tx`select id from accounts where id = ${accountId} for update`;
+    if (opts.initial) {
+      const claimed = await tx`
+        update accounts set recovery_codes_issued_at = now()
+        where id = ${accountId} and recovery_codes_issued_at is null returning 1`;
+      if (claimed.length === 0) throw new ApiError(409, "codes_already_issued");
+    }
     await tx`delete from recovery_codes where account_id = ${accountId}`;
     for (const c of codes) {
       await tx`
@@ -218,20 +233,11 @@ export function recoveryRoutes(
     method: "POST",
     path: "/api/me/recovery-codes/initial",
     auth: "full",
-    handler: async ({ sql, cfg, session }) => {
-      const id = session!.accountId;
-      // Claim first so two racing first calls cannot both be shown a set.
-      const claimed = await sql`
-        update accounts set recovery_codes_issued_at = now()
-        where id = ${id} and recovery_codes_issued_at is null returning 1`;
-      if (claimed.length === 0) throw new ApiError(409, "codes_already_issued");
-      try {
-        return { status: 200, json: { codes: await issueCodes(sql, cfg, id) } };
-      } catch (e) {
-        await sql`update accounts set recovery_codes_issued_at = null where id = ${id}`;
-        throw e;
-      }
-    },
+    // The claim commits with the codes, so two racing first calls cannot both be shown a set.
+    handler: async ({ sql, cfg, session }) => ({
+      status: 200,
+      json: { codes: await issueCodes(sql, cfg, session!.accountId, { initial: true }) },
+    }),
   };
 
   const regenerate: Route = {

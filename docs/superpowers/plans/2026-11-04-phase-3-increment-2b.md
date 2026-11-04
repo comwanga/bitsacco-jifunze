@@ -33,4 +33,10 @@ Proposal for separate approval: prioritize secure account-owned learning-progres
 
 ## Execution results
 
-Pending execution. CI on this local branch is not claimed; H3 requires CI after an authorized publication, terminology review and legal review before general auth release.
+Implementation and local verification completed. See the [implementation report](2026-11-04-phase-3-increment-2b-report.md) for repository state, security evidence, 206 API / 135 unit / 31 account browser / 148 learning browser passes, lab checks, exact JS impact and limitations. All 52 learning-suite skips are existing project/device exclusions. Three additional focused browser checks passed with the complete simulated NIP-07 contract. The pinned Node 24.22.2 API image also passed its cryptographic/runtime smoke checks.
+
+New onboarding prose is server-rendered after the first postbuild run identified an account-page budget overage; the final build passes unchanged limits. Browser verification found and removed a dangling ARIA reference; test locators were scoped to the main landmark to avoid Next's own route announcer. The final account accessibility run passes in both languages.
+
+The official NIP-98 illustrative event has an incorrect canonical ID and is kept as a negative fixture. Five newly recorded relay events supplement the official BIP-340 CSV; the spike's unrecorded historical relay dataset is not claimed as recovered. Invalid-proof, replay, browser-binding and transaction boundaries are permanently covered.
+
+CI on this local branch is not claimed; H3 requires CI after authorized publication, terminology review and legal review before general auth release. A live signer/identity-generation/backup check remains pending. Footer layout work is queued separately; no footer or shared layout changes are included here.

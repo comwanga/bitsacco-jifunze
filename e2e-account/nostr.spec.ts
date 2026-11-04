@@ -11,6 +11,7 @@ test.describe.configure({ retries: 0 });
 
 async function signer(page: Page, mode = "approve") {
   const key = randomBytes(32);
+  const pubkey = signedEvent(new Uint8Array(), "", undefined, {}, [], key).pubkey;
   let calls = 0;
   await page.exposeFunction("fakeNostrSign", async (event: { created_at: number }) => {
     calls++;
@@ -22,9 +23,9 @@ async function signer(page: Page, mode = "approve") {
     if (mode === "extra") Object.assign(signed, { nsec: "fixture-secret-never-forward" });
     return signed;
   });
-  await page.addInitScript(() => {
-    Object.assign(window, { nostr: { signEvent: (e: unknown) => (window as unknown as { fakeNostrSign: (e: unknown) => Promise<unknown> }).fakeNostrSign(e) } });
-  });
+  await page.addInitScript((pubkey) => {
+    Object.assign(window, { nostr: { getPublicKey: async () => pubkey, signEvent: (e: unknown) => (window as unknown as { fakeNostrSign: (e: unknown) => Promise<unknown> }).fakeNostrSign(e) } });
+  }, pubkey);
   return () => calls;
 }
 

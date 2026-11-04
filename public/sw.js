@@ -79,6 +79,11 @@ function pageOfData(pathname) {
   return i >= 0 ? pathname.slice(0, i + 1) : null;
 }
 
+// Signed-in account pages and the community must never be stored by the worker.
+function privateNavigation(pathname) {
+  return /^\/(sw|en)\/(account|community)(\/|$)/.test(pathname);
+}
+
 function cacheableStatic(pathname) {
   return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/") ||
     pathname === "/logo.svg" || pathname === "/manifest.webmanifest";
@@ -115,6 +120,7 @@ async function networkFirstPage(request) {
   try {
     const response = await fetch(request);
     if (response.ok) cache.put(stripSearch(request), response.clone());
+    else if (response.status === 404 || response.status === 410) await cache.delete(stripSearch(request));
     return response;
   } catch {
     const pathname = new URL(request.url).pathname;
@@ -126,9 +132,20 @@ async function networkFirstPage(request) {
   }
 }
 
+// Network only; offline falls back to the shared offline page, never to a stored account page.
+async function privatePage(request) {
+  try {
+    return await fetch(request);
+  } catch {
+    const cache = await caches.open(PAGES);
+    return (await cache.match(`/${langOf(new URL(request.url).pathname)}/offline/`)) || Response.error();
+  }
+}
+
 // A page opened through in-app navigation only fetches its data file, so also keep its HTML
 // for a full reload offline. Skipped for prefetches, to save data on metered connections.
 async function warmPage(path) {
+  if (privateNavigation(path)) return;
   const cache = await caches.open(PAGES);
   if (await cache.match(path)) return;
   try {
@@ -145,14 +162,21 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  if (url.pathname.startsWith("/api/")) return;
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(cacheFirst(request));
+    return;
+  }
+  if (request.mode === "navigate" && privateNavigation(url.pathname)) {
+    event.respondWith(privatePage(request));
     return;
   }
   if (request.mode === "navigate") {
     event.respondWith(networkFirstPage(request));
     return;
   }
+  // Data and RSC fetches for private pages go straight to the browser network.
+  if (privateNavigation(url.pathname)) return;
   const page = pageOfData(url.pathname);
   if (page) {
     event.respondWith(staleWhileRevalidate(DATA, request));

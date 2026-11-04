@@ -19,7 +19,7 @@ const sw: Record<keyof typeof en, string> = {
   nostrGuideNote: "Mwongozo huu wa nje unaeleza maandalizi ya programu ya kusaini. Jaribio la moja kwa moja la Jifunze na programu hii bado linasubiri.",
   nostrBackupStep: "Kabla ya kuendelea, fuata maelekezo ya programu yako ya kusaini ya kurejesha na kuhifadhi nakala ya akiba. Ikiwa inawezekana, tumia nakala iliyosimbwa kwa usalama, na uweke taarifa za kurejesha mahali pa siri na salama.",
   nostrBackupGuide: "Mfano: mwongozo wa Alby wa nakala ya akiba (Kiingereza)",
-  nostrPublicHelp: "Utambulisho wako wa umma (npub) unaweza kushirikiwa. Ufunguo wako wa siri (nsec) lazima ubaki siri: usiuandike, maneno ya kurejesha au nywila ya programu ya kusaini kwenye Jifunze.",
+  nostrPublicHelp: "Utambulisho wako wa umma (npub) unaweza kushirikiwa. Ufunguo wako wa siri (nsec) lazima ubaki siri. Usiingize nsec, maneno ya kurejesha au nywila ya programu yako ya kusaini kwenye Jifunze.",
   nostrLossHelp: "Ukipoteza ufunguo wako wa siri bila nakala ya akiba inayotumika, unaweza kupoteza kabisa udhibiti wa utambulisho huo wa Nostr. Jifunze haihifadhi wala kurejesha ufunguo wako wa siri, na misimbo ya kurejesha ya Jifunze haiurejeshi.",
   nostrReturnStep: "Utambulisho wako na nakala ya akiba zikiwa tayari, rudi hapa, angalia programu yako ya kusaini, chagua Endelea na Nostr na ukubali ombi la kuingia. Ukirudi baadaye, tumia programu na utambulisho huohuo; huhitaji kuandika tena ufunguo wako wa siri.",
 };

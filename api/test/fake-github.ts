@@ -25,7 +25,53 @@ function json(res: ServerResponse, status: number, body: unknown): void {
   res.end(JSON.stringify(body));
 }
 
-export async function startFakeGithub(opts: { clientId: string; clientSecret: string }): Promise<FakeGithub> {
+export type FakeGithubOptions = {
+  clientId: string;
+  clientSecret: string;
+  /** Listen on this port (default: any free port). */
+  port?: number;
+  /**
+   * Browser tests only: /login/oauth/authorize shows a consent page with Approve and Deny buttons instead of
+   * redirecting at once, so a spec can choose the user (or a denial) in the browser.
+   */
+  consent?: boolean;
+  /** Like a registered GitHub App callback list: any other redirect_uri is refused. Default: any. */
+  redirectUris?: string[];
+};
+
+/** The consent page's preset users. A spec that needs a user of its own enters an id and login instead. */
+export const PRESET_USERS: Record<string, FakeUser> = {
+  "1": { id: 1001, login: "octo", avatar_url: "https://avatars.example/u/1001" },
+  "2": { id: 2002, login: "hubot", avatar_url: null },
+};
+
+const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+function consentPage(p: { redirect: string; state: string; challenge: string }): string {
+  const hidden = (name: string, value: string) => `<input type="hidden" name="${name}" value="${esc(value)}">`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Fake GitHub (test only)</title></head>
+<body><main><h1>Fake GitHub (test only)</h1>
+<p>This page stands in for GitHub in browser tests. It is not GitHub and authenticates no one.</p>
+<form method="get" action="/login/oauth/authorize/decide">
+${hidden("redirect_uri", p.redirect)}${hidden("state", p.state)}${hidden("code_challenge", p.challenge)}
+<p><button name="user" value="1">Approve as user 1 (octo, id 1001)</button></p>
+<p><button name="user" value="2">Approve as user 2 (hubot, id 2002)</button></p>
+<fieldset><legend>Another user</legend>
+<p><label>GitHub user id <input name="id" inputmode="numeric"></label></p>
+<p><label>GitHub login <input name="login"></label></p>
+<p><button name="user" value="custom">Approve as this user</button></p>
+</fieldset>
+<p><button name="deny" value="1">Deny</button></p>
+</form></main></body></html>`;
+}
+
+function redirectTo(res: ServerResponse, location: URL): void {
+  res.statusCode = 302;
+  res.setHeader("Location", location.toString());
+  res.end();
+}
+
+export async function startFakeGithub(opts: FakeGithubOptions): Promise<FakeGithub> {
   let nextUser: FakeUser = { id: 1001, login: "octo", avatar_url: "https://avatars.example/u/1001" };
   const codes = new Map<string, { challenge: string; user: FakeUser }>();
   const tokens = new Map<string, FakeUser>();
@@ -41,6 +87,13 @@ export async function startFakeGithub(opts: { clientId: string; clientSecret: st
           return json(res, 400, { error: "invalid_request" });
         }
         if (url.searchParams.get("code_challenge_method") !== "S256") return json(res, 400, { error: "invalid_request" });
+        if (opts.redirectUris && !opts.redirectUris.includes(redirect)) return json(res, 400, { error: "redirect_uri_mismatch" });
+        if (opts.consent) {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "text/html; charset=utf-8");
+          res.setHeader("Cache-Control", "no-store");
+          return res.end(consentPage({ redirect, state: url.searchParams.get("state") ?? "", challenge }));
+        }
         const code = `code_${randomBytes(8).toString("hex")}`;
         codes.set(code, { challenge, user: nextUser });
         const back = new URL(redirect);
@@ -49,6 +102,40 @@ export async function startFakeGithub(opts: { clientId: string; clientSecret: st
         res.statusCode = 302;
         res.setHeader("Location", back.toString());
         return res.end();
+      }
+      if (opts.consent && req.method === "GET" && url.pathname === "/login/oauth/authorize/decide") {
+        const q = url.searchParams;
+        const redirect = q.get("redirect_uri") ?? "";
+        const challenge = q.get("code_challenge") ?? "";
+        if (!redirect || !challenge || (opts.redirectUris && !opts.redirectUris.includes(redirect))) {
+          return json(res, 400, { error: "invalid_request" });
+        }
+        const back = new URL(redirect);
+        if (q.has("deny")) {
+          // What GitHub sends when the user cancels the authorization.
+          back.searchParams.set("error", "access_denied");
+          back.searchParams.set("error_description", "The user has denied your application access.");
+          back.searchParams.set("state", q.get("state") ?? "");
+          return redirectTo(res, back);
+        }
+        const choice = q.get("user") ?? "";
+        let user = PRESET_USERS[choice];
+        if (choice === "custom") {
+          const id = Number(q.get("id"));
+          const login = q.get("login") ?? "";
+          if (!Number.isSafeInteger(id) || id <= 0 || !/^[A-Za-z0-9-]{1,39}$/.test(login)) return json(res, 400, { error: "invalid_user" });
+          user = { id, login, avatar_url: null };
+        }
+        if (!user) return json(res, 400, { error: "invalid_user" });
+        const code = `code_${randomBytes(8).toString("hex")}`;
+        codes.set(code, { challenge, user });
+        back.searchParams.set("code", code);
+        back.searchParams.set("state", q.get("state") ?? "");
+        return redirectTo(res, back);
+      }
+      if (req.method === "GET" && url.pathname === "/") {
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        return res.end("Fake GitHub (test only)\n");
       }
       if (req.method === "POST" && url.pathname === "/login/oauth/access_token") {
         const f = await readForm(req);
@@ -76,7 +163,7 @@ export async function startFakeGithub(opts: { clientId: string; clientSecret: st
       json(res, 404, { message: "Not Found" });
     })().catch(() => json(res, 500, { message: "fake failed" }));
   });
-  await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+  await new Promise<void>((r) => server.listen(opts.port ?? 0, "127.0.0.1", r));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   return {
     url,

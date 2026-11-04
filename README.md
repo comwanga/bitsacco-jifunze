@@ -6,7 +6,7 @@ A free, Kiswahili-first Bitcoin learning platform with three roadmaps:
 - **Bitcoin kwa Wajenzi** (Bitcoin for Builders), for developers building on Bitcoin, Lightning and Fedimint.
 - **Lightning kwa Wajenzi** (Lightning for Builders), all 17 chapters of *Mastering the Lightning Network*, simplified, with a live lab: an in-page CLI/Python editor that runs against regtest Lightning nodes in Docker on your laptop. See [lab/README.md](lab/README.md).
 
-Every lesson ships in Kiswahili and English. There are no accounts and no backend: the site is a static export. Progress lives in the reader's browser and can be exported to a file and imported on another phone. Lessons opened once stay readable offline.
+Every lesson ships in Kiswahili and English. Learning needs no account and no backend: the site is a static export. Progress lives in the reader's browser and can be exported to a file and imported on another phone. Lessons opened once stay readable offline.
 
 ## Stack
 
@@ -68,6 +68,29 @@ docker run --rm -p 8080:8080 jifunze   # http://localhost:8080/sw/
 
 The image serves plain files from `nginxinc/nginx-unprivileged` as a non-root user. There is no app server, database or secret.
 
+## Akaunti (account) stack
+
+The optional account (GitHub sign-in and recovery codes) is a small Node 24 API in [`api/`](api/) with PostgreSQL. nginx serves the site and proxies `/api/` to it. The site starts and serves pages without the API.
+
+```bash
+cp api/.env.example api/.env.local   # fill in the GitHub App and the recovery pepper
+docker compose up --build            # http://localhost:8080/sw/account/
+```
+
+- `api/.env.local` is git-ignored and is not sent to Docker builds. Secrets are never committed: compose reads them at run time.
+- Only the site is published, on `127.0.0.1:8080`. The API and the database have no host port.
+- Sign in locally with Chromium or Firefox. The session cookie is `__Host-` and `Secure`, and Safari/WebKit refuses it on `http://localhost`.
+- The rate limits live in the API's memory, so they reset whenever it restarts.
+- GitHub requires the `redirect_uri` to match a registered callback. Register all three on the GitHub App: `/api/auth/github/callback`, `/api/auth/github/callback/reauth` and `/api/auth/github/callback/replace` (for example `http://localhost:8080/api/auth/github/callback`).
+
+```bash
+export TEST_DATABASE_URL=postgres://...   # a throwaway PostgreSQL database
+npm run api:test
+npm run build && npm run e2e:account      # Chromium, against the real API and a fake GitHub
+```
+
+`npm run e2e:account` starts a fake GitHub (`api/test/fake-github-server.ts`) with a test-only consent page. It is not real GitHub authentication. CI runs both, validates `compose.yaml` and builds the API image.
+
 ## Content
 
 Lessons, roadmaps, quizzes and the glossary live in [`content/`](content/) and are licensed CC BY-SA 4.0. See [CONTRIBUTING.md](CONTRIBUTING.md) to add or translate a lesson.
@@ -91,7 +114,9 @@ lib/progress/          on-device progress model, storage and React hook
 lib/build/             post-build CSP, link and budget helpers
 scripts/               validate-content.ts, postbuild.ts, make-icons.mjs
 public/                service worker, web app manifest, icons, logo
-docker/                nginx config and security headers
+api/                   account API (Node 24, PostgreSQL), its migrations and tests
+e2e-account/           account browser checks against the API and a fake GitHub
+docker/                nginx config, security headers and the API image
 ```
 
 ## The Lightning lab

@@ -1,0 +1,55 @@
+# Local account stack: the site (nginx) on http://localhost:8080, the account API and PostgreSQL.
+#   cp api/.env.example api/.env.local   # then fill it in; it is git-ignored and never committed
+#   docker compose up --build
+# Only the site is published. The API and the database have no host port: the API trusts X-Real-IP only
+# from a private peer, so nginx must be the only way in.
+name: jifunze
+
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks: [edge, internal]
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    env_file:
+      - path: api/.env.local # GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, RECOVERY_PEPPER_V1
+        required: false # so `docker compose config` works without it; the API names any missing key at boot
+    environment:
+      PORT: "3001"
+      SITE_ORIGIN: http://localhost:8080
+      # A local-only database on the internal network, with no host port.
+      DATABASE_URL: postgres://jifunze:${JIFUNZE_DB_PASSWORD:-local-only}@postgres:5432/jifunze
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # internal: reached only by nginx; egress: outbound HTTPS to GitHub.
+    networks: [internal, egress]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: jifunze
+      POSTGRES_DB: jifunze
+      POSTGRES_PASSWORD: ${JIFUNZE_DB_PASSWORD:-local-only}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jifunze -d jifunze"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+networks:
+  edge: {}
+  internal:
+    internal: true
+  egress: {}
+
+volumes:
+  pgdata: {}

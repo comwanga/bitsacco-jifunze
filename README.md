@@ -104,6 +104,7 @@ Both nginx and the API log to the containers' stdout and stderr (`docker compose
 - **nginx error lines are the exception, and nginx cannot redact them.** They quote the full request line and the full client address (`client: …`).
   - They stay on, at the image's normal level, because they are what explains an outage.
   - No `/api/` URL carries a secret except the three GitHub callbacks, which hold the OAuth `code` and `state`. Those three alone log errors only at `crit` and above. Their failures still show in the access log (status, `upstream=`) and in `docker compose logs api`.
+  - A malformed callback path, such as one containing a backslash, doesn't match those quiet locations in nginx, so its upstream errors are logged at the normal level, query string included. The API still treats it as a callback, with the same state and PKCE checks. Real codes and states only arrive at the exact registered callback URLs, so such a line can only hold values the requester typed.
 - **Access:** anyone who can run `docker` on the host can read these logs. Keep that to operators. Never forward the logs to a shared tool that applies looser rules.
 - **Retention:** application logs are kept 14 days (design F6). Compose bounds log size per container (the `local` driver, 3 × 10 MB) but cannot enforce an age limit. The production host must enforce the 14 days, for example with journald `MaxRetentionSec=14day` or the log shipper's own retention.
 

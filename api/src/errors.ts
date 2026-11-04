@@ -1,4 +1,8 @@
 export type ErrorCode =
+  | "nostr_invalid"
+  | "nostr_expired"
+  | "challenge_invalid"
+  | "nostr_lifecycle_pending"
   | "not_found"
   | "method_not_allowed"
   | "bad_origin"
@@ -29,6 +33,10 @@ export class ApiError extends Error {
 }
 
 export const MESSAGES: Record<ErrorCode, { sw: string; en: string }> = {
+  nostr_invalid: { sw: "Sahihi ya Nostr si halali kwa ombi hili. Tafadhali jaribu tena.", en: "The Nostr signature is not valid for this request. Please try again." },
+  nostr_expired: { sw: "Muda wa ombi la kuingia umekwisha. Tafadhali anza tena.", en: "The sign-in request has expired. Please start again." },
+  challenge_invalid: { sw: "Ombi la kuingia limekwisha au si halali kwenye kivinjari hiki. Tafadhali anza tena.", en: "The sign-in request has expired or is not valid in this browser. Please start again." },
+  nostr_lifecycle_pending: { sw: "Kubadilisha njia ya kuingia ya Nostr bado hakupatikani. Unaweza kutoka na kuendelea kujifunza.", en: "Replacing a Nostr sign-in method is not available yet. You can sign out and keep learning." },
   not_found: {
     sw: "Hatukupata ukurasa au kitu ulichotafuta.",
     en: "We could not find what you were looking for.",

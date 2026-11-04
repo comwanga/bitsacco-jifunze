@@ -19,6 +19,14 @@
 
 ## Boundaries and roadmap proposal
 
+### Additional onboarding requirement (maintainer, this session)
+
+Provide two explicit route-local choices: existing Nostr identity (default) and new to Nostr. Beginners get bilingual steps to choose a browser signer, create a standard identity inside that signer, back it up using its supported recovery mechanism (prefer encryption where supported), return here and approve sign-in. Explain shareable `npub`, secret `nsec`, and permanent loss of identity control without a usable backup. No Jifunze key generation, key-entry field, private-key custody, upload or restore claims. Keep the stable internal account / hex provider UID architecture; NIP-19 is a display/export format, not a different identity.
+
+Compare [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md) and link the external signer's official creation/backup documentation as guidance. Alby's [official Nostr guide](https://guides.getalby.com/user-guide/browser-extension/features/nostr) documents local identity generation and [Master Key backup](https://guides.getalby.com/user-guide/browser-extension/features/master-key). This is a documentation-based example, not a live Jifunze interoperability pass or endorsement of its custody implementation. Tests must cover switching both choices by keyboard, beginner guidance and links, no key inputs/storage/network side effects, both languages and axe.
+
+Increment 2c adds mobile/remote signers and assesses identity creation/backup with real signers. Any integrated browser key generation or encrypted local custody remains a separately approved future security review.
+
 No NIP-46, relay/WebSocket/CSP expansion, private-key handling, automatic linking, Nostr identity replacement, or progress synchronization. Existing anonymous/offline progress stays device-local and unchanged.
 
 Proposal for separate approval: prioritize secure account-owned learning-progress synchronization immediately after Increment 2d, before the full Builder Community and contribution-discovery experience. Progress belongs to internal account IDs; merging local progress must require explicit consent. This increment records the proposal only and does not change the approved implementation order.

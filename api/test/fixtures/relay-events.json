@@ -1,0 +1,150 @@
+[
+  {
+    "content": "{\"id\":\"p1793817642116612\",\"n\":\"هررررر\",\"t\":\"\",\"ts\":1793817642116,\"ty\":\"p\"}",
+    "created_at": 1793817642,
+    "id": "72bf69768005498559e7477953f71d1444cec6fa5654b1b3ac4d8aa16a396efe",
+    "kind": 1,
+    "pubkey": "5e868749cb940beefa93299fb7a4062427d84451ecae99517acfff5ac99029d1",
+    "sig": "3a2b33a346aa049e239111ad06a4207a794b0d274ecfb50fc0e366e23491515d587024dfcaeaa22ef15bbc50dfa06ad3df9f31676b52b47ecf24a4b6f84d47a0",
+    "tags": [
+      [
+        "t",
+        "tlgblue-dm-45dda58cca595080acebc0b5"
+      ],
+      [
+        "d",
+        "presence"
+      ]
+    ]
+  },
+  {
+    "content": "{\"v\":1,\"online\":true,\"ts\":1793817641}",
+    "created_at": 1793817641,
+    "id": "44a22ea402688e61a156394dddd483ad3f78644b682cfd95d16ef7f7a056577f",
+    "kind": 1,
+    "pubkey": "77dad091662523c6d4c7921180277e767ec31420cbde72b27438101b43593d68",
+    "sig": "9f0c4d6ffda376a02b0340963333f4caed8ad91a4af38d97b315f12ea0cb574ecb7e2a00bdfd04ef65f7c4c11bedd5e5e39baf9cf1a01016782f76f6b79b2813",
+    "tags": [
+      [
+        "t",
+        "nexora-webchat-v1"
+      ],
+      [
+        "presence",
+        "1"
+      ]
+    ]
+  },
+  {
+    "content": "Fading that on ETH.\n\nYou called SHORT, our lanes say LONG (conviction +0.04).\nWe're trading 3 positions live, $1277 equity. Divergence is alpha — let's see who's right.\n\nBook: https://sylunara-signals.crypto-guard.workers.dev/signals.json\n#trading #bots #crypto #sylunara",
+    "created_at": 1793817638,
+    "id": "53d64d68ca5b594ff5eefa1658a84850a6c7dcb0ed7e83b09311ae2299cb2d19",
+    "kind": 1,
+    "pubkey": "567b21e2a428a8f7b67aa03ec21cfa610fae2afc2df5a7513de0d4e69be2077d",
+    "sig": "d2e4003b5471306cd850ae503d32d10f34ce3970e6fd944c7dd85679dc24d9c5149b949ce48682cc6fdd302b822164aff833b0413abc054d2e548e6f8bb4260a",
+    "tags": [
+      [
+        "t",
+        "trading"
+      ],
+      [
+        "t",
+        "bots"
+      ],
+      [
+        "t",
+        "crypto"
+      ],
+      [
+        "t",
+        "signals"
+      ],
+      [
+        "t",
+        "algotrading"
+      ],
+      [
+        "t",
+        "sylunara"
+      ],
+      [
+        "t",
+        "stocks"
+      ],
+      [
+        "t",
+        "equities"
+      ],
+      [
+        "t",
+        "forex"
+      ],
+      [
+        "t",
+        "options"
+      ],
+      [
+        "e",
+        "3cd2ba07bc84c5bc8d112844ca7f3771aa2e3763234135571d31ca6a1ac7cb68",
+        "",
+        "reply"
+      ],
+      [
+        "p",
+        "dee495f082308199ccd7d5956885289025fbc23e6e44751647044de6731b4120"
+      ]
+    ]
+  },
+  {
+    "content": "{\"id\":\"p1793817630620637\",\"n\":\"محمد\",\"t\":\"\",\"ts\":1793817630620,\"ty\":\"p\"}",
+    "created_at": 1793817630,
+    "id": "a4ca4aa0c5760e7800125395d7e127161501fc73c302ff26e5b2f993441f35c8",
+    "kind": 1,
+    "pubkey": "5f6c463ed171f8713e0f68074ce5276b1e3e366fad2962bfb94be3b36ae53bf4",
+    "sig": "ed562973a5b36d2700efa55f32ca47d6be4c52d1f79646e692bb82b8900f660676b98a699804769dfe800a2701d5d9b0c95a8d414df6897f8b66533bec95b24f",
+    "tags": [
+      [
+        "t",
+        "payamresan-general"
+      ],
+      [
+        "d",
+        "presence"
+      ]
+    ]
+  },
+  {
+    "content": "Trump hammers Fox News, blaming network for GOP losses as ratings slide\n\nTrump is a frequent critic of media companies, especially broadcasters that he views as being biased against him.\n\nhttps://www.cnbc.com/2026/11/04/trump-fox-news-gop-midterm-losses.html",
+    "created_at": 1793817628,
+    "id": "10fb7c77572e171d588c3c3312a21d56adc41e5a832bbc7e8a1225dbd8b89ff5",
+    "kind": 1,
+    "pubkey": "2d1f0804fd31064c5ac6dcca8cc7bf5b6e33bafbeae22682fa8f8d46b03442ca",
+    "sig": "e4af3ef7c4bcda61f43399a9580256153e0623480da046bb41282110d9aa5c0c52aec1ecb302c59f3252fe54f4069640ca62be0a289b0960e3bc1498701f5903",
+    "tags": [
+      [
+        "t",
+        "business"
+      ],
+      [
+        "t",
+        "news"
+      ],
+      [
+        "t",
+        "world"
+      ],
+      [
+        "t",
+        "global"
+      ],
+      [
+        "t",
+        "cnbc"
+      ],
+      [
+        "t",
+        "feed"
+      ]
+    ]
+  }
+]

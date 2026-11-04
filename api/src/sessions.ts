@@ -112,8 +112,8 @@ export const meRoute: Route = {
     const s = session!;
     const [acct] = await sql<{ id: string; preferred_lang: string; issued: Date | null }[]>`
       select id, preferred_lang, recovery_codes_issued_at as issued from accounts where id = ${s.accountId}`;
-    const ids = await sql<{ provider: string; handle: string | null; avatar_url: string | null; linked_at: Date }[]>`
-      select provider, handle, avatar_url, linked_at from identities
+    const ids = await sql<{ provider: string; provider_uid: string; handle: string | null; avatar_url: string | null; linked_at: Date }[]>`
+      select provider, provider_uid, handle, avatar_url, linked_at from identities
       where account_id = ${s.accountId} order by linked_at`;
     const ev = await sql<{ at: Date }[]>`
       select at from security_events
@@ -127,6 +127,7 @@ export const meRoute: Route = {
         account: { id: acct!.id, preferredLang: acct!.preferred_lang, recoveryCodesIssued: acct!.issued !== null },
         identities: ids.map((i) => ({
           provider: i.provider,
+          ...(i.provider === "nostr" ? { pubkey: i.provider_uid } : {}),
           handle: i.handle,
           avatarUrl: i.avatar_url,
           linkedAt: i.linked_at,

@@ -1,0 +1,10 @@
+[
+  { "term_en": "sign in", "term_sw": "ingia", "status": "pending", "context": "Account pages and the header: the GitHub sign-in button and the sign-in page title (\"Ingia kwenye Jifunze\")." },
+  { "term_en": "sign out", "term_sw": "toka", "status": "pending", "context": "Account pages: the sign-out button and page (\"Toka\", \"Umetoka kwenye akaunti\")." },
+  { "term_en": "account", "term_sw": "akaunti", "status": "pending", "context": "The header link \"Akaunti\" and every account page; also used for a GitHub account (\"akaunti ya GitHub\")." },
+  { "term_en": "session", "term_sw": "kipindi", "status": "pending", "context": "Recovery page: the restricted 15-minute session after a recovery code (\"Kipindi hiki kinaisha baada ya dakika 15\")." },
+  { "term_en": "recovery code", "term_sw": "msimbo wa kurejesha", "status": "pending", "context": "Welcome, sign-in, account and recovery pages; plural \"misimbo ya kurejesha\". The required confirmation uses the brief's \"Nimezihifadhi\" (zi- agreement) while the surrounding copy agrees with misimbo (i-), e.g. \"Iweke mahali pa siri\"; a reviewer should choose one." },
+  { "term_en": "identity", "term_sw": "njia ya kuingia", "status": "pending", "context": "Account home: the linked sign-in identity, shown as \"Njia ya kuingia\" (sign-in method) rather than a literal \"utambulisho\"." },
+  { "term_en": "replace", "term_sw": "badilisha", "status": "pending", "context": "Recovery page: \"Badilisha GitHub\", replacing the lost GitHub identity with another one." },
+  { "term_en": "re-authenticate", "term_sw": "thibitisha tena kuwa ni wewe", "status": "pending", "context": "Account home: confirming with GitHub again before new recovery codes (\"thibitisha kwanza kuwa ni wewe\")." }
+]

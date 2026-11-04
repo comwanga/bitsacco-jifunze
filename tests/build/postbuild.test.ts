@@ -50,6 +50,14 @@ describe("links and budget", () => {
     const refs = internalRefs('<a href="https://x.org/">x</a><a href="//cdn.x/y">y</a><a href="#top">t</a><a href="/sw/glossary/#sats">g</a><img src="/logo.svg">');
     expect(refs).toEqual(["/sw/glossary/#sats", "/logo.svg"]);
   });
+  test("internalRefs skips /api/ refs, which the API serves, but still reports missing pages", () => {
+    const refs = internalRefs(
+      '<a href="/api/auth/github/start?purpose=signin&amp;lang=sw&amp;return=/sw/account/">g</a><a href="/api/me">m</a><a href="/sw/x/">x</a><a href="/apiary/">a</a>',
+    );
+    expect(refs).toEqual(["/sw/x/", "/apiary/"]);
+    expect(refs.filter((r) => r.startsWith("/api/"))).toEqual([]);
+    expect(resolvesInOut(out, "/sw/x/")).toBe(false);
+  });
   test("resolvesInOut finds directories, files and .html pages", () => {
     expect(resolvesInOut(out, "/sw/")).toBe(true);
     expect(resolvesInOut(out, "/sw/glossary/#x")).toBe(false);

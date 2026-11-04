@@ -1,4 +1,5 @@
 import { t, type Lang } from "@/lib/i18n";
+import { siteCopy } from "@/lib/site-copy";
 import { BrandLockup } from "./BrandLockup";
 import { HeaderNav, type NavItem } from "./HeaderNav";
 import { LanguageSwitch } from "./LanguageSwitch";
@@ -19,6 +20,11 @@ export function siteNav(lang: Lang): NavItem[] {
   ];
 }
 
+/** The account link: outside the main navigation list on wide screens (after the language switch), last in the phone menu. */
+export function accountNav(lang: Lang): NavItem {
+  return { href: `/${lang}/account/`, label: siteCopy[lang].account, match: [`/${lang}/account/`] };
+}
+
 /** One compact row pinned by CSS while scrolling: brand on the left, navigation and language switch grouped on the right. */
 export function SiteHeader({ lang }: { lang: Lang }) {
   return (
@@ -31,7 +37,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       </a>
       <div className="mx-auto flex h-full max-w-[96rem] items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
         <BrandLockup lang={lang} />
-        <HeaderNav items={siteNav(lang)} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
+        <HeaderNav items={siteNav(lang)} account={accountNav(lang)} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
           <LanguageSwitch lang={lang} />
         </HeaderNav>
       </div>

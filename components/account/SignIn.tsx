@@ -6,9 +6,6 @@ import type { Lang } from "@/lib/i18n";
 import { apiFetch, dropQueryParams, githubStart, queryParam, safeReturn } from "./api";
 import { ErrorAlert, primaryBtn, secondaryBtn } from "./parts";
 
-// The API answers /{lang}/account/recovery/; anything else is not followed.
-const RECOVERY_REDIRECT = /^\/(sw|en)\/account\/recovery\/$/;
-
 export function SignIn({ lang }: { lang: Lang }) {
   const c = accountCopy[lang];
   // The server-rendered link already works without JavaScript; the browser adds a safe ?return= if one was given.
@@ -46,10 +43,13 @@ export function SignIn({ lang }: { lang: Lang }) {
     }
     setBusy(true);
     setFormError(null);
-    const res = await apiFetch<{ redirect?: unknown }>("/api/auth/recovery", { method: "POST", body: { code: code.trim() } });
+    const res = await apiFetch("/api/auth/recovery", { method: "POST", body: { code: code.trim() } });
     if (res.ok) {
-      const to = typeof res.data?.redirect === "string" && RECOVERY_REDIRECT.test(res.data.redirect) ? res.data.redirect : `/${lang}/account/recovery/`;
-      window.location.assign(to);
+      // Stay in the language the code was entered in. The API's redirect names the account's saved language,
+      // which can differ, so it is not followed. A full page load on purpose: the recovery page starts fresh
+      // with the new session cookie.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign(`/${lang}/account/recovery/`);
       return;
     }
     setBusy(false);

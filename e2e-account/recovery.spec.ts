@@ -12,12 +12,13 @@ test("sw: a recovery code, Replace GitHub, and a reused code", async ({ page }) 
   const oldUser = freshUser();
   const newUser = freshUser();
 
-  const codes = await signUp(page, "sw", oldUser);
-  await finishWelcome(page, "sw");
+  // The account is created in English, so its saved language differs from the page recovery starts on.
+  const codes = await signUp(page, "en", oldUser);
+  await finishWelcome(page, "en");
   const original = await whoAmI(page);
-  await signOut(page, "sw");
+  await signOut(page, "en");
 
-  // A code from welcome opens the restricted recovery session.
+  // A code from welcome opens the restricted recovery session, in the language of the page it was entered on.
   await submitRecoveryCode(page, "sw", codes[0]!);
   await expect(page).toHaveURL(/\/sw\/account\/recovery\/$/);
   await expect(page.getByRole("heading", { name: c.replaceHeading })).toBeVisible();
@@ -53,15 +54,21 @@ test("sw: a recovery code, Replace GitHub, and a reused code", async ({ page }) 
   await expect(page).toHaveURL(/\/sw\/account\/signin\/$/);
 });
 
-test("en: a recovery code from an English account opens the English recovery page", async ({ page }) => {
+test("en: a recovery code entered on the English page opens the English recovery page, whatever the account's language", async ({ page }) => {
   const c = accountCopy.en;
-  const codes = await signUp(page, "en", freshUser());
-  await finishWelcome(page, "en");
-  await signOut(page, "en");
+  // A Kiswahili account: the recovery page must still follow the English page the code was entered on.
+  const codes = await signUp(page, "sw", freshUser());
+  await finishWelcome(page, "sw");
+  await signOut(page, "sw");
 
   // Lower case and without dashes still matches: the API normalises the code.
+  const answer = page.waitForResponse((r) => new URL(r.url()).pathname === "/api/auth/recovery");
   await submitRecoveryCode(page, "en", codes[3]!.replaceAll("-", "").toLowerCase());
+  // The answer's body is pinned to exactly { redirect } by api/test/recovery.test.ts; the page navigates before
+  // it could be read here.
+  expect((await answer).status()).toBe(200);
   await expect(page).toHaveURL(/\/en\/account\/recovery\/$/);
   await expect(page.getByRole("heading", { name: c.recoveryHeading })).toBeVisible();
   await expect(page.getByRole("heading", { name: c.replaceHeading })).toBeVisible();
+  expect((await whoAmI(page)).scope).toBe("recovery"); // still the restricted session
 });

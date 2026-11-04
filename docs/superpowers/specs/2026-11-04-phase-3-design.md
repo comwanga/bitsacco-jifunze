@@ -36,7 +36,7 @@ Journey: **Jifunze → Jaribu → Jenga → Changia → Kua** (Learn → Practis
 | D9 | Recovery | **Approved** (F5, revision 3) | Includes concurrency tests for replacement (F5). Administrative removal needs **legal review before general release**, and deletion keeps strong evidence and two-maintainer approval |
 | D10 | Ecosystem registry | **Approved** | A curated, broad, reviewable registry with no score (section G5) |
 | D11 | API dependencies | **Provisionally approved**; `nostr-tools` and the sign-in page's `connect-src 'self' wss:` **approved with conditions** | API: `postgres`, `@noble/curves`, `@noble/hashes`, `zod`, and a minimal router with tests for its boundaries. Client: `nostr-tools` **2.25.2**, NIP-46 only, loaded after explicit activation on the Nostr sign-in page only, with the relay validation and resource rules in F3 |
-| D12 | Translation review | **Approved in principle** | No reviewers named yet. New terminology is tracked as **pending review** and not released as reviewed (section H2) |
+| D12 | Translation review | **Approved in principle** | New terminology is tracked as **pending review** and not released as reviewed (section H2). Increment 2a's account terms were approved on 2026-11-04 by the project maintainer, a native Kiswahili speaker; no other reviewers are named yet |
 | D13 | Retention | **Approved** | Security events kept 90 days; sessions and challenges purged daily; covered by tests (section F6) |
 
 ---
@@ -812,6 +812,11 @@ Nothing is released unless all of these hold:
   - verified, synced, partial.
 
   These ship only after review by Kenyan and Tanzanian Kiswahili reviewers (D12, not yet appointed).
+
+  **Increment 2a review, 2026-11-04:**
+  - The project maintainer, a native Kiswahili speaker, reviewed the existing Kiswahili account phrases and the eight terms Increment 2a recorded as pending. Those eight are: sign in, sign out, account, session, recovery code, identity, replace, re-authenticate.
+  - Decision: **approved without wording changes**. `content/terminology-review.json` records the approval.
+  - The approval covers that existing content only. Terms from later increments still go through review before release.
 
 ---
 

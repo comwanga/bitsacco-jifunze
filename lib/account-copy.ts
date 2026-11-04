@@ -4,7 +4,7 @@ import type { Lang } from "./i18n.ts";
 // Copy for the account pages only. Kept out of lib/i18n.ts, whose dictionary is bundled into every page's
 // JavaScript, the same way lib/simulations/copy.ts is. The pages show this copy, keyed by the API's error
 // code, and never the API's own message strings. Kiswahili and English are written separately; the shared
-// terms are listed as pending in content/terminology-review.json.
+// terms and their review are recorded in content/terminology-review.json.
 
 type ErrorKeys = `error_${ErrorCode}`;
 

@@ -93,22 +93,67 @@ export const RECOVERY_RULES = [
   { name: "recovery-net", key: slash24, limit: 20, windowMs: HOUR_MS },
 ];
 
-/** Counts every attempt; the first one past the threshold in an hour is reported once. Never blocks. */
+/**
+ * One operator log line per hourly window: outcome counts only, never a code, IP or account.
+ * Failed attempts are counted here instead of one security-event row each, which would let an
+ * attacker turn guessing into unbounded database writes.
+ */
+export type RecoverySummary = {
+  event: "recovery_attempts_hourly";
+  windowStart: string;
+  attempts: number;
+  succeeded: number;
+  invalid: number;
+  rateLimited: number;
+};
+export type Outcome = "succeeded" | "invalid" | "rateLimited";
+
+function logSummary(s: RecoverySummary): void {
+  console.info(JSON.stringify(s));
+}
+
+/**
+ * Counts every attempt in fixed hourly windows. The first attempt past the threshold in a window
+ * is reported once as a flood. When a window ends, its counts go to `report` on the next attempt.
+ * Never blocks; memory is constant.
+ */
 export class FloodWatch {
+  private windowStart = 0;
   private windowEnd = 0;
   private count = 0;
   private reported = false;
+  private outcomes: Record<Outcome, number> = { succeeded: 0, invalid: 0, rateLimited: 0 };
   private readonly now: () => number;
-  constructor(now: () => number = Date.now) {
+  private readonly report: (s: RecoverySummary) => void;
+  constructor(now: () => number = Date.now, report: (s: RecoverySummary) => void = logSummary) {
     this.now = now;
+    this.report = report;
+  }
+  /** Records how an attempt in the current window ended. */
+  outcome(kind: Outcome): void {
+    this.outcomes[kind] += 1;
   }
   /** Returns the count when this call should write the hourly alert, else null. */
   note(): number | null {
     const t = this.now();
     if (t >= this.windowEnd) {
+      if (this.count > 0) {
+        try {
+          this.report({
+            event: "recovery_attempts_hourly",
+            windowStart: new Date(this.windowStart).toISOString(),
+            attempts: this.count,
+            ...this.outcomes,
+          });
+        } catch {
+          // Monitoring must never turn into a failure for the caller.
+        }
+      }
+      this.windowStart = t;
       this.windowEnd = t + HOUR_MS;
       this.count = 0;
       this.reported = false;
+      this.outcomes = { succeeded: 0, invalid: 0, rateLimited: 0 };
     }
     this.count += 1;
     if (this.count > FLOOD_THRESHOLD && !this.reported) {
@@ -140,18 +185,31 @@ export function recoveryRoutes(
         }
       }
 
-      if (!allowed) throw new ApiError(429, "rate_limited");
+      if (!allowed) {
+        flood.outcome("rateLimited");
+        throw new ApiError(429, "rate_limited");
+      }
 
+      const invalid = () => {
+        flood.outcome("invalid");
+        return new ApiError(401, "recovery_invalid");
+      };
       const normalised = normaliseCode((body as { code: string }).code);
-      const accountId = normalised ? await consumeCode(sql, cfg, normalised) : null;
-      if (!accountId) throw new ApiError(401, "recovery_invalid");
+      if (!normalised) throw invalid();
 
-      await revokeOtherSessions(sql, accountId);
-      const { cookie } = await createSession(sql, accountId, "recovery");
-      await logEvent(sql, accountId, "recovery_code_used");
-      const [acct] = await sql<{ preferred_lang: string }[]>`
-        select preferred_lang from accounts where id = ${accountId}`;
-      const lang = acct?.preferred_lang === "en" ? "en" : "sw";
+      // One transaction: if any step fails, the code is not spent and no session changes.
+      // The code row stays locked until commit, so a concurrent use of it waits and then sees it used.
+      const { cookie, lang } = await sql.begin(async (tx) => {
+        const accountId = await consumeCode(tx, cfg, normalised);
+        if (!accountId) throw invalid();
+        await revokeOtherSessions(tx, accountId);
+        const { cookie } = await createSession(tx, accountId, "recovery");
+        await logEvent(tx, accountId, "recovery_code_used");
+        const [acct] = await tx<{ preferred_lang: string }[]>`
+          select preferred_lang from accounts where id = ${accountId}`;
+        return { cookie, lang: acct?.preferred_lang === "en" ? "en" : "sw" };
+      });
+      flood.outcome("succeeded");
       return { status: 200, json: { redirect: `/${lang}/account/recovery/` }, setCookies: [cookie] };
     },
   };

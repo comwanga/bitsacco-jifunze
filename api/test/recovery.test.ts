@@ -5,10 +5,19 @@ import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import type { Config } from "../src/config.ts";
 import { connect, migrate } from "../src/db.ts";
 import { githubRoutes, GITHUB_START_RULE } from "../src/github-routes.ts";
-import { createServer } from "../src/http.ts";
+import { createServer, type Route } from "../src/http.ts";
 import { clientIp } from "../src/http.ts";
 import { Limiter, perIp, slash24 } from "../src/ratelimit.ts";
-import { generateCodes, hashCode, issueCodes, normaliseCode, recoveryRoutes } from "../src/recovery.ts";
+import {
+  FloodWatch,
+  generateCodes,
+  hashCode,
+  issueCodes,
+  normaliseCode,
+  RECOVERY_RULES,
+  recoveryRoutes,
+  type RecoverySummary,
+} from "../src/recovery.ts";
 import { createSession, meRoute, readSession } from "../src/sessions.ts";
 import { fakeConfig, ORIGIN, resetTestDb, testDatabaseUrl } from "./helpers.ts";
 
@@ -33,8 +42,12 @@ async function newAccount(lang: "sw" | "en" = "sw"): Promise<string> {
   return row!.id;
 }
 
-async function withApi<T>(fn: (base: string) => Promise<T>, cfg: Config = cfgV1()): Promise<T> {
-  const server = createServer([meRoute, ...recoveryRoutes()], { cfg, sql, readSession, log: () => {}, logError: () => {} });
+async function withApi<T>(
+  fn: (base: string) => Promise<T>,
+  cfg: Config = cfgV1(),
+  table: Route[] = [meRoute, ...recoveryRoutes()],
+): Promise<T> {
+  const server = createServer(table, { cfg, sql, readSession, log: () => {}, logError: () => {} });
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   try {
     return await fn(`http://127.0.0.1:${(server.address() as AddressInfo).port}`);
@@ -243,6 +256,64 @@ describe("recovery limits", () => {
   }, 60_000);
 });
 
+describe("failed recovery attempts are counted in aggregate, not stored one by one", () => {
+  it("one structured summary per hour with outcome counts only; no per-attempt security events", async () => {
+    const a = await newAccount();
+    const [code] = await issueCodes(sql, cfgV1(), a);
+    let t = 1_000_000;
+    const reports: RecoverySummary[] = [];
+    const watch = new FloodWatch(() => t, (s) => reports.push(s));
+    const table = [meRoute, ...recoveryRoutes(new Limiter(RECOVERY_RULES), watch)];
+    await withApi(
+      async (base) => {
+        expect((await rec(base, code, "198.51.100.1")).status).toBe(200);
+        for (let i = 0; i < 2; i++) expect((await rec(base, "ABCD-EFGH-IJKL-MNOP", "198.51.100.2")).status).toBe(401);
+        for (let i = 0; i < 5; i++) expect((await rec(base, "not a code", "198.51.100.3")).status).toBe(401);
+        expect((await rec(base, "ABCD-EFGH-IJKL-MNOP", "198.51.100.3")).status).toBe(429);
+        expect(reports).toEqual([]); // nothing until the hour is over
+
+        t += 3_600_000;
+        expect((await rec(base, "ABCD-EFGH-IJKL-MNOP", "203.0.113.1")).status).toBe(401);
+        expect(reports).toEqual([
+          {
+            event: "recovery_attempts_hourly",
+            windowStart: new Date(1_000_000).toISOString(),
+            attempts: 9,
+            succeeded: 1,
+            invalid: 7,
+            rateLimited: 1,
+          },
+        ]);
+        const out = JSON.stringify(reports);
+        for (const secret of [code!, code!.replaceAll("-", ""), "198.51.100", "203.0.113"]) expect(out).not.toContain(secret);
+        const events = await sql<{ event: string }[]>`select event from security_events`;
+        expect(events.map((e) => e.event)).toEqual(["recovery_code_used"]);
+      },
+      cfgV1(),
+      table,
+    );
+  });
+
+  it("a summary sink that throws never fails the request", async () => {
+    let t = 0;
+    const watch = new FloodWatch(
+      () => t,
+      () => {
+        throw new Error("sink down");
+      },
+    );
+    await withApi(
+      async (base) => {
+        expect((await rec(base, "ABCD-EFGH-IJKL-MNOP", "198.51.100.2")).status).toBe(401);
+        t += 3_600_000;
+        expect((await rec(base, "ABCD-EFGH-IJKL-MNOP", "198.51.100.2")).status).toBe(401);
+      },
+      cfgV1(),
+      [meRoute, ...recoveryRoutes(new Limiter(RECOVERY_RULES), watch)],
+    );
+  });
+});
+
 describe("refused requests and shared limits", () => {
   const status = async (base: string, ip: string) => (await rec(base, "ABCD-EFGH-IJKL-MNOP", ip)).status;
 
@@ -354,6 +425,61 @@ describe("recovery sessions", () => {
       };
       expect(j.scope).toBe("recovery");
       expect(j.notices.map((n) => n.type)).toEqual(["recovery_code_used"]);
+    });
+  });
+
+  describe("redemption is one transaction", () => {
+    // Each failure is injected after the code row has already been marked used inside the request.
+    it.each([
+      ["creating the recovery session", "sessions"],
+      ["recording the security event", "security_events"],
+    ])("a failure %s rolls back: 500, the code stays usable, other sessions stay live", async (_, table) => {
+      const a = await newAccount("en");
+      const [code] = await issueCodes(sql, cfgV1(), a);
+      const full = pair((await createSession(sql, a, "full")).cookie);
+      await sql.unsafe(`
+        create function fail_insert() returns trigger language plpgsql as $$ begin raise exception 'injected failure'; end $$;
+        create trigger fail_redeem before insert on ${table} for each row execute function fail_insert();`);
+      await withApi(async (base) => {
+        const failed = await rec(base, code, "198.51.100.1");
+        expect(failed.status).toBe(500);
+        expect(await errCode(failed)).toBe("internal");
+        expect(failed.headers.getSetCookie()).toEqual([]);
+        expect(await sql`select 1 from recovery_codes where account_id = ${a} and used_at is not null`).toHaveLength(0);
+        expect(await sql`select 1 from sessions where account_id = ${a} and scope = 'recovery'`).toHaveLength(0);
+        expect(await sql`select 1 from security_events where event = 'recovery_code_used'`).toHaveLength(0);
+        expect(await readSession(sql, full.split("=")[1])).not.toBeNull();
+
+        await sql.unsafe(`drop trigger fail_redeem on ${table}`);
+        const ok = await rec(base, code, "198.51.100.2");
+        expect(ok.status).toBe(200);
+        expect(await readSession(sql, full.split("=")[1])).toBeNull();
+        expect(await sql`select 1 from security_events where event = 'recovery_code_used'`).toHaveLength(1);
+      });
+    });
+
+    it("20 concurrent uses while the first attempt fails → still at most one success, and the code is not lost", async () => {
+      const a = await newAccount();
+      const [code] = await issueCodes(sql, cfgV1(), a);
+      // Fails only the first recovery-session insert; later ones go through. A sequence, unlike a
+      // table row, is not rolled back with the failing transaction.
+      await sql.unsafe(`
+        create sequence fail_seq;
+        create function fail_first() returns trigger language plpgsql as $$
+        begin
+          if nextval('fail_seq') = 1 then raise exception 'injected failure'; end if;
+          return new;
+        end $$;
+        create trigger fail_redeem before insert on sessions for each row execute function fail_first();`);
+      await withApi(async (base) => {
+        const rs = await Promise.all(Array.from({ length: 20 }, (_, i) => rec(base, code, `198.51.${100 + i}.9`)));
+        const statuses = rs.map((r) => r.status);
+        expect(statuses.filter((s) => s === 200)).toHaveLength(1);
+        expect(statuses.filter((s) => s === 500)).toHaveLength(1);
+        expect(statuses.filter((s) => s === 401)).toHaveLength(18);
+        expect(await sql`select 1 from sessions where account_id = ${a} and scope = 'recovery'`).toHaveLength(1);
+        expect(await sql`select 1 from security_events where event = 'recovery_code_used'`).toHaveLength(1);
+      });
     });
   });
 

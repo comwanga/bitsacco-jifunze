@@ -585,7 +585,13 @@ Unchanged from revision 1:
   - **no global block** (Increment 2a review, correction C). A shared global ceiling would let one attacker exhaust it and lock every learner out of recovery.
 
   Global volume above 300 per hour only records one `recovery_flood` security event per hour for operators. At 80 bits, guessing a code is infeasible however many networks an attacker uses. The per-source limits exist to stop noise and denial of service.
-- **Logging:** every failure counts in a security event (no code is stored), and a global spike raises an operator alert.
+- **Logging (revised in the Increment 2a review):** failed attempts are **not** stored one security-event row each. A row per failure would let an attacker turn guessing into unbounded database writes. Instead:
+  - the API counts outcomes in fixed hourly windows and writes **one** structured log line per window: `{"event":"recovery_attempts_hourly","windowStart","attempts","succeeded","invalid","rateLimited"}`. It holds counts only, never a code, IP address or account. Memory is constant, and the line goes to the application log (14-day retention, F6);
+  - a global spike still writes one `recovery_flood` security event per hour;
+  - each **successful** redemption writes a `recovery_code_used` security event, in the same transaction that consumes the code.
+
+  This replaces the earlier rule that every failure counts in a security event.
+- **Atomic redemption:** consuming the code, revoking the account's other sessions, creating the recovery session and writing `recovery_code_used` are **one transaction**. If any step fails, the code stays unused and nothing else changes. The consumed code row stays locked until commit, so of several simultaneous uses at most one succeeds.
 
 **The recovery session and replacing an identity (condition 1)**
 - A successful code gives a session with `scope='recovery'`, valid 15 minutes.

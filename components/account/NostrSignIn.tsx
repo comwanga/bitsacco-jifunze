@@ -20,6 +20,7 @@ export function NostrSignIn({ lang, returnTo, disabled, onBusyChange, onboarding
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const locked = useRef(false);
+  const navigating = useRef(false);
   const alertRef = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- browser extension availability is checked after hydration */
@@ -27,6 +28,18 @@ export function NostrSignIn({ lang, returnTo, disabled, onBusyChange, onboarding
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => { if (error) alertRef.current?.focus(); }, [error]);
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      // Only a completed attempt can be reset; a pending signer request must stay locked.
+      if (!event.persisted || !navigating.current) return;
+      navigating.current = false;
+      locked.current = false;
+      setStatus(null);
+      onBusyChange(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [onBusyChange]);
 
   async function signIn() {
     if (locked.current || disabled) return;
@@ -34,7 +47,6 @@ export function NostrSignIn({ lang, returnTo, disabled, onBusyChange, onboarding
     if (!signer) { setAvailable(false); return; }
     locked.current = true;
     onBusyChange(true); setError(null); setStatus(c.nostrPending);
-    let navigating = false;
     try {
       const challenge = await apiFetch<{ challengeId: string; nonce: string; url: string }>("/api/auth/nostr/challenge", { method: "POST", body: { lang, returnTo } });
       if (!challenge.ok) { setError(errorText(lang, challenge.code)); return; }
@@ -69,9 +81,9 @@ export function NostrSignIn({ lang, returnTo, disabled, onBusyChange, onboarding
       if (!result.ok) { setError(errorText(lang, result.code)); return; }
       // A full navigation starts account state fresh with the server's HttpOnly session cookie.
       window.location.assign(safeReturn(lang, result.data.redirect));
-      navigating = true;
+      navigating.current = true;
     } catch { setError(c.nostrFailed); }
-    finally { if (!navigating) { locked.current = false; onBusyChange(false); setStatus(null); } }
+    finally { if (!navigating.current) { locked.current = false; onBusyChange(false); setStatus(null); } }
   }
 
   return <div className="mt-4">

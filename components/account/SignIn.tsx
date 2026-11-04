@@ -15,6 +15,8 @@ export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode
   const [ready, setReady] = useState(false);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [nostrBusy, setNostrBusy] = useState(false);
+  const authBusy = busy || nostrBusy;
   const [formError, setFormError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +28,7 @@ export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode
     /* eslint-enable react-hooks/set-state-in-effect */
     dropQueryParams(["error"]); // shown once; ?return= stays for the link
 
-    // Back after a successful code restores this page from the back/forward cache: re-enable the form.
+    // Restore the recovery form. Nostr owns its attempt state, including any still-pending request.
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) setBusy(false);
     };
@@ -36,7 +38,7 @@ export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // never a native submission: the CSP has form-action 'none'
-    if (busy) return;
+    if (authBusy) return;
     if (!code.trim()) {
       setFormError(c.recoveryCodeEmpty);
       inputRef.current?.focus();
@@ -62,11 +64,11 @@ export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode
     <>
       {pageError && <ErrorAlert lang={lang} code={pageError} />}
       <p className="mt-8">
-        <a href={githubStart("signin", lang, returnTo)} className={primaryBtn} aria-disabled={busy || undefined} tabIndex={busy ? -1 : undefined} onClick={(e) => { if (busy) e.preventDefault(); }}>
+        <a href={githubStart("signin", lang, returnTo)} className={primaryBtn} aria-disabled={authBusy || undefined} tabIndex={authBusy ? -1 : undefined} onClick={(e) => { if (authBusy) e.preventDefault(); }}>
           {c.continueGithub}
         </a>
       </p>
-      <NostrSignIn lang={lang} returnTo={returnTo} disabled={busy} onBusyChange={setBusy} onboarding={onboarding} />
+      <NostrSignIn lang={lang} returnTo={returnTo} disabled={authBusy} onBusyChange={setNostrBusy} onboarding={onboarding} />
       <details className="mt-8 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5">
         <summary className="cursor-pointer font-semibold">{c.useRecoveryCode}</summary>
         <form method="post" onSubmit={submit} noValidate className="mt-4">
@@ -100,8 +102,8 @@ export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode
             </p>
           )}
           <p className="mt-4">
-            <button type="submit" disabled={!ready || busy} className={secondaryBtn}>
-              {busy ? c.checking : c.recoveryCodeSubmit}
+            <button type="submit" disabled={!ready || authBusy} className={secondaryBtn}>
+              {authBusy ? c.checking : c.recoveryCodeSubmit}
             </button>
           </p>
         </form>

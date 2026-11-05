@@ -14,10 +14,15 @@ printf '%s\n' "${API_HOST:-}" | grep -Eq '^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.railwa
 # The base image's 15-local-resolvers.envsh reads the actual /etc/resolv.conf, including IPv6.
 [ -n "${NGINX_LOCAL_RESOLVERS:-}" ] || fail 'set NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1'
 case "${STAGING_AUTH_ENABLED:-0}" in 0|1) ;; *) fail 'invalid STAGING_AUTH_ENABLED' ;; esac
-case "${TRUSTED_PROXY_CIDRS:-}" in *[!0-9a-fA-F:./\ ]*) fail 'invalid TRUSTED_PROXY_CIDRS characters' ;; esac
-if [ "${STAGING_AUTH_ENABLED:-0}" = 1 ]; then
-  [ -n "${TRUSTED_PROXY_CIDRS:-}" ] || fail 'verified TRUSTED_PROXY_CIDRS required before authentication'
-fi
+[ -z "${TRUSTED_PROXY_CIDRS:-}" ] || fail 'Railway has no verified ingress CIDRs; remove TRUSTED_PROXY_CIDRS'
+case "${RAILWAY_TRUST_MODEL:-}" in
+  '') [ "${STAGING_AUTH_ENABLED:-0}" = 0 ] || fail 'explicit isolated-staging trust model required' ;;
+  isolated-staging)
+    [ "${RAILWAY_ENVIRONMENT_NAME:-}" = staging ] || fail 'trust model is restricted to staging'
+    printf '%s\n' "${SITE_ORIGIN:-}" | grep -Eq '^https://[a-z0-9]([a-z0-9.-]*[a-z0-9])?$' || fail 'staging requires an exact HTTPS SITE_ORIGIN'
+    ;;
+  *) fail 'unknown RAILWAY_TRUST_MODEL' ;;
+esac
 
 security=/tmp/jifunze-security-headers.conf
 cat /etc/nginx/snippets/security-headers.conf > "$security"
@@ -26,30 +31,40 @@ printf '\nadd_header X-Robots-Tag "noindex, nofollow" always;\n' >> "$security"
 extra=/tmp/jifunze-railway-server.conf
 : > "$extra"
 printf '%s\n' "include $security;" 'add_header Cache-Control "no-store" always;' 'absolute_redirect off;' >> "$extra"
+cat >> "$extra" <<'NGINX'
+set $railway_client_valid $railway_header_shape;
+# realip runs before server rewrite. An unchanged socket address means parsing
+# failed (or is unverifiable); never fall back to one shared rate-limit bucket.
+if ($remote_addr = $realip_remote_addr) { set $railway_client_valid 0; }
+if ($http_x_forwarded_proto != https) { set $railway_client_valid 0; }
+NGINX
 if [ "${STAGING_AUTH_ENABLED:-0}" = 0 ]; then
   # Static learning and health remain available before edge/header/logging acceptance.
   printf '%s\n' 'if ($uri ~ "^/api/(?!health$|internal/)") { return 503; }' >> "$extra"
 else
-  printf '%s\n' 'if ($railway_api_untrusted) { return 403; }' >> "$extra"
+  printf '%s\n' 'if ($railway_api_invalid) { return 403; }' >> "$extra"
 fi
 
 conf=/tmp/jifunze-railway.conf
 {
-  printf '%s\n' 'geo $realip_remote_addr $railway_trusted_peer {' '  default 0;'
-  for cidr in ${TRUSTED_PROXY_CIDRS:-}; do
-    case "$cidr" in */*)
-      bits=${cidr##*/}
-      case "$bits" in ''|*[!0-9]*) fail 'invalid proxy prefix length' ;; esac
-      case "${cidr%/*}" in
-        *:*) [ "$bits" -ge 64 ] && [ "$bits" -le 128 ] || fail 'proxy IPv6 ranges must be /64 or narrower' ;;
-        *) [ "$bits" -ge 24 ] && [ "$bits" -le 32 ] || fail 'proxy IPv4 ranges must be /24 or narrower' ;;
-      esac ;;
-    esac
-    printf '  %s 1;\n' "$cidr"
-  done
-  printf '%s\n' '}' 'real_ip_header X-Real-IP;' 'real_ip_recursive off;'
-  for cidr in ${TRUSTED_PROXY_CIDRS:-}; do printf 'set_real_ip_from %s;\n' "$cidr"; done
-  printf '%s\n' 'map "$railway_trusted_peer:$uri" $railway_api_untrusted {' '  default 0;' '  "~^0:/api/(?!health$|internal/)" 1;' '}'
+  # These are deliberately ALL peers, not an exclusive Railway edge allowlist.
+  # The operator explicitly trusts every private co-tenant in this staging env.
+  # Header validation does not authenticate the edge; see the deployment decision.
+  if [ "${RAILWAY_TRUST_MODEL:-}" = isolated-staging ]; then
+    printf '%s\n' 'set_real_ip_from 0.0.0.0/0;' 'set_real_ip_from ::/0;' 'real_ip_header X-Real-IP;' 'real_ip_recursive off;'
+  fi
+  cat <<'NGINX'
+map $http_x_real_ip $railway_header_shape {
+  default 0;
+  "~^(?:0|[1-9][0-9]{0,2})(?:[.](?:0|[1-9][0-9]{0,2})){3}$" 1;
+  "~^[0-9A-Fa-f:]*:[0-9A-Fa-f:]*$" 1;
+  "~^[0-9A-Fa-f:]+:(?:0|[1-9][0-9]{0,2})(?:[.](?:0|[1-9][0-9]{0,2})){3}$" 1;
+}
+map "$railway_client_valid:$uri" $railway_api_invalid {
+  default 0;
+  "~^0:/api/(?!health$|internal/)" 1;
+}
+NGINX
   sed \
     -e "s/listen 8080;/listen ${PORT:-8080};\n  listen [::]:${PORT:-8080};/" \
     -e "s/resolver 127.0.0.11 valid=10s ipv6=off;/resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv4=off;/" \

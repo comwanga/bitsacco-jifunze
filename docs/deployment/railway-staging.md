@@ -1,20 +1,20 @@
 # Railway staging: preparation and acceptance
 
-This is a controlled staging deployment, not general authentication release. Base implementation: `8d8f574cbe96d9a393043d3690b8ed03ad770aaa` (PR #8, open, CI check/account/lab all passed). Work is isolated on `deploy/railway-staging`; do not merge PR #8 or push this deployment branch without separate authorization.
+This is a controlled staging deployment, not general authentication release. PR #8 is merged. The published/deployed preparation baseline is `4af42665d3895482a412b8d23ef4932cdfca69f5`; its CI passed. Work is isolated on `deploy/railway-staging`. The ingress correction below remains local until separately authorized publication. Do not merge or enable authentication without authorization.
 
 ## Execution plan
 
 1. Preserve PR #8 and its signed history. Use the existing static-export/nginx and Node 24 API Dockerfiles, with PostgreSQL 16 on a new persistent staging volume.
 2. Make the web build take its public origin from `SITE_ORIGIN`; default production metadata to `https://bitsaccojifunze.xyz`. Non-production origins receive robots noindex/disallow. Pass only public configuration as web build arguments; never API secrets.
 3. Adapt nginx at runtime only when `JIFUNZE_HOSTING=railway`: discover its actual container DNS resolvers, use the API's Railway private domain and fixed port, preserve same-origin routing and callback-log redaction, and forward HTTPS correctly.
-4. Initially keep authentication disabled at nginx while static pages and `/api/health` can be checked. Do not guess edge CIDRs or trust client-supplied forwarding headers. Enable authentication only after actual Railway peer ranges/header overwrite behavior and provider logging are verified. Unknown proxy peers must fail closed.
+4. Keep authentication disabled while static pages and `/api/health` are checked. Railway has no exclusive ingress CIDRs. Use only the explicit isolated-staging environment trust decision below; never describe guessed peer ranges as verified. Validate a single normalized client address and HTTPS protocol; malformed values and unexpected configuration fail closed. Activation remains a separate maintainer decision after live ingress/privacy tests.
 5. Authenticate the maintainer's Railway CLI, inspect existing projects/workspace/plan and obtain approval for any paid resources. Use current CLI/API/dashboard service settings; no deprecated `railway.toml`/`railway.json` and no additional application infrastructure SDK dependency.
 6. Provision only the approved staging environment: web public, API private, PostgreSQL private with persistent storage. No API domain or database TCP proxy. One API replica preserves the existing in-memory rate-limit model.
 7. Add `staging.bitsaccojifunze.xyz` to web and retrieve the real generated CNAME/TXT records. The maintainer changes only those records in Namecheap; nameservers and unrelated records stay intact. Do not attach the production root domain yet.
 8. The maintainer creates the separate staging GitHub App and enters its client credentials directly in Railway. Preserve exact OAuth callbacks, PKCE/state/browser binding, secure cookies and the existing recovery pepper. Do not enter credentials in chat.
 9. Run sequential local configuration/metadata/proxy tests and image builds, then staging HTTPS, proxy/header/rate-limit/logging, persistence and backup/restore checks. Use synthetic identities and markers only. Real GitHub consent and external Nostr signer acceptance remain maintainer actions.
 
-## Current preflight
+## Historical preparation preflight (before provisioning)
 
 - Local and published implementation HEAD match; working tree was clean before the separate worktree was created. No unrelated local work changed.
 - Railway CLI 5.63.1 is installed but currently unauthenticated. Project, workspace, plan, cost and resource availability on Railway are not yet verified.
@@ -26,7 +26,7 @@ This is a controlled staging deployment, not general authentication release. Bas
 
 | Service | Source/build | Network | Settings |
 |---|---|---|---|
-| web | Existing root Dockerfile, repository root context | Only public service, port 8080 | Public build argument/runtime `SITE_ORIGIN=https://staging.bitsaccojifunze.xyz`, `JIFUNZE_HOSTING=railway`, `PORT=8080`, `API_HOST=${{api.RAILWAY_PRIVATE_DOMAIN}}`, `API_PORT=3001`, `NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1`, `STAGING_AUTH_ENABLED=0`; health `/en/` remains independent of API availability; set `TRUSTED_PROXY_CIDRS` only from verified ingress evidence before enabling authentication |
+| web | Existing root Dockerfile, repository root context | Only public service, port 8080 | Public build argument/runtime `SITE_ORIGIN=https://staging.bitsaccojifunze.xyz`, `JIFUNZE_HOSTING=railway`, `PORT=8080`, `API_HOST=${{api.RAILWAY_PRIVATE_DOMAIN}}`, `API_PORT=3001`, `NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1`, `STAGING_AUTH_ENABLED=0`; health `/en/` remains independent of API availability. After approval, opt in to `RAILWAY_TRUST_MODEL=isolated-staging`; Railway's environment name must be `staging`. Leave `TRUSTED_PROXY_CIDRS` unset. |
 | api | `docker/api.Dockerfile`, repository root context | Private only, port 3001 | `RAILWAY_DOCKERFILE_PATH=docker/api.Dockerfile`, `PORT=3001`; `SITE_ORIGIN` exactly staging HTTPS origin; `DATABASE_URL` references PostgreSQL's private connection; staging `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, persistent `RECOVERY_PEPPER_V1`; health `/api/health`; one replica |
 | postgres | PostgreSQL 16 image/version confirmed before creation | Private only, no TCP proxy | New staging database and random credentials in Railway only; persistent data volume; backup schedule and restore drill |
 
@@ -34,7 +34,7 @@ API startup already applies pending SQL migrations under advisory locks and tran
 
 ## Domain and OAuth handoff
 
-DNS values are **pending actual Railway domain creation**. Do not invent a CNAME target or TXT verification token. In Namecheap Advanced DNS, add only the exact records Railway returns. A staging CNAME normally uses host `staging`; use Railway's actual TXT host/value exactly. Verify DNS propagation, certificate issuance and public HTTPS before authentication acceptance.
+The Railway staging domain has been created; DNS ownership and its certificate remain pending maintainer action. Retrieve the current exact CNAME/TXT values from Railway before changing Namecheap; do not invent them. This ingress correction changes no DNS. Verify DNS propagation, certificate issuance and public HTTPS before authentication acceptance.
 
 Register these callbacks on the staging GitHub App:
 
@@ -47,7 +47,7 @@ Use no repository permissions or webhook configuration beyond the existing sign-
 ## Ingress and privacy acceptance
 
 - Confirm the actual runtime DNS resolves the API's private domain and that the selected port is reachable. Railway supports private IPv6 in both legacy and new environments; nginx selects private IPv6 upstreams and listens on both IPv4/IPv6. Verify that the actual API socket peer is a private ULA recognized by the existing API trusted-peer policy. Do not broaden API trust to an unverified platform IPv4 range. Stop/restart the API: learning pages must continue to work and account requests must fail visibly without cached authentication data.
-- Obtain the actual trusted edge peer addresses/ranges from Railway configuration/support and controlled network inspection. Do not infer a trusted CIDR from one truncated client log or use all private networks. Exact observed peer pinning is staging-only until the provider confirms its stability/ranges.
+- Recheck that this isolated environment has only the three trusted services and that only web has public ingress. Accept the documented environment-level boundary below explicitly; do not infer exclusive edge identity from observed peer addresses. Adding any co-tenant or public API/database ingress invalidates this acceptance and requires review.
 - From client A, exhaust the existing wrong-recovery-code limit; client B on another network must still receive 401, not 429. Repeat A with forged `X-Real-IP`, `X-Forwarded-For` and `Forwarded`; A must stay limited. Verify HTTP redirects, forwarded protocol and cookie flags without recording cookie values.
 - Send synthetic OAuth callback code/state markers, including an upstream-unavailable and oversized-header request. Inspect Railway HTTP/build/deploy logs and nginx/API logs for the markers, raw query strings, cookies and Authorization. Do not use a real OAuth code for this check. App redaction is not evidence of edge redaction.
 - Check directory redirects through the actual HTTPS edge, including a real directory under `/_next/static/`. The Railway nginx mode emits relative redirects so the inner HTTP connection cannot produce a public HTTP/8080 Location. The plain-HTTP stand-in is not TLS/edge acceptance.
@@ -55,9 +55,9 @@ Use no repository permissions or webhook configuration beyond the existing sign-
 
 ## Log retention discrepancy
 
-Railway currently documents Free 3 days, Trial/Hobby 7 days and Pro 30 days. It also states that upgrading can restore logs outside the prior display retention period. Neither the selected plan nor a configurable deletion policy has been verified. Do not claim Jifunze's approved 14-day application-log retention is satisfied.
+Railway currently documents Free 3 days, Trial/Hobby 7 days and Pro 30 days. It also states that upgrading can restore logs outside the prior display retention period. The active Hobby plan provides seven days; the maintainer approved this exception for controlled staging with disposable accounts only. Physical deletion/custom retention is not established. Do not claim Jifunze's approved 14-day production application-log policy is satisfied.
 
-Before general release, obtain provider confirmation of deletion/custom retention, or approve a minimal 14-day external log store and suppress duplicate sensitive application logs at the provider. Exporting logs alone cannot erase Railway's longer-retained copies or edge logs. Any staging policy exception must be explicitly recorded by the maintainer; do not silently change the approved policy or buy another service.
+Before general release, obtain provider confirmation of deletion/custom retention, or approve a minimal 14-day external log store and suppress duplicate sensitive application logs at the provider. Exporting logs alone cannot erase Railway's longer-retained copies or edge logs. The staging exception does not alter production policy or authorize another service.
 
 ## Backup and restore acceptance (required before general release)
 
@@ -85,6 +85,8 @@ Actual deployment IDs, service health, DNS records, selected-plan cost, acceptan
 
 ## Local preparation evidence
 
+The following preparation results describe the original baseline. The current ingress decision and subsequent verification follow this historical evidence.
+
 - Nine new origin tests failed against the original placeholder configuration, then passed with the implementation. The focused origin/metadata run passed 10 tests; the complete repository suite passed **144 tests**. Site typechecking passed with a 512 MiB heap (256 MiB was insufficient).
 - The final synthetic nginx contract passed **29 checks**, including private IPv6 transport, distinct client identities, forged forwarding headers, unknown-peer rejection, no-store, relative directory redirects, disabled-auth behavior, callback redaction in both log streams, unavailable API behavior and web restart/idempotence. It uses an echo upstream and a stand-in front proxy, not Railway or live OAuth/Nostr acceptance.
 - The staging Docker web build passed and its actual export passed: **110 application pages have noindex**, robots disallows crawling, and **282 sitemap/language URLs** use the staging origin. This includes the separately rooted `/` redirect page; the export test caught its missing noindex before correction. nginx's vendor `50x.html` is covered by HTTP X-Robots-Tag rather than application metadata.
@@ -94,3 +96,36 @@ Actual deployment IDs, service health, DNS records, selected-plan cost, acceptan
 - No authentication API source, signature verification, schema migration, account/session/recovery behavior, approved wording or learning-progress code changed. The lab's paired local bridge changes only its default exact-origin allowlist for the newly registered domains.
 - Final deployment-branch CI and the full browser suites await authorized publication. The original implementation's green CI belongs to `8d8f574`, not this new deployment branch. Heavy native browser checks were deferred while available workstation RAM fell below 200 MiB; local Docker tests ran sequentially in the existing VM's available memory.
 - No real Railway client-IP, edge logs, custom-domain TLS, live GitHub, Nostr signer, database persistence or backup/restore acceptance has been performed. Language approval from 2026-11-05 is preserved; legal/operational/live-signer general-release gates remain open.
+
+## Staging ingress decision — 2026-11-05
+
+**Root cause.** The original configuration required an exclusive, stable proxy CIDR allowlist. Railway does not provide that contract or an application-verifiable signed edge identity. Observed socket addresses cannot supply it. See [provider support confirmation](https://station.railway.com/questions/asp-net-core-trusted-ingress-boundary-an-ea6cad35), [public header specifications](https://docs.railway.com/networking/public-networking/specs-and-limits) and [private-network isolation](https://docs.railway.com/networking/private-networking/how-it-works).
+
+**Verified provider behavior.** The public HTTPS edge replaces client-supplied X-Real-IP and forwarded protocol. Private callers bypass normalization. Networks are isolated by project/environment. RFC Forwarded is not an authoritative source; no X-Forwarded-For position is used.
+
+**Explicit staging assumption.** The operator trusts all workloads and operators within this environment: web, API and PostgreSQL. They form one security boundary. Before opting in, verify exactly those three services, only NGINX public, no API/database domains or TCP proxies, and reviewed deployment sources. The new mode is gated by `RAILWAY_TRUST_MODEL=isolated-staging`, `RAILWAY_ENVIRONMENT_NAME=staging` and an HTTPS `SITE_ORIGIN`. No automatic production opt-in exists. Authentication has a separate switch and remains disabled by default.
+
+**Implementation.** In this explicit mode the realip module accepts input from all peers (`0.0.0.0/0` and `::/0`), deliberately expressing environment-wide trust, not an exclusive/verified Railway CIDR. Header shape checks reject missing, duplicate/comma-separated, port-bearing, scoped or non-numeric forms. NGINX's native address parser rejects invalid octets/IPv6 and emits one canonical address. Unchanged socket-address fallback fails closed on protected API routes. Unexpected forwarded protocol is rejected. NGINX removes X-Forwarded-For/Forwarded and supplies one X-Real-IP plus HTTPS to the private API. The unchanged API normalizes mapped IPv4 and derives IPv6 /64 limiter keys from bytes. Health and hidden internal paths retain their existing exceptions; neither provides authentication.
+
+**Residual limitation.** Header validation does not authenticate the edge. A compromised or untrusted private co-tenant can submit any valid X-Real-IP directly to NGINX or the API. This was reproduced, not merely assumed. This bounded model is sufficient for controlled staging with trusted workloads and disposable accounts, subject to maintainer authorization. It is not approval for unrestricted production. Any workload/access-path change requires another review; IP limits also cannot distinguish users sharing one NAT and are not account-ownership proofs.
+
+### Real Railway verification (temporary probe, no authentication enabled)
+
+- Rechecked project `9a7612e6-649f-44ca-91db-45977f0a8c41`, environment `staging`, exactly three healthy one-replica services, only web public; source SHA `4af42665d3895482a412b8d23ef4932cdfca69f5`.
+- Temporarily rendered the new policy on the existing web service and exposed only a non-authentication health probe to a temporary process in the existing API container. It imported the deployed API's actual `clientIp`, `normaliseIp`, `perIp` and `Limiter`. No authentication route was opened, extra Railway service created, source pushed or DNS modified. All runtime probe code/config was removed/restored afterward.
+- Client A: maintainer workstation's public network. Client B: existing API container using SFO public egress to the public HTTPS hostname, not its private URL. Railway HTTP logs confirmed distinct public source addresses on the same public host. An attempted web-fetch-tool second source was inaccessible and is not counted.
+- A received 200,200,200,429; B independently received 200,200,200,429. Opaque client tags differed (`a0339898a1e66263c7db` vs `5ba8640b1d00668d8387`). First request IDs: A `vd_6rRWLTX20R45ILPU1MQ`, B `sYCy8tJDQFeF19JFY53eZw`. No full client addresses were written to this evidence.
+- Six attempts from limited A using forged addresses, malformed lists, a port-bearing IPv6 literal, a scoped address and forged XFF/Forwarded/protocol remained 429 with A's original tag. The API received a valid canonical client address, HTTPS, correct public Host, private IPv6 transport and no XFF/Forwarded.
+- Nine malformed direct-private address forms returned 403. A valid forged direct-private address returned 200, demonstrating the residual co-tenant trust. Public internal visibility stayed 404; public Nostr challenge stayed 503 without a cookie.
+- Stopping the non-authentication upstream produced a real 502/no-store while English learning remained 200. The original API's outage/restart behavior was also verified during provisioning. Restoring published NGINX configuration restored normal health. This is not an authenticated callback or live OAuth/Nostr acceptance test.
+- Initial probe setup attempts failed SSH/validation before reload because of operator-session log/PID permissions; they are not counted as live-policy passes. The successful policy was validated with a separate operator-owned validation PID file and reloaded, then restored.
+
+### Verification and remaining release gates
+
+Focused Docker ingress contract: 46 checks passed, including malformed/duplicate headers, canonical IPv6/mapped addresses, distinct clients, private co-tenant residual trust, no-store, relative redirects, restart, callback log privacy, upstream loss and invalid opt-in configurations. The original implementation failed the explicit-mode test with `verified TRUSTED_PROXY_CIDRS required before authentication` before the correction.
+
+The full API regression passed 206 tests against the existing disposable PostgreSQL test database, including GitHub, Nostr, recovery, account/session ownership, canonical-address limiter keys and transaction/concurrency cases. The private deployed API retained the exact NIP-98 URL, Secure/HttpOnly/SameSite=Lax/Path=/ pre-auth cookie, wrong-origin 403 and missing-signature 401/no-session behavior; account/session counts stayed zero. These attribute checks do not claim a live authenticated browser session. Repository tests passed 144 cases. The existing export passed UX budgets; a new production build and browser suites were not rerun for this server-configuration-only change. Local regression host was Node 24.19.0; deployed API/probe ran Node 24.22.2 and nginx was tested in its Linux image. No browser process was launched under the workstation's memory pressure.
+
+No API authentication/recovery logic, schema, frontend, translations, dependencies or JavaScript budgets changed. GitHub callbacks and exact NIP-98 origin/body/signature verification remain the original implementation. Session-cookie and real-signer acceptance do not follow merely from a forwarding test. Publication/deployment of this local correction, explicit staging trust acceptance, custom-domain DNS/TLS, staging GitHub App configuration and live provider consent remain separate authorization/acceptance steps.
+
+The approved seven-day Hobby log exception applies only to disposable staging data; production's fourteen-day requirement is unchanged. Native scheduled/manual backups were rejected as Pro-only during provisioning; no plan change was made. The logical restore drill passed, but durable off-service backups remain a general-release gate.

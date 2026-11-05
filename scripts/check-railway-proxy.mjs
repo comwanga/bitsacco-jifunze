@@ -43,11 +43,12 @@ try {
     "--entrypoint", "sh"];
   const command = ["-c", 'cp /fixture/nginx.conf /etc/nginx/conf.d/default.conf && sh /docker-entrypoint.sh nginx -g "daemon off;"'];
   let web;
-  function startWeb(enabled, cidrs = "") {
-    return run(`web-${enabled}`, [...common, "-e", `STAGING_AUTH_ENABLED=${enabled}`, "-e", `TRUSTED_PROXY_CIDRS=${cidrs}`], nginx, command);
+  function startWeb(enabled, model = "") {
+    return run(`web-${enabled}`, [...common, "-e", `STAGING_AUTH_ENABLED=${enabled}`, "-e", `RAILWAY_TRUST_MODEL=${model}`,
+      "-e", "RAILWAY_ENVIRONMENT_NAME=staging", "-e", "SITE_ORIGIN=https://staging.bitsaccojifunze.xyz"], nginx, command);
   }
   const request = (client, target, url, headers = [], method = "GET") => {
-    const result = docker("exec", client, "curl", "--max-time", "8", "-sS", "-X", method, "-w", "\n%{http_code}", ...headers.flatMap(h => ["-H", h]), `http://${target}:8080${url}`);
+    const result = docker("exec", client, "curl", "--ipv4", "--max-time", "8", "-sS", "-X", method, "-w", "\n%{http_code}", ...headers.flatMap(h => ["-H", h]), `http://${target}:8080${url}`);
     const at = result.lastIndexOf("\n");
     return { status: Number(result.slice(at + 1)), body: result.slice(0, at) };
   };
@@ -71,10 +72,10 @@ try {
   const disabledHeaders = docker("exec", a, "curl", "-sSI", "http://front:8080/");
   equal(/x-robots-tag: noindex, nofollow/i.test(disabledHeaders), true, "staging HTTP responses prohibit indexing");
   docker("rm", "-f", web);
-  web = startWeb(1, `${ip(front)}/32`); await ready();
+  web = startWeb(1, "isolated-staging"); await ready();
   const spoof = ["X-Real-IP: 203.0.113.99", "X-Forwarded-For: 203.0.113.98", "Forwarded: for=203.0.113.97", "X-Forwarded-Proto: http"];
   const first = request(a, "front", "/api/me", spoof);
-  equal(first.status, 200, "trusted front proxy reaches API");
+  equal(first.status, 200, "normalized front request reaches API in explicit environment trust mode");
   const info = JSON.parse(first.body);
   const apiHeaders = docker("exec", a, "curl", "-sSI", "http://front:8080/api/me");
   equal((apiHeaders.match(/cache-control: no-store/gi) || []).length, 1, "proxied account responses have one no-store policy");
@@ -88,7 +89,20 @@ try {
   equal(second.ip !== info.ip, true, "clients cannot collapse into the front proxy's shared address");
   docker("restart", web); await ready();
   equal(JSON.parse(request(a, "front", "/api/me").body).ip, ip(a), "web restart renders the same configuration without duplicating directives");
-  equal(request(a, "web", "/api/me", spoof).status, 403, "untrusted direct private peer cannot impersonate the front proxy");
+  const directHeaders = ["X-Real-IP: 203.0.113.99", "X-Forwarded-Proto: https"];
+  equal(JSON.parse(request(a, "web", "/api/me", directHeaders).body).ip, "203.0.113.99", "residual boundary: trusted private co-tenant can supply a valid address directly");
+  for (const value of ["", "unknown", "1.2.3.999", "01.2.3.4", "1.2.3.4:80", "1.2.3.4, 5.6.7.8", "[2001:db8::1]", "[2001:db8::1]:80", "2001:::1", "fe80::1%eth0", "::ffff:01.2.3.4"]) {
+    equal(request(a, "web", "/api/me", [`X-Real-IP: ${value}`, "X-Forwarded-Proto: https"]).status, 403, `invalid or ambiguous forwarded address rejected: ${value || "missing"}`);
+  }
+  equal(request(a, "web", "/api/me", ["X-Real-IP: 203.0.113.1", "X-Real-IP: 203.0.113.2", "X-Forwarded-Proto: https"]).status, 403, "duplicate client-address headers rejected");
+  equal(request(a, "web", "/api/me", ["X-Real-IP: 203.0.113.1", "X-Real-IP: 203.0.113.1", "X-Forwarded-Proto: https"]).status, 403, "identical duplicate client-address headers rejected");
+  equal(request(a, "web", "/api/me", ["X-Real-IP: 203.0.113.1", "X-Forwarded-Proto: http"]).status, 403, "unexpected forwarded protocol rejected");
+  equal(request(a, "web", "/api/me", ["X-Real-IP: 203.0.113.1", "X-Forwarded-Proto: https, http"]).status, 403, "ambiguous forwarded protocol rejected");
+  equal(request(a, "web", "/api/me", [`X-Real-IP: ${ip(a)}`, "X-Forwarded-Proto: https"]).status, 403, "unchanged socket address fails closed");
+  // nginx emits canonical mapped IPv6; the unchanged API normaliseIp collapses it to IPv4.
+  for (const [value, canonical] of [["2001:0DB8:0000:0000:0000:0000:0000:0001", "2001:db8::1"], ["::ffff:203.0.113.5", "::ffff:203.0.113.5"]]) {
+    equal(JSON.parse(request(a, "web", "/api/me", [`X-Real-IP: ${value}`, "X-Forwarded-Proto: https"]).body).ip, canonical, "nginx emits a canonical numeric address");
+  }
   equal(request(a, "web", "/api/internal/visibility", spoof).status, 404, "direct internal route stays hidden");
   const marker = "JF_SYNTHETIC_OAUTH_MARKER";
   equal(request(a, "front", `/api/auth/github/callback?code=${marker}&state=${marker}`).status, 200, "callback reaches upstream");
@@ -99,11 +113,11 @@ try {
   equal(logResult.status, 0, "both nginx log streams are readable");
   const logs = logResult.stdout + logResult.stderr;
   equal(logs.includes(marker), false, "nginx logs omit synthetic callback secrets on success and upstream failure");
-  for (const cidrs of ["", "0.0.0.0/0", "10.0.0.0/8", "0:0:0:0:0:0:0:0/0", "0.0.0.0/00", "127.0.0.1;return 200;"]) {
+  for (const extra of [[], ["RAILWAY_TRUST_MODEL=anything"], ["RAILWAY_TRUST_MODEL=isolated-staging", "RAILWAY_ENVIRONMENT_NAME=production"], ["RAILWAY_TRUST_MODEL=isolated-staging", "RAILWAY_ENVIRONMENT_NAME=staging", "SITE_ORIGIN=http://staging.bitsaccojifunze.xyz"], ["RAILWAY_TRUST_MODEL=isolated-staging", "RAILWAY_ENVIRONMENT_NAME=staging", "SITE_ORIGIN=https://staging.bitsaccojifunze.xyz", "TRUSTED_PROXY_CIDRS=100.64.0.0/24"]]) {
     const result = spawnSync("docker", ["run", "--rm", "--network", name, "--memory=64m", ...common,
-      "-e", "STAGING_AUTH_ENABLED=1", "-e", `TRUSTED_PROXY_CIDRS=${cidrs}`, "-e", "NGINX_LOCAL_RESOLVERS=127.0.0.11",
+      "-e", "STAGING_AUTH_ENABLED=1", ...extra.flatMap(v => ["-e", v]), "-e", "NGINX_LOCAL_RESOLVERS=127.0.0.11",
       nginx, "-c", "cp /fixture/nginx.conf /etc/nginx/conf.d/default.conf && sh /docker-entrypoint.d/19-jifunze-railway.sh"], { encoding: "utf8", windowsHide: true });
-    equal(result.status !== 0, true, "empty, wildcard, broad or malformed proxy trust cannot enable authentication");
+    equal(result.status !== 0, true, "missing, unexpected, production or contradictory trust configuration fails closed");
   }
   console.log(`check-railway-proxy: ${checks} checks passed; actual Railway ingress remains unverified`);
 } catch (error) {

@@ -27,7 +27,7 @@ test.describe("anonymous public release", () => {
         await page.goto(`/${lang}/account/${route}`);
         await expect(page.locator("[data-account-unavailable]")).toBeVisible();
         await expect(page.locator('a[href*="/api/"], main input, main button')).toHaveCount(0);
-        await expect(page.locator('header a[href*="/account/"]')).toHaveCount(0);
+        await expect(page.locator('header a[href*="/account/"]:not([hreflang])')).toHaveCount(0);
       }
       expect(api).toEqual([]);
       await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));

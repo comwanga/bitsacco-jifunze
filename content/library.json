@@ -27,13 +27,14 @@
     },
     "author": "Andreas M. Antonopoulos & David A. Harding",
     "language": "en",
-    "format": "online",
-    "url": "https://github.com/bitcoinbook/bitcoinbook/blob/275c4eb8eab8800c6adc39f8def8e8f8fa356a57/BOOK.md",
+    "format": "pdf",
+    "url": "/books/mastering-bitcoin-en-3rd-edition.pdf",
     "licence": "CC BY-SA 4.0",
     "note": {
-      "sw": "Toleo la 3 (2023). Soma toleo rasmi la waandishi mtandaoni.",
-      "en": "Third edition (2023). Read the authors’ official online edition."
-    }
+      "en": "Third edition (2023). PDF generated from the official open-source text; not the publisher’s official PDF.",
+      "sw": "Toleo la 3 (2023). PDF imetengenezwa kutoka maandishi rasmi ya chanzo huria; si PDF rasmi ya mchapishaji."
+    },
+    "sizeBytes": 9421967
   },
   {
     "id": "kujifunza-bitcoin",

@@ -1,5 +1,7 @@
 # Mastering Bitcoin source and redistribution review
 
+The maintainer subsequently authorized generating a third-edition PDF from the licensed official source. See [generated-edition provenance and verification](mastering-bitcoin-generated.md). The online-only findings below describe the earlier published candidate and its narrower authorization.
+
 Checked 2026-11-05 for the anonymous public release. No book PDF was copied, purchased, generated, altered or redistributed.
 
 ## Decision

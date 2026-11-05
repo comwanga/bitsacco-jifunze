@@ -3,7 +3,7 @@ import { SIMULATIONS } from "../simulations/registry.ts";
 
 /** Language-relative static pages, shared by metadata and build/browser assertions. */
 export function sitePaths(root = CONTENT_ROOT): string[] {
-  return ["", "learn/", "library/", "glossary/", "progress/", "offline/",
+  return ["", "learn/", "library/", "library/mastering-bitcoin-en/", "glossary/", "progress/", "offline/",
     ...listRoadmaps(root).flatMap((r) => [`${r.id}/`, `tree/${r.id}/`, ...flatLessons(r).map((slug) => `${r.id}/${slug}/`)]),
     "simulations/", ...SIMULATIONS.map((s) => `simulations/${s.id}/`),
   ];

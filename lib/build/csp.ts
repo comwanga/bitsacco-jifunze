@@ -16,7 +16,7 @@ export function inlineScriptHashes(html: string): string[] {
 // Pages with a lab exercise may talk to the learner's own lab bridge (or their Codespace).
 export const LAB_CONNECT = "http://127.0.0.1:7777 http://localhost:7777 https://*.app.github.dev";
 
-export function buildCsp(hashes: string[], opts: { lab?: boolean } = {}): string {
+export function buildCsp(hashes: string[], opts: { lab?: boolean; pdfReader?: boolean } = {}): string {
   return [
     "default-src 'self'",
     `script-src 'self' ${[...new Set(hashes)].join(" ")}`.trim(),
@@ -26,6 +26,7 @@ export function buildCsp(hashes: string[], opts: { lab?: boolean } = {}): string
     opts.lab ? `connect-src 'self' ${LAB_CONNECT}` : "connect-src 'self'",
     "manifest-src 'self'",
     "worker-src 'self'",
+    ...(opts.pdfReader ? ["frame-src blob:"] : []),
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'none'",

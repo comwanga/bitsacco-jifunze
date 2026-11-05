@@ -111,6 +111,14 @@ test("a navigation to /api/auth/github/start is not intercepted", async () => {
   expect(h.cached("pages-v1")).toEqual([]);
 });
 
+test("book downloads and PDF navigations never enter the offline lesson cache", async () => {
+  const h = harness(async () => { throw Error("book must use browser network directly"); });
+  for (const mode of ["navigate", "cors", "same-origin"]) {
+    expect((await h.fire(h.nav("/books/mastering-bitcoin-en-3rd-edition.pdf", mode))).intercepted).toBe(false);
+  }
+  expect(Object.keys(h.stores)).toEqual([]);
+});
+
 test("a navigation to /sw/account/ is answered from the network and never put in any cache", async () => {
   const h = harness(async () => new Response("secret", { status: 200 }));
   const r = await h.fire(h.nav("/sw/account/"));

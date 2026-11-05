@@ -11,6 +11,11 @@ import { pageWeight } from "../../lib/build/budget.ts";
 const sha = (s: string) => `'sha256-${crypto.createHash("sha256").update(s, "utf8").digest("base64")}'`;
 
 describe("csp", () => {
+  test("only the book reader permits native blob frames; objects and external frames stay blocked", () => {
+    expect(buildCsp([], { pdfReader: true })).toContain("frame-src blob:");
+    expect(buildCsp([], { pdfReader: true })).toContain("object-src 'none'");
+    expect(buildCsp([])).not.toContain("blob:");
+  });
   test("hashes inline scripts only, not external ones", () => {
     const html = '<head></head><body><script>alert(1)</script><script src="/_next/a.js"></script><script id="x">b()</script></body>';
     expect(inlineScriptHashes(html)).toEqual([sha("alert(1)"), sha("b()")]);

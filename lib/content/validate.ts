@@ -225,7 +225,14 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
       issues.push({ level: "error", rule: 2, file: rel(root, libraryFile), message: lib.error.message });
     } else if (lib.success) {
       for (const item of lib.data) {
-        const problem = item.url ? checkUrl(item.url) : null;
+        // A tightly constrained local static PDF is also a valid library resource.
+        // Lesson reference URLs retain the existing HTTPS-only validation.
+        const localPdf = item.format === "pdf" && /^\/books\/[a-z0-9-]+\.pdf$/.test(item.url ?? "");
+        let problem = item.url && !localPdf ? checkUrl(item.url) : null;
+        if (localPdf) {
+          const file = path.join(root, "..", "public", item.url!);
+          if (!fs.existsSync(file) || fs.statSync(file).size !== item.sizeBytes) problem = "local PDF missing or file size differs from library metadata";
+        }
         if (problem) issues.push({ level: "error", rule: 3, file: rel(root, libraryFile), message: `${item.id}: ${problem}` });
       }
     }

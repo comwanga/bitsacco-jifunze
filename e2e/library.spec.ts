@@ -1,7 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const officialBook = "https://github.com/bitcoinbook/bitcoinbook/blob/275c4eb8eab8800c6adc39f8def8e8f8fa356a57/BOOK.md";
 for (const lang of ["en", "sw"] as const) test(`${lang}: library offers the official English third edition and clearly marks the pending translation`, async ({ page }) => {
   const pdfRequests: string[] = [];
   page.on("request", r => { if (new URL(r.url()).pathname.endsWith(".pdf")) pdfRequests.push(r.url()); });
@@ -9,10 +8,11 @@ for (const lang of ["en", "sw"] as const) test(`${lang}: library offers the offi
   const english = page.locator("#mastering-bitcoin-en");
   await expect(english).toContainText("Andreas M. Antonopoulos & David A. Harding");
   await expect(english).toContainText("CC BY-SA 4.0");
-  const link = english.getByRole("link");
-  await expect(link).toHaveAttribute("href", officialBook);
-  await expect(link).not.toHaveAttribute("type", "application/pdf");
-  await expect(link).toContainText(lang === "en" ? "Read online" : "Soma mtandaoni");
+  const link = english.getByRole("link", { name: lang === "en" ? "Read PDF here" : "Soma PDF hapa" });
+  await expect(link).toHaveAttribute("href", `/${lang}/library/mastering-bitcoin-en/`);
+  const download = english.locator('a[type="application/pdf"]');
+  await expect(download).toHaveAttribute("href", "/books/mastering-bitcoin-en-3rd-edition.pdf");
+  await expect(download).toHaveAttribute("download", "mastering-bitcoin-en-3rd-edition.pdf");
   await link.focus();
   await expect(link).toBeFocused();
   const pending = page.locator("#kujifunza-bitcoin");

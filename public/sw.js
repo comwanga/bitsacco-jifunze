@@ -162,7 +162,8 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (url.pathname.startsWith("/api/")) return;
+  // Explicit book transfers stay with the browser. Never cache a full PDF as a navigation page.
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/books/")) return;
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(cacheFirst(request));
     return;

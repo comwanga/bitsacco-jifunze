@@ -24,6 +24,13 @@ try {
   check(ready, "production nginx serves the final export");
   const config = docker("exec", name, "nginx", "-T").replace(/^\s*#.*$/gm, "");
   check(!/proxy_pass|set_real_ip_from|real_ip_header|\bresolver\s/.test(config), "static nginx has no API, DNS or proxy-trust dependency");
+  const book = JSON.parse(fs.readFileSync("public/books/mastering-bitcoin-en-3rd-edition.source.json", "utf8"));
+  const pdfURL = `http://localhost:4323/books/${book.filename}`;
+  const pdfHead = await fetch(pdfURL, { method: "HEAD" });
+  check(pdfHead.status === 200 && pdfHead.headers.get("content-type") === "application/pdf", "book is served as a PDF by production nginx");
+  check(Number(pdfHead.headers.get("content-length")) === book.bytes, "packaged book size matches verified manifest");
+  const range = await fetch(pdfURL, { headers: { range: "bytes=0-31" } });
+  check(range.status === 206 && (await range.text()).startsWith("%PDF-"), "native PDF readers can request byte ranges");
   for (const pathname of ["/en/", "/sw/", "/sw/savers/wallets-keys/", "/en/lightning/routing-htlcs/", "/robots.txt", "/sitemap.xml", "/sw.js", "/missing-release-page"]) {
     const r = await fetch(`http://localhost:4323${pathname}`);
     check(r.status === (pathname.includes("missing-release") ? 404 : 200), `status ${pathname}`);

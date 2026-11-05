@@ -50,6 +50,8 @@ Required on every Railway environment except one named `production` on the produ
 
 To remove a tester, change the variable and redeploy the API by the procedure above: their sessions and recovery codes stop working immediately, with no database change, and work again if they are re-added. Their account row remains. A test asserts that `createSession` has only these four callers, so a new session path fails the suite until it is reviewed.
 
+While authentication is enabled, nginx asks the API's `/api/internal/tester-gate` before forwarding any API request. A deployment without an allowlist, such as one built from `main`, has no such route (or answers 404), so nginx answers 500 and forwards nothing; learning pages are unaffected. Web must already run this code before `STAGING_AUTH_ENABLED=1` is set: the currently deployed web (`3a02083`) has no gate, so setting it today would expose the API as it stands.
+
 The refusals reuse approved copy in both languages, so an unlisted person sees "start again". This is deliberate: it does not confirm the allowlist decided it. A tester who is wrongly refused should send the maintainer their numeric id.
 
 ## Canonical origin and the generated hostname

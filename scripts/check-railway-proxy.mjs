@@ -22,7 +22,10 @@ const ip = id => JSON.parse(docker("inspect", "--format", "{{json .NetworkSettin
 const equal = (got, want, label) => { if (got !== want) throw new Error(`${label}: expected ${want}, got ${got}`); checks++; console.log(`ok ${label}`); };
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-fs.writeFileSync(path.join(fixture, "api.mjs"), `import http from 'node:http';http.createServer((req,res)=>{res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,ip:req.headers['x-real-ip'],proto:req.headers['x-forwarded-proto'],xff:req.headers['x-forwarded-for']||'',forwarded:req.headers.forwarded||''}));}).listen(3001,'::');`);
+// Two stand-ins: the current API answers the tester gate (GET only, as the real route does); a stale one has no such route.
+const echo = gate => `import http from 'node:http';http.createServer((req,res)=>{${gate}res.setHeader('Content-Type','application/json');`;
+fs.writeFileSync(path.join(fixture, "api-stale.mjs"), `${echo(`if(req.url==='/api/internal/tester-gate'){res.statusCode=404;return res.end();}`)}res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,stale:true}));}).listen(3001,'::');`);
+fs.writeFileSync(path.join(fixture, "api.mjs"), `${echo(`if(req.url==='/api/internal/tester-gate'){res.statusCode=req.method==='GET'&&!req.headers.cookie&&!req.headers.authorization?204:405;return res.end();}`)}res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,ip:req.headers['x-real-ip'],proto:req.headers['x-forwarded-proto'],xff:req.headers['x-forwarded-for']||'',forwarded:req.headers.forwarded||''}));}).listen(3001,'::');`);
 fs.writeFileSync(path.join(fixture, "front.conf"), `server { listen 8080; access_log off; resolver 127.0.0.11 ipv6=off; location / { set $web http://web:8080; proxy_pass $web; proxy_set_header Host $http_host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-Proto https; } }`);
 fs.writeFileSync(path.join(fixture, "index.html"), "<!doctype html><title>Synthetic static learning</title><p>Learning remains available</p>");
 
@@ -135,7 +138,17 @@ try {
   equal(request(a, "front", "/api/health", [GENERATED]).status, 200, "health stays available on the generated hostname with authentication on");
   docker("stop", api);
   equal(request(a, "front", "/").status, 200, "learning remains available without API");
-  equal([502, 504].includes(request(a, "front", `/api/auth/github/callback/reauth?code=${marker}&state=${marker}`).status), true, "callback upstream failure is visible");
+  equal([500, 502, 504].includes(request(a, "front", `/api/auth/github/callback/reauth?code=${marker}&state=${marker}`).status), true, "callback upstream failure is visible");
+  equal(request(a, "front", "/api/auth/nostr/verify", ["Authorization: Nostr fixture"], "POST").body.includes("peer"), false, "account request fails visibly while the API is down");
+  // A deployment without the allowlist, such as one built from main: authentication must stay closed.
+  run("api-stale", ["--network-alias", "api.railway.internal", ...mount(path.join(fixture, "api-stale.mjs"), "/fixture.mjs")], "node:24.22.2-alpine3.24", ["node", "/fixture.mjs"]);
+  await sleep(12000); // nginx re-resolves the API's name after its 10-second validity
+  equal(docker("exec", a, "curl", "--max-time", "5", "-sS", "http://api.railway.internal:3001/api/me").includes('"stale":true'), true, "the stale API is up and would answer if it were reached");
+  for (const [target, method] of [["/api/me", "GET"], ["/api/auth/github/start?purpose=signin&lang=sw", "GET"], [`/api/auth/github/callback?code=${marker}&state=${marker}`, "GET"], ["/api/auth/nostr/challenge", "POST"], ["/api/auth/nostr/verify", "POST"], ["/api/auth/recovery", "POST"]]) {
+    const refused = request(a, "front", target, [], method);
+    equal(refused.status >= 500 && !refused.body.includes("stale"), true, `stale API cannot serve ${method} ${target.split("?")[0]} with authentication enabled`);
+  }
+  equal(request(a, "front", "/").status, 200, "learning remains available with a stale API");
   const logResult = spawnSync("docker", ["logs", web], { encoding: "utf8", windowsHide: true });
   equal(logResult.status, 0, "both nginx log streams are readable");
   const logs = logResult.stdout + logResult.stderr;

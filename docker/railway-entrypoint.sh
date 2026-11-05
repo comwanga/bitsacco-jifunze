@@ -49,6 +49,22 @@ if [ "${STAGING_AUTH_ENABLED:-0}" = 0 ]; then
   printf '%s\n' 'if ($uri ~ "^/api/(?!health$|internal/)") { return 503; }' >> "$extra"
 else
   printf '%s\n' 'if ($railway_api_invalid) { return 403; }' >> "$extra"
+  # An API without the tester allowlist, such as a stale deployment, has no gate route: nginx answers 500 and never
+  # forwards the request. Its error line would quote the original request, callback code included, so crit only.
+  cat >> "$extra" <<'NGINX'
+location = /_jifunze_tester_gate {
+  internal;
+  error_log /var/log/nginx/error.log crit;
+  proxy_method GET;
+  proxy_pass_request_body off;
+  proxy_set_header Content-Length "";
+  proxy_set_header Cookie "";
+  proxy_set_header Authorization "";
+  proxy_set_header Host $host;
+  proxy_connect_timeout 3s;
+  proxy_pass $api/api/internal/tester-gate;
+}
+NGINX
 fi
 
 conf=/tmp/jifunze-railway.conf
@@ -86,5 +102,9 @@ NGINX
     -e '/proxy_set_header X-Real-IP \$remote_addr;/a\    proxy_set_header X-Forwarded-For "";\n    proxy_set_header Forwarded "";\n    proxy_set_header X-Forwarded-Proto https;\n    proxy_hide_header Cache-Control;\n    proxy_connect_timeout 3s;' \
     /etc/nginx/jifunze-base.conf
 } > "$conf"
+if [ "${STAGING_AUTH_ENABLED:-0}" = 1 ]; then
+  sed -i '/^  location \/api\/ {$/a\    auth_request /_jifunze_tester_gate;' "$conf"
+  grep -q 'auth_request /_jifunze_tester_gate;' "$conf" || fail 'tester gate could not be applied'
+fi
 cat "$conf" > /etc/nginx/conf.d/default.conf
 nginx -t

@@ -12,7 +12,7 @@ import { createServer, PREAUTH_COOKIE, SESSION_COOKIE, type Route } from "../src
 import { nostrRoutes } from "../src/nostr-routes.ts";
 import { Limiter, perIp } from "../src/ratelimit.ts";
 import { generateCodes, recoveryRoutes } from "../src/recovery.ts";
-import { healthRoute } from "../src/routes.ts";
+import { healthRoute, routes } from "../src/routes.ts";
 import { createSession, logoutRoute, meRoute, readSession } from "../src/sessions.ts";
 import { startFakeGithub, type FakeGithub } from "./fake-github.ts";
 import { fakeConfig, ORIGIN, resetTestDb, testDatabaseUrl } from "./helpers.ts";
@@ -527,6 +527,27 @@ describe("the canonical authentication origin", () => {
     expect(res.status).toBe(401);
     expect(await res.text()).toContain("nostr_invalid");
     expect(await count("sessions")).toBe(0);
+  });
+});
+
+describe("the proxy's tester gate", () => {
+  const gate = (api: Api) => get(`${api.base}/api/internal/tester-gate`);
+
+  it("answers 204 when the allowlist is in force, even one that denies everyone", async () => {
+    expect((await gate(await startApi(allowlist(), routes))).status).toBe(204);
+    expect((await gate(await startApi({ github: new Set(), nostr: new Set() }, routes))).status).toBe(204);
+  });
+
+  it("answers 404 when no allowlist is in force, so the proxy keeps authentication closed", async () => {
+    const res = await gate(await startApi(null, routes));
+    expect(res.status).toBe(404);
+    expect(await res.text()).toContain("not_found");
+  });
+
+  it("reveals nothing about the list", async () => {
+    const res = await gate(await startApi(allowlist(), routes));
+    expect(await res.text()).toBe("");
+    expect(res.headers.getSetCookie()).toEqual([]);
   });
 });
 

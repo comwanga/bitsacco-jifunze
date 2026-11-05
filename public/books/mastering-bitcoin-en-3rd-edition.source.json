@@ -10,9 +10,9 @@
   "license": "CC BY-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
   "licenseGrant": "https://github.com/bitcoinbook/bitcoinbook/commit/94c9ba64b454eb79ca77904a48251bd4efab73cf",
-  "bytes": 9421967,
-  "pages": 420,
-  "sha256": "138bd9c4314e8013da2036286003a0d323f3866153129bc5d421c4df14a03650",
+  "bytes": 9112090,
+  "pages": 406,
+  "sha256": "aedbf60fc15e199903d3bfede1268dae4aa75922f764fb44b1d400eb0d255511",
   "generator": {
     "revision": "275c4eb8eab8800c6adc39f8def8e8f8fa356a57",
     "image": "asciidoctor/docker-asciidoctor@sha256:b0c0ebff6e2d6f5cd66a075310ca7f076921d8acb293d8f4ae8fcae0d7fea30c",

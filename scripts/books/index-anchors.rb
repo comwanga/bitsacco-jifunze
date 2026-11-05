@@ -13,6 +13,10 @@ class JifunzeBookHTML < Asciidoctor::Converter::Html5Converter
   def convert_inline_indexterm(node)
     terms = node.attr('terms') || [node.text]
     terms = terms.compact.reject(&:empty?)
+    # Atlas puts range IDs and sort hints inside index macros. They are publishing
+    # metadata, not index terms. Retain human-readable see/see-also references.
+    terms = terms.reject { |term| term.match?(/\A(?:id|startref|primary-sortas|secondary-sortas|tertiary-sortas)=/) }
+    terms = terms.map { |term| term.sub(/\Asee=/, 'see ').sub(/\Aseealso=/, 'see also ') }
     return super if terms.empty?
     list = ($jifunze_index ||= [])
     id = "jifunze-index-#{list.length + 1}"

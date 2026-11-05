@@ -32,14 +32,14 @@ Publishing image: `asciidoctor/docker-asciidoctor@sha256:b0c0ebff6e2d6f5cd66a075
 
 `public/books/mastering-bitcoin-en-3rd-edition.pdf`
 
-- 9,421,967 bytes (8.99 MiB); 420 pages; SHA-256 `138bd9c4314e8013da2036286003a0d323f3866153129bc5d421c4df14a03650`.
+- 9,112,090 bytes (8.69 MiB); 406 pages; SHA-256 `aedbf60fc15e199903d3bfede1268dae4aa75922f764fb44b1d400eb0d255511`.
 - 343 bookmarks and 2,292 link annotations; no out-of-range internal link destinations.
 - All 19 major source headings present in order: preface, 14 chapters, appendices A–C and index. All 1,695 parsed source paragraphs and 171 listing blocks found in extracted PDF text after whitespace normalization; zero missing. The HTML contains 115 tables (including structural admonition tables) and 79 images; every image loads and all 79 image occurrences are present in the PDF. Mathematical blocks are vector content rather than image occurrences.
-- All 679 parsed table cells are present after whitespace normalization. A separate 6,393-window text comparison leaves 19 boundary windows across numbered lists/tables and vector formula boundaries where PDF list markers/repeated table headers and mathematical text extraction alter extraction order. Their constituent paragraphs, table cells and code are present; these are extraction-order differences, not omitted source sections.
+- All 679 parsed table cells are present after whitespace normalization. A separate 5,979-window text comparison leaves 19 boundary windows across numbered lists/tables and vector formula boundaries where PDF list markers/repeated table headers and mathematical text extraction alter extraction order. Their constituent paragraphs, table cells and code are present; these are extraction-order differences, not omitted source sections.
 - Independent PyMuPDF and pypdf reopen the PDF successfully. Tagged structure exists; no encryption, JavaScript, open actions, unexpected blank pages or text outside page bounds. Only embedded DejaVu font families are used.
 - Every page rasterized and inspected in contact sheets, with enlarged checks of attribution, code, equations, tables and figures. Contact sheets and audit JSON remain in ignored `.superpowers/pdf-generation/`. No missing diagram, clipped code or unreadable replacement glyph was observed.
 
-Limitations: fixed-layout pages require zoom on small screens; native PDF controls and assistive-technology support vary by browser. Tagged output is not a PDF/UA certification. The original raw MathML and converted vector formulas need native reader support; the unchanged source remains linked for an alternative accessible representation. The generated index uses linked occurrence numbers rather than publisher page references.
+Limitations: fixed-layout pages require zoom on small screens; native PDF controls and assistive-technology support vary by browser. Tagged output is not a PDF/UA certification. The original raw MathML and converted vector formulas need native reader support; the unchanged source remains linked for an alternative accessible representation. The generated index uses linked occurrence numbers rather than publisher page references; Atlas range IDs and sort hints are omitted from display, and see/see-also references are labelled.
 
 ## Application integration and release safety
 

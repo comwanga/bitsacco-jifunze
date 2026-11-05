@@ -1,6 +1,67 @@
 # Railway staging: preparation and acceptance
 
-This is a controlled staging deployment, not general authentication release. PR #8 is merged. The published/deployed preparation baseline is `4af42665d3895482a412b8d23ef4932cdfca69f5`; its CI passed. Work is isolated on `deploy/railway-staging`. The ingress correction below remains local until separately authorized publication. Do not merge or enable authentication without authorization.
+This is a controlled staging deployment, not general authentication release. PR #8 is merged. Work is isolated on `deploy/railway-staging`. Do not merge or enable authentication without authorization.
+
+## Current state (verified 2026-11-05)
+
+| Item | State |
+|---|---|
+| Domain | `staging.bitsaccojifunze.xyz`: DNS public, Railway verified, Let's Encrypt certificate valid to 2027-02-03 |
+| Authentication | Disabled: `STAGING_AUTH_ENABLED=0`; `/api/*` except health and hidden internal paths returns 503 at nginx |
+| Web deployment | `3a02083` from `deploy/railway-staging`, CI passed |
+| API deployment | `6d418dc` (the `main` merge of PR #8); `api/` and `docker/api.Dockerfile` are identical to `3a02083` |
+| GitHub App | Staging App; the three callbacks below registered exactly, wildcards, device flow and webhook off; Railway holds its Client ID and secret. GitHub's public lookup returns 404, so it appears to be private: confirm a non-owner tester can authorize it. Its permissions were not independently verified |
+| Tester allowlist, canonical-host gate, HSTS | Implemented on this branch, **not yet deployed** |
+
+### Deployment source: staging can deploy `main`
+
+The `web` and `api` services have a repository source but **no branch trigger**, so nothing deploys automatically on a push. However, saving the GitHub credentials in the dashboard created an API deployment from `main` HEAD (`6d418dc`), not from this branch. The `branch` value in deployment metadata is not reliable evidence (`4af4266`, which is not on `main`, is also labelled `main`): check the commit.
+
+It was harmless that time because the API code was identical. It would not be again: `main` has no allowlist, canonical-host gate or Railway nginx mode. **Never apply a staged variable change or use a dashboard deploy on these services.** Use the procedure below, and confirm the deployed commit before relying on any gate.
+
+`deploymentTriggerCreate` can pin both services to this branch, but Railway does not document whether creating a trigger starts a deployment, and a pin makes every later push to this branch deploy. It therefore needs its own authorization and has not been applied.
+
+### Controlled activation (each step needs authorization)
+
+1. Review and publish this branch; wait for CI.
+2. Set the lists without deploying: `railway variable set TESTER_GITHUB_IDS=... TESTER_NOSTR_PUBKEYS=... --skip-deploys -s api -e staging`.
+3. Deploy the API at the exact commit, then the web service, with authentication still off: `serviceInstanceDeployV2(serviceId, environmentId, commitSha)`.
+4. Confirm both commits with `railway deployment list --json`, and the API boot line `event="tester_allowlist"` with `enforced=true`, the expected counts and `invalid=[]`.
+5. Confirm live, with authentication still off: HSTS on the custom domain; on the generated hostname, public pages and health 200 and `/api/me` 404.
+6. Set `STAGING_AUTH_ENABLED=1 --skip-deploys` on web and deploy web at the same exact commit. Repeat step 4's commit check. Roll back by setting it to `0` the same way.
+
+Any later API or web deployment repeats steps 3 and 4 before testing continues.
+
+## Tester allowlist
+
+Learning content stays public. Authentication is limited to the identities in two API variables:
+
+- `TESTER_GITHUB_IDS`: comma-separated GitHub numeric user ids (not logins, which can change hands). `gh api users/<login> --jq .id` shows one.
+- `TESTER_NOSTR_PUBKEYS`: comma-separated lowercase 64-character hex public keys (not `npub`).
+
+Required on every Railway environment except one named `production` on the production origin, and enforced anywhere either variable is present. **Missing, empty or malformed means nobody can authenticate**; one bad entry denies everyone, and the boot line names the variable, never a value. The API deliberately stays healthy in that state rather than failing its boot: a failed deployment can leave the previous one, possibly with no allowlist, serving.
+
+| Path | Check | Refused as |
+|---|---|---|
+| GitHub sign-in, reauth, replace | After GitHub proves the identity, before any change | Same as a stale request (`state_invalid`) |
+| Nostr verify | After the signature, URL, payload and proof checks; challenge spent | Same as a spent challenge (`challenge_invalid`) |
+| Recovery code | After the code matches; transaction rolled back, so the code stays unspent | Same as a wrong code (`recovery_invalid`) |
+| Any existing session | On every request, in the one session gate in `api/src/http.ts` | Treated as no session |
+
+To remove a tester, change the variable and redeploy the API by the procedure above: their sessions and recovery codes stop working immediately, with no database change, and work again if they are re-added. Their account row remains. A test asserts that `createSession` has only these four callers, so a new session path fails the suite until it is reviewed.
+
+The refusals reuse approved copy in both languages, so an unlisted person sees "start again". This is deliberate: it does not confirm the allowlist decided it. A tester who is wrongly refused should send the maintainer their numeric id.
+
+## Canonical origin and the generated hostname
+
+`https://staging.bitsaccojifunze.xyz` is the only authentication origin. OAuth redirects, NIP-98 URLs and the API's origin check all come from `SITE_ORIGIN`. In Railway mode nginx also answers every `/api/*` path except health with a JSON 404 unless the hostname equals `SITE_ORIGIN`'s, whatever `STAGING_AUTH_ENABLED` says. Without this, a person could finish a real flow on `web-staging-d337.up.railway.app` by moving a callback there by hand, and hold a session on a second origin. Public pages and health remain on the generated hostname; removing that Railway domain is optional and was not done.
+
+## Reviewed findings
+
+- **HSTS:** absent on the live site. Railway mode now sends `max-age=86400`: this host only, one day, no `includeSubDomains` or `preload`, so it cannot bind the production root. Production needs its own decision.
+- **Account error while disabled:** the page blamed the reader's internet connection for nginx's 503. A non-JSON 5xx now shows the existing "something went wrong on our side" copy in both languages; no wording changed. "Continue with GitHub" still shows nginx's plain 503 while authentication is off, which ends at activation.
+- **Local Lightning lab:** Lightning lessons call `127.0.0.1:7777/hello` on load to find an optional lab, so Chrome and Edge may ask for local network access. This is the designed behaviour (`docs/superpowers/specs/2026-11-03-lightning-lab-design.md`) and the page explains it. No change; tell testers that declining does not affect sign-in.
+- **Private-network trust boundary:** rechecked against Railway's environment configuration: exactly `web`, `api` and `postgres`; only `web` has a public domain; no TCP proxies. The accepted limitation below is unchanged, and neither the allowlist nor the canonical-host gate relies on client addresses. A private co-tenant could still reach the API directly, which is why adding one invalidates this acceptance.
 
 ## Execution plan
 
@@ -22,21 +83,19 @@ This is a controlled staging deployment, not general authentication release. PR 
 - Public DNS on 2026-11-05 confirms `dns1.registrar-servers.com` / `dns2.registrar-servers.com`; a public-resolver lookup returned NXDOMAIN for the staging name. No DNS modifications were made.
 - The old domain in historical specifications/spikes is evidence of earlier proposals and should remain historical. Active metadata and runtime configuration must use the new environment origin.
 
-## Intended service settings (not yet provisioned)
+## Service settings
 
 | Service | Source/build | Network | Settings |
 |---|---|---|---|
 | web | Existing root Dockerfile, repository root context | Only public service, port 8080 | Public build argument/runtime `SITE_ORIGIN=https://staging.bitsaccojifunze.xyz`, `JIFUNZE_HOSTING=railway`, `PORT=8080`, `API_HOST=${{api.RAILWAY_PRIVATE_DOMAIN}}`, `API_PORT=3001`, `NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1`, `STAGING_AUTH_ENABLED=0`; health `/en/` remains independent of API availability. After approval, opt in to `RAILWAY_TRUST_MODEL=isolated-staging`; Railway's environment name must be `staging`. Leave `TRUSTED_PROXY_CIDRS` unset. |
-| api | `docker/api.Dockerfile`, repository root context | Private only, port 3001 | `RAILWAY_DOCKERFILE_PATH=docker/api.Dockerfile`, `PORT=3001`; `SITE_ORIGIN` exactly staging HTTPS origin; `DATABASE_URL` references PostgreSQL's private connection; staging `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, persistent `RECOVERY_PEPPER_V1`; health `/api/health`; one replica |
+| api | `docker/api.Dockerfile`, repository root context | Private only, port 3001 | `RAILWAY_DOCKERFILE_PATH=docker/api.Dockerfile`, `PORT=3001`; `SITE_ORIGIN` exactly staging HTTPS origin; `DATABASE_URL` references PostgreSQL's private connection; staging `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, persistent `RECOVERY_PEPPER_V1`; `TESTER_GITHUB_IDS`, `TESTER_NOSTR_PUBKEYS`; health `/api/health`; one replica |
 | postgres | PostgreSQL 16 image/version confirmed before creation | Private only, no TCP proxy | New staging database and random credentials in Railway only; persistent data volume; backup schedule and restore drill |
 
 API startup already applies pending SQL migrations under advisory locks and transactions before it starts listening. Failure logs contain only a migration filename/error code. Verify the migration ledger and idempotent restart on the actual staging database; never use the local development URL. Deploy rollback restores prior images; database rollback requires a compatible forward migration or a tested backup, not destructive schema changes.
 
 ## Domain and OAuth handoff
 
-The Railway staging domain has been created; DNS ownership and its certificate remain pending maintainer action. Retrieve the current exact CNAME/TXT values from Railway before changing Namecheap; do not invent them. This ingress correction changes no DNS. Verify DNS propagation, certificate issuance and public HTTPS before authentication acceptance.
-
-Register these callbacks on the staging GitHub App:
+DNS, domain ownership, the certificate and public HTTPS are verified. These callbacks are registered on the staging GitHub App:
 
 - `https://staging.bitsaccojifunze.xyz/api/auth/github/callback`
 - `https://staging.bitsaccojifunze.xyz/api/auth/github/callback/reauth`
@@ -126,6 +185,6 @@ Focused Docker ingress contract: 46 checks passed, including malformed/duplicate
 
 The full API regression passed 206 tests against the existing disposable PostgreSQL test database, including GitHub, Nostr, recovery, account/session ownership, canonical-address limiter keys and transaction/concurrency cases. The private deployed API retained the exact NIP-98 URL, Secure/HttpOnly/SameSite=Lax/Path=/ pre-auth cookie, wrong-origin 403 and missing-signature 401/no-session behavior; account/session counts stayed zero. These attribute checks do not claim a live authenticated browser session. Repository tests passed 144 cases. The existing export passed UX budgets; a new production build and browser suites were not rerun for this server-configuration-only change. Local regression host was Node 24.19.0; deployed API/probe ran Node 24.22.2 and nginx was tested in its Linux image. No browser process was launched under the workstation's memory pressure.
 
-No API authentication/recovery logic, schema, frontend, translations, dependencies or JavaScript budgets changed. GitHub callbacks and exact NIP-98 origin/body/signature verification remain the original implementation. Session-cookie and real-signer acceptance do not follow merely from a forwarding test. Publication/deployment of this local correction, explicit staging trust acceptance, custom-domain DNS/TLS, staging GitHub App configuration and live provider consent remain separate authorization/acceptance steps.
+No API authentication/recovery logic, schema, frontend, translations, dependencies or JavaScript budgets changed. GitHub callbacks and exact NIP-98 origin/body/signature verification remain the original implementation. Session-cookie and real-signer acceptance do not follow merely from a forwarding test. This correction has since been published and deployed to web, and the custom domain and staging GitHub App are configured. Live provider consent remains a separate authorization/acceptance step.
 
 The approved seven-day Hobby log exception applies only to disposable staging data; production's fourteen-day requirement is unchanged. Native scheduled/manual backups were rejected as Pro-only during provisioning; no plan change was made. The logical restore drill passed, but durable off-service backups remain a general-release gate.

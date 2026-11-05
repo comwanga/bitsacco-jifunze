@@ -87,7 +87,11 @@ for (const lang of LANGS) {
       await page.evaluate((path) => window.location.assign(path), `/${lang}/`);
       await page.waitForURL(new RegExp(`/${lang}/$`));
       await page.goBack({ waitUntil: "commit" });
-      await expect.poll(() => cacheState(page)).toEqual({ documentId: original.documentId, restores: 1 });
+      // A commit can precede Chromium's execution-context switch. Retry transient evaluation errors too;
+      // a reload still fails because it cannot preserve this document ID and persisted pageshow count.
+      await expect(async () => {
+        expect(await cacheState(page)).toEqual({ documentId: original.documentId, restores: 1 });
+      }).toPass({ timeout: 5000 });
       await expect(button).toBeDisabled();
       await expect(page.getByRole("main").getByRole("link", { name: c.continueGithub })).toHaveAttribute("aria-disabled", "true");
       await expect(page.locator('form button[type="submit"]')).toBeDisabled();

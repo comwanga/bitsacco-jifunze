@@ -1,6 +1,6 @@
 # Railway staging: preparation and acceptance
 
-This is a controlled staging deployment, not general authentication release. PR #8 is merged. Work is isolated on `deploy/railway-staging`. Do not merge or enable authentication without authorization.
+This is a controlled staging deployment, not general authentication release. Railway staging builds from `deploy/railway-staging`; keep that branch. Do not enable authentication without authorization.
 
 ## Current state (verified 2026-11-05)
 
@@ -12,7 +12,7 @@ This is a controlled staging deployment, not general authentication release. PR 
 | API deployment | `6d418dc` (the `main` merge of PR #8); `api/` and `docker/api.Dockerfile` are identical to `3a02083` |
 | GitHub App | Private staging App owned by the maintainer; 0 repository, organization and account permissions; the three callbacks below registered exactly, wildcards, device flow and webhook off; Railway holds its Client ID and secret. While it is private, plan on only its owner being able to authorize it: other GitHub testers need it made public, which needs approval |
 | Railway source | `web` and `api` have `source.branch=deploy/railway-staging`; no triggers; auto-deploy off |
-| Tester allowlist, canonical-host gate, HSTS | Implemented on this branch, **not yet deployed** |
+| Tester allowlist and gate, canonical-host gate, HSTS | Implemented, **not yet deployed** |
 
 ### Deployment source
 

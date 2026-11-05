@@ -17,11 +17,13 @@ work = Path('.superpowers/pdf-generation')
 pdf = work / 'mastering-bitcoin-en-3rd-edition.pdf'
 doc = fitz.open(pdf)
 metadata = doc.metadata
-metadata.update(author='Andreas M. Antonopoulos; David A. Harding',
-                subject='Third edition; generated from official open-source revision 275c4eb8eab8800c6adc39f8def8e8f8fa356a57; CC BY-SA 4.0',
-                keywords='Bitcoin, third edition, CC BY-SA 4.0, generated open-source edition')
-doc.set_metadata(metadata)
-doc.saveIncr()  # Chromium already compresses streams/subsets fonts; do not resample illustrations.
+expected_metadata = dict(author='Andreas M. Antonopoulos; David A. Harding',
+                         subject='Third edition; generated from official open-source revision 275c4eb8eab8800c6adc39f8def8e8f8fa356a57; CC BY-SA 4.0',
+                         keywords='Bitcoin, third edition, CC BY-SA 4.0, generated open-source edition')
+if any(metadata.get(key) != value for key,value in expected_metadata.items()):
+    metadata.update(expected_metadata)
+    doc.set_metadata(metadata)
+    doc.saveIncr()  # Repeated verification preserves the checksum; no image resampling.
 doc.close()
 doc = fitz.open(pdf)
 print('Metadata recorded; checking pages',flush=True)
@@ -29,7 +31,7 @@ reader = PdfReader(pdf)
 html = json.loads((work / 'html-audit.json').read_text(encoding='utf8'))
 norm = lambda text: re.sub(r'\s+', '', text)
 texts = []
-blank, clipped, invalid_links = [], [], []
+blank, clipped, invalid_links, unsafe_actions = [], [], [], []
 fonts, image_count, links = set(), 0, 0
 for page in doc:
     if page.number % 100 == 0:
@@ -56,8 +58,10 @@ for page in doc:
     fonts.update(f[3] for f in page.get_fonts())
     for link in page.get_links():
         links += 1
-        if link['kind'] == fitz.LINK_GOTO and not 0 <= link['page'] < len(doc):
+        if link['kind'] in (fitz.LINK_GOTO,fitz.LINK_NAMED) and not 0 <= link.get('page',-1) < len(doc):
             invalid_links.append([page.number+1,link])
+        if link['kind'] == fitz.LINK_LAUNCH or str(link.get('uri','')).lower().startswith(('javascript:','file:','data:')):
+            unsafe_actions.append([page.number+1,link])
 rendered = norm('\n'.join(texts))
 expected = norm(html['text'])
 # Dense overlapping windows detect missing prose. Reordering across table cells or
@@ -80,12 +84,18 @@ audit['vectorEquations'] = html.get('vectorEquations',0)
 audit['tableCells'] = len(html.get('cells',[]))
 audit['missingTableCells'] = [c for c in html.get('cells',[]) if norm(c) and norm(c) not in rendered]
 audit['equations'] = html.get('equations',[])
+destinations = reader.named_destinations
+audit['namedDestinations'] = len(destinations)
+audit['unsafeActions'] = unsafe_actions
 outline = {norm(title): page for _,title,page in doc.get_toc()}
 audit['chapterPages'] = [outline[norm(h['text'])] for h in html['headings']]
 (work / 'pdf-audit.json').write_text(json.dumps(audit,indent=2),encoding='utf8')
 (work / 'pdf-text.txt').write_text('\n\n'.join(texts),encoding='utf8')
 assert len(reader.pages)==len(doc) and not reader.is_encrypted
 assert not blank and not clipped and not invalid_links
+assert not unsafe_actions
+assert all(0 <= reader.get_destination_page_number(dest) < len(doc) for dest in destinations.values())
+assert all(1 <= page <= len(doc) for _,_,page in doc.get_toc())
 assert all(h['present'] for h in headings)
 assert image_count == len(html['images'])
 assert not audit['missingParagraphs'] and not audit['missingListings']

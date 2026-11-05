@@ -7,6 +7,14 @@ import { routes } from "./routes.ts";
 import { purgeExpired, readSession } from "./sessions.ts";
 
 const cfg = loadConfig(process.env);
+// Counts and key names only: the identities themselves stay out of the logs.
+console.info(JSON.stringify({
+  event: "tester_allowlist",
+  enforced: cfg.testerAllowlist !== null,
+  github: cfg.testerAllowlist?.github.size ?? 0,
+  nostr: cfg.testerAllowlist?.nostr.size ?? 0,
+  invalid: cfg.testerAllowlistInvalid,
+}));
 let sql: ReturnType<typeof connect>;
 try {
   sql = connect(cfg.databaseUrl);

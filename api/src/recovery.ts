@@ -2,6 +2,7 @@ import { createHmac, randomBytes, randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { Config } from "./config.ts";
 import { logEvent } from "./accounts.ts";
+import { accountAllowed } from "./allowlist.ts";
 import { ApiError } from "./errors.ts";
 import type { Route, Session, Sql } from "./http.ts";
 import { Limiter, perIp, slash24 } from "./ratelimit.ts";
@@ -233,6 +234,8 @@ export function recoveryRoutes(
       const { cookie, lang } = await sql.begin(async (tx) => {
         const accountId = await consumeCode(tx, cfg, normalised);
         if (!accountId) throw invalid();
+        // Answered as a wrong code. Throwing rolls back the transaction, so the code stays unspent.
+        if (!(await accountAllowed(tx, cfg.testerAllowlist, accountId))) throw invalid();
         await revokeOtherSessions(tx, accountId);
         const { cookie } = await createSession(tx, accountId, "recovery");
         await logEvent(tx, accountId, "recovery_code_used");

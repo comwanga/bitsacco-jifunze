@@ -1,6 +1,7 @@
 import { createServer as createHttpServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { isIP } from "node:net";
 import type { ZodType } from "zod";
+import { accountAllowed } from "./allowlist.ts";
 import type { Config } from "./config.ts";
 import { normaliseIp } from "./ratelimit.ts";
 import { ApiError, MESSAGES, type ErrorCode } from "./errors.ts";
@@ -227,7 +228,9 @@ export function createServer(routes: Route[], deps: Deps): Server {
 
       // 5. session (before the body is parsed, so an anonymous request never reaches validation)
       const cookies = parseCookies(req.headers.cookie);
-      const session = await readSession(sql, cookies[SESSION_COOKIE]);
+      let session = await readSession(sql, cookies[SESSION_COOKIE]);
+      // The one gate for sessions that already exist: removing a tester ends their access on every route.
+      if (session && !(await accountAllowed(sql, cfg.testerAllowlist, session.accountId))) session = null;
       if (session) accountId = session.accountId;
       if (route.auth !== "public") {
         if (!session) throw new ApiError(401, "unauthenticated");

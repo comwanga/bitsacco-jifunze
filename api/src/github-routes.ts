@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { logEvent, replaceGithubIdentity, signInWithGithub } from "./accounts.ts";
+import { identityAllowed } from "./allowlist.ts";
 import { consumeChallenge, createChallenge, peekLang, safeReturn } from "./challenges.ts";
 import { ApiError, type ErrorCode } from "./errors.ts";
 import { authorizeUrl, githubIdentity } from "./github.ts";
@@ -155,6 +156,9 @@ async function completeCallback(
     codeVerifier: ch.pkceVerifier,
     redirectUri: `${cfg.siteOrigin}${callbackPath(purpose)}`,
   });
+
+  // Every purpose: no account, session or replacement for an identity outside the tester allowlist.
+  if (!identityAllowed(cfg.testerAllowlist, "github", String(gh.id))) return fail("state_invalid");
 
   if (purpose === "signin") {
     const r = await signInWithGithub(sql, gh, ch.lang, session);

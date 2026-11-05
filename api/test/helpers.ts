@@ -17,6 +17,8 @@ export function fakeConfig(over: Partial<Config> = {}): Config {
     githubApiBase: "http://127.0.0.1:1",
     peppers: new Map([[1, Buffer.alloc(32, 1)]]),
     currentPepper: 1,
+    testerAllowlist: null,
+    testerAllowlistInvalid: [],
     ...over,
   };
 }

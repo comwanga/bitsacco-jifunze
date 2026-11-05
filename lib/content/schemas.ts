@@ -108,11 +108,16 @@ export const LibraryItemSchema = z.object({
   title: LocalizedSchema,
   author: z.string().min(1),
   language: LangSchema,
-  url: z.string().min(1),
-  sizeBytes: z.number().int().positive(),
+  format: z.enum(["pdf", "online", "pending-pdf"]).default("pdf"),
+  url: z.string().min(1).optional(),
+  sizeBytes: z.number().int().positive().optional(),
   licence: z.string().min(1),
   credit: z.string().optional(),
   note: LocalizedSchema.optional(),
+}).refine(item => item.format === "pending-pdf" ? item.url === undefined : Boolean(item.url), {
+  message: "Available resources require a URL; pending PDFs must not advertise a download URL",
+}).refine(item => item.format !== "pdf" || item.sizeBytes !== undefined, {
+  message: "Available PDFs require a verified file size",
 });
 export const LibrarySchema = z.array(LibraryItemSchema);
 export type LibraryItem = z.infer<typeof LibraryItemSchema>;

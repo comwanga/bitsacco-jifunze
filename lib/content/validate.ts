@@ -225,7 +225,7 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
       issues.push({ level: "error", rule: 2, file: rel(root, libraryFile), message: lib.error.message });
     } else if (lib.success) {
       for (const item of lib.data) {
-        const problem = checkUrl(item.url);
+        const problem = item.url ? checkUrl(item.url) : null;
         if (problem) issues.push({ level: "error", rule: 3, file: rel(root, libraryFile), message: `${item.id}: ${problem}` });
       }
     }

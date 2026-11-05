@@ -7,4 +7,6 @@ if (origin.origin !== configuredOrigin || (origin.protocol !== "https:" && !loca
 }
 export const SITE_URL = origin.origin;
 export const SITE_INDEXABLE = SITE_URL === "https://bitsaccojifunze.xyz";
+// The initial public release is anonymous. Staging/local account acceptance stays separate.
+export const ACCOUNTS_AVAILABLE = !SITE_INDEXABLE;
 export const REPO_URL = "https://github.com/comwanga/bitsacco-jifunze";

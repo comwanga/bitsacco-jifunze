@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { PathHeader } from "@/components/roadmap/PathHeader";
 import { PathTree } from "@/components/roadmap/PathTree";
@@ -11,7 +12,7 @@ type Params = { params: Promise<{ lang: string; roadmap: string }> };
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, roadmap } = await params;
   const tree = buildTree(lang as Lang, roadmap);
-  return { title: `${tree.title} · ${t(lang as Lang, "viewTree")}`, description: tree.description };
+  return pageMetadata(lang as Lang, `tree/${roadmap}/`, `${tree.title} · ${t(lang as Lang, "viewTree")}`, tree.description);
 }
 export default async function TreePage({ params }: Params) {
   const { lang: l, roadmap } = await params;

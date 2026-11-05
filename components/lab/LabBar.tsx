@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { t, type Lang } from "@/lib/i18n";
-import { forgetLab, pairLab, useLab } from "@/lib/lab/useLab";
+import { connectLab, forgetLab, pairLab, useLab } from "@/lib/lab/useLab";
 
 const NAMES: Record<string, string> = { bitcoind: "bitcoind", alice: "Alice", bob: "Bob", chan: "Chan", dina: "Dina", erin: "Erin" };
 const IMPL: Record<string, string> = { lnd: "LND", cln: "c-lightning", eclair: "Eclair", bitcoind: "regtest" };
@@ -14,7 +14,9 @@ export function LabBar({ lang }: { lang: Lang }) {
   const [busy, setBusy] = useState(false);
 
   const message =
-    lab.phase === "checking"
+    lab.phase === "idle"
+      ? t(lang, "labIdle")
+      : lab.phase === "checking"
       ? t(lang, "labChecking")
       : lab.phase === "absent"
         ? t(lang, "labAbsent")
@@ -30,6 +32,7 @@ export function LabBar({ lang }: { lang: Lang }) {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
         <strong className="text-dawn">{t(lang, "labTitle")}</strong>
         <span aria-live="polite">{message}</span>
+        {lab.phase === "idle" && <button type="button" onClick={() => void connectLab()} className="rounded-full bg-sun-deep px-4 py-1.5 font-semibold text-white">{t(lang, "labConnectCheck")}</button>}
         {lab.phase === "ready" && lab.status && (
           <span className="flex flex-wrap gap-1.5">
             {Object.entries(lab.status.nodes).map(([name, n]) => (

@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { siteCopy } from "@/lib/site-copy";
 import { ContinueLearning } from "@/components/home/ContinueLearning";
@@ -7,6 +8,11 @@ import { BaobabScene } from "@/components/intro/BaobabScene";
 import { flatLessons, getGlossary, getLesson, getLibrary, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
 import { introScript } from "@/lib/intro/shouldPlay";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const lang = (await params).lang as Lang;
+  return pageMetadata(lang, "", t(lang, "siteName"), t(lang, "heroLead"));
+}
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;

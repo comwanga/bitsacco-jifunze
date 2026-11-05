@@ -1,3 +1,5 @@
+import { ACCOUNTS_AVAILABLE } from "@/lib/site";
+import { AccountUnavailable } from "@/components/account/AccountUnavailable";
 import type { Metadata } from "next";
 import { SignOut } from "@/components/account/SignOut";
 import { accountCopy } from "@/lib/account-copy";
@@ -13,6 +15,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 // A static shell; the island talks to the account API from the browser.
 export default async function SignOutPage({ params }: Params) {
   const lang = (await params).lang as Lang;
+  if (!ACCOUNTS_AVAILABLE) return <AccountUnavailable lang={lang} />;
   const c = accountCopy[lang];
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8 pb-16">

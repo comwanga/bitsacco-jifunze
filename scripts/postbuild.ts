@@ -5,8 +5,11 @@ import { BUDGET, pageWeight } from "../lib/build/budget.ts";
 import { buildCsp, injectCsp, inlineScriptHashes } from "../lib/build/csp.ts";
 import { internalRefs, resolvesInOut } from "../lib/build/links.ts";
 import { flatLessons, getRoadmap } from "../lib/content/load.ts";
+import { SITE_URL } from "../lib/site.ts";
 
 const OUT = path.resolve("out");
+// Runtime static mode must never serve an export built for staging.
+fs.writeFileSync(path.join(OUT, "site-origin.txt"), `${SITE_URL}\n`);
 const kb = (n: number) => `${(n / 1024).toFixed(1)} KB`;
 
 function htmlFiles(dir: string): string[] {

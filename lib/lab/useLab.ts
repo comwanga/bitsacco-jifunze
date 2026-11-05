@@ -6,7 +6,7 @@ import { DEFAULT_LAB_URL, hello, LabError, status, type LabConfig, type LabStatu
 const KEY = "jifunze:lab";
 const POLL_MS = 15_000;
 
-export type LabPhase = "checking" | "absent" | "unpaired" | "ready";
+export type LabPhase = "idle" | "checking" | "absent" | "unpaired" | "ready";
 export type LabState = { phase: LabPhase; config: LabConfig; status?: LabStatus; problem?: "wrong-code" | "origin" };
 
 function loadConfig(): LabConfig {
@@ -30,12 +30,14 @@ function saveConfig(c: LabConfig): void {
   }
 }
 
-const SERVER: LabState = { phase: "checking", config: { url: DEFAULT_LAB_URL, token: "" } };
+const SERVER: LabState = { phase: "idle", config: { url: DEFAULT_LAB_URL, token: "" } };
 let state: LabState | null = null;
+// Consent lasts only for this document, never persisted with a pairing token.
+let connected = false;
 const listeners = new Set<() => void>();
 
 function get(): LabState {
-  if (state === null) state = { phase: "checking", config: loadConfig() };
+  if (state === null) state = { phase: "idle", config: loadConfig() };
   return state;
 }
 
@@ -45,6 +47,7 @@ function set(next: LabState): void {
 }
 
 export async function refreshLab(): Promise<void> {
+  if (!connected) return;
   const current = get();
   const { config } = current;
   if (!config.token) {
@@ -61,7 +64,14 @@ export async function refreshLab(): Promise<void> {
   }
 }
 
+export async function connectLab(): Promise<void> {
+  connected = true;
+  set({ ...get(), phase: "checking" });
+  await refreshLab();
+}
+
 export async function pairLab(code: string, url?: string): Promise<boolean> {
+  connected = true;
   const config = { url: (url || get().config.url).trim() || DEFAULT_LAB_URL, token: code.trim() };
   try {
     const s = await status(config);
@@ -78,8 +88,8 @@ export async function pairLab(code: string, url?: string): Promise<boolean> {
 export function forgetLab(): void {
   const config = { url: get().config.url, token: "" };
   saveConfig(config);
-  set({ phase: "checking", config });
-  void refreshLab();
+  connected = false;
+  set({ phase: "idle", config });
 }
 
 function subscribe(l: () => void): () => void {

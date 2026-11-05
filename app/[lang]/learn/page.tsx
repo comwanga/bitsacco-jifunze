@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { simulationCopy } from "@/lib/simulations/copy";
@@ -9,7 +10,7 @@ type Params = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const lang = (await params).lang as Lang;
-  return { title: t(lang, "catalogTitle"), description: t(lang, "catalogLead") };
+  return pageMetadata(lang, "learn/", t(lang, "catalogTitle"), t(lang, "catalogLead"));
 }
 
 export default async function LearnPage({ params }: Params) {

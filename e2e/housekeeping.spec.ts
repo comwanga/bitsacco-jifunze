@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { indexablePaths } from "../lib/content/routes";
+import { SITE_INDEXABLE, SITE_URL } from "../lib/site";
 import { LANGS } from "../lib/i18n";
 
 test("static metadata includes lessons and language alternatives", async ({ request }, info) => {
@@ -17,7 +18,9 @@ test("static metadata includes lessons and language alternatives", async ({ requ
   expect(xml).toContain('hreflang="en"');
   const robots = await request.get("/robots.txt");
   expect(robots.ok()).toBe(true);
-  expect(await robots.text()).toContain("Sitemap:");
+  expect(await robots.text()).toContain(SITE_INDEXABLE ? `Sitemap: ${SITE_URL}/sitemap.xml` : "Disallow: /");
+  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>|href="([^"]+)"/g)].map(m => m[1] || m[2]);
+  expect(urls.every(url => new URL(url).origin === SITE_URL)).toBe(true);
 });
 
 test("a lesson opened through in-app navigation reloads offline", async ({ page, context }, info) => {

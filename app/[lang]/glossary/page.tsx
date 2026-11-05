@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { GlossaryList } from "@/components/glossary/GlossaryList";
 import { getGlossary } from "@/lib/content/load";
@@ -7,7 +8,7 @@ type Params = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const lang = (await params).lang as Lang;
-  return { title: t(lang, "glossaryTitle"), description: t(lang, "glossaryLead") };
+  return pageMetadata(lang, "glossary/", t(lang, "glossaryTitle"), t(lang, "glossaryLead"));
 }
 
 export default async function GlossaryPage({ params }: Params) {

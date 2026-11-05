@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { ACCOUNTS_AVAILABLE } from "../lib/site";
 import { accountCopy } from "../lib/account-copy";
 import { t } from "../lib/i18n";
 
@@ -51,16 +52,19 @@ test.describe("header and footer layout", () => {
 
   for (const lang of ["en", "sw"] as const) for (const width of [390, 768, 1280, 1920]) {
     test(`${lang}: shared footer follows content and aligns legal information at ${width}px`, async ({ page }) => {
+      // Footer geometry must not depend on a live account service.
+      await page.route("**/api/me", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "internal" } }) }));
       await page.setViewportSize({ width, height: width === 390 ? 844 : 1080 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       for (const route of ["account/", "offline/", "", "account/signin/", "savers/money-and-bitcoin/", "glossary/"]) {
         await test.step(route || "homepage", async () => {
           await page.goto(`/${lang}/${route}`);
-          if (route === "account/") {
-            // The static test server has no account service. Keep that separate runtime error visible.
-            await expect(page.getByRole("main").getByRole("alert")).toContainText(accountCopy[lang].error_network);
+          if (route === "account/" && ACCOUNTS_AVAILABLE) {
+            // Exercise the real error layout with a deterministic service failure.
+            await expect(page.getByRole("main").getByRole("alert")).toContainText(accountCopy[lang].error_internal);
           }
-          if (route === "account/signin/") await expect(page.locator("#nostr-help")).toBeVisible();
+          if (!ACCOUNTS_AVAILABLE && route.startsWith("account/")) await expect(page.locator("[data-account-unavailable]")).toBeVisible();
+          if (route === "account/signin/" && ACCOUNTS_AVAILABLE) await expect(page.locator("#nostr-help")).toBeVisible();
           await expect(page.getByRole("contentinfo")).toHaveCount(1);
           const layout = await page.evaluate(() => {
             const rect = (el: Element) => {
@@ -122,9 +126,9 @@ test.describe("header and footer layout", () => {
 test("the current section is marked in the served HTML, before any script runs", async ({ browser }) => {
   const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1280, height: 800 } });
   const page = await ctx.newPage();
-  await page.goto("http://localhost:4321/sw/glossary/");
+  await page.goto("/sw/glossary/");
   await expect(page.getByRole("navigation", { name: "Menyu" }).locator('[aria-current="page"]')).toHaveText("Kamusi");
-  await page.goto("http://localhost:4321/en/tree/lightning/");
+  await page.goto("/en/tree/lightning/");
   await expect(page.getByRole("navigation", { name: "Menu" }).locator('[aria-current="page"]')).toHaveText("Labs");
   await ctx.close();
 });

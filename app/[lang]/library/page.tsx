@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { getLibrary } from "@/lib/content/load";
 import { formatBytes } from "@/lib/format";
@@ -7,7 +8,7 @@ type Params = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const lang = (await params).lang as Lang;
-  return { title: t(lang, "libraryTitle"), description: t(lang, "libraryLead") };
+  return pageMetadata(lang, "library/", t(lang, "libraryTitle"), t(lang, "libraryLead"));
 }
 
 export default async function LibraryPage({ params }: Params) {

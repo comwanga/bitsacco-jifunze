@@ -170,7 +170,7 @@ Lessons with exercises load a small lazy island (the editor) and get a CSP that 
 
 - **JavaScript budget.** The spec asks for under 100 KB of compressed JavaScript per page. The React 19 and Next.js 16 runtime alone is about 130 KB gzip (pages measure about 141 KB gzip, about 120 KB brotli), so this stack can't meet the target. CI enforces a 150 KB ceiling to catch regressions. Deciding between accepting this and changing the framework is open.
 - **Review.** All 16 lessons are drafts written for review. They have no `lastReviewed` date, so the reader shows a draft notice. Each needs a Kiswahili reviewer and a technical reviewer before launch.
-- **Live URL.** `lib/site.ts` uses `https://jifunze.bitsacco.com` as a placeholder.
+- **Deployment.** The registered production domain is `https://bitsaccojifunze.xyz`; staging is `https://staging.bitsaccojifunze.xyz`. The web build uses `SITE_ORIGIN` for metadata and blocks indexing on non-production origins. See the [Railway staging runbook](docs/deployment/railway-staging.md) for deployment status and acceptance gates; no live deployment is implied by these defaults.
 - **Kujifunza Bitcoin PDF.** The library links to `https://bitsacco.com/kujifunza-bitcoin-sw.pdf`, which goes live when bitsacco/bitsacco PR #107 merges.
 
 ## Licences

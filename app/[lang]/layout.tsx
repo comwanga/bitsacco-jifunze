@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { isLang, LANGS, t, type Lang } from "@/lib/i18n";
-import { SITE_URL } from "@/lib/site";
+import { SITE_INDEXABLE, SITE_URL } from "@/lib/site";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const l: Lang = isLang(lang) ? lang : "sw";
   return {
     metadataBase: new URL(SITE_URL),
+    robots: SITE_INDEXABLE ? undefined : { index: false, follow: false },
     title: { default: t(l, "siteName"), template: `%s | ${t(l, "siteName")}` },
     description: t(l, "heroLead"),
     alternates: { languages: { sw: "/sw/", en: "/en/" } },

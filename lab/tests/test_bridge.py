@@ -6,7 +6,8 @@ import unittest
 
 from jifunze_lab.bridge import Bridge, format_token, get_or_create_token
 
-ORIGIN = "https://jifunze.bitsacco.com"
+ORIGIN = "https://bitsaccojifunze.xyz"
+STAGING_ORIGIN = "https://staging.bitsaccojifunze.xyz"
 TOKEN = "ABCDEFGHJKLM"
 
 
@@ -35,7 +36,7 @@ def make(**kw):
 
     b = Bridge(
         token=TOKEN,
-        origins=[ORIGIN, "http://localhost:3000"],
+        origins=[ORIGIN, STAGING_ORIGIN, "http://localhost:3000"],
         run_fn=run_fn,
         check_fn=check_fn,
         reset_fn=reset_fn,
@@ -66,12 +67,14 @@ class Origins(unittest.TestCase):
 
     def test_preflight_from_allowed_origin_allows_private_network(self):
         b, _ = make()
-        status, headers, _ = req(b, "OPTIONS", "/run", token=None)
-        self.assertEqual(status, 204)
-        self.assertEqual(headers["Access-Control-Allow-Origin"], ORIGIN)
-        self.assertEqual(headers["Access-Control-Allow-Private-Network"], "true")
-        self.assertIn("authorization", headers["Access-Control-Allow-Headers"])
-        self.assertEqual(headers["Vary"], "Origin")
+        for origin in [ORIGIN, STAGING_ORIGIN]:
+            with self.subTest(origin=origin):
+                status, headers, _ = req(b, "OPTIONS", "/run", origin=origin, token=None)
+                self.assertEqual(status, 204)
+                self.assertEqual(headers["Access-Control-Allow-Origin"], origin)
+                self.assertEqual(headers["Access-Control-Allow-Private-Network"], "true")
+                self.assertIn("authorization", headers["Access-Control-Allow-Headers"])
+                self.assertEqual(headers["Vary"], "Origin")
 
     def test_preflight_from_other_origin_is_refused(self):
         b, _ = make()

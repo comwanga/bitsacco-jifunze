@@ -15,23 +15,29 @@ printf '%s\n' "${API_HOST:-}" | grep -Eq '^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.railwa
 [ -n "${NGINX_LOCAL_RESOLVERS:-}" ] || fail 'set NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1'
 case "${STAGING_AUTH_ENABLED:-0}" in 0|1) ;; *) fail 'invalid STAGING_AUTH_ENABLED' ;; esac
 [ -z "${TRUSTED_PROXY_CIDRS:-}" ] || fail 'Railway has no verified ingress CIDRs; remove TRUSTED_PROXY_CIDRS'
+# Validated before use: the hostname goes into the nginx configuration below.
+printf '%s\n' "${SITE_ORIGIN:-}" | grep -Eq '^https://[a-z0-9]([a-z0-9.-]*[a-z0-9])?$' || fail 'SITE_ORIGIN must be an exact HTTPS origin'
+canonical_host=${SITE_ORIGIN#https://}
 case "${RAILWAY_TRUST_MODEL:-}" in
   '') [ "${STAGING_AUTH_ENABLED:-0}" = 0 ] || fail 'explicit isolated-staging trust model required' ;;
   isolated-staging)
     [ "${RAILWAY_ENVIRONMENT_NAME:-}" = staging ] || fail 'trust model is restricted to staging'
-    printf '%s\n' "${SITE_ORIGIN:-}" | grep -Eq '^https://[a-z0-9]([a-z0-9.-]*[a-z0-9])?$' || fail 'staging requires an exact HTTPS SITE_ORIGIN'
     ;;
   *) fail 'unknown RAILWAY_TRUST_MODEL' ;;
 esac
 
 security=/tmp/jifunze-security-headers.conf
 cat /etc/nginx/snippets/security-headers.conf > "$security"
-printf '\nadd_header X-Robots-Tag "noindex, nofollow" always;\n' >> "$security"
+# This host only and short-lived: no includeSubDomains or preload, which would outlast staging.
+printf '\nadd_header X-Robots-Tag "noindex, nofollow" always;\nadd_header Strict-Transport-Security "max-age=86400" always;\n' >> "$security"
 
 extra=/tmp/jifunze-railway-server.conf
 : > "$extra"
 printf '%s\n' "include $security;" 'add_header Cache-Control "no-store" always;' 'absolute_redirect off;' >> "$extra"
 cat >> "$extra" <<'NGINX'
+# Authentication exists only on the canonical origin. The generated hostname keeps public pages and health; the
+# rewrite drops the query string, so a callback's code and state are not logged either.
+if ($railway_api_wrong_host) { rewrite ^ /api/internal/wrong-host? last; }
 set $railway_client_valid $railway_header_shape;
 # realip runs before server rewrite. An unchanged socket address means parsing
 # failed (or is unverifiable); never fall back to one shared rate-limit bucket.
@@ -53,7 +59,12 @@ conf=/tmp/jifunze-railway.conf
   if [ "${RAILWAY_TRUST_MODEL:-}" = isolated-staging ]; then
     printf '%s\n' 'set_real_ip_from 0.0.0.0/0;' 'set_real_ip_from ::/0;' 'real_ip_header X-Real-IP;' 'real_ip_recursive off;'
   fi
+  printf 'map $host $railway_canonical_host {\n  default 0;\n  "%s" 1;\n}\n' "$canonical_host"
   cat <<'NGINX'
+map "$railway_canonical_host:$uri" $railway_api_wrong_host {
+  default 0;
+  "~^0:/api/(?!health$|internal/)" 1;
+}
 map $http_x_real_ip $railway_header_shape {
   default 0;
   "~^(?:0|[1-9][0-9]{0,2})(?:[.](?:0|[1-9][0-9]{0,2})){3}$" 1;

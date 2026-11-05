@@ -56,7 +56,7 @@ jobs:
           mkdir -p .superpowers/staging-export
           docker cp jifunze-staging-export:/usr/share/nginx/html/. .superpowers/staging-export/
           node scripts/check-staging-export.mjs .superpowers/staging-export
-          docker run --rm --network none --memory=64m -e JIFUNZE_HOSTING=railway -e NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 -e API_HOST=api.railway.internal jifunze/railway-web:ci nginx -t
+          docker run --rm --network none --memory=64m -e JIFUNZE_HOSTING=railway -e NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 -e API_HOST=api.railway.internal -e SITE_ORIGIN="$SITE_ORIGIN" jifunze/railway-web:ci nginx -t
       - name: Phase 1 and Phase 2 initial JavaScript budgets
         run: npm run check:ux-budget
       - name: Install Chromium for browser checks

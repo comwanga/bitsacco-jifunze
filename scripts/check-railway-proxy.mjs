@@ -23,7 +23,7 @@ const equal = (got, want, label) => { if (got !== want) throw new Error(`${label
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 fs.writeFileSync(path.join(fixture, "api.mjs"), `import http from 'node:http';http.createServer((req,res)=>{res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,ip:req.headers['x-real-ip'],proto:req.headers['x-forwarded-proto'],xff:req.headers['x-forwarded-for']||'',forwarded:req.headers.forwarded||''}));}).listen(3001,'::');`);
-fs.writeFileSync(path.join(fixture, "front.conf"), `server { listen 8080; access_log off; resolver 127.0.0.11 ipv6=off; location / { set $web http://web:8080; proxy_pass $web; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-Proto https; } }`);
+fs.writeFileSync(path.join(fixture, "front.conf"), `server { listen 8080; access_log off; resolver 127.0.0.11 ipv6=off; location / { set $web http://web:8080; proxy_pass $web; proxy_set_header Host $http_host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-Proto https; } }`);
 fs.writeFileSync(path.join(fixture, "index.html"), "<!doctype html><title>Synthetic static learning</title><p>Learning remains available</p>");
 
 try {
@@ -47,8 +47,12 @@ try {
     return run(`web-${enabled}`, [...common, "-e", `STAGING_AUTH_ENABLED=${enabled}`, "-e", `RAILWAY_TRUST_MODEL=${model}`,
       "-e", "RAILWAY_ENVIRONMENT_NAME=staging", "-e", "SITE_ORIGIN=https://staging.bitsaccojifunze.xyz"], nginx, command);
   }
+  const CANONICAL = "Host: staging.bitsaccojifunze.xyz";
+  const GENERATED = "Host: web-staging-d337.up.railway.app";
   const request = (client, target, url, headers = [], method = "GET") => {
-    const result = docker("exec", client, "curl", "--ipv4", "--max-time", "8", "-sS", "-X", method, "-w", "\n%{http_code}", ...headers.flatMap(h => ["-H", h]), `http://${target}:8080${url}`);
+    // The public edge passes the requested hostname on; requests are for the canonical one unless a test says otherwise.
+    const all = headers.some(h => /^host:/i.test(h)) ? headers : [CANONICAL, ...headers];
+    const result = docker("exec", client, "curl", "--ipv4", "--path-as-is", "--max-time", "8", "-sS", "-X", method, "-w", "\n%{http_code}", ...all.flatMap(h => ["-H", h]), `http://${target}:8080${url}`);
     const at = result.lastIndexOf("\n");
     return { status: Number(result.slice(at + 1)), body: result.slice(0, at) };
   };
@@ -66,18 +70,25 @@ try {
   fs.writeFileSync(path.join(fixture, "directory-headers.txt"), directoryHeaders);
   equal(/^location: \/_next\/static\/check\/\s*$/im.test(directoryHeaders), true, "nginx directory redirects remain relative for the public HTTPS edge");
   equal(request(a, "front", "/api/auth/nostr/challenge", [], "POST").status, 503, "authentication is closed before ingress acceptance");
-  const closedHeaders = docker("exec", a, "curl", "-sSI", "http://front:8080/api/auth/nostr/challenge");
+  const closedHeaders = docker("exec", a, "curl", "-sSI", "-H", CANONICAL, "http://front:8080/api/auth/nostr/challenge");
   equal(/cache-control: no-store/i.test(closedHeaders), true, "disabled authentication responses remain no-store");
   equal(request(a, "front", "/api/internal/visibility").status, 404, "internal routes remain hidden");
-  const disabledHeaders = docker("exec", a, "curl", "-sSI", "http://front:8080/");
+  const disabledHeaders = docker("exec", a, "curl", "-sSI", "-H", CANONICAL, "http://front:8080/");
   equal(/x-robots-tag: noindex, nofollow/i.test(disabledHeaders), true, "staging HTTP responses prohibit indexing");
+  equal(/^strict-transport-security: max-age=86400\s*$/im.test(disabledHeaders), true, "static pages send HSTS limited to this host for one day");
+  equal(/^strict-transport-security: max-age=86400\s*$/im.test(closedHeaders), true, "API responses send the same HSTS policy");
+  const generatedClosed = request(a, "front", "/api/me", [GENERATED]);
+  equal(generatedClosed.status, 404, "generated hostname has no account API while authentication is disabled");
+  equal(JSON.parse(generatedClosed.body).error.code, "not_found", "generated hostname answers in the API's error shape");
+  equal(request(a, "front", "/", [GENERATED]).status, 200, "public learning content stays available on the generated hostname");
+  equal(request(a, "front", "/api/health", [GENERATED]).status, 200, "health stays available on the generated hostname");
   docker("rm", "-f", web);
   web = startWeb(1, "isolated-staging"); await ready();
   const spoof = ["X-Real-IP: 203.0.113.99", "X-Forwarded-For: 203.0.113.98", "Forwarded: for=203.0.113.97", "X-Forwarded-Proto: http"];
   const first = request(a, "front", "/api/me", spoof);
   equal(first.status, 200, "normalized front request reaches API in explicit environment trust mode");
   const info = JSON.parse(first.body);
-  const apiHeaders = docker("exec", a, "curl", "-sSI", "http://front:8080/api/me");
+  const apiHeaders = docker("exec", a, "curl", "-sSI", "-H", CANONICAL, "http://front:8080/api/me");
   equal((apiHeaders.match(/cache-control: no-store/gi) || []).length, 1, "proxied account responses have one no-store policy");
   equal(/^f[cd]/i.test(info.peer), true, "upstream uses private IPv6, preserving the API's existing trusted-peer policy");
   equal(info.ip, ip(a), "forged public forwarding headers cannot change client identity");
@@ -106,6 +117,22 @@ try {
   equal(request(a, "web", "/api/internal/visibility", spoof).status, 404, "direct internal route stays hidden");
   const marker = "JF_SYNTHETIC_OAUTH_MARKER";
   equal(request(a, "front", `/api/auth/github/callback?code=${marker}&state=${marker}`).status, 200, "callback reaches upstream");
+  // With authentication on, the generated hostname must never reach an authentication route: the echo upstream
+  // answers 200 to anything, so any status but 404 here would be a bypass.
+  for (const [path, method] of [["/api/me", "GET"], ["/api/auth/github/start?purpose=signin&lang=sw", "GET"], [`/api/auth/github/callback?code=${marker}&state=${marker}`, "GET"], [`/api/auth/github/callback/reauth?code=${marker}&state=${marker}`, "GET"], [`/api/auth/github/callback/replace?code=${marker}&state=${marker}`, "GET"], ["/api/auth/nostr/challenge", "POST"], ["/api/auth/nostr/verify", "POST"], ["/api/auth/recovery", "POST"], ["/api/auth/logout", "POST"]]) {
+    const denied = request(a, "front", path, [GENERATED], method);
+    equal(denied.status, 404, `generated hostname cannot reach ${method} ${path.split("?")[0]}`);
+    equal(denied.body.includes("peer"), false, `upstream never sees ${method} ${path.split("?")[0]} from the generated hostname`);
+  }
+  // nginx compares the normalized path but forwards the raw one, so a path must not look like health and be something else.
+  for (const path of ["/api/health/../me", "/api/health/%2e%2e/me", "/api/health%2F..%2Fme", "//api/me", "/api/./me", "/api/internal/../me", "/api/health/", "/api/health;x", "/api/health/..\\me"]) {
+    equal(request(a, "front", path, [GENERATED]).body.includes("peer"), false, `path variant cannot reach the API from the generated hostname: ${path}`);
+  }
+  for (const host of ["staging.bitsaccojifunze.xyz.evil.example", "evil.example", "xstaging.bitsaccojifunze.xyz"]) {
+    equal(request(a, "front", "/api/me", [`Host: ${host}`]).status, 404, `lookalike or unknown hostname refused: ${host}`);
+  }
+  equal(request(a, "front", "/api/me", ["Host: STAGING.BITSACCOJIFUNZE.XYZ"]).status, 200, "hostname comparison follows nginx's case-insensitive normalization");
+  equal(request(a, "front", "/api/health", [GENERATED]).status, 200, "health stays available on the generated hostname with authentication on");
   docker("stop", api);
   equal(request(a, "front", "/").status, 200, "learning remains available without API");
   equal([502, 504].includes(request(a, "front", `/api/auth/github/callback/reauth?code=${marker}&state=${marker}`).status), true, "callback upstream failure is visible");
@@ -118,6 +145,12 @@ try {
       "-e", "STAGING_AUTH_ENABLED=1", ...extra.flatMap(v => ["-e", v]), "-e", "NGINX_LOCAL_RESOLVERS=127.0.0.11",
       nginx, "-c", "cp /fixture/nginx.conf /etc/nginx/conf.d/default.conf && sh /docker-entrypoint.d/19-jifunze-railway.sh"], { encoding: "utf8", windowsHide: true });
     equal(result.status !== 0, true, "missing, unexpected, production or contradictory trust configuration fails closed");
+  }
+  for (const origin of [[], ["-e", "SITE_ORIGIN=http://staging.bitsaccojifunze.xyz"], ["-e", "SITE_ORIGIN=https://staging.bitsaccojifunze.xyz/"], ["-e", 'SITE_ORIGIN=https://a"; evil']]) {
+    const result = spawnSync("docker", ["run", "--rm", "--network", name, "--memory=64m", ...common,
+      "-e", "STAGING_AUTH_ENABLED=0", ...origin, "-e", "NGINX_LOCAL_RESOLVERS=127.0.0.11",
+      nginx, "-c", "cp /fixture/nginx.conf /etc/nginx/conf.d/default.conf && sh /docker-entrypoint.d/19-jifunze-railway.sh"], { encoding: "utf8", windowsHide: true });
+    equal(result.status !== 0, true, "a canonical hostname cannot be derived, so Railway mode refuses to start even with authentication disabled");
   }
   console.log(`check-railway-proxy: ${checks} checks passed; actual Railway ingress remains unverified`);
 } catch (error) {

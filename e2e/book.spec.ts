@@ -61,7 +61,7 @@ for (const failure of ["http", "wrong-type", "truncated", "wrong-hash", "interru
   }));
   await page.goto(route);
   await page.getByRole("button", { name: "Read PDF", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("could not be loaded or verified");
+  await expect(page.locator("[data-pdf-reader]").getByRole("alert")).toContainText("could not be loaded or verified");
   await expect(page.locator("iframe")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Download complete PDF" })).toHaveAttribute("href", pdf);
@@ -85,5 +85,5 @@ test("loading can be cancelled and Kiswahili navigation uses the same reader", a
   await page.getByRole("button", { name: "Ghairi" }).click();
   await expect(read).toBeVisible();
   await expect(page.locator("iframe")).toHaveCount(0);
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator("[data-pdf-reader]").getByRole("alert")).toHaveCount(0);
 });

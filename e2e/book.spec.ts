@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import meta from "../public/books/mastering-bitcoin-en-3rd-edition.source.json";
+import meta from "../public/books/mastering-bitcoin-en-3rd-edition.source.json" with { type: "json" };
 
 const route = "/en/library/mastering-bitcoin-en/";
 const pdf = `/books/${meta.filename}`;

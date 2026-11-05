@@ -226,7 +226,7 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
     } else if (lib.success) {
       for (const item of lib.data) {
         // A tightly constrained local static PDF is also a valid library resource.
-        // Lesson reference URLs retain the existing HTTPS-only validation.
+        // Lesson reference URL validation is unchanged.
         const localPdf = item.format === "pdf" && /^\/books\/[a-z0-9-]+\.pdf$/.test(item.url ?? "");
         let problem = item.url && !localPdf ? checkUrl(item.url) : null;
         if (localPdf) {

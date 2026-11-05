@@ -10,7 +10,7 @@ import { pubkeyOf, TESTERS } from "./testers";
 test.beforeAll(async () => {
   const sql = connect(process.env.TEST_DATABASE_URL!);
   const uids = Object.values(TESTERS).flatMap((t) => [String(t.github.id), pubkeyOf(t.nostrKey)]);
-  await sql`delete from accounts where id in (select account_id from identities where provider_uid = any(${sql.array(uids)}))`;
+  await sql`delete from accounts where id in (select account_id from identities where provider_uid in ${sql(uids)})`;
   await sql.end({ timeout: 5 });
 });
 

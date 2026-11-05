@@ -71,7 +71,7 @@ The API suite includes the existing sign-in, PKCE/state, re-authentication ident
 ## 6. Limitations and release gates
 
 - A real NIP-07 signer login and real signer identity creation/backup were **not executed**. No signer is claimed to have passed live Jifunze interoperability. Automated NIP-07 coverage is simulated, with real signatures.
-- New Kiswahili text is **pending maintainer review** in `content/terminology-review.json`; existing approvals are retained.
+- **Maintainer approval recorded on 2026-11-05:** all 28 new English/Kiswahili pairs, including the final `nostrCodesHelp` sentence, are approved in `content/terminology-review.json`. This supersedes the original pending-review status; existing Increment 2a approvals and wording are unchanged.
 - Branch CI, production HTTPS/front-proxy checks and the approved administrative-removal legal review remain release gates. Main's successful post-merge CI is separate evidence. No general release is claimed.
 - Host Node is 24.19.0, below the repository's declared minimum 24.20.0; the executed local site/test results are reported honestly. The production API image was built and its cryptography and route imports were additionally checked on pinned Node **24.22.2**. Branch CI still needs to verify the full suite on the supported toolchain. No host toolchain upgrade was made.
 - Recovery codes are usable for Nostr accounts, but replacing a lost Nostr identity and cross-provider recovery/linking remain deferred. The UI states this limitation.

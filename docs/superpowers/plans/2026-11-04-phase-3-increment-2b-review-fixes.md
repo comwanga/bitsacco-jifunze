@@ -26,7 +26,7 @@ The Nostr recovery explanation now includes the exact warning:
 
 The existing explanation about privacy, fresh sign-in and deferred identity replacement is retained. The four revised entries are `nostrCheckSigner`, `nostrWelcomeLead`, `nostrPublicHelp` and `nostrCodesHelp`. The supplied Kiswahili proposals are used verbatim, with the warning integrated into `nostrCodesHelp`. English remains unchanged except for that warning. The existing account browser checks display the complete recovery explanation in both languages.
 
-All Increment 2b wording remains **pending maintainer approval**, recorded in `content/terminology-review.json`. No previously approved Increment 2a wording or approval metadata is changed.
+The project maintainer, a native Kiswahili speaker, **approved all 28 new English/Kiswahili pairs on 2026-11-05**, including the final `nostrCodesHelp` sentence: "Kubadilisha utambulisho wa Nostr uliopotea kutawezekana katika sasisho lijalo." The approval is recorded in `content/terminology-review.json` and supersedes the earlier pending status. No previously approved Increment 2a wording or approval metadata is changed.
 
 ## Final verification provenance
 

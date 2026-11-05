@@ -1,3 +1,5 @@
+import { loadTesterAllowlist, type TesterAllowlist } from "./allowlist.ts";
+
 export type Config = {
   siteOrigin: string;
   port: number;
@@ -8,6 +10,10 @@ export type Config = {
   githubApiBase: string;
   peppers: Map<number, Buffer>;
   currentPepper: number;
+  /** Null: no tester restriction. Otherwise only these identities may authenticate. */
+  testerAllowlist: TesterAllowlist | null;
+  /** Keys whose malformed values made the allowlist deny everyone. */
+  testerAllowlistInvalid: string[];
 };
 
 const REQUIRED = ["SITE_ORIGIN", "DATABASE_URL", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"] as const;
@@ -38,6 +44,8 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     throw new Error(`Configuration error (${parts.join("; ")})`);
   }
 
+  const testers = loadTesterAllowlist(env);
+
   return {
     siteOrigin: env.SITE_ORIGIN as string,
     port,
@@ -48,5 +56,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     githubApiBase: env.GITHUB_API_BASE || "https://api.github.com",
     peppers,
     currentPepper: Math.max(...peppers.keys()),
+    testerAllowlist: testers.allowlist,
+    testerAllowlistInvalid: testers.invalid,
   };
 }

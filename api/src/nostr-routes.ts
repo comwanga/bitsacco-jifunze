@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { signInWithNostr } from "./accounts.ts";
-import { createNostrChallenge, safeReturn } from "./challenges.ts";
+import { identityAllowed } from "./allowlist.ts";
+import { consumeNostrChallenge, createNostrChallenge, safeReturn } from "./challenges.ts";
 import { ApiError } from "./errors.ts";
 import { PREAUTH_COOKIE, type Route } from "./http.ts";
 import { verifyNostr } from "./nostr.ts";
@@ -35,7 +36,13 @@ export function nostrRoutes(
       try { parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(rawBody)); } catch { throw new ApiError(401, "nostr_invalid"); }
       const proof = proofBody.safeParse(parsed);
       if (!proof.success) throw new ApiError(401, "nostr_invalid");
-      const result = await signInWithNostr(sql, pubkey, { ...proof.data, preauth: cookies[PREAUTH_COOKIE] ?? "" }, session);
+      const preauth = cookies[PREAUTH_COOKIE] ?? "";
+      if (!identityAllowed(cfg.testerAllowlist, "nostr", pubkey)) {
+        // Spent like any other proof, and answered as a spent challenge is.
+        await consumeNostrChallenge(sql, proof.data.challengeId, proof.data.nonce, preauth);
+        throw new ApiError(401, "challenge_invalid");
+      }
+      const result = await signInWithNostr(sql, pubkey, { ...proof.data, preauth }, session);
       return { status: 200, json: { redirect: result.redirect }, setCookies: [result.cookie, `${PREAUTH_COOKIE}=; ${COOKIE_ATTRS}; Max-Age=0`] };
     },
   }];

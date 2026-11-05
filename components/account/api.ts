@@ -16,8 +16,8 @@ export type Me = {
 
 /**
  * Every account request goes through here: same origin, with the session cookie and the X-Jifunze header the
- * API requires. Never throws. An error body that is not the API's JSON shape (a proxy page, or no API at all)
- * counts as "network", because the account service was not reached.
+ * API requires. Never throws. An error body that is not the API's JSON shape counts as "network", because the
+ * account service was not reached, except a 5xx: a proxy answered, so the reader's own connection works.
  */
 export async function apiFetch<T = unknown>(path: string, init: { method?: "GET" | "POST"; body?: unknown; rawBody?: string; authorization?: string } = {}): Promise<ApiResult<T>> {
   const headers: Record<string, string> = { "X-Jifunze": "1" };
@@ -47,7 +47,8 @@ export async function apiFetch<T = unknown>(path: string, init: { method?: "GET"
   }
   const code = (json as { error?: { code?: unknown } } | undefined)?.error?.code;
   // An unknown code is passed on as is; errorText() shows the general message for it.
-  return { ok: false, status: res.status, code: typeof code === "string" ? (code as ErrorCode) : "network" };
+  if (typeof code === "string") return { ok: false, status: res.status, code: code as ErrorCode };
+  return { ok: false, status: res.status, code: res.status >= 500 ? "internal" : "network" };
 }
 
 /** The same rule as the API's safeReturn, so the link carries only a return path the API will accept. */

@@ -5,13 +5,19 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm install --global npm@12.0.2
 COPY package.json package-lock.json .npmrc ./
-RUN npm ci
+COPY api/.npmrc api/package.json api/package-lock.json ./api/
+RUN npm ci && npm ci --prefix api
 COPY . .
-RUN npm run build
+# These are public metadata, never credentials. Railway provides the same origin to the API at runtime.
+ARG SITE_ORIGIN
+ENV SITE_ORIGIN=$SITE_ORIGIN
+RUN NODE_OPTIONS=--max-old-space-size=768 npm run build
 
 FROM nginxinc/nginx-unprivileged:stable-alpine AS runner
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=101:101 docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx.conf /etc/nginx/jifunze-base.conf
 COPY docker/security-headers.conf /etc/nginx/snippets/security-headers.conf
+COPY --chmod=755 docker/railway-entrypoint.sh /docker-entrypoint.d/19-jifunze-railway.sh
 COPY --from=build /app/out /usr/share/nginx/html
 USER 101
 EXPOSE 8080

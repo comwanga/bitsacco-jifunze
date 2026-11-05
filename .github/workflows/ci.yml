@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, deploy/railway-staging]
 
 permissions:
   contents: read
@@ -46,6 +46,17 @@ jobs:
         run: npm run validate
       - name: Build (includes CSP, link check and performance budget)
         run: npm run build
+      - name: Build the staging web image and verify exported origin/noindex
+        env:
+          SITE_ORIGIN: https://staging.bitsaccojifunze.xyz
+        run: |
+          docker build --build-arg SITE_ORIGIN="$SITE_ORIGIN" -t jifunze/railway-web:ci .
+          docker create --name jifunze-staging-export jifunze/railway-web:ci
+          trap 'docker rm -f jifunze-staging-export >/dev/null 2>&1 || true' EXIT
+          mkdir -p .superpowers/staging-export
+          docker cp jifunze-staging-export:/usr/share/nginx/html/. .superpowers/staging-export/
+          node scripts/check-staging-export.mjs .superpowers/staging-export
+          docker run --rm --network none --memory=64m -e JIFUNZE_HOSTING=railway -e NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 -e API_HOST=api.railway.internal -e SITE_ORIGIN="$SITE_ORIGIN" jifunze/railway-web:ci nginx -t
       - name: Phase 1 and Phase 2 initial JavaScript budgets
         run: npm run check:ux-budget
       - name: Install Chromium for browser checks
@@ -109,8 +120,12 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Account browser checks (real API, fake GitHub)
         run: npm run e2e:account
+      - name: Tester allowlist browser checks (real API, fake GitHub)
+        run: npm run e2e:allowlist
       - name: Validate the compose file
         run: docker compose config -q
+      - name: Railway nginx ingress contract (synthetic, not live Railway acceptance)
+        run: node scripts/check-railway-proxy.mjs
       # Builds the API image and runs docker/nginx.conf in front of it: which client address reaches the rate
       # limiter (realip on and off, forged headers), and that no callback code or state reaches any log.
       - name: nginx proxy checks (client address, log redaction)

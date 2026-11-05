@@ -229,6 +229,7 @@ describe("replace GitHub identity", () => {
     expect(publicPaths).toEqual(
       [
         "GET /api/health",
+        "GET /api/internal/tester-gate",
         "GET /api/auth/github/start",
         "GET /api/auth/github/callback",
         "GET /api/auth/github/callback/reauth",

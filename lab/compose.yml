@@ -83,7 +83,7 @@ services:
     build: .
     image: jifunze/lab:local
     environment:
-      JIFUNZE_ORIGINS: ${JIFUNZE_ORIGINS:-https://jifunze.bitsacco.com,http://localhost:3000,http://localhost:4321}
+      JIFUNZE_ORIGINS: ${JIFUNZE_ORIGINS:-https://bitsaccojifunze.xyz,https://staging.bitsaccojifunze.xyz,http://localhost:3000,http://localhost:4321}
     ports: ["127.0.0.1:7777:7777"]
     volumes:
       - alice:/lab/nodes/alice:ro

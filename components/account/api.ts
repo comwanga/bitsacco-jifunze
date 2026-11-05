@@ -10,7 +10,7 @@ export type ApiResult<T> = { ok: true; status: number; data: T } | { ok: false; 
 export type Me = {
   scope: "full" | "recovery";
   account: { id: string; preferredLang: string; recoveryCodesIssued: boolean };
-  identities: { provider: "github"; handle: string | null; avatarUrl: string | null; linkedAt: string }[];
+  identities: { provider: "github" | "nostr"; pubkey?: string; handle: string | null; avatarUrl: string | null; linkedAt: string }[];
   notices: { type: "recovery_code_used"; at: string }[];
 };
 
@@ -19,15 +19,16 @@ export type Me = {
  * API requires. Never throws. An error body that is not the API's JSON shape (a proxy page, or no API at all)
  * counts as "network", because the account service was not reached.
  */
-export async function apiFetch<T = unknown>(path: string, init: { method?: "GET" | "POST"; body?: unknown } = {}): Promise<ApiResult<T>> {
+export async function apiFetch<T = unknown>(path: string, init: { method?: "GET" | "POST"; body?: unknown; rawBody?: string; authorization?: string } = {}): Promise<ApiResult<T>> {
   const headers: Record<string, string> = { "X-Jifunze": "1" };
-  if (init.body !== undefined) headers["Content-Type"] = "application/json";
+  if (init.body !== undefined || init.rawBody !== undefined) headers["Content-Type"] = "application/json";
+  if (init.authorization) headers.Authorization = init.authorization;
   let res: Response;
   try {
     res = await fetch(path, {
       method: init.method ?? "GET",
       headers,
-      body: init.body === undefined ? undefined : JSON.stringify(init.body),
+      body: init.rawBody ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
       credentials: "same-origin",
       cache: "no-store",
     });

@@ -223,7 +223,7 @@ describe("replace GitHub identity", () => {
     expect(await githubUids(x)).toEqual(["2002"]);
   });
 
-  it('every route in the final 2a table with auth other than "public" rejects a request without a session with 401, and every route without recoveryAllowed rejects a recovery session with 403', async () => {
+  it('every guarded route rejects anonymous requests, and full-only routes reject recovery sessions', async () => {
     const api = await serve(appRoutes);
     const publicPaths = appRoutes.filter((r) => r.auth === "public").map((r) => `${r.method} ${r.path}`).sort();
     expect(publicPaths).toEqual(
@@ -234,6 +234,8 @@ describe("replace GitHub identity", () => {
         "GET /api/auth/github/callback/reauth",
         "GET /api/auth/github/callback/replace",
         "POST /api/auth/recovery",
+        "POST /api/auth/nostr/challenge",
+        "POST /api/auth/nostr/verify",
       ].sort(),
     );
     const guarded = appRoutes.filter((r) => r.auth !== "public");

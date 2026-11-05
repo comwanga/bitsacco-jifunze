@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SignIn } from "@/components/account/SignIn";
+import { NostrOnboarding } from "@/components/account/NostrOnboarding";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 
@@ -17,8 +18,8 @@ export default async function SignInPage({ params }: Params) {
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8 pb-16">
       <h1 className="text-3xl font-extrabold tracking-tight">{c.signinHeading}</h1>
-      <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.signinLead}</p>
-      <SignIn lang={lang} />
+      <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.signinChoiceLead}</p>
+      <SignIn lang={lang} onboarding={<NostrOnboarding lang={lang} />} />
     </div>
   );
 }

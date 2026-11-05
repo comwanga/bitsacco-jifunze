@@ -48,5 +48,17 @@ export default defineConfig({
       reuseExistingServer: false,
     },
   ],
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } }],
+  projects: [
+    { name: "chromium", testIgnore: "**/nostr-bfcache.spec.ts", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } },
+    {
+      name: "chromium-bfcache",
+      testMatch: "**/nostr-bfcache.spec.ts",
+      // The default headless shell disables BFCache. Full Chromium is required for a real restore.
+      use: {
+        ...devices["Desktop Chrome"], channel: "chromium",
+        launchOptions: { ignoreDefaultArgs: ["--disable-back-forward-cache"] },
+        viewport: { width: 1280, height: 800 }, serviceWorkers: "block", trace: "off",
+      },
+    },
+  ],
 });

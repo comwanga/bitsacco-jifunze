@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, dropQueryParams, githubStart, queryParam, safeReturn } from "./api";
 import { ErrorAlert, primaryBtn, secondaryBtn } from "./parts";
+import { NostrSignIn } from "./NostrSignIn";
 
-export function SignIn({ lang }: { lang: Lang }) {
+export function SignIn({ lang, onboarding }: { lang: Lang; onboarding: ReactNode }) {
   const c = accountCopy[lang];
   // The server-rendered link already works without JavaScript; the browser adds a safe ?return= if one was given.
   const [returnTo, setReturnTo] = useState(`/${lang}/account/`);
@@ -14,6 +15,8 @@ export function SignIn({ lang }: { lang: Lang }) {
   const [ready, setReady] = useState(false);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [nostrBusy, setNostrBusy] = useState(false);
+  const authBusy = busy || nostrBusy;
   const [formError, setFormError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -25,7 +28,7 @@ export function SignIn({ lang }: { lang: Lang }) {
     /* eslint-enable react-hooks/set-state-in-effect */
     dropQueryParams(["error"]); // shown once; ?return= stays for the link
 
-    // Back after a successful code restores this page from the back/forward cache: re-enable the form.
+    // Restore the recovery form. Nostr owns its attempt state, including any still-pending request.
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) setBusy(false);
     };
@@ -35,7 +38,7 @@ export function SignIn({ lang }: { lang: Lang }) {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); // never a native submission: the CSP has form-action 'none'
-    if (busy) return;
+    if (authBusy) return;
     if (!code.trim()) {
       setFormError(c.recoveryCodeEmpty);
       inputRef.current?.focus();
@@ -61,10 +64,11 @@ export function SignIn({ lang }: { lang: Lang }) {
     <>
       {pageError && <ErrorAlert lang={lang} code={pageError} />}
       <p className="mt-8">
-        <a href={githubStart("signin", lang, returnTo)} className={primaryBtn}>
+        <a href={githubStart("signin", lang, returnTo)} className={primaryBtn} aria-disabled={authBusy || undefined} tabIndex={authBusy ? -1 : undefined} onClick={(e) => { if (authBusy) e.preventDefault(); }}>
           {c.continueGithub}
         </a>
       </p>
+      <NostrSignIn lang={lang} returnTo={returnTo} disabled={authBusy} onBusyChange={setNostrBusy} onboarding={onboarding} />
       <details className="mt-8 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5">
         <summary className="cursor-pointer font-semibold">{c.useRecoveryCode}</summary>
         <form method="post" onSubmit={submit} noValidate className="mt-4">
@@ -98,8 +102,8 @@ export function SignIn({ lang }: { lang: Lang }) {
             </p>
           )}
           <p className="mt-4">
-            <button type="submit" disabled={!ready || busy} className={secondaryBtn}>
-              {busy ? c.checking : c.recoveryCodeSubmit}
+            <button type="submit" disabled={!ready || authBusy} className={secondaryBtn}>
+              {authBusy ? c.checking : c.recoveryCodeSubmit}
             </button>
           </p>
         </form>

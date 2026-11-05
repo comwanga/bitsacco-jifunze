@@ -1,6 +1,12 @@
 import { expect, test } from "vitest";
 import { MESSAGES } from "../../api/src/errors.ts";
 import { accountCopy, errorText } from "../../lib/account-copy.ts";
+import { nostrOnboardingCopy } from "../../lib/nostr-onboarding-copy.ts";
+
+test("Nostr onboarding copy has complete nonempty bilingual parity", () => {
+  expect(Object.keys(nostrOnboardingCopy.en).sort()).toEqual(Object.keys(nostrOnboardingCopy.sw).sort());
+  for (const copy of Object.values(nostrOnboardingCopy)) expect(Object.values(copy).every((v) => v.trim())).toBe(true);
+});
 
 test("account copy has complete matching nonempty language keys", () => {
   expect(Object.keys(accountCopy.en).sort()).toEqual(Object.keys(accountCopy.sw).sort());

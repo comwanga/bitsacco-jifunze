@@ -1,4 +1,5 @@
 import { errorCode } from "./db.ts";
+import { consumeNostrChallenge } from "./challenges.ts";
 import { ApiError } from "./errors.ts";
 import type { Session, Sql } from "./http.ts";
 import { createSession, revokeOtherSessions, revokeSession } from "./sessions.ts";
@@ -68,6 +69,39 @@ export async function signInWithGithub(
 
 const IDENTITY_UNIQUE = "identities_provider_provider_uid_key";
 
+/** A proven pubkey is the sole provider identifier; never links to the previous session's account. */
+export async function signInWithNostr(sql: Sql, pubkey: string, challenge: { challengeId: string; nonce: string; preauth: string }, previous: Session | null): Promise<{ cookie: string; redirect: string }> {
+  return sql.begin(async (tx) => {
+    const ch = await consumeNostrChallenge(tx, challenge.challengeId, challenge.nonce, challenge.preauth);
+    if (!ch) throw new ApiError(401, "challenge_invalid");
+    const refresh = async (): Promise<string | undefined> => {
+      const [row] = await tx<{ account_id: string }[]>`
+        update identities set last_verified_at = now()
+        where provider = 'nostr' and provider_uid = ${pubkey} returning account_id`;
+      return row?.account_id;
+    };
+    let accountId = await refresh();
+    let created = false;
+    if (!accountId) {
+      const [acct] = await tx<{ id: string }[]>`insert into accounts (preferred_lang) values (${ch.lang}) returning id`;
+      const ins = await tx`insert into identities (account_id, provider, provider_uid)
+        values (${acct!.id}, 'nostr', ${pubkey}) on conflict (provider, provider_uid) do nothing returning 1`;
+      if (ins.length === 1) { accountId = acct!.id; created = true; }
+      else {
+        await tx`delete from accounts where id = ${acct!.id}`;
+        accountId = await refresh();
+        if (!accountId) throw new Error("identity vanished during sign-in");
+      }
+    }
+    const active = await tx`select 1 from accounts where id = ${accountId} and deleted_at is null for key share`;
+    if (active.length === 0) throw new ApiError(401, "unauthenticated");
+    const fresh = await createSession(tx, accountId, "full");
+    if (previous) await revokeSession(tx, previous.tokenHash);
+    await logEvent(tx, accountId, "signin", { provider: "nostr", created: String(created) });
+    return { cookie: fresh.cookie, redirect: created ? `/${ch.lang}/account/welcome/` : ch.returnTo };
+  });
+}
+
 /**
  * Replaces the account's GitHub identity. ONE transaction holds the identity change, the revocation of
  * every session of the account, the fresh full session and the event: all commit or none do.
@@ -97,6 +131,9 @@ export async function replaceGithubIdentity(
       const acct = await tx`
         select id from accounts where id = ${accountId} and deleted_at is null for no key update nowait`;
       if (acct.length === 0) throw new ApiError(401, "unauthenticated");
+      // Replacement requires an existing identity of the same provider. Cross-provider linking is 2d.
+      const existingGithub = await tx`select 1 from identities where account_id = ${accountId} and provider = 'github'`;
+      if (existingGithub.length === 0) throw new ApiError(403, "nostr_lifecycle_pending");
       if (binding) {
         const [live] = await tx<{ fresh: boolean }[]>`
           select (scope = 'recovery' or reauth_at > now() - interval '10 minutes') as fresh from sessions

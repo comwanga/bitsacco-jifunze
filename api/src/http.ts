@@ -19,6 +19,9 @@ export type Route = {
   handler: (ctx: Ctx) => Promise<Reply>;
 };
 export type Ctx = {
+  authorization: string | undefined;
+  rawBody: Buffer;
+  requestTarget: string;
   params: Record<string, string>;
   query: URLSearchParams;
   body: unknown;
@@ -248,6 +251,9 @@ export function createServer(routes: Route[], deps: Deps): Server {
 
       // 7. handler
       const reply = await route.handler({
+        authorization: headerValue(req.headers.authorization),
+        rawBody: raw,
+        requestTarget: req.url ?? "",
         params,
         query: url.searchParams,
         body,

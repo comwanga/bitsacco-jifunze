@@ -24,10 +24,16 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
       - name: Pin npm
         run: npm install --global npm@12.0.2
       - name: Install
         run: npm ci
+      # Root browser-test imports include API helpers and their declared dependencies.
+      - name: Install the API
+        run: npm ci --prefix api
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=low
       - name: Lint
@@ -73,6 +79,7 @@ jobs:
           --health-retries 10
     env:
       TEST_DATABASE_URL: postgres://postgres:test-only@127.0.0.1:5432/jifunze_test
+      JIFUNZE_TEST_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:

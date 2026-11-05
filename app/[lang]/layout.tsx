@@ -43,9 +43,9 @@ export default async function LangLayout({
   if (!isLang(lang)) notFound();
   return (
     <html lang={lang}>
-      <body className="min-h-screen antialiased">
+      <body className="flex min-h-screen flex-col antialiased">
         <SiteHeader lang={lang} />
-        <main id="main">{children}</main>
+        <main id="main" className="flex-1">{children}</main>
         <SiteFooter lang={lang} />
         <RegisterSW />
       </body>

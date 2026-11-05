@@ -73,9 +73,9 @@ export function SiteFooter({ lang }: { lang: Lang }) {
             ]}
           />
         </div>
-        <div data-footer-legal className="mt-6 flex flex-wrap gap-x-6 gap-y-1 border-t border-white/10 pt-5 text-sm">
+        <div data-footer-legal className="mt-6 flex flex-col gap-x-6 gap-y-1 border-t border-white/10 pt-5 text-sm md:flex-row md:justify-between">
           <p>{t(lang, "footerNoAdvice")}</p>
-          <p className="text-white/60">{t(lang, "footerLicence")}</p>
+          <p className="text-white/60 md:shrink-0 md:text-right">{t(lang, "footerLicence")}</p>
         </div>
       </div>
     </footer>

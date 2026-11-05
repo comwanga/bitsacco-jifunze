@@ -1,4 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
+import { accountCopy } from "../lib/account-copy";
+import { t } from "../lib/i18n";
 
 // Layout checks for the header and footer refinement, at the widths the brief names.
 const box = async (page: Page, selector: string) => (await page.locator(selector).first().boundingBox())!;
@@ -38,17 +40,74 @@ test.describe("header and footer layout", () => {
     expect(await page.locator("header[data-site-header]").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   });
 
-  test("the footer is compact and keeps the legal text together", async ({ page }) => {
+  test("the footer remains compact on desktop and phone", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/en/glossary/");
     expect((await box(page, "footer")).height).toBeLessThanOrEqual(300);
-    const disclaimer = await box(page, "footer [data-footer-legal] p:first-child");
-    const licence = await box(page, "footer [data-footer-legal] p:last-child");
-    expect(licence.x - (disclaimer.x + disclaimer.width)).toBeLessThanOrEqual(48);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/en/glossary/");
     expect((await box(page, "footer")).height).toBeLessThanOrEqual(560);
   });
+
+  for (const lang of ["en", "sw"] as const) for (const width of [390, 768, 1280, 1920]) {
+    test(`${lang}: shared footer follows content and aligns legal information at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 1080 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const route of ["account/", "offline/", "", "account/signin/", "savers/money-and-bitcoin/", "glossary/"]) {
+        await test.step(route || "homepage", async () => {
+          await page.goto(`/${lang}/${route}`);
+          if (route === "account/") {
+            // The static test server has no account service. Keep that separate runtime error visible.
+            await expect(page.getByRole("main").getByRole("alert")).toContainText(accountCopy[lang].error_network);
+          }
+          if (route === "account/signin/") await expect(page.locator("#nostr-help")).toBeVisible();
+          await expect(page.getByRole("contentinfo")).toHaveCount(1);
+          const layout = await page.evaluate(() => {
+            const rect = (el: Element) => {
+              const r = el.getBoundingClientRect();
+              return { x: r.x, y: r.y + scrollY, right: r.right, bottom: r.bottom + scrollY };
+            };
+            const footer = document.querySelector("footer")!;
+            const legal = footer.querySelector("[data-footer-legal]")!;
+            return {
+              header: rect(document.querySelector("header")!), main: rect(document.querySelector("main")!),
+              footer: rect(footer), legal: rect(legal),
+              disclaimer: rect(legal.firstElementChild!), licence: rect(legal.lastElementChild!),
+              height: innerHeight, documentHeight: document.documentElement.scrollHeight,
+              overflow: document.documentElement.scrollWidth - innerWidth,
+              footerPosition: getComputedStyle(footer).position,
+            };
+          });
+          expect(layout.overflow).toBeLessThanOrEqual(0);
+          expect(layout.main.y).toBeGreaterThanOrEqual(layout.header.bottom);
+          expect(layout.footer.y).toBeGreaterThanOrEqual(layout.main.bottom - 1);
+          expect(layout.footer.bottom).toBeGreaterThanOrEqual(layout.height - 1);
+          expect(Math.abs(layout.footer.bottom - layout.documentHeight)).toBeLessThanOrEqual(1);
+          expect(["fixed", "absolute"]).not.toContain(layout.footerPosition);
+          if (width >= 768 && ["account/", "offline/"].includes(route)) {
+            expect(layout.documentHeight).toBe(layout.height);
+          }
+          const legal = page.locator("[data-footer-legal]");
+          await expect(legal.locator("p:first-child")).toHaveText(t(lang, "footerNoAdvice"));
+          await expect(legal.locator("p:last-child")).toHaveText(t(lang, "footerLicence"));
+          expect(layout.disclaimer.x).toBe(layout.legal.x);
+          if (width >= 768) {
+            expect(layout.licence.right).toBeCloseTo(layout.legal.right, 0);
+            expect(layout.licence.y).toBeCloseTo(layout.disclaimer.y, 0);
+            expect(layout.licence.x - layout.disclaimer.right).toBeGreaterThanOrEqual(23);
+          } else {
+            expect(layout.licence.x).toBe(layout.legal.x);
+            expect(layout.licence.y - layout.disclaimer.bottom).toBeGreaterThanOrEqual(3);
+          }
+        });
+      }
+      const learning = page.locator(`footer a[href="/${lang}/learn/"]`);
+      await learning.focus();
+      await expect(learning).toBeFocused();
+      await learning.press("Enter");
+      await expect(page).toHaveURL(new RegExp(`/${lang}/learn/$`));
+    });
+  }
 
   test("the footer says which link is the live lab and which is browser practice", async ({ page }) => {
     await page.goto("/en/");

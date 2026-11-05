@@ -2,6 +2,8 @@
 
 Prepared 2026-11-05. This document records preparation, not live production acceptance. GitHub Draft PR publication has now been authorized by the maintainer. Railway provisioning/deployment and DNS changes still require separate authorization.
 
+The verification tables and no-publication statements below record the earlier baseline at `7a6f74d`. The authorized follow-up, updated book availability and subsequent verification are recorded in [the final review record](final-release-review.md) and the Draft PR description.
+
 ## Source and verified staging baseline
 
 - Repository: `comwanga/bitsacco-jifunze`; PR #9 merged; fetched main is `21a7c48edcf8244aa0513aef322faf11cda87541`.

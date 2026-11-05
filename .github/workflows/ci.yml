@@ -120,6 +120,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Account browser checks (real API, fake GitHub)
         run: npm run e2e:account
+      - name: Tester allowlist browser checks (real API, fake GitHub)
+        run: npm run e2e:allowlist
       - name: Validate the compose file
         run: docker compose config -q
       - name: Railway nginx ingress contract (synthetic, not live Railway acceptance)

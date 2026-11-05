@@ -14,6 +14,7 @@
     "check": "npm run lint && npm run typecheck && npm run test && npm run validate",
     "e2e": "playwright test",
     "e2e:account": "playwright test -c playwright.account.config.ts",
+    "e2e:allowlist": "playwright test -c playwright.allowlist.config.ts",
     "api:typecheck": "tsc -p api --noEmit",
     "api:test": "vitest run --config api/vitest.config.ts",
     "api:start": "node api/src/main.ts"

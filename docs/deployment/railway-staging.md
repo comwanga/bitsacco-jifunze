@@ -10,16 +10,17 @@ This is a controlled staging deployment, not general authentication release. PR 
 | Authentication | Disabled: `STAGING_AUTH_ENABLED=0`; `/api/*` except health and hidden internal paths returns 503 at nginx |
 | Web deployment | `3a02083` from `deploy/railway-staging`, CI passed |
 | API deployment | `6d418dc` (the `main` merge of PR #8); `api/` and `docker/api.Dockerfile` are identical to `3a02083` |
-| GitHub App | Staging App; the three callbacks below registered exactly, wildcards, device flow and webhook off; Railway holds its Client ID and secret. GitHub's public lookup returns 404, so it appears to be private: confirm a non-owner tester can authorize it. Its permissions were not independently verified |
+| GitHub App | Private staging App owned by the maintainer; 0 repository, organization and account permissions; the three callbacks below registered exactly, wildcards, device flow and webhook off; Railway holds its Client ID and secret. While it is private, plan on only its owner being able to authorize it: other GitHub testers need it made public, which needs approval |
+| Railway source | `web` and `api` have `source.branch=deploy/railway-staging`; no triggers; auto-deploy off |
 | Tester allowlist, canonical-host gate, HSTS | Implemented on this branch, **not yet deployed** |
 
-### Deployment source: staging can deploy `main`
+### Deployment source
 
-The `web` and `api` services have a repository source but **no branch trigger**, so nothing deploys automatically on a push. However, saving the GitHub credentials in the dashboard created an API deployment from `main` HEAD (`6d418dc`), not from this branch. The `branch` value in deployment metadata is not reliable evidence (`4af4266`, which is not on `main`, is also labelled `main`): check the commit.
+Before 2026-11-05 the `web` and `api` services had a repository source and no branch. Saving the GitHub credentials in the dashboard then created an API deployment from `main` HEAD (`6d418dc`), not from this branch. It was harmless because the API code was identical. The `branch` value in deployment metadata is not reliable evidence (`4af4266`, which is not on `main`, is also labelled `main`): check the commit.
 
-It was harmless that time because the API code was identical. It would not be again: `main` has no allowlist, canonical-host gate or Railway nginx mode. **Never apply a staged variable change or use a dashboard deploy on these services.** Use the procedure below, and confirm the deployed commit before relying on any gate.
+Both services now have `source.branch=deploy/railway-staging`, set with `environmentPatchCommit` and `skipDeploys: true`. That created no deployment; the commits and image digests were unchanged. Auto-deploy is off (`serviceInstanceAutoDeployStatus`: `enabled=false`, `reason=NO_INSTALLATION`, because Railway's GitHub App has no installation for this repository) and there are no triggers, so a push deploys nothing.
 
-`deploymentTriggerCreate` can pin both services to this branch, but Railway does not document whether creating a trigger starts a deployment, and a pin makes every later push to this branch deploy. It therefore needs its own authorization and has not been applied.
+Whether a dashboard variable save now builds from the pinned branch has not been observed, because proving it takes a deployment. Until the next authorized deployment shows it, **do not apply a staged variable change or use a dashboard deploy on these services**: use the procedure below and confirm the deployed commit. The tester gate limits the damage if this is ever missed: an API without the allowlist cannot serve authentication.
 
 ### Controlled activation (each step needs authorization)
 

@@ -17,6 +17,8 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } },
-    { name: "mobile", use: { ...devices["Pixel 5"] } },
+    // The table suite sets its own narrow and desktop viewports in both engines.
+    { name: "mobile", testIgnore: "lesson-tables.spec.ts", use: { ...devices["Pixel 5"] } },
+    { name: "webkit", testMatch: "lesson-tables.spec.ts", use: { ...devices["Desktop Safari"] } },
   ],
 });

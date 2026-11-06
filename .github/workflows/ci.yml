@@ -63,8 +63,8 @@ jobs:
         run: |
           node scripts/check-public-export.mjs
           node scripts/check-public-runtime.mjs
-      - name: Install Chromium for browser checks
-        run: npx playwright install --with-deps chromium
+      - name: Install Chromium and WebKit for browser checks
+        run: npx playwright install --with-deps chromium webkit
       - name: Browser checks (smoke, phone layout, offline, accessibility)
         run: npm run e2e
       - name: Keep browser traces on failure

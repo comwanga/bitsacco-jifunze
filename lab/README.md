@@ -11,7 +11,7 @@ A regtest Lightning network on your laptop for the **Lightning kwa Wajenzi** pat
 | Dina | LND | Receives, force-closes |
 | Erin | Eclair (full profile only) | Chapter 4: comparing implementations |
 
-The four-node topology follows *Mastering the Lightning Network*. The book runs Chan on Eclair. Eclair's native signing library crashes under some Docker setups, so here Chan runs c-lightning and Eclair is a fifth node, Erin.
+The four-node topology follows *Mastering the Lightning Network*. The book runs Chan on Eclair. Native secp256k1 signing crashes were observed with Eclair 0.12–0.13 under Docker Desktop on Windows, so here Chan runs c-lightning and Eclair is a fifth node, Erin.
 
 ## Requirements
 
@@ -21,6 +21,8 @@ The four-node topology follows *Mastering the Lightning Network*. The book runs 
 - Port 7777 free.
 
 ## Commands
+
+From the repository root, run `cd lab` first.
 
 ```bash
 ./lab doctor              # check this computer
@@ -37,11 +39,13 @@ The four-node topology follows *Mastering the Lightning Network*. The book runs 
 
 The `lab` container runs a small HTTP service, the **bridge**, published only on `127.0.0.1:7777`.
 
-- The bridge answers only allowlisted origins: `JIFUNZE_ORIGINS`, by default the Jifunze site and `localhost` dev servers. Any other website gets 403.
-- Every request except `/hello` needs the **pairing code** from `./lab pair`. Ten wrong codes in a minute lock it for a minute.
+- The bridge answers only exact allowlisted origins: `JIFUNZE_ORIGINS` defaults to `https://bitsaccojifunze.xyz`, `https://staging.bitsaccojifunze.xyz`, `http://localhost:3000` and `http://localhost:4321`. Any other website gets 403. Codespaces passes the same list to the lab container; do not replace it with a wildcard.
+- Operational requests except `GET /hello` need the **pairing code** from `./lab pair`. Browser preflight requests are origin-checked without a token. Ten wrong codes in a minute lock it for a minute.
 - Your code runs inside the `lab` container as an unprivileged user (uid 1000), with a 30-second limit and 64 KB of output. The bridge has no Docker socket and no access to your files.
 
-The first time a lesson page calls the lab, Chrome and Edge may ask to "allow access to devices on your local network". Allow it for the Jifunze site.
+Opening a lesson does not probe localhost. Choose the lab check/connect action deliberately, then enter the pairing code. Chrome and Edge may request local-network permission at that point; declining does not prevent reading the lesson.
+
+Learner code can reach the internet from the lab container; this is not an egress-isolated sandbox. Run only code you trust, keep the pairing code private, and do not mount personal files or wallet secrets. The origin allowlist and pairing protect bridge access; they do not make arbitrary learner code safe.
 
 ## In the editor
 
@@ -50,7 +54,9 @@ The first time a lesson page calls the lab, Chrome and Edge may ask to "allow ac
 
 ## GitHub Codespaces
 
-No suitable laptop? Open the repository in a Codespace (4 cores, 8 GB). The dev container starts the lab and prints the pairing code. Make port 7777 **public** in the Ports tab, if the start-up script couldn't do it, and paste the forwarded `https://…-7777.app.github.dev` URL into the lab bar's "Using Codespaces?" field. The pairing code still protects it.
+The local WSL2/Docker lab is implemented and demonstrated. Codespaces is a separate setup path: the [devcontainer](../.devcontainer/devcontainer.json) is configured for 4 cores/8 GB, Docker-in-Docker, lab startup, forwarding port 7777 and printing the pairing code. The previous Codespaces attempt failed during Docker-in-Docker installation. A successful rebuild, automatic startup and end-to-end Jifunze connection have **not** been verified there.
+
+After a successful devcontainer setup, inspect its startup output; if needed, run `cd lab`, `./lab doctor`, `./lab up` and `./lab pair`. The lesson page needs a **public** forwarded port 7777; private forwarding requires GitHub cookies that its cross-site requests cannot use. Make only that bridge port public in the Ports tab if the configured command fails, then enter its `https://…-7777.app.github.dev` URL in the lab bar's "Using Codespaces?" field and pair. Exact-origin checks and the pairing code still apply. Do not expose node RPC ports or use real funds.
 
 ## Troubleshooting
 
@@ -71,5 +77,5 @@ JIFUNZE_LAB_TOKEN="$(./lab pair --raw)" python3 tests/smoke_solutions.py [--lite
 ## Credits
 
 - Topology and exercises follow *Mastering the Lightning Network* by Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt (CC BY-SA 4.0).
-- Node images: [Polar](https://github.com/jamaljsr/polar)'s regtest images (MIT).
+- Node images: [Polar](https://github.com/jamaljsr/polar)'s regtest image definitions (MIT); bundled node software retains its respective upstream license.
 - The bridge, CLI wrappers, `jifunze_lab` helpers and checks are Jifunze code (MIT).

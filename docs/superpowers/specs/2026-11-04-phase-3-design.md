@@ -1,5 +1,7 @@
 # Phase 3: GitHub, Nostr and the builder ecosystem: design (revision 3.2)
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 **Status.** Revision 2's architecture is **approved in principle** (maintainer review, 2026-11-04). This revision 3:
 - applies that review's corrections: the recovery-flow conditions (F5), the visibility semantics and HTML indexing (E2), and documentation consistency;
 - pins the NIP-46 client dependency (F3).

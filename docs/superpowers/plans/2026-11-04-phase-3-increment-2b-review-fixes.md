@@ -1,5 +1,7 @@
 # Increment 2b: independent-review corrections
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 Reviewed baseline: `b873417aa1291d9d81b6faff9284fe25a57cc56a`. Work stays on `feat/phase-3-2b-nostr`; no push, PR or merge is authorized.
 
 ## P2: real browser-cache restoration

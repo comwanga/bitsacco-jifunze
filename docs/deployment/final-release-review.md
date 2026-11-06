@@ -1,5 +1,7 @@
 # Public education release: final review record
 
+> **Historical online-only candidate review, 2026-11-05.** This predates the generated English PDF and merged production release. For the current resource see [PDF provenance](mastering-bitcoin-generated.md); for deployment and live acceptance see [production operations](production.md). Counts and pending gates below apply to the recorded earlier commits.
+
 This is preparation and Draft PR publication, not production deployment or live public-domain acceptance. Production remains `https://bitsaccojifunze.xyz`; staging remains `https://staging.bitsaccojifunze.xyz`. No www domain, Railway resource, billing change, DNS change or live authentication activation is included.
 
 ## Source and book decision

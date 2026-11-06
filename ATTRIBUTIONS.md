@@ -1,6 +1,6 @@
 # Attributions
 
-All lessons in `content/` are original Bitsacco Jifunze lessons, released under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Any lesson adapted from another work names its source and licence in its `source` front matter and is listed here.
+The curriculum in `content/` is released under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The Savers and Bitcoin Builders lessons are original Jifunze material; the Lightning lessons are adaptations credited below. Adapted lessons also name their source and licence in their `source` front matter.
 
 ## Mastering the Lightning Network
 
@@ -8,12 +8,18 @@ The 17 lessons in `content/lightning/` are adapted, simplified and translated in
 
 ## Lab software
 
-The lab in `lab/` runs [Polar](https://github.com/jamaljsr/polar)'s regtest node images (MIT) for Bitcoin Core, LND, Core Lightning and Eclair. The bridge, CLI wrappers, helpers and checks are Jifunze code (MIT).
+The lab in `lab/` runs regtest node images from [Polar](https://github.com/jamaljsr/polar). Polar's image definitions are MIT-licensed; bundled Bitcoin Core, LND, Core Lightning and Eclair software retains its respective upstream license. The bridge, CLI wrappers, helpers and checks are Jifunze code (MIT).
 
 ## Kujifunza Bitcoin and the whitepaper
 
-- **Kujifunza Bitcoin: Kuprogramu Blockchain Huria** is the Kiswahili edition of *Mastering Bitcoin* (3rd edition) by Andreas M. Antonopoulos and David A. Harding, translated by comwanga, licensed CC BY-SA 4.0. Lessons link to its chapters rather than copying them.
+- **Kujifunza Bitcoin: Kuprogramu Blockchain Huria** is the Kiswahili edition of *Mastering Bitcoin* (3rd edition) by Andreas M. Antonopoulos and David A. Harding, translated by comwanga, licensed CC BY-SA 4.0. Official publication awaits [Bitsacco PR #107](https://github.com/bitsacco/bitsacco/pull/107). Library and lesson references retain the credits and explain pending availability; no Kiswahili book download is advertised.
 - **Bitcoin: A Peer-to-Peer Electronic Cash System** by Satoshi Nakamoto, in English and Kiswahili, is linked from bitsacco.com.
+
+## Mastering Bitcoin — generated English PDF
+
+[*Mastering Bitcoin: Programming the Open Blockchain*, third edition](https://github.com/bitcoinbook/bitcoinbook), by Andreas M. Antonopoulos and David A. Harding, is locally hosted as a PDF generated from official open-source revision `275c4eb8eab8800c6adc39f8def8e8f8fa356a57`, under CC BY-SA 4.0. It is not the publisher's official PDF. Typesetting, open fonts, linked index, bookmarks and provenance notices were added; book content was not rewritten.
+
+The [provenance and reproduction record](docs/deployment/mastering-bitcoin-generated.md) documents the later license grant, asset credits and completeness checks. The [source manifest](public/books/mastering-bitcoin-en-3rd-edition.source.json) records the exact artifact checksum. Separate MIT whitepaper, CC0 errata, CC BY 4.0 Bitcoin Design Guide images, [font](scripts/books/font-notices.txt) and [MathJax](scripts/books/mathjax-LICENSE.txt) notices are retained in the PDF.
 
 ## Bitsacco
 

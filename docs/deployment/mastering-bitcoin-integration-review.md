@@ -1,5 +1,7 @@
 # English Mastering Bitcoin integration: local review
 
+> **Historical local integration review, 2026-11-05.** The PDF and reader were subsequently published, merged and deployed in release `39fa78a34deece8f3ed6eedd162725557de9829e`. Local-only/unpushed and Draft PR statements below describe that earlier checkpoint. See [production acceptance](production.md) and [current provenance](mastering-bitcoin-generated.md).
+
 This follow-up is local preparation, not publication or deployment. Branch: `release/public-education`. Production remains `https://bitsaccojifunze.xyz`; staging remains `https://staging.bitsaccojifunze.xyz`; no www domain. Main remains `21a7c48edcf8244aa0513aef322faf11cda87541`. The starting release HEAD was `57d215d7a88c367205cf68e34b338d847f787302`.
 
 ## A. Source verification

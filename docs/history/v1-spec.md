@@ -1,5 +1,7 @@
 # Bitsacco Jifunze — v1 Spec
 
+> **Historical design, 2026-11-03.** This two-roadmap proposal predates the implemented Lightning path, learning trees, simulations and generated English PDF. Its proposed hostname, review status and performance targets are not current deployment instructions. See the [current documentation](../README.md) and [production runbook](../deployment/production.md).
+
 Nov 3, 2026 · @colmwanga
 
 Bitsacco Jifunze is a free, Kiswahili-first Bitcoin learning platform in its own repo, `comwanga/bitsacco-jifunze`, launching with two roadmaps: one for savers and one for builders. Version 1 is a static site with no accounts or backend; bitsacco.com only links to it.

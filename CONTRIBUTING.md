@@ -66,7 +66,7 @@ Add the slug to `content/roadmaps/<roadmap>.json`. If only one language is ready
 
 1. Every lesson exists in both `sw` and `en`, or is marked `translationPending`.
 2. Front matter matches the schema, and every roadmap entry and prerequisite points to a real lesson.
-3. Every quiz answer is one of its options, and every resource link is well formed (https).
+3. Every quiz answer is one of its options, and resource URLs are HTTPS or valid internal site paths. The build also checks exported internal links.
 4. Adapted lessons name their source and licence.
 5. Glossary terms are used consistently. This is a warning, not a failure.
 
@@ -78,6 +78,8 @@ Each lesson needs two sign-offs before `lastReviewed` is set:
 
 - a **Kiswahili reviewer** for wording and clarity, and
 - a **technical reviewer** for accuracy.
+
+The maintainer has approved the existing Kiswahili wording. Independent human technical-content sign-off remains outstanding before a public-launch announcement. Missing `lastReviewed` dates must not be treated as evidence that the completed language review is still pending; do not set review dates without both required sign-offs. New or changed material still needs the applicable reviews.
 
 Lessons explain how things work. They must never give financial or investment advice, promise returns, or tell readers what to buy.
 

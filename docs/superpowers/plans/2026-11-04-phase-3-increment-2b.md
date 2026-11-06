@@ -1,5 +1,7 @@
 # Increment 2b: NIP-07 execution and evidence
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 ## Baseline and review
 
 - PR #7 merged 2026-11-04 at `f69326f8c9026a6c59cfb4f18ffe4c7ebd08d6f4`.

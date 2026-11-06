@@ -1,8 +1,30 @@
-# Railway staging: preparation and acceptance
+# Railway staging safeguards
+
+Last verified during production acceptance on **2026-11-06**. Staging remains separate from the [anonymous production service](production.md).
+
+| Item | Verified state |
+| --- | --- |
+| Project / environment | `bitsacco-jifunze` / `staging` (`1b138f86-2127-4c52-9142-868ecdf75460`) |
+| Public origin | `https://staging.bitsaccojifunze.xyz`; noindex/nofollow, robots disallow all |
+| Services | Public NGINX web; private Node API; private PostgreSQL |
+| Web/API source | `deploy/railway-staging`, `af5559514cb475cef4d7cb6df7624db72713aeb0` |
+| Web deployment | `4549aec0-324e-4032-9c57-306ceef68c79` |
+| API deployment | `7ad5f149-4785-4461-8365-13a64fadecd7` |
+| PostgreSQL deployment | `f8ac6eaf-5174-4157-9064-8304c295fe4e` |
+| Status / deployment triggers | All three SUCCESS; web/API automatic deployment disabled, no triggers |
+| Authentication | `STAGING_AUTH_ENABLED=0`; tester allowlist closed; no provider acceptance claimed |
+
+Before any authorized staging change, capture environment/service IDs, source SHA, deployment IDs, domains, trigger settings, configuration ETag and redacted variable comparisons. Production acceptance preserved ETag `8f3a697a57105d8e9b93c5ce9fe823e46a2d68e4d9ae01879c3e70e55c2a4c77`. Do not log secrets. Deploy only the exact reviewed SHA, verify its actual deployment metadata, and compare the baseline afterward. Never infer the source commit from a branch label or variable save.
+
+Keep API/database private, authentication disabled and tester variables unchanged unless separately authorized. Do not duplicate this environment into production. The explicit isolated-staging proxy trust decision below accepts a trusted private co-tenant boundary; it does **not** approve future authenticated production. Live GitHub consent, real Nostr signer acceptance, durable off-service database backups and account-release log/privacy acceptance remain separate gates. The static production site has no account database to back up.
+
+## Historical preparation and ingress evidence (2026-11-05)
+
+The remainder preserves earlier snapshots, proposed activation steps, security findings and verification limitations. Statements such as “not deployed”, CLI unauthenticated, missing HSTS, automatic localhost probing and pending branch CI describe their original checkpoint, not the current state above. The tester/canonical-host gates were subsequently deployed at `af555951`; production later made lab discovery user-initiated. Railway repository access was restored before production deployment; the earlier `NO_INSTALLATION` reason is historical. No authentication activation is authorized by these archived instructions.
 
 This is a controlled staging deployment, not general authentication release. Railway staging builds from `deploy/railway-staging`; keep that branch. Do not enable authentication without authorization.
 
-## Current state (verified 2026-11-05)
+## Earlier staging snapshot (2026-11-05)
 
 | Item | State |
 |---|---|

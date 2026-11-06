@@ -1,5 +1,7 @@
 # Phase 1: learning experience (approved design)
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 Nov 3, 2026 · approved by the maintainer ("approved, use comwanga/bitsacco-jifunze and start phase 1")
 
 Source: the platform audit of Nov 3, 2026 (sections A–G). This file keeps the Phase 1 decisions that the plan argues from.

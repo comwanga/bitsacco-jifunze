@@ -1,5 +1,7 @@
 # Phase 3 investigations (2026-11-04)
 
+> **Historical investigation evidence.** These scripts do not ship in the application. They preserve authentication/privacy findings and unverified boundaries, not production instructions. See [current documentation](../../../README.md).
+
 These are throwaway investigations run before any Phase 3 application code. None of this code ships. It is kept here so the findings in the [Phase 3 design](../../specs/2026-11-04-phase-3-design.md) can be checked and rerun.
 
 ## 1. Nostr login verification (`nostr/`): 26/26 passed

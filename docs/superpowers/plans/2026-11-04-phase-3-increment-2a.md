@@ -1,5 +1,7 @@
 # Phase 3 Increment 2a: API foundation, GitHub sign-in, sessions and recovery
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A learner can sign in with GitHub, receive ten recovery codes, sign out, and recover the account with a code, including replacing a lost GitHub identity. All of it in Kiswahili and English, with no change to anonymous learning pages.

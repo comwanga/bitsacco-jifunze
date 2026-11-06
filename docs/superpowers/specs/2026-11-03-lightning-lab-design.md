@@ -1,5 +1,7 @@
 # Lightning kwa Wajenzi: Mastering the Lightning Network track with a live lab
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 Nov 3, 2026 · design for review
 
 ## Intent

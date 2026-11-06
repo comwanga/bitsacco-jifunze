@@ -1,5 +1,7 @@
 # Initial anonymous public release
 
+> **Historical release preparation, 2026-11-05.** The release is now merged and deployed at `39fa78a34deece8f3ed6eedd162725557de9829e`. Its proposed release-branch source, additional $10 allowance and pending deployment/DNS statements below were superseded. Use the [production runbook](production.md); retain this record for isolation decisions and earlier verification evidence.
+
 Prepared 2026-11-05. This document records preparation, not live production acceptance. GitHub Draft PR publication has now been authorized by the maintainer. Railway provisioning/deployment and DNS changes still require separate authorization.
 
 The verification tables and no-publication statements below record the earlier baseline at `7a6f74d`. The authorized follow-up, updated book availability and subsequent verification are recorded in [the final review record](final-release-review.md) and the Draft PR description.

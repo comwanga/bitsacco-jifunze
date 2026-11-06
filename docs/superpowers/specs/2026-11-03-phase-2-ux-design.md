@@ -1,5 +1,7 @@
 # UX Phase 2: learning trees and practice simulations
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 2026-11-03 · implementation scope approved by the maintainer · base `1a1ad0d291e949c1a70748022e9ac36149977a15`
 
 This is the next **UX** phase. The older v1 spec uses “Phase 2” for accounts, synced progress, certificates and chama cohorts; those are a separate product scope. The maintainer asked to proceed with designing the learning tree and simulations after Phase 1.
@@ -122,7 +124,7 @@ Preserve the Phase 1 caps for existing pages, including shared-dictionary effect
 
 ## Delivery and review
 
-Implement in the order in the [task plan](../plans/2026-11-03-phase-2-ux.md): data contracts, tree, shared simulation shell, UTXO, channel balances, lesson discovery, final verification. Use signed commits without co-author trailers. Phase 1 PR #2 was verified merged at `1a1ad0d291e949c1a70748022e9ac36149977a15`; implementation starts from updated main on `feat/phase-2-ux`. Keep work local until publication is explicitly authorized.
+The completed implementation is recorded in the [implementation report](../reports/2026-11-03-phase-2-ux-implementation.md). The original delivery order was: data contracts, tree, shared simulation shell, UTXO, channel balances, lesson discovery, final verification. Use signed commits without co-author trailers. Phase 1 PR #2 was verified merged at `1a1ad0d291e949c1a70748022e9ac36149977a15`; implementation starts from updated main on `feat/phase-2-ux`. Keep work local until publication is explicitly authorized.
 
 Success means a learner can find any lesson from a readable tree, demonstrate where change comes from, and explain why a two-party channel has a direction-dependent payment limit. Real-world protocol edge cases remain in the linked lessons and live lab.
 

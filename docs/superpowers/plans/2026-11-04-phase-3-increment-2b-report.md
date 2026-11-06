@@ -1,5 +1,7 @@
 # Increment 2b implementation report
 
+> **Historical phase record.** Decisions, proposals, hostnames, pending gates and results below describe this dated phase, not current operating instructions. See [current guides](../../README.md).
+
 ## 1. Repository state
 
 - Branch: `feat/phase-3-2b-nostr`.

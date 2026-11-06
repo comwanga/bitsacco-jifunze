@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { flatLessons, getLesson, listRoadmaps } from "../lib/content/load";
 
 for (const lang of ["en", "sw"] as const) test(`${lang}: library offers the official English third edition and clearly marks the pending translation`, async ({ page }) => {
   const pdfRequests: string[] = [];
@@ -24,4 +25,33 @@ for (const lang of ["en", "sw"] as const) test(`${lang}: library offers the offi
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(axe.violations.filter(v => ["serious", "critical"].includes(v.impact!))).toEqual([]);
+});
+
+for (const lang of ["en", "sw"] as const) test(`${lang}: every lesson companion reference opens the pending publication notice instead of a missing PDF`, async ({ page }) => {
+  test.setTimeout(90_000); // Each case follows all 15 references, rather than a representative lesson.
+  const references = listRoadmaps().flatMap(roadmap => flatLessons(roadmap).flatMap(slug =>
+    getLesson(roadmap.id, slug, lang).frontmatter.resources
+      .filter(resource => resource.title.startsWith("Kujifunza Bitcoin"))
+      .map(resource => ({ path: `/${lang}/${roadmap.id}/${slug}/`, title: resource.title })),
+  ));
+  expect(references).toHaveLength(15);
+  const pdfRequests: string[] = [];
+  const errors: string[] = [];
+  page.on("request", request => { if (new URL(request.url()).pathname.endsWith(".pdf")) pdfRequests.push(request.url()); });
+  page.on("pageerror", error => errors.push(error.message));
+  for (const reference of references) {
+    await page.goto(reference.path);
+    const link = page.locator('section[aria-labelledby="res"]').getByRole("link", { name: reference.title, exact: true });
+    await expect(link).toHaveAttribute("href", "/sw/library/#kujifunza-bitcoin");
+    await expect(link.locator("xpath=ancestor::li")).toContainText(lang === "en" ? "not a PDF download" : "si upakuaji wa PDF");
+    await link.click();
+    await expect(page).toHaveURL(/\/sw\/library\/#kujifunza-bitcoin$/);
+    const notice = page.locator("#kujifunza-bitcoin");
+    await expect(notice).toContainText("inasubiri kuchapishwa rasmi");
+    await expect(notice).toContainText("Andreas M. Antonopoulos & David A. Harding");
+    await expect(notice).toContainText("comwanga");
+    await expect(notice.getByRole("link")).toHaveCount(0);
+  }
+  expect(pdfRequests).toEqual([]);
+  expect(errors).toEqual([]);
 });

@@ -9,7 +9,7 @@
   "forwardPorts": [7777],
   "portsAttributes": { "7777": { "label": "Jifunze lab bridge", "onAutoForward": "notify" } },
   "containerEnv": {
-    "JIFUNZE_ORIGINS": "https://jifunze.bitsacco.com,http://localhost:3000"
+    "JIFUNZE_ORIGINS": "https://bitsaccojifunze.xyz,https://staging.bitsaccojifunze.xyz,http://localhost:3000,http://localhost:4321"
   },
   "postStartCommand": "cd lab && ./lab up && (gh codespace ports visibility 7777:public -c \"$CODESPACE_NAME\" || echo 'Make port 7777 public in the Ports tab') && ./lab pair"
 }

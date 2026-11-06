@@ -2,7 +2,7 @@
 
 Nov 3, 2026 · @colmwanga
 
-Bitsacco Jifunze is a free, Kiswahili-first Bitcoin learning platform in its own repo, `bitsacco/jifunze`, launching with two roadmaps: one for savers and one for builders. Version 1 is a static site with no accounts or backend; bitsacco.com only links to it.
+Bitsacco Jifunze is a free, Kiswahili-first Bitcoin learning platform in its own repo, `comwanga/bitsacco-jifunze`, launching with two roadmaps: one for savers and one for builders. Version 1 is a static site with no accounts or backend; bitsacco.com only links to it.
 
 ## Goals
 
@@ -150,10 +150,10 @@ A static site with no accounts has very little to attack or leak, and that is a 
 
 ## Repo, CI and deployment
 
-The repo is `bitsacco/jifunze`, using the same stack as bitsacco.com (Next.js 16, React 19, TypeScript, Tailwind 4) but built as a static export.
+The repo is `comwanga/bitsacco-jifunze`, using the same stack as bitsacco.com (Next.js 16, React 19, TypeScript, Tailwind 4) but built as a static export.
 
 ```
-jifunze/
+bitsacco-jifunze/
   app/[lang]/                 # sw and en routes
     page.tsx                  # home: pick a roadmap
     [roadmap]/page.tsx        # roadmap page
@@ -184,7 +184,7 @@ No dates are set; each phase is planned when its gate is reached. Version 1 laun
 These need an answer before building starts; none blocks writing lessons.
 
 - [ ] **Live URL.** For example `jifunze.bitsacco.com`. Needed for metadata, the sitemap and the bitsacco.com link.
-- [ ] **Repo creation.** Someone with admin rights on the bitsacco GitHub org creates `bitsacco/jifunze` (or approves it).
+- [x] **Repository.** `comwanga/bitsacco-jifunze` is the public project repository.
 - [ ] **Code licence.** Confirm MIT for Jifunze code; the main bitsacco repo has no licence today.
 - [ ] **Hosting.** Where the static site runs (the same infrastructure as bitsacco.com, or a static host).
 - [ ] **Lesson lists.** Approve or edit the 8 + 8 lessons above.

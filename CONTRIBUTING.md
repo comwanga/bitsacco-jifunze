@@ -5,9 +5,10 @@ Karibu! Translations, fixes and new lessons all arrive as ordinary pull requests
 ## Quick start
 
 ```bash
-gh repo fork bitsacco/jifunze --clone
-cd jifunze
+gh repo fork comwanga/bitsacco-jifunze --clone
+cd bitsacco-jifunze
 npm ci
+npm ci --prefix api # dependencies for repository checks; does not start an API server
 git switch -c content/my-change
 # edit files in content/
 npm run validate

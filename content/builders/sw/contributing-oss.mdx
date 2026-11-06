@@ -26,7 +26,7 @@ terms:
   - pull-request
 ---
 
-Miradi ya <Term id="open-source" /> hukua kwa badiliko moja dogo na la uangalifu kwa wakati. Msimbo wa Bitsacco uko github.com/bitsacco: tovuti na programu ndogo kwa TypeScript (`bitsacco/bitsacco`), seva ya anwani za Lightning kwa Rust (`bitsacco/lnaddrd`), na jukwaa hili la kujifunzia. Kila badiliko huwafikia watumiaji tu kupitia <Term id="pull-request" /> iliyokaguliwa na CI iliyopita.
+Miradi ya <Term id="open-source" /> hukua kwa badiliko moja dogo na la uangalifu kwa wakati. Msimbo wa Bitsacco uko github.com/bitsacco: tovuti na programu ndogo kwa TypeScript (`bitsacco/bitsacco`), seva ya anwani za Lightning kwa Rust (`bitsacco/lnaddrd`); jukwaa hili la kujifunzia liko `comwanga/bitsacco-jifunze`. Kila badiliko huwafikia watumiaji tu kupitia <Term id="pull-request" /> iliyokaguliwa na CI iliyopita.
 
 ## Hatua ya 1: Tafuta kitu kinachofaa kufanywa
 
@@ -41,10 +41,11 @@ Kwa Jifunze, michango mizuri ya kwanza ni kusahihisha herufi, kuboresha sentensi
 ## Hatua ya 2: Fanya badiliko
 
 ```bash
-gh repo fork bitsacco/jifunze --clone
-cd jifunze
+gh repo fork comwanga/bitsacco-jifunze --clone
+cd bitsacco-jifunze
 git switch -c fix/wallets-keys-wording
 npm ci
+npm ci --prefix api # vitegemezi vya ukaguzi; haiwashi seva ya API
 # hariri content/savers/sw/wallets-keys.mdx
 npm run validate
 npm run check

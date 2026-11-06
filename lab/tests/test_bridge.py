@@ -3,6 +3,7 @@ import os
 import re
 import tempfile
 import unittest
+from pathlib import Path
 
 from jifunze_lab.bridge import Bridge, format_token, get_or_create_token
 
@@ -36,7 +37,7 @@ def make(**kw):
 
     b = Bridge(
         token=TOKEN,
-        origins=[ORIGIN, STAGING_ORIGIN, "http://localhost:3000"],
+        origins=kw.get("origins", [ORIGIN, STAGING_ORIGIN, "http://localhost:3000"]),
         run_fn=run_fn,
         check_fn=check_fn,
         reset_fn=reset_fn,
@@ -87,6 +88,40 @@ class Origins(unittest.TestCase):
         status, _, body = req(b, "GET", "/hello", token=None)
         self.assertEqual(status, 200)
         self.assertEqual(body["lab"], "jifunze")
+
+
+class CodespacesOrigins(unittest.TestCase):
+    def configured_origins(self):
+        root = Path(__file__).resolve().parents[2]
+        config = json.loads((root / ".devcontainer/devcontainer.json").read_text(encoding="utf-8"))
+        origins = config["containerEnv"]["JIFUNZE_ORIGINS"].split(",")
+        compose = (root / "lab/compose.yml").read_text(encoding="utf-8")
+        default = re.search(r"JIFUNZE_ORIGINS:\s*\$\{JIFUNZE_ORIGINS:-([^}]+)\}", compose).group(1).split(",")
+        self.assertEqual(set(origins), set(default))
+        self.assertEqual(set(origins), {ORIGIN, STAGING_ORIGIN, "http://localhost:3000", "http://localhost:4321"})
+        return origins
+
+    def test_configured_origins_allow_preflight_and_require_pairing_for_requests(self):
+        for origin in self.configured_origins():
+            with self.subTest(origin=origin):
+                b, _ = make(origins=self.configured_origins())
+                status, headers, _ = req(b, "OPTIONS", "/status", origin=origin, token=None)
+                self.assertEqual(status, 204)
+                self.assertEqual(headers["Access-Control-Allow-Origin"], origin)
+                self.assertEqual(req(b, "GET", "/status", origin=origin)[0], 200)
+                for token in (None, "WRONGWRONGWR"):
+                    self.assertEqual(req(b, "GET", "/status", origin=origin, token=token)[0], 401)
+                    self.assertEqual(req(b, "POST", "/run", origin=origin, token=token)[0], 401)
+
+    def test_retired_and_unrelated_origins_are_rejected_even_with_the_pairing_code(self):
+        b, calls = make(origins=self.configured_origins())
+        for origin in ["https://jifunze.bitsacco.com", "https://evil.example", ORIGIN + ".evil.example", ORIGIN + "/", ORIGIN + ":444"]:
+            for method, endpoint in [("OPTIONS", "/status"), ("GET", "/status"), ("POST", "/run")]:
+                with self.subTest(origin=origin, method=method):
+                    status, headers, _ = req(b, method, endpoint, origin=origin)
+                    self.assertEqual(status, 403)
+                    self.assertNotIn("Access-Control-Allow-Origin", headers)
+        self.assertEqual(calls["run"], [])
 
 
 class Tokens(unittest.TestCase):

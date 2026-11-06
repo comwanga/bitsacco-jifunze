@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { ProgressTransfer } from "@/components/progress/ProgressTransfer";
 import { flatLessons, getLesson, listRoadmaps } from "@/lib/content/load";
@@ -7,7 +8,7 @@ type Params = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const lang = (await params).lang as Lang;
-  return { title: t(lang, "progressTitle") };
+  return pageMetadata(lang, "progress/", t(lang, "progressTitle"));
 }
 
 export default async function ProgressPage({ params }: Params) {

@@ -1,0 +1,32 @@
+{
+  "filename": "mastering-bitcoin-en-3rd-edition.pdf",
+  "title": "Mastering Bitcoin: Programming the Open Blockchain, Third Edition",
+  "authors": [
+    "Andreas M. Antonopoulos",
+    "David A. Harding"
+  ],
+  "upstream": "https://github.com/bitcoinbook/bitcoinbook",
+  "revision": "275c4eb8eab8800c6adc39f8def8e8f8fa356a57",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "licenseGrant": "https://github.com/bitcoinbook/bitcoinbook/commit/94c9ba64b454eb79ca77904a48251bd4efab73cf",
+  "bytes": 9112090,
+  "pages": 406,
+  "sha256": "aedbf60fc15e199903d3bfede1268dae4aa75922f764fb44b1d400eb0d255511",
+  "generator": {
+    "revision": "275c4eb8eab8800c6adc39f8def8e8f8fa356a57",
+    "image": "asciidoctor/docker-asciidoctor@sha256:b0c0ebff6e2d6f5cd66a075310ca7f076921d8acb293d8f4ae8fcae0d7fea30c",
+    "chromium": "156.0.8078.4",
+    "mathjax": "3.2.2",
+    "indexEntries": 1644
+  },
+  "description": "PDF generated from the official open-source text, not the publisher official PDF. Typesetting, open fonts, linked index, bookmarks and provenance notices added; book text unchanged.",
+  "notices": [
+    "Source copyright and license retained in PDF",
+    "Satoshi Nakamoto whitepaper: MIT",
+    "Whitepaper errata: CC0",
+    "Bitcoin Design Guide images: CC BY 4.0",
+    "DejaVu / Bitstream Vera / DejaVu Math font notices embedded",
+    "MathJax equation glyphs: Apache 2.0 notice embedded"
+  ]
+}

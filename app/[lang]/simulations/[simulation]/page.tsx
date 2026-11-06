@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SimulationShell } from "@/components/simulations/SimulationShell";
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, simulation } = await params;
   const entry = getSimulation(simulation);
   if (!entry) notFound();
-  return { title: entry.title[lang as Lang], description: entry.description[lang as Lang] };
+  return pageMetadata(lang as Lang, `simulations/${simulation}/`, entry.title[lang as Lang], entry.description[lang as Lang]);
 }
 export default async function SimulationPage({ params }: Params) {
   const { lang, simulation } = await params;

@@ -9,7 +9,7 @@ import { LANGS } from "../../lib/i18n";
 test("sitemap includes every localised page with matching language alternatives", () => {
   const entries = sitemap();
   const roadmaps = listRoadmaps();
-  const expectedCount = (5 + roadmaps.length * 2 + roadmaps.reduce((n, r) => n + flatLessons(r).length, 0) + 1 + SIMULATIONS.length) * LANGS.length;
+  const expectedCount = (6 + roadmaps.length * 2 + roadmaps.reduce((n, r) => n + flatLessons(r).length, 0) + 1 + SIMULATIONS.length) * LANGS.length;
   expect(entries).toHaveLength(expectedCount);
   expect(new Set(entries.map((e) => e.url)).size).toBe(entries.length);
   expect(entries.filter((e) => e.url.includes("/offline/"))).toEqual([]); // offline pages are noindex

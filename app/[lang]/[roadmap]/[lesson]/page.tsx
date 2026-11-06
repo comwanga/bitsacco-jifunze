@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CourseNav } from "@/components/lesson/CourseNav";
@@ -27,7 +28,7 @@ type Params = { params: Promise<{ lang: string; roadmap: string; lesson: string 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, roadmap, lesson } = await params;
   const l = getLesson(roadmap as RoadmapId, lesson, lang as Lang);
-  return { title: l.frontmatter.title, description: l.frontmatter.description };
+  return pageMetadata(lang as Lang, `${roadmap}/${lesson}/`, l.frontmatter.title, l.frontmatter.description);
 }
 
 export default async function LessonPage({ params }: Params) {

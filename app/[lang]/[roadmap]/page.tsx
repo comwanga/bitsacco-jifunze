@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProgressTick } from "@/components/roadmap/ProgressTick";
@@ -19,7 +20,7 @@ type Params = { params: Promise<{ lang: string; roadmap: string }> };
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, roadmap } = await params;
   const r = getRoadmap(roadmap as RoadmapId);
-  return { title: r.title[lang as Lang], description: r.description[lang as Lang] };
+  return pageMetadata(lang as Lang, `${roadmap}/`, r.title[lang as Lang], r.description[lang as Lang]);
 }
 
 export default async function RoadmapPage({ params }: Params) {

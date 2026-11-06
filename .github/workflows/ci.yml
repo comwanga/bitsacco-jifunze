@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, deploy/railway-staging]
+    branches: [main, deploy/railway-staging, release/public-education]
 
 permissions:
   contents: read
@@ -59,8 +59,12 @@ jobs:
           docker run --rm --network none --memory=64m -e JIFUNZE_HOSTING=railway -e NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 -e API_HOST=api.railway.internal -e SITE_ORIGIN="$SITE_ORIGIN" jifunze/railway-web:ci nginx -t
       - name: Phase 1 and Phase 2 initial JavaScript budgets
         run: npm run check:ux-budget
-      - name: Install Chromium for browser checks
-        run: npx playwright install --with-deps chromium
+      - name: Public export metadata and static nginx isolation
+        run: |
+          node scripts/check-public-export.mjs
+          node scripts/check-public-runtime.mjs
+      - name: Install Chromium and WebKit for browser checks
+        run: npx playwright install --with-deps chromium webkit
       - name: Browser checks (smoke, phone layout, offline, accessibility)
         run: npm run e2e
       - name: Keep browser traces on failure
@@ -114,7 +118,9 @@ jobs:
         run: npm audit --omit=dev --prefix api --audit-level=low
       - name: API tests (PostgreSQL)
         run: npm run api:test
-      - name: Build
+      - name: Build account acceptance export
+        env:
+          SITE_ORIGIN: http://127.0.0.1:4352
         run: npm run build
       - name: Install Chromium for browser checks
         run: npx playwright install --with-deps chromium

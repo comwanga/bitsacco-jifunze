@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { getExercise } from "../../lib/content/load.ts";
 import type { GlossaryTerm } from "../../lib/content/schemas.ts";
 import type { Lang } from "../../lib/i18n.ts";
@@ -18,6 +18,14 @@ export type LessonContext = { lessonKey: LessonKey; lesson: string; exerciseIds:
 
 export function makeMdxComponents(lang: Lang, glossary: GlossaryTerm[], ctx?: LessonContext) {
   const byId = new Map(glossary.map((g) => [g.id, g]));
+
+  function Table(props: ComponentPropsWithoutRef<"table">) {
+    return (
+      <div className="lesson-table-scroll" role="group" aria-label={lang === "sw" ? "Jedwali la somo" : "Lesson table"} tabIndex={0}>
+        <table {...props} />
+      </div>
+    );
+  }
 
   function Exercise({ id }: { id: string }) {
     if (!ctx) return null;
@@ -66,5 +74,5 @@ export function makeMdxComponents(lang: Lang, glossary: GlossaryTerm[], ctx?: Le
     );
   }
 
-  return { Term, Callout, Exercise };
+  return { Term, Callout, Exercise, table: Table };
 }

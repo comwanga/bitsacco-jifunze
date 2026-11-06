@@ -8,6 +8,7 @@ const root = path.resolve(process.argv[2] ?? "out");
 const port = Number(process.argv[3] ?? 4321);
 const apiProxy = process.env.API_PROXY ? new URL(process.env.API_PROXY) : null;
 const types = {
+  ".pdf": "application/pdf",
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript",
   ".css": "text/css",

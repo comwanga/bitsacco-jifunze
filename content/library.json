@@ -20,12 +20,28 @@
     "note": { "sw": "Karatasi nyeupe ya Bitcoin (2008), kwa Kiingereza.", "en": "The original Bitcoin whitepaper (2008)." }
   },
   {
+    "id": "mastering-bitcoin-en",
+    "title": {
+      "sw": "Mastering Bitcoin: Programming the Open Blockchain (Kiingereza, toleo la 3)",
+      "en": "Mastering Bitcoin: Programming the Open Blockchain (English, third edition)"
+    },
+    "author": "Andreas M. Antonopoulos & David A. Harding",
+    "language": "en",
+    "format": "pdf",
+    "url": "/books/mastering-bitcoin-en-3rd-edition.pdf",
+    "licence": "CC BY-SA 4.0",
+    "note": {
+      "en": "Third edition (2023). PDF generated from the official open-source text; not the publisher’s official PDF.",
+      "sw": "Toleo la 3 (2023). PDF imetengenezwa kutoka maandishi rasmi ya chanzo huria; si PDF rasmi ya mchapishaji."
+    },
+    "sizeBytes": 9112090
+  },
+  {
     "id": "kujifunza-bitcoin",
     "title": { "sw": "Kujifunza Bitcoin: Kuprogramu Blockchain Huria", "en": "Kujifunza Bitcoin (Mastering Bitcoin in Kiswahili)" },
     "author": "Andreas M. Antonopoulos & David A. Harding",
     "language": "sw",
-    "url": "https://bitsacco.com/kujifunza-bitcoin-sw.pdf",
-    "sizeBytes": 7549747,
+    "format": "pending-pdf",
     "licence": "CC BY-SA 4.0",
     "credit": "comwanga",
     "note": {

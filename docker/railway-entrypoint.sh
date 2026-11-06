@@ -9,6 +9,49 @@ port() {
   [ "$1" -gt 0 ] && [ "$1" -le 65535 ]
 }
 port "${PORT:-8080}" || fail 'invalid PORT'
+# Production has no upstream, real-IP trust exception or authentication capability.
+# Keep the staging transformation below intact.
+if [ "${JIFUNZE_SITE_MODE:-accounts}" = static ]; then
+  [ "${RAILWAY_ENVIRONMENT_NAME:-}" = production ] || fail 'static mode requires production environment'
+  [ "${SITE_ORIGIN:-}" = https://bitsaccojifunze.xyz ] || fail 'static mode requires the official public origin'
+  [ "$(cat /usr/share/nginx/html/site-origin.txt)" = "$SITE_ORIGIN" ] || fail 'export origin mismatch'
+  [ "${STAGING_AUTH_ENABLED:-0}" = 0 ] || fail 'static mode cannot enable authentication'
+  [ -z "${RAILWAY_TRUST_MODEL:-}${TRUSTED_PROXY_CIDRS:-}${API_HOST:-}" ] || fail 'static mode cannot use API or proxy trust settings'
+  security=/tmp/jifunze-security-headers.conf
+  cat /etc/nginx/snippets/security-headers.conf > "$security"
+  printf '\nadd_header Strict-Transport-Security "max-age=86400" always;\n' >> "$security"
+  cat > /tmp/jifunze-static-server.conf <<'NGINX'
+absolute_redirect off;
+include /tmp/jifunze-security-headers.conf;
+location = /api {
+  include /tmp/jifunze-security-headers.conf;
+  access_log /var/log/nginx/access.log api_redacted;
+  error_log /var/log/nginx/error.log crit;
+  add_header Cache-Control "no-store" always;
+  default_type application/json;
+  return 404 '{"error":{"code":"not_found"}}';
+}
+location ^~ /api/ {
+  include /tmp/jifunze-security-headers.conf;
+  access_log /var/log/nginx/access.log api_redacted;
+  error_log /var/log/nginx/error.log crit;
+  add_header Cache-Control "no-store" always;
+  default_type application/json;
+  return 404 '{"error":{"code":"not_found"}}';
+}
+NGINX
+  sed \
+    -e "s/listen 8080;/listen ${PORT:-8080};\n  listen [::]:${PORT:-8080};/" \
+    -e '/^  resolver /d' -e '/^  resolver_timeout /d' -e '/^  set \$api /d' \
+    -e '/^  # Answered here/,/^  location = \/manifest.webmanifest/ { /^  location = \/manifest.webmanifest/!d; }' \
+    -e "s|/etc/nginx/snippets/security-headers.conf|$security|g" \
+    -e '/server_tokens off;/a\  include /tmp/jifunze-static-server.conf;' \
+    /etc/nginx/jifunze-base.conf > /etc/nginx/conf.d/default.conf
+  nginx -t
+  exit 0
+fi
+[ "${JIFUNZE_SITE_MODE:-accounts}" = accounts ] || fail 'unknown site mode'
+[ "${RAILWAY_ENVIRONMENT_NAME:-}" != production ] || fail 'production requires static mode; authenticated production needs separate acceptance'
 port "${API_PORT:-3001}" || fail 'invalid API_PORT'
 printf '%s\n' "${API_HOST:-}" | grep -Eq '^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.railway\.internal$' || fail 'API_HOST must be a Railway private domain'
 # The base image's 15-local-resolvers.envsh reads the actual /etc/resolv.conf, including IPv6.

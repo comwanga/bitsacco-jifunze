@@ -27,7 +27,7 @@ terms:
   - pull-request
 ---
 
-<Term id="open-source">Open-source</Term> projects grow one small, careful change at a time. Bitsacco's code lives at github.com/bitsacco: the website and mini-apps in TypeScript (`bitsacco/bitsacco`), a Lightning Address server in Rust (`bitsacco/lnaddrd`), and this learning platform. Every change reaches users only through a reviewed <Term id="pull-request" /> and a green CI run.
+<Term id="open-source">Open-source</Term> projects grow one small, careful change at a time. Bitsacco's code lives at github.com/bitsacco: the website and mini-apps in TypeScript (`bitsacco/bitsacco`), a Lightning Address server in Rust (`bitsacco/lnaddrd`); this learning platform lives at `comwanga/bitsacco-jifunze`. Every change reaches users only through a reviewed <Term id="pull-request" /> and a green CI run.
 
 ## Step 1: Find something worth doing
 
@@ -42,10 +42,11 @@ For Jifunze, great first contributions are fixing a typo, improving a Kiswahili 
 ## Step 2: Make the change
 
 ```bash
-gh repo fork bitsacco/jifunze --clone
-cd jifunze
+gh repo fork comwanga/bitsacco-jifunze --clone
+cd bitsacco-jifunze
 git switch -c fix/wallets-keys-wording
 npm ci
+npm ci --prefix api # dependencies for repository checks; does not start an API server
 # edit content/savers/sw/wallets-keys.mdx
 npm run validate
 npm run check

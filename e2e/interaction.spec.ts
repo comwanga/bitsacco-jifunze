@@ -11,8 +11,9 @@ for (const lang of ["en", "sw"] as const) for (const id of ["utxo", "channel-bal
     context.on("request", (r) => { if (!["GET", "HEAD"].includes(r.method()) || new URL(r.url()).port === "7777") writes.push(r.url()); });
     await page.goto(`/${lang}/simulations/${id}/`);
     const start = page.getByRole("button", { name: c.start, exact: true });
+    await expect(start).toBeEnabled();
     if (info.project.name === "mobile") await start.tap();
-    else { await start.focus(); await page.keyboard.press("Enter"); }
+    else { await start.focus(); await expect(start).toBeFocused(); await page.keyboard.press("Enter"); }
     await expect(page.getByRole("heading", { name: c.practice, exact: true })).toBeFocused();
     const sim = page.locator("[data-module]");
     if (id === "utxo") {

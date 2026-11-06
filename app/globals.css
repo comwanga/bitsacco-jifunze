@@ -158,9 +158,10 @@ body {
   padding: 0;
   font-size: inherit;
 }
-.lesson-body table {
-  display: block;
+.lesson-body .lesson-table-scroll {
   overflow-x: auto;
+}
+.lesson-body table {
   border-collapse: collapse;
   font-size: 0.95rem;
 }

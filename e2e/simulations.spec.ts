@@ -11,7 +11,7 @@ for (const lang of ["sw", "en"] as const) {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     for (const id of ["utxo", "channel-balances"]) {
-      await page.goto(`http://localhost:4321/${lang}/simulations/${id}/`);
+      await page.goto(`/${lang}/simulations/${id}/`);
       await expect(page.getByRole("heading", { name: simulationCopy[lang].workedExample, exact: true })).toBeVisible();
       await expect(page.getByRole("button", { name: simulationCopy[lang].start, exact: true })).toBeDisabled();
       await expect(page.getByText(simulationCopy[lang].noJs)).toBeVisible();
@@ -41,7 +41,7 @@ test("a failed interactive download keeps the explanation and can retry", async 
     if (fail && asset(route.request().url()).includes("UTXO_INTERACTIVE_MODULE")) await route.abort();
     else await route.continue();
   });
-  await page.goto("http://localhost:4321/en/simulations/utxo/");
+  await page.goto("/en/simulations/utxo/");
   await page.getByRole("button", { name: "Start simulation", exact: true }).click();
   await expect(page.locator('main [role="alert"]')).toContainText("could not load");
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();

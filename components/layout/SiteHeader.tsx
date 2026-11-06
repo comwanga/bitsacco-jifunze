@@ -3,6 +3,7 @@ import { siteCopy } from "@/lib/site-copy";
 import { BrandLockup } from "./BrandLockup";
 import { HeaderNav, type NavItem } from "./HeaderNav";
 import { LanguageSwitch } from "./LanguageSwitch";
+import { ACCOUNTS_AVAILABLE } from "@/lib/site";
 
 /** Main destinations, with the paths that count as "inside" each one for the current-page marker. */
 export function siteNav(lang: Lang): NavItem[] {
@@ -37,7 +38,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
       </a>
       <div className="mx-auto flex h-full max-w-[96rem] items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
         <BrandLockup lang={lang} />
-        <HeaderNav items={siteNav(lang)} account={accountNav(lang)} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
+        <HeaderNav items={siteNav(lang)} account={ACCOUNTS_AVAILABLE ? accountNav(lang) : undefined} label={t(lang, "menu")} menuLabel={t(lang, "menu")}>
           <LanguageSwitch lang={lang} />
         </HeaderNav>
       </div>

@@ -27,6 +27,7 @@ npm run dev          # http://localhost:3000/sw/
 ## Check everything
 
 ```bash
+npm ci --prefix api  # dependencies for repository checks; does not start an API server
 npm run check        # lint, typecheck, unit tests, content validation
 npm run build        # static export to out/, then CSP hashes, link check and performance budget
 npm run check:ux-budget # stricter Phase 1/2 page budgets, after the build
@@ -110,9 +111,13 @@ Both nginx and the API log to the containers' stdout and stderr (`docker compose
 
 `bash scripts/check-proxy.sh` checks all of this on a throwaway Docker stack: it sends callback requests carrying a code and state, stops the API mid-run, and greps every nginx and API log line.
 
-### Production deployment gate: the HTTPS front proxy
+### Anonymous public release
 
-This nginx listens on plain HTTP, so production needs a TLS terminator in front. **Do not deploy behind one until every item below is done.**
+The initial public educational release uses one static NGINX service with no account API or database. Follow the [public release runbook](docs/deployment/public-release.md) for its explicit static mode, isolation, verification and approval gates. It does not require an API proxy trust exception. Staging authentication acceptance remains separate.
+
+### Authenticated production deployment gate: the HTTPS front proxy
+
+This nginx listens on plain HTTP, so production needs a TLS terminator in front. **For deployments with an account API, do not deploy behind one until every item below is done.**
 
 1. Uncomment the `set_real_ip_from` / `real_ip_header` / `real_ip_recursive` lines in [`docker/nginx.conf`](docker/nginx.conf).
    - Set `set_real_ip_from` to the front proxy's real address range. Never a guess, and never a wide private range other clients share.
@@ -171,7 +176,7 @@ Lessons with exercises load a small lazy island (the editor) and get a CSP that 
 - **JavaScript budget.** The spec asks for under 100 KB of compressed JavaScript per page. The React 19 and Next.js 16 runtime alone is about 130 KB gzip (pages measure about 141 KB gzip, about 120 KB brotli), so this stack can't meet the target. CI enforces a 150 KB ceiling to catch regressions. Deciding between accepting this and changing the framework is open.
 - **Review.** All 16 lessons are drafts written for review. They have no `lastReviewed` date, so the reader shows a draft notice. Each needs a Kiswahili reviewer and a technical reviewer before launch.
 - **Deployment.** The registered production domain is `https://bitsaccojifunze.xyz`; staging is `https://staging.bitsaccojifunze.xyz`. The web build uses `SITE_ORIGIN` for metadata and blocks indexing on non-production origins. See the [Railway staging runbook](docs/deployment/railway-staging.md) for deployment status and acceptance gates; no live deployment is implied by these defaults.
-- **Kujifunza Bitcoin PDF.** The library links to `https://bitsacco.com/kujifunza-bitcoin-sw.pdf`, which goes live when bitsacco/bitsacco PR #107 merges.
+- **Kujifunza Bitcoin PDF.** Official publication awaits [bitsacco/bitsacco PR #107](https://github.com/bitsacco/bitsacco/pull/107). Library and lesson references explain pending availability and retain the credits; no download is advertised until publication is verified.
 
 ## Licences
 

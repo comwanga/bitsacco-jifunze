@@ -54,6 +54,8 @@ Add the slug to `content/roadmaps/<roadmap>.json`. If only one language is ready
 - `<Callout type="tip|warning|scam" title="...">...</Callout>` for boxed notes.
 - End with a `## Try it` / `## Jaribu` activity. The reader adds the reflection, quiz and resources itself.
 
+- Every lesson's `reflection` is a required reasoning activity, with at least three paired English/Kiswahili prompts. Ask learners to explain a mechanism, test an assumption or failure case, and consider what evidence could change their answer. Include a level-appropriate scenario rather than only factual recall. The reader also asks learners to formulate their own question and self-confirm completion. It stores the confirmation timestamp, never their answers. Existing progress files remain compatible; old completed lessons are retained.
+
 ### Quizzes
 
 `content/quizzes/<roadmap>/<slug>.json` holds about 4 questions with `prompt`, `options` (each with an `id` and `label`), `answer` and `explanation`, all bilingual.

@@ -8,6 +8,10 @@ objectives:
   - Create a wallet, mine blocks and explain coinbase maturity
   - Reset your lab cleanly between experiments
 resources:
+  - title: "Bitcoin developer guide: peer-to-peer network"
+    url: "https://developer.bitcoin.org/devguide/p2p_network.html"
+    kind: docs
+    language: en
   - title: "Kujifunza Bitcoin, chapter 3: Bitcoin Core, the reference implementation"
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
@@ -29,6 +33,7 @@ resources:
 reflection:
   - "Explain regtest to a teammate without jargon. What problem does it solve?"
   - "What could go wrong if you tested your code against mainnet instead?"
+  - "A regtest node accepts a block from your own miner. What would you change to test independent validation rather than merely producing a block, and which conclusions would still not transfer to mainnet?"
 source:
   type: original
 translationOf: sw
@@ -96,6 +101,14 @@ rm -rf ~/.bitcoin/regtest   # on macOS: ~/Library/Application Support/Bitcoin/re
 ```
 
 Starting from a clean datadir makes experiments repeatable, which is exactly what you want for automated tests later.
+
+## Producing, relaying and validating are different jobs
+
+Your regtest miner proposes blocks in a deliberately easy test network. A full node independently checks consensus rules; hearing a block from a peer or a miner does not make it valid. Relay policy also governs which unconfirmed transactions a node chooses to keep or forward, and is distinct from block validity. Different mempools do not by themselves establish a consensus split.
+
+An archival full node retains historical blocks. A pruned full node can still validate while discarding older block data after verification. Keeping every historical byte and checking the rules are different properties. Peer connectivity affects which data a node sees and when; it does not grant a peer permission to create invalid coins.
+
+For the discussion below, describe a controlled two-node regtest experiment: what would each node observe if one stops receiving blocks, and how would you distinguish delayed information from invalid data? Do not infer mainnet propagation, mining incentives or adversarial resistance from one isolated regtest miner.
 
 ## Lab evidence
 

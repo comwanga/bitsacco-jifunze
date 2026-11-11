@@ -8,6 +8,7 @@ for (const scenario of [
 ] as const) {
   test(`${scenario.roadmap}/${scenario.slug}: ${scenario.pass ? "passing" : "failing"} quiz ${scenario.completes ? "completes" : "does not complete"} the lesson`, async ({ page }) => {
     await page.goto(`/en/${scenario.roadmap}/${scenario.slug}/`);
+    await page.getByRole("button", { name: "I have written or discussed reasoned answers", exact: true }).click();
     const questions = getQuiz(scenario.roadmap, scenario.slug)!.questions;
     const correctCount = scenario.pass ? Math.ceil(questions.length * 0.75) : 0;
     const quiz = page.getByRole("region", { name: "Check yourself" });

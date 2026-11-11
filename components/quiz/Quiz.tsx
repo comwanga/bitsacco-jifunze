@@ -68,6 +68,7 @@ export function Quiz({ lessonKey, lang, questions, completesLesson }: { lessonKe
           <p className="text-lg font-semibold">
             {t(lang, "quizResult")} {correct} {t(lang, "quizOf")} {questions.length}
           </p>
+          {!progress.lessons[lessonKey]?.reflectedAt && !progress.lessons[lessonKey]?.completedAt && <p className="mt-3"><a href="#reflect" className="text-teal-700 underline dark:text-teal-400">{t(lang, "reflectionRequired")}</a></p>}
           <button type="button" onClick={retry} className="mt-4 rounded-full border border-teal-600 px-5 py-2 font-semibold text-teal-700 dark:text-teal-400">
             {t(lang, "quizRetry")}
           </button>

@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { GlossaryTerm, LessonFrontmatter, Resource } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
+import type { LessonKey } from "@/lib/progress/model";
+import { ReflectionCheck } from "./ReflectionCheck";
+import { discussionCopy } from "@/lib/discussion-copy";
 
 export function Objectives({ lang, items }: { lang: Lang; items: string[] }) {
   return (
@@ -47,18 +50,20 @@ export function KeyTerms({ lang, terms }: { lang: Lang; terms: GlossaryTerm[] })
   );
 }
 
-export function Reflection({ lang, prompts }: { lang: Lang; prompts: string[] }) {
+export function Reflection({ lang, prompts, lessonKey }: { lang: Lang; prompts: string[]; lessonKey: LessonKey }) {
   return (
     <section className="my-10" aria-labelledby="reflect">
       <h2 id="reflect" className="text-xl font-bold">
         {t(lang, "reflection")}
       </h2>
-      <p className="mt-1 text-[var(--muted)]">{t(lang, "reflectionHint")}</p>
+      <p className="mt-1 text-[var(--muted)]">{discussionCopy[lang].hint}</p>
       <ol className="mt-3 list-decimal space-y-2 pl-5">
         {prompts.map((p) => (
           <li key={p}>{p}</li>
         ))}
       </ol>
+      <p id="reflection-check-hint" className="mt-4 text-sm text-[var(--muted)]">{discussionCopy[lang].criteria}</p>
+      <ReflectionCheck copy={{ confirm: discussionCopy[lang].confirm, done: discussionCopy[lang].done, recorded: discussionCopy[lang].recorded }} lessonKey={lessonKey} />
     </section>
   );
 }

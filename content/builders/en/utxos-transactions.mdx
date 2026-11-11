@@ -8,6 +8,10 @@ objectives:
   - Work out the fee of a transaction from its inputs and outputs
   - Send, decode and confirm a transaction on regtest
 resources:
+  - title: "BIP 141: Segregated Witness"
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki"
+    kind: docs
+    language: en
   - title: "Kujifunza Bitcoin, chapters 6 and 9: transactions and fees"
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
@@ -20,6 +24,7 @@ resources:
 reflection:
   - "Why does Bitcoin create change outputs instead of just reducing a balance?"
   - "What would happen to a transaction whose outputs added up to more than its inputs?"
+  - "Compare a payment's economic intent with its serialized transaction identifier. Which changes could preserve intent while changing an identifier, and why would a later transaction depending on that identifier care?"
 source:
   type: original
 translationOf: sw
@@ -88,6 +93,14 @@ bitcoin-cli -regtest -rpcwallet=bob getbalance
 **Expected:** Bob's balance is `1.50000000`. The transaction now has one <Term id="confirmation" />.
 
 **Done when:** you can point to the change output in the decoded transaction and compute its fee.
+
+## Transaction identity and SegWit
+
+A payment's intention and a transaction's byte-level identity are different. A transaction ID is derived from serialization. Historically, some changes to signature encoding could change a transaction ID without changing the intended payment. A later transaction spending an output identifies its parent by transaction ID, so an unexpected change can break that dependency.
+
+SegWit separates witness data from the serialization used for the transaction ID. The witness transaction ID also commits to witness data. This addresses important unwanted malleability cases and supports protocols that depend on transactions before confirmation. It does not mean every possible transaction change preserves an ID or that a signature alone guarantees settlement.
+
+In your regtest decoded output, compare the transaction ID, witness-related hash where reported, inputs, outputs and virtual size. Read BIP 141's definitions before explaining which data each identifier commits to. For the discussion, identify an assumption under which a parent ID remains stable and one modification that changes the payment itself. No additional mainnet transaction is needed.
 
 ## Lab evidence
 

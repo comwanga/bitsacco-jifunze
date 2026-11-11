@@ -8,6 +8,10 @@ objectives:
   - Recognise the main address types by their prefix
   - Read a wallet descriptor and derive addresses from it
 resources:
+  - title: "Chaincode seminar: Scripts and Wallets — further technical study"
+    url: "https://chaincode.gitbook.io/seminars/bitcoin-protocol-development/script-wallets"
+    kind: docs
+    language: en
   - title: "Kujifunza Bitcoin, chapters 4 and 5: keys, addresses and wallet recovery"
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
@@ -20,6 +24,7 @@ resources:
 reflection:
   - "Why can a wallet restored from a seed phrase find all its old addresses?"
   - "What does a descriptor tell a watch-only wallet that a list of addresses doesn't?"
+  - "A backup contains private keys but omits the wallet's script policy and derivation information. What can and cannot be reconstructed, and how would you test compatibility without exposing real keys?"
 source:
   type: original
 translationOf: sw
@@ -95,6 +100,12 @@ bitcoin-cli -regtest -rpcwallet=alice getaddressinfo "<first address>"
 <Callout type="warning" title="Public is not harmless">
 An extended public key (`xpub`/`tpub`) can't spend, but it reveals every address in the account, and so your whole history and balance. Share it only with tools you trust.
 </Callout>
+
+## Spending policy is more than a key
+
+An address refers to a destination with spending conditions, not necessarily a single person's identity. A script can require several keys or time-related conditions. A descriptor expresses how wallet outputs are constructed, including keys and relevant script structure. Possessing private keys does not automatically tell another wallet the exact policy or derivation paths to search.
+
+Keep public configuration available for recovery while respecting its privacy implications. Test recovery with fictional regtest wallets and documented formats. Ask which parts of the policy are checked by consensus, which are wallet conventions, and which are merely social instructions. A policy requiring an officer's permission in a constitution is not automatically enforced by a script that accepts any two keys.
 
 ## Lab evidence
 

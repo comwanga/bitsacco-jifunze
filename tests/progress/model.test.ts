@@ -6,11 +6,33 @@ import {
   mergeProgress,
   parseProgressFile,
   recordQuiz,
+  recordReflection,
+  recordLabPass,
   serializeProgress,
 } from "../../lib/progress/model.ts";
 
 const T1 = "2026-11-01T10:00:00.000Z";
 const T2 = "2026-11-02T10:00:00.000Z";
+
+test("required discussion confirmation round-trips and merges without invalidating legacy completion", () => {
+  const old = markComplete(emptyProgress(), "savers/a", T1);
+  const reflected = recordReflection(emptyProgress(), "savers/b", T2);
+  const both = mergeProgress(old, reflected);
+  expect(parseProgressFile(serializeProgress(both, T2))).toEqual({ ok: true, progress: both });
+  expect(both.lessons["savers/a"]).toEqual({ completedAt: T1 });
+  expect(both.lessons["savers/b"]).toEqual({ reflectedAt: T2 });
+  expect(mergeProgress(reflected, recordReflection(emptyProgress(), "savers/b", T1)).lessons["savers/b"].reflectedAt).toBe(T1);
+  expect(recordReflection(reflected, "savers/b", T1)).toBe(reflected);
+  expect(parseProgressFile(JSON.stringify({ ...old, lessons: { "savers/a": { reflectedAt: 42 } } }))).toEqual({ ok: false, error: "invalid-shape" });
+});
+
+test("a required discussion cannot be skipped by passing the last lab exercise", () => {
+  const passed = recordLabPass(emptyProgress(), "lightning/a", "exercise", ["exercise"], T1, true);
+  expect(passed.lessons["lightning/a"].completedAt).toBeUndefined();
+  expect(passed.lessons["lightning/a"].lab?.passed).toEqual(["exercise"]);
+  const reflected = recordReflection(passed, "lightning/a", T2);
+  expect(recordLabPass(reflected, "lightning/a", "exercise", ["exercise"], T2, true).lessons["lightning/a"].completedAt).toBe(T2);
+});
 
 describe("markComplete", () => {
   test("keeps the first completion time", () => {

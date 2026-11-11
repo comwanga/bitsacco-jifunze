@@ -8,6 +8,10 @@ objectives:
   - Tengeneza pochi, chimba bloku na ueleze ukomavu wa coinbase
   - Safisha maabara yako vizuri kati ya majaribio
 resources:
+  - title: "Mwongozo wa Bitcoin: mtandao wa rika"
+    url: "https://developer.bitcoin.org/devguide/p2p_network.html"
+    kind: docs
+    language: en
   - title: "Kujifunza Bitcoin, sura ya 3: Bitcoin Core, utekelezaji wa marejeleo"
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
@@ -29,6 +33,7 @@ resources:
 reflection:
   - "Mweleze mwenzako regtest bila maneno magumu. Inatatua tatizo gani?"
   - "Nini kingeharibika kama ungejaribu msimbo wako kwenye mainnet badala yake?"
+  - "Nodi ya regtest inakubali bloku ya mchimbaji wako. Ungebadili nini kujaribu uhakiki huru badala ya kutengeneza bloku tu, na hitimisho lipi bado halihamishiki kwenye mtandao mkuu?"
 source:
   type: original
 terms:
@@ -95,6 +100,14 @@ rm -rf ~/.bitcoin/regtest   # kwenye macOS: ~/Library/Application Support/Bitcoi
 ```
 
 Kuanza na datadir safi hufanya majaribio yarudiwe kwa namna ile ile, ambayo ndiyo unayotaka kwa majaribio ya kiotomatiki baadaye.
+
+## Kutengeneza, kusambaza na kuhakiki ni kazi tofauti
+
+Mchimbaji wako wa regtest hupendekeza bloku kwenye mtandao rahisi wa majaribio. Nodi kamili hukagua kanuni kwa kujitegemea; kupokea bloku kutoka kwa rika au mchimbaji hakuifanyi halali. Sera ya kusambaza pia huamua miamala isiyothibitishwa ambayo nodi huhifadhi au kutuma; ni tofauti na uhalali wa bloku. Madimbwi tofauti ya miamala hayathibitishi yenyewe mgawanyiko wa kanuni.
+
+Nodi ya kumbukumbu huhifadhi bloku za historia. Nodi kamili iliyopunguza data inaweza bado kuhakiki huku ikifuta bloku za zamani baada ya ukaguzi. Kuhifadhi kila baiti na kukagua kanuni ni sifa tofauti. Muunganisho wa rika huathiri data inayoonekana na muda wake; haumruhusu rika kuunda sarafu batili.
+
+Kwa majadiliano, eleza jaribio la nodi mbili za regtest: kila moja itaona nini moja ikiacha kupokea bloku, na utatofautishaje taarifa zilizochelewa na data batili? Usihitimishe hali ya usambazaji, motisha za uchimbaji au usalama wa mtandao mkuu kutoka mchimbaji mmoja wa majaribio.
 
 ## Ushahidi wa maabara
 

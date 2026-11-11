@@ -8,7 +8,7 @@ import { internalRefs } from "./links.ts";
  * runtime alone is ~130 KB gzip, so the JS gate fails only above jsCeiling (a regression guard)
  * and warns above the spec value. Lab pages (laptop-only, with the exercise editor) get jsCeilingLab.
  * The 151 KiB general ceiling includes a measured 1 KiB allowance for curriculum progression;
- * stricter learner-page UX limits are unchanged.
+ * stricter learner-page UX limits are unchanged. See docs/audit/2026-11-11-platform.md.
  */
 export const BUDGET = { firstLessonTotal: 200 * 1024, jsPerPage: 100 * 1024, jsCeiling: 151 * 1024, jsCeilingLab: 165 * 1024 };
 

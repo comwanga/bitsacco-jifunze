@@ -6,16 +6,20 @@ Bitsacco Jifunze is a Kiswahili-first, bilingual Bitcoin education platform. Lea
 
 ## Learning paths
 
-- **Bitcoin kwa Wawekaji / Bitcoin for Savers — 8 lessons:** Bitcoin basics, wallets, custody, payments and safety for everyday learners and savings groups.
+- **Bitcoin kwa Wawekaji / Bitcoin for Savers — 8 introductory lessons + 16 specialization lessons:** retain the accessible introduction, then choose individual savings/financial sovereignty, community savings or cooperative finance, progressing through foundations, intermediate practice and advanced cases.
 - **Bitcoin kwa Wajenzi / Bitcoin for Builders — 8 lessons:** regtest, transactions, keys, Lightning, Fedimint and contributing to open-source projects.
 - **Lightning kwa Wajenzi / Lightning for Builders — 17 lessons:** adapted from *Mastering the Lightning Network*, with interactive exercises.
 
-Lessons are available in Kiswahili and English, with learning trees, quizzes, a glossary and Bitcoin simulations. The educational library includes the whitepaper in both languages and an in-app English *Mastering Bitcoin*, third-edition PDF reader and download. The Kiswahili book awaits official publication.
+All 49 lessons are available in Kiswahili and English, with learning trees, quizzes, a glossary and fictional practice simulations. Every lesson includes required open-ended discussion: explain reasoning, test an assumption and formulate a question of your own. Learners self-confirm the activity before new lesson completion; answers stay with learners and existing completions remain valid. New and changed content awaits human language/subject review.
+
+The educational library includes the whitepaper in both languages and an in-app English *Mastering Bitcoin*, third-edition PDF reader and download. The Kiswahili book awaits official publication. See the [platform audit](docs/audit/2026-11-11-platform.md) and [curriculum, primary sources and review map](docs/audit/2026-11-11-curriculum.md).
 
 Learning progress stays in the browser and can be exported and imported. Previously opened lessons support offline reading; interactive simulations work offline after their modules have been loaded. The book is downloaded only on request and is not included in the offline lesson cache.
 
 <details>
 <summary>Preview the learning paths and Lightning tree</summary>
+
+These screenshots show the previous public release, before the specialization expansion. Current lesson counts and review status are above.
 
 **Three learning paths in Kiswahili**
 
@@ -59,7 +63,7 @@ On Linux, Playwright may need `npx playwright install --with-deps chromium webki
 
 Educators can improve explanations and quizzes, translators can maintain bilingual lessons and terminology, and developers can fix issues or improve the platform and lab. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and submit changes to [comwanga/bitsacco-jifunze](https://github.com/comwanga/bitsacco-jifunze).
 
-Maintainer Kiswahili review is complete. Independent human technical-content sign-off remains outstanding before a public-launch announcement; automated tests do not replace that review.
+The project owner completed educational review of this expansion on 11 November 2026, covering Kiswahili, Bitcoin accuracy, financial concepts, community/cooperative savings and documentation. The [review record](docs/audit/2026-11-11-owner-review.md) distinguishes that completed review from outstanding independent technical sign-off and release authorization. Automated checks do not supply those approvals.
 
 ## Documentation and licences
 

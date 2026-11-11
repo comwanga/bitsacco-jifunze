@@ -1,12 +1,24 @@
 import os
+import gc
 import time
 import unittest
+import warnings
 
 os.environ.setdefault("JIFUNZE_SAME_USER", "1")
 from jifunze_lab.runner import run  # noqa: E402
 
 
 class Runner(unittest.TestCase):
+    def test_output_streams_are_closed_after_run(self):
+        gc.collect()
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter("always", ResourceWarning)
+            result = run("python", "print('resource cleanup')", "none")
+            gc.collect()
+        self.assertEqual(result["stdout"], "resource cleanup\n")
+        self.assertEqual(result["exitCode"], 0)
+        self.assertEqual([str(w.message) for w in captured if issubclass(w.category, ResourceWarning)], [])
+
     def test_python_prints(self):
         r = run("python", "print(1)", "none")
         self.assertEqual(r["stdout"], "1\n")

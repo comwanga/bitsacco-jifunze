@@ -1,11 +1,14 @@
 import type { LessonKey } from "../progress/model.ts";
 import type { Localized } from "../i18n.ts";
 import { simulationCopy } from "./copy.ts";
+import { savingsCopy } from "./savings-copy.ts";
 
-export type SimulationId = "utxo" | "channel-balances";
+export type SimulationId = "utxo" | "channel-balances" | "savings-scenarios";
 export type SimulationEntry = { id: SimulationId; title: Localized; description: Localized; lessons: LessonKey[] };
 
 export const SIMULATIONS: SimulationEntry[] = [
+  { id: "savings-scenarios", title: { en: savingsCopy.en.title, sw: savingsCopy.sw.title }, description: { en: savingsCopy.en.lead, sw: savingsCopy.sw.lead },
+    lessons: ["savers/budget-resilience", "savers/money-purchasing-power", "savers/payments-liquidity", "savers/planning-sovereignty", "savers/group-treasury", "savers/cooperative-balance-sheet"] },
   { id: "utxo", title: { sw: simulationCopy.sw.utxoTitle, en: simulationCopy.en.utxoTitle },
     description: { sw: simulationCopy.sw.utxoLead, en: simulationCopy.en.utxoLead }, lessons: ["builders/utxos-transactions"] },
   { id: "channel-balances", title: { sw: simulationCopy.sw.channelTitle, en: simulationCopy.en.channelTitle },

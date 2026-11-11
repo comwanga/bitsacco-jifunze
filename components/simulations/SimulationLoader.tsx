@@ -20,7 +20,7 @@ export function SimulationLoader({ id, lang, c }: SimulationProps & { id: Simula
   async function load() {
     setLoading(true); setError(false);
     try {
-      const loadedModule = id === "utxo" ? await import("./UtxoSimulation") : await import("./ChannelSimulation");
+      const loadedModule = id === "utxo" ? await import("./UtxoSimulation") : id === "channel-balances" ? await import("./ChannelSimulation") : await import("./SavingsSimulation");
       setComponent(() => loadedModule.default);
     } catch { setError(true); }
     finally { setLoading(false); }

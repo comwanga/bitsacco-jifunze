@@ -3,7 +3,7 @@ import { getSimulation, simulationsForLesson, SIMULATIONS } from "../../lib/simu
 import { validateSimulationLessons } from "../../lib/content/tree.ts";
 
 test("registry contains only the approved simulations and valid lesson targets", () => {
-  expect(SIMULATIONS.map((s) => s.id)).toEqual(["utxo", "channel-balances"]);
+  expect(SIMULATIONS.map((s) => s.id)).toEqual(["savings-scenarios", "utxo", "channel-balances"]);
   expect(getSimulation("utxo")?.lessons).toEqual(["builders/utxos-transactions"]);
   expect(simulationsForLesson("lightning/payment-channels").map((s) => s.id)).toEqual(["channel-balances"]);
   expect(simulationsForLesson("savers/scams")).toEqual([]);

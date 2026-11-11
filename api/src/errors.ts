@@ -3,6 +3,7 @@ export type ErrorCode =
   | "nostr_expired"
   | "challenge_invalid"
   | "nostr_lifecycle_pending"
+  | "nostr_key_mismatch"
   | "not_found"
   | "method_not_allowed"
   | "bad_origin"
@@ -37,6 +38,7 @@ export const MESSAGES: Record<ErrorCode, { sw: string; en: string }> = {
   nostr_expired: { sw: "Muda wa ombi la kuingia umekwisha. Tafadhali anza tena.", en: "The sign-in request has expired. Please start again." },
   challenge_invalid: { sw: "Ombi la kuingia limekwisha au si halali kwenye kivinjari hiki. Tafadhali anza tena.", en: "The sign-in request has expired or is not valid in this browser. Please start again." },
   nostr_lifecycle_pending: { sw: "Kubadilisha njia ya kuingia ya Nostr bado hakupatikani. Unaweza kutoka na kuendelea kujifunza.", en: "Replacing a Nostr sign-in method is not available yet. You can sign out and keep learning." },
+  nostr_key_mismatch: { sw: "Ufunguo wa Nostr uliotumia kuthibitisha si ule wa akaunti hii. Tumia programu ya kusaini yenye utambulisho wa akaunti yako.", en: "The Nostr key you confirmed with is not the one on this account. Use the signer that holds this account's identity." },
   not_found: {
     sw: "Hatukupata ukurasa au kitu ulichotafuta.",
     en: "We could not find what you were looking for.",

@@ -552,7 +552,7 @@ describe("the proxy's tester gate", () => {
 });
 
 describe("no alternative session path", () => {
-  it("createSession is called only by the four gated flows", () => {
+  it("createSession is called only by the five gated flows", () => {
     const src = join(dirname(fileURLToPath(import.meta.url)), "..", "src");
     const callers = readdirSync(src)
       .filter((f) => f.endsWith(".ts"))
@@ -567,6 +567,7 @@ describe("no alternative session path", () => {
       });
     expect(callers.sort()).toEqual([
       "accounts.ts:replaceGithubIdentity",
+      "accounts.ts:replaceNostrIdentity",
       "accounts.ts:signInWithGithub",
       "accounts.ts:signInWithNostr",
       "recovery.ts:redeem",

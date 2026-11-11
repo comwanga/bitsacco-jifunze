@@ -4,10 +4,10 @@ This guide is for the retained local account compatibility stack. The public web
 
 Local account exports must use a local `SITE_ORIGIN` so the public-origin build does not replace sign-in with its anonymous explanation. Pass the local origin explicitly when building the web image; no production configuration should be copied into this stack.
 
-The optional account (GitHub sign-in and recovery codes) is a small Node 24 API in [`api/`](../../api/) with PostgreSQL. nginx serves the site and proxies `/api/` to it. The site starts and serves pages without the API.
+The optional account (Nostr sign-in and recovery codes) is a small Node 24 API in [`api/`](../../api/) with PostgreSQL. nginx serves the site and proxies `/api/` to it. The site starts and serves pages without the API.
 
 ```bash
-cp api/.env.example api/.env.local   # fill in the GitHub App and the recovery pepper
+cp api/.env.example api/.env.local   # fill in the recovery pepper; the GitHub App is optional
 docker compose build --build-arg SITE_ORIGIN=http://localhost:8080 web
 docker compose build api
 docker compose up --no-build         # http://localhost:8080/sw/account/
@@ -18,16 +18,31 @@ docker compose up --no-build         # http://localhost:8080/sw/account/
 - Only the site is published, on `127.0.0.1:8080`. The API and the database have no host port. This is a local development stack, not a production boundary.
 - Sign in locally with Chromium or Firefox. The session cookie is `__Host-` and `Secure`, and Safari/WebKit refuses it on `http://localhost`.
 - The rate limits live in the API's memory, so they reset whenever it restarts.
-- GitHub requires the `redirect_uri` to match a registered callback. Register all three on the GitHub App: `/api/auth/github/callback`, `/api/auth/github/callback/reauth` and `/api/auth/github/callback/replace` (for example `http://localhost:8080/api/auth/github/callback`).
+- GitHub is optional. With both `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` unset the API starts without it: no `/api/auth/github/*` path exists and session cookies are `SameSite=Strict`. The sign-in page shows a GitHub button only when the site is built with `JIFUNZE_GITHUB_SIGNIN=1`; the default build, including the Docker web image, offers Nostr only. Setting only one of the two is a configuration error.
+- If GitHub is configured, it requires the `redirect_uri` to match a registered callback. Register all three on the GitHub App: `/api/auth/github/callback`, `/api/auth/github/callback/reauth` and `/api/auth/github/callback/replace` (for example `http://localhost:8080/api/auth/github/callback`).
 
 ```bash
 export TEST_DATABASE_URL=postgres://...   # a throwaway PostgreSQL database
 npm run api:test
-SITE_ORIGIN=http://localhost:4352 npm run build
+SITE_ORIGIN=http://localhost:4352 JIFUNZE_GITHUB_SIGNIN=1 npm run build   # the suites also cover the GitHub module
 npm run e2e:account                      # Chromium, against the real API and a fake GitHub
 ```
 
 `npm run e2e:account` starts a fake GitHub (`api/test/fake-github-server.ts`) with a test-only consent page. It is not real GitHub authentication. CI runs both, validates `compose.yaml` and builds the API image.
+
+## Nostr account lifecycle
+
+Stage 1 of the Nostr-first identity design (`docs/superpowers/specs/2026-11-12-nostr-first-identity-design.md`, proposed separately) adds these routes. Each proof is a NIP-98 event signed for that route's own URL, over a single-use challenge bound to the browser and, except for sign-in, to the session that asked for it.
+
+| Route | Session | Effect |
+| --- | --- | --- |
+| `POST /api/auth/nostr/challenge` with `purpose` `signin`, `reauth` or `replace` | none for `signin`; full for `reauth`; full or recovery for `replace` | Issues the challenge and the URL to sign for |
+| `POST /api/auth/nostr/reauth` | full | The account's own key confirms; refreshes this session's re-authentication time. Another key is refused (`nostr_key_mismatch`) and the challenge is spent |
+| `POST /api/auth/nostr/replace` | recovery, or full re-authenticated within 10 minutes | Attaches the newly proven key to this session's account, revokes every session and starts a fresh one. A key held by another account is refused (`identity_in_use`) |
+| `POST /api/auth/logout/all` | any | Revokes every session of the account |
+| `POST /api/me/delete` with `{"confirm":true}` | full, re-authenticated within 10 minutes | Deletes the account with its identities, sessions, challenges and recovery codes |
+
+Key replacement does not issue recovery codes itself; the fresh session can request a new set from `POST /api/me/recovery-codes`. The account pages do not use these routes yet: the recovery and account screens for Nostr are Stage 4 of the design. No secret key, seed phrase or signer password is ever sent to the API.
 
 ## Logs
 

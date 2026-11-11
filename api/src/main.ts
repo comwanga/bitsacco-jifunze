@@ -3,8 +3,8 @@ import { fileURLToPath } from "node:url";
 import { loadConfig } from "./config.ts";
 import { connect, errorCode, migrate, MigrationError } from "./db.ts";
 import { createServer } from "./http.ts";
-import { routes } from "./routes.ts";
-import { purgeExpired, readSession } from "./sessions.ts";
+import { routesFor } from "./routes.ts";
+import { purgeExpired, readSession, setSessionSameSite } from "./sessions.ts";
 
 const cfg = loadConfig(process.env);
 // Counts and key names only: the identities themselves stay out of the logs.
@@ -15,6 +15,9 @@ console.info(JSON.stringify({
   nostr: cfg.testerAllowlist?.nostr.size ?? 0,
   invalid: cfg.testerAllowlistInvalid,
 }));
+// GitHub is mounted only when its App is configured. Without it no cross-site redirect carries the session.
+console.info(JSON.stringify({ event: "auth_methods", nostr: true, github: cfg.githubEnabled }));
+setSessionSameSite(cfg.githubEnabled ? "Lax" : "Strict");
 let sql: ReturnType<typeof connect>;
 try {
   sql = connect(cfg.databaseUrl);
@@ -43,7 +46,7 @@ async function purge(): Promise<void> {
 await purge();
 setInterval(() => void purge(), 24 * 60 * 60 * 1000).unref();
 
-const server = createServer(routes, { cfg, sql, readSession });
+const server = createServer(routesFor(cfg), { cfg, sql, readSession });
 server.listen(cfg.port, () => {
   console.info(JSON.stringify({ event: "listening", port: cfg.port }));
 });

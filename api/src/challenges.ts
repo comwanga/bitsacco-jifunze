@@ -7,23 +7,36 @@ type Purpose = "signin" | "reauth" | "replace";
 const sha256 = (s: string): Buffer => createHash("sha256").update(s).digest();
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 
-export async function createNostrChallenge(sql: Sql, lang: Lang, returnTo: string): Promise<{ challengeId: string; nonce: string; preauth: string }> {
+/** `binding` is the initiating session: required for reauth and replace, absent for signin (a schema check enforces both). */
+export async function createNostrChallenge(
+  sql: Sql, lang: Lang, returnTo: string, purpose: Purpose = "signin", binding?: { accountId: string; sessionTokenHash: Buffer },
+): Promise<{ challengeId: string; nonce: string; preauth: string }> {
   const nonce = randomBytes(32).toString("base64url");
   const preauth = randomBytes(32).toString("base64url");
   const [row] = await sql<{ id: string }[]>`
-    insert into auth_challenges (purpose, provider, secret_hash, binding_hash, lang, return_to, expires_at)
-    values ('signin', 'nostr', ${sha256(nonce)}, ${sha256(preauth)}, ${lang}, ${returnTo}, now() + interval '5 minutes')
+    insert into auth_challenges (purpose, provider, secret_hash, binding_hash, lang, return_to, account_id, session_token_hash, expires_at)
+    values (${purpose}, 'nostr', ${sha256(nonce)}, ${sha256(preauth)}, ${lang}, ${returnTo},
+      ${binding?.accountId ?? null}, ${binding?.sessionTokenHash ?? null}, now() + interval '5 minutes')
     returning id`;
   return { challengeId: row!.id, nonce, preauth };
 }
 
 /** Caller owns the transaction: consumption must commit with account/session creation. */
-export async function consumeNostrChallenge(sql: Sql, id: string, nonce: string, preauth: string): Promise<{ lang: Lang; returnTo: string } | null> {
+/**
+ * A challenge is spent only for the purpose it was created for. For reauth and replace, `session` must be the very
+ * session that asked for it, on the same account: a challenge can never be carried to another account or session.
+ */
+export async function consumeNostrChallenge(
+  sql: Sql, id: string, nonce: string, preauth: string, purpose: Purpose = "signin", session?: { accountId: string; tokenHash: Buffer },
+): Promise<{ lang: Lang; returnTo: string } | null> {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id) || !TOKEN.test(nonce) || !TOKEN.test(preauth)) return null;
+  if ((purpose === "signin") !== (session === undefined)) return null;
   const [row] = await sql<{ lang: Lang; return_to: string }[]>`
     update auth_challenges set used_at = now()
     where id = ${id} and secret_hash = ${sha256(nonce)} and binding_hash = ${sha256(preauth)}
-      and purpose = 'signin' and provider = 'nostr' and used_at is null and expires_at > now()
+      and purpose = ${purpose} and provider = 'nostr' and used_at is null and expires_at > now()
+      and account_id is not distinct from ${session?.accountId ?? null}
+      and session_token_hash is not distinct from ${session?.tokenHash ?? null}
     returning lang, return_to`;
   return row ? { lang: row.lang, returnTo: row.return_to } : null;
 }

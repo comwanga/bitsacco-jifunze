@@ -9,4 +9,6 @@ export const SITE_URL = origin.origin;
 export const SITE_INDEXABLE = SITE_URL === "https://bitsaccojifunze.xyz";
 // The initial public release is anonymous. Staging/local account acceptance stays separate.
 export const ACCOUNTS_AVAILABLE = !SITE_INDEXABLE;
+// Nostr is the learner sign-in. The GitHub button is built in only for a deployment that mounts the GitHub routes.
+export const GITHUB_SIGNIN = process.env.JIFUNZE_GITHUB_SIGNIN === "1";
 export const REPO_URL = "https://github.com/comwanga/bitsacco-jifunze";

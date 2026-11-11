@@ -27,7 +27,7 @@ services:
       dockerfile: docker/api.Dockerfile
     logging: *logging
     env_file:
-      - path: api/.env.local # GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, RECOVERY_PEPPER_V1
+      - path: api/.env.local # RECOVERY_PEPPER_V1; optionally GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
         required: false # so `docker compose config` works without it; the API names any missing key at boot
     environment:
       PORT: "3001"

@@ -1,4 +1,4 @@
-import { ACCOUNTS_AVAILABLE } from "@/lib/site";
+import { ACCOUNTS_AVAILABLE, GITHUB_SIGNIN } from "@/lib/site";
 import { AccountUnavailable } from "@/components/account/AccountUnavailable";
 import type { Metadata } from "next";
 import { SignIn } from "@/components/account/SignIn";
@@ -22,7 +22,7 @@ export default async function SignInPage({ params }: Params) {
     <div className="mx-auto max-w-3xl px-4 pt-8 pb-16">
       <h1 className="text-3xl font-extrabold tracking-tight">{c.signinHeading}</h1>
       <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.signinChoiceLead}</p>
-      <SignIn lang={lang} onboarding={<NostrOnboarding lang={lang} />} />
+      <SignIn lang={lang} github={GITHUB_SIGNIN} onboarding={<NostrOnboarding lang={lang} />} />
     </div>
   );
 }

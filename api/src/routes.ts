@@ -3,7 +3,9 @@ import type { Route } from "./http.ts";
 import { githubRoutes } from "./github-routes.ts";
 import { nostrRoutes } from "./nostr-routes.ts";
 import { recoveryRoutes } from "./recovery.ts";
-import { logoutRoute, meRoute } from "./sessions.ts";
+import type { Config } from "./config.ts";
+import { deleteAccountRoute } from "./delete-route.ts";
+import { logoutAllRoute, logoutRoute, meRoute } from "./sessions.ts";
 
 export const healthRoute: Route = {
   method: "GET",
@@ -26,4 +28,12 @@ export const testerGateRoute: Route = {
   },
 };
 
-export const routes: Route[] = [healthRoute, testerGateRoute, meRoute, logoutRoute, ...githubRoutes(), ...nostrRoutes(), ...recoveryRoutes()];
+export const routes: Route[] = [
+  healthRoute, testerGateRoute, meRoute, logoutRoute, logoutAllRoute, deleteAccountRoute(),
+  ...githubRoutes(), ...nostrRoutes(), ...recoveryRoutes(),
+];
+
+/** The routes a deployment actually serves: without a configured GitHub App, no GitHub path exists at all. */
+export function routesFor(cfg: Pick<Config, "githubEnabled">): Route[] {
+  return cfg.githubEnabled ? routes : routes.filter((r) => !r.path.startsWith("/api/auth/github/"));
+}

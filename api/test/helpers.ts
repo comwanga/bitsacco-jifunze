@@ -11,6 +11,7 @@ export function fakeConfig(over: Partial<Config> = {}): Config {
     siteOrigin: ORIGIN,
     port: 0,
     databaseUrl: "postgres://fake:fake@localhost/fake",
+    githubEnabled: true,
     githubClientId: "fake-client-id",
     githubClientSecret: "fake-client-secret",
     githubOAuthBase: "http://127.0.0.1:1",

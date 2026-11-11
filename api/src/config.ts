@@ -4,6 +4,8 @@ export type Config = {
   siteOrigin: string;
   port: number;
   databaseUrl: string;
+  /** False when no GitHub App is configured: the GitHub routes are then not mounted at all. */
+  githubEnabled: boolean;
   githubClientId: string;
   githubClientSecret: string;
   githubOAuthBase: string;
@@ -16,11 +18,17 @@ export type Config = {
   testerAllowlistInvalid: string[];
 };
 
-const REQUIRED = ["SITE_ORIGIN", "DATABASE_URL", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"] as const;
+const REQUIRED = ["SITE_ORIGIN", "DATABASE_URL"] as const;
 
 // Errors name keys only, never values.
 export function loadConfig(env: NodeJS.ProcessEnv): Config {
   const missing: string[] = REQUIRED.filter((k) => !env[k]);
+
+  // GitHub is optional, but half a credential is a mistake, not a choice.
+  const githubEnabled = Boolean(env.GITHUB_CLIENT_ID) && Boolean(env.GITHUB_CLIENT_SECRET);
+  if (Boolean(env.GITHUB_CLIENT_ID) !== Boolean(env.GITHUB_CLIENT_SECRET)) {
+    missing.push(env.GITHUB_CLIENT_ID ? "GITHUB_CLIENT_SECRET" : "GITHUB_CLIENT_ID");
+  }
 
   const peppers = new Map<number, Buffer>();
   const invalid: string[] = [];
@@ -50,8 +58,9 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     siteOrigin: env.SITE_ORIGIN as string,
     port,
     databaseUrl: env.DATABASE_URL as string,
-    githubClientId: env.GITHUB_CLIENT_ID as string,
-    githubClientSecret: env.GITHUB_CLIENT_SECRET as string,
+    githubEnabled,
+    githubClientId: env.GITHUB_CLIENT_ID ?? "",
+    githubClientSecret: env.GITHUB_CLIENT_SECRET ?? "",
     githubOAuthBase: env.GITHUB_OAUTH_BASE || "https://github.com",
     githubApiBase: env.GITHUB_API_BASE || "https://api.github.com",
     peppers,

@@ -121,6 +121,8 @@ jobs:
       - name: Build account acceptance export
         env:
           SITE_ORIGIN: http://127.0.0.1:4352
+          # The account suites also exercise the retained GitHub module against a fake provider.
+          JIFUNZE_GITHUB_SIGNIN: "1"
         run: npm run build
       - name: Install Chromium for browser checks
         run: npx playwright install --with-deps chromium

@@ -15,6 +15,16 @@ import { SESSION_COOKIE, type Route, type Session, type Sql } from "./http.ts";
 const COOKIE_ATTRS = "HttpOnly; Secure; SameSite=Lax; Path=/";
 export const clearSessionCookie = `${SESSION_COOKIE}=; ${COOKIE_ATTRS}; Max-Age=0`;
 
+/*
+ * Lax exists only so the session can accompany the redirect back from GitHub. Without the GitHub routes nothing
+ * needs the cookie on a cross-site navigation (the pages are static and call the API same-site), so the boot code
+ * switches new session cookies to Strict. Set once at start-up, before the server listens.
+ */
+let sessionSameSite: "Lax" | "Strict" = "Lax";
+export function setSessionSameSite(value: "Lax" | "Strict"): void {
+  sessionSameSite = value;
+}
+
 /** Window for /api/me notices: recovery-code-used events from the last 30 days. */
 const NOTICE_WINDOW = "30 days";
 
@@ -42,7 +52,7 @@ export async function createSession(
     insert into sessions (token_hash, account_id, scope, created_at, last_seen_at, expires_at)
     values (${tokenHash}, ${accountId}, ${scope}, now(), now(), now() + ${lifetime}::interval)`;
   return {
-    cookie: `${SESSION_COOKIE}=${token.toString("base64url")}; ${COOKIE_ATTRS}`,
+    cookie: `${SESSION_COOKIE}=${token.toString("base64url")}; HttpOnly; Secure; SameSite=${sessionSameSite}; Path=/`,
     tokenHash,
   };
 }
@@ -145,6 +155,22 @@ export const logoutRoute: Route = {
   recoveryAllowed: true,
   handler: async ({ sql, session }) => {
     await revokeSession(sql, session!.tokenHash);
+    return { status: 204, setCookies: [clearSessionCookie] };
+  },
+};
+
+/** Sign out everywhere: every session of the account, this one included. */
+export const logoutAllRoute: Route = {
+  method: "POST",
+  path: "/api/auth/logout/all",
+  auth: "any",
+  recoveryAllowed: true,
+  handler: async ({ sql, session }) => {
+    await sql.begin(async (tx) => {
+      const revoked = await revokeOtherSessions(tx, session!.accountId);
+      await tx`insert into security_events (account_id, event, detail)
+        values (${session!.accountId}, 'signout_all', ${tx.json({ sessions: String(revoked) })})`;
+    });
     return { status: 204, setCookies: [clearSessionCookie] };
   },
 };

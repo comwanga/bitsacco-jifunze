@@ -2,7 +2,7 @@ import { errorCode } from "./db.ts";
 import { consumeNostrChallenge } from "./challenges.ts";
 import { ApiError } from "./errors.ts";
 import type { Session, Sql } from "./http.ts";
-import { createSession, revokeOtherSessions, revokeSession } from "./sessions.ts";
+import { createSession, markReauth, revokeOtherSessions, revokeSession } from "./sessions.ts";
 
 type GithubUser = { id: number; login: string; avatarUrl: string };
 
@@ -175,6 +175,121 @@ export async function replaceGithubIdentity(
     });
   } catch (e) {
     // 55P03 lock_not_available: the NOWAIT row lock, or lock_timeout on any other wait.
+    if (errorCode(e) === "55P03") throw new ApiError(409, "replace_conflict");
+    throw e;
+  }
+}
+
+type NostrProof = { challengeId: string; nonce: string; preauth: string };
+
+/**
+ * Re-authentication with the account's own Nostr key. The challenge must be the one this very session asked for.
+ * A proof from any other key spends the challenge and is refused: it never touches the session.
+ */
+export async function reauthWithNostr(sql: Sql, pubkey: string, proof: NostrProof, session: Session): Promise<void> {
+  const own = await sql.begin(async (tx) => {
+    const ch = await consumeNostrChallenge(tx, proof.challengeId, proof.nonce, proof.preauth, "reauth",
+      { accountId: session.accountId, tokenHash: session.tokenHash });
+    if (!ch) throw new ApiError(401, "challenge_invalid");
+    const mine = await tx`
+      update identities set last_verified_at = now()
+      where account_id = ${session.accountId} and provider = 'nostr' and provider_uid = ${pubkey} and revoked_at is null
+      returning 1`;
+    if (mine.length === 0) return false; // commit the consumption, change nothing else
+    if (!(await markReauth(tx, session.tokenHash))) throw new ApiError(401, "unauthenticated");
+    await logEvent(tx, session.accountId, "reauth", { provider: "nostr" });
+    return true;
+  });
+  if (!own) throw new ApiError(403, "nostr_key_mismatch");
+}
+
+/**
+ * Replaces the account's Nostr key with a newly proven one. The same shape as replaceGithubIdentity, in ONE
+ * transaction: lock the account (a concurrent replacement → 409 replace_conflict), spend the challenge that this
+ * session asked for, re-check the session (live; a full session re-authenticated within 10 minutes; a recovery
+ * session as it is), refuse a key that belongs to another account (409 identity_in_use), swap the identity, revoke
+ * every session of the account and start a fresh full one. Any failure rolls all of it back, the challenge included.
+ * The account is always the session's: there is no way to name another one.
+ */
+export async function replaceNostrIdentity(
+  sql: Sql,
+  pubkey: string,
+  proof: NostrProof,
+  session: Pick<Session, "accountId" | "tokenHash" | "scope">,
+): Promise<{ outcome: "replaced" | "unchanged"; cookie: string; returnTo: string }> {
+  const accountId = session.accountId;
+  try {
+    return await sql.begin(async (tx) => {
+      await tx`set local lock_timeout = '2s'`;
+      const acct = await tx`
+        select id from accounts where id = ${accountId} and deleted_at is null for no key update nowait`;
+      if (acct.length === 0) throw new ApiError(401, "unauthenticated");
+      const ch = await consumeNostrChallenge(tx, proof.challengeId, proof.nonce, proof.preauth, "replace",
+        { accountId, tokenHash: session.tokenHash });
+      if (!ch) throw new ApiError(401, "challenge_invalid");
+      const [live] = await tx<{ fresh: boolean }[]>`
+        select (scope = 'recovery' or reauth_at > now() - interval '10 minutes') as fresh from sessions
+        where token_hash = ${session.tokenHash} and account_id = ${accountId} and scope = ${session.scope}
+          and revoked_at is null and expires_at > now()
+        for no key update`;
+      if (!live) throw new ApiError(401, "unauthenticated");
+      if (!live.fresh) throw new ApiError(403, "reauth_required");
+      // Replacement only: attaching Nostr to an account that never had it is cross-provider linking, a later stage.
+      const existing = await tx`select 1 from identities where account_id = ${accountId} and provider = 'nostr'`;
+      if (existing.length === 0) throw new ApiError(403, "nostr_lifecycle_pending");
+
+      const [owner] = await tx<{ account_id: string }[]>`
+        select account_id from identities where provider = 'nostr' and provider_uid = ${pubkey}`;
+      if (owner && owner.account_id !== accountId) throw new ApiError(409, "identity_in_use");
+      let outcome: "replaced" | "unchanged";
+      if (owner) {
+        await tx`update identities set last_verified_at = now() where provider = 'nostr' and provider_uid = ${pubkey}`;
+        outcome = "unchanged";
+      } else {
+        await tx`delete from identities where account_id = ${accountId} and provider = 'nostr'`;
+        try {
+          await tx`insert into identities (account_id, provider, provider_uid) values (${accountId}, 'nostr', ${pubkey})`;
+        } catch (e) {
+          // Another account committed this key after our check above.
+          const constraint = (e as { constraint_name?: unknown } | null)?.constraint_name;
+          if (errorCode(e) === "23505" && constraint === IDENTITY_UNIQUE) throw new ApiError(409, "identity_in_use");
+          throw e;
+        }
+        outcome = "replaced";
+      }
+      await revokeOtherSessions(tx, accountId); // every session, the initiating one included
+      const fresh = await createSession(tx, accountId, "full");
+      await logEvent(tx, accountId, "identity_replaced", { provider: "nostr", outcome });
+      return { outcome, cookie: fresh.cookie, returnTo: ch.returnTo };
+    });
+  } catch (e) {
+    if (errorCode(e) === "55P03") throw new ApiError(409, "replace_conflict");
+    throw e;
+  }
+}
+
+/**
+ * Deletes the account and, by cascade, its identities, sessions, challenges and recovery codes. Its security events
+ * stay without an account reference. Requires this full session to be live and re-authenticated within 10 minutes,
+ * checked inside the transaction. The remaining event records that a deletion happened, never whose.
+ */
+export async function deleteAccount(sql: Sql, session: Pick<Session, "accountId" | "tokenHash">): Promise<void> {
+  try {
+    await sql.begin(async (tx) => {
+      await tx`set local lock_timeout = '2s'`;
+      const acct = await tx`select id from accounts where id = ${session.accountId} for update nowait`;
+      if (acct.length === 0) throw new ApiError(401, "unauthenticated");
+      const [live] = await tx<{ fresh: boolean }[]>`
+        select (reauth_at > now() - interval '10 minutes') as fresh from sessions
+        where token_hash = ${session.tokenHash} and account_id = ${session.accountId} and scope = 'full'
+          and revoked_at is null and expires_at > now()
+        for no key update`;
+      if (!live) throw new ApiError(401, "unauthenticated");
+      if (!live.fresh) throw new ApiError(403, "reauth_required");
+      await tx`delete from accounts where id = ${session.accountId}`;
+      await logEvent(tx, null, "account_deleted");
+    });
+  } catch (e) {
     if (errorCode(e) === "55P03") throw new ApiError(409, "replace_conflict");
     throw e;
   }

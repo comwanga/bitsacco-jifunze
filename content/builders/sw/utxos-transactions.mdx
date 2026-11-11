@@ -8,6 +8,10 @@ objectives:
   - Hesabu ada ya muamala kutoka kwa pembejeo na matokeo yake
   - Tuma, fafanua na uthibitishe muamala kwenye regtest
 resources:
+  - title: "BIP 141: Segregated Witness"
+    url: "https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki"
+    kind: docs
+    language: en
   - title: "Kujifunza Bitcoin, sura ya 6 na 9: miamala na ada"
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
@@ -20,6 +24,7 @@ resources:
 reflection:
   - "Kwa nini Bitcoin hutengeneza matokeo ya chenji badala ya kupunguza salio tu?"
   - "Nini kingetokea kwa muamala ambao matokeo yake yanazidi pembejeo zake?"
+  - "Linganisha lengo la malipo na kitambulisho cha muamala kilichosimbwa. Ni mabadiliko yapi yanaweza kuhifadhi lengo lakini kubadili kitambulisho, na muamala unaokitegemea ungeathirikaje?"
 source:
   type: original
 terms:
@@ -87,6 +92,14 @@ bitcoin-cli -regtest -rpcwallet=bob getbalance
 **Unachotarajia:** salio la Bob ni `1.50000000`. Muamala sasa una <Term id="confirmation" /> mmoja.
 
 **Umemaliza ukiweza:** kuonyesha tokeo la chenji kwenye muamala uliofafanuliwa na kuhesabu ada yake.
+
+## Utambulisho wa muamala na SegWit
+
+Lengo la malipo na utambulisho wa baiti za muamala ni tofauti. Kitambulisho hutokana na mpangilio uliosimbwa wa data. Kihistoria, baadhi ya mabadiliko ya usimbaji wa sahihi yaliweza kubadili kitambulisho bila kubadili lengo la malipo. Muamala wa baadaye hutaja kitambulisho cha mzazi anapotumia tokeo lake; badiliko lisilotarajiwa linaweza kuvunja utegemezi huo.
+
+SegWit hutenga data ya ushahidi na mpangilio unaotumika kuunda kitambulisho cha muamala. Kitambulisho cha muamala chenye ushahidi pia hufunga data ya ushahidi. Hii hushughulikia baadhi ya mabadiliko yasiyotakiwa na kusaidia itifaki zinazotegemea miamala kabla ya uthibitisho. Haimaanishi kila badiliko huhifadhi kitambulisho au sahihi huhakikisha malipo kukamilika.
+
+Katika matokeo yaliyofumbuliwa ya regtest, linganisha kitambulisho, hashi inayohusisha ushahidi pale ipo, ingizo, matokeo na ukubwa halisi wa kukadiria ada. Soma maana katika BIP 141 kabla ya kueleza data inayofungwa na kila kitambulisho. Taja dhana inayohifadhi kitambulisho cha mzazi na badiliko linalobadili malipo yenyewe. Huhitaji muamala mpya wa mtandao mkuu.
 
 ## Ushahidi wa maabara
 

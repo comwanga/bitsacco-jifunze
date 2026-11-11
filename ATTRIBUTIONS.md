@@ -2,6 +2,10 @@
 
 The curriculum in `content/` is released under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The Savers and Bitcoin Builders lessons are original Jifunze material; the Lightning lessons are adaptations credited below. Adapted lessons also name their source and licence in their `source` front matter.
 
+## Discussion-based learning
+
+The required open-ended activities draw pedagogical inspiration from [Chaincode Labs' Bitcoin Protocol Development seminar](https://chaincode.gitbook.io/seminars/bitcoin-protocol-development), including its topic readings, design-trade-off discussions and learner-generated questions. Jifunze's questions and additional explanations are newly authored for its audiences, not reproductions or translations of Chaincode's question bank. Links do not imply endorsement or permission to relicense third-party material.
+
 ## Mastering the Lightning Network
 
 The 17 lessons in `content/lightning/` are adapted, simplified and translated into Kiswahili from [*Mastering the Lightning Network*](https://github.com/lnbook/lnbook) by Andreas M. Antonopoulos, Olaoluwa Osuntokun and René Pickhardt, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each lesson names the book and its chapter in `source` and resources. The lab's four-node topology (Alice, Bob, Chan and Dina) follows the book's examples.

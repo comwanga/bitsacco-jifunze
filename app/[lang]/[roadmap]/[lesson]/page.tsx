@@ -95,7 +95,7 @@ export default async function LessonPage({ params }: Params) {
       <div className="lesson-body">{body}</div>
       <LessonPracticeLinks lessonKey={key} lang={lang} />
 
-      <Reflection lang={lang} prompts={fm.reflection} />
+      <Reflection lang={lang} prompts={fm.reflection} lessonKey={key} />
 
       {quizFile && (
         <div lang={lang}>

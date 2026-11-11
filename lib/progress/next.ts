@@ -9,7 +9,7 @@ export type NextUp = { roadmap: RoadmapId; slug: string; reason: "continue" | "s
 export function lastActivity(p: Progress): { key: LessonKey; at: string } | null {
   let best: { key: LessonKey; at: string } | null = null;
   for (const [key, l] of Object.entries(p.lessons)) {
-    for (const at of [l.completedAt, l.quiz?.at]) {
+    for (const at of [l.completedAt, l.quiz?.at, l.reflectedAt]) {
       if (at && (!best || at > best.at)) best = { key: key as LessonKey, at };
     }
   }

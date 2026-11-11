@@ -8,6 +8,7 @@ import {
   parseProgressFile,
   recordLabPass,
   recordQuiz,
+  recordReflection,
   type LessonKey,
   type ParseError,
   type Progress,
@@ -62,6 +63,7 @@ export function useProgress(): {
   progress: Progress;
   canPersist: boolean;
   complete(key: LessonKey): void;
+  reflect(key: LessonKey): void;
   quiz(key: LessonKey, correct: number, total: number): void;
   importText(text: string): ParseError | null;
   labPass(key: LessonKey, exerciseId: string, allIds: string[]): void;
@@ -69,7 +71,11 @@ export function useProgress(): {
   const progress = useSyncExternalStore(subscribe, read, () => SERVER_SNAPSHOT);
   const canPersist = useSyncExternalStore(subscribe, canPersistNow, () => true);
 
-  const complete = useCallback((key: LessonKey) => write(markComplete(read(), key, new Date().toISOString())), []);
+  const complete = useCallback((key: LessonKey) => {
+    const current = read();
+    if (current.lessons[key]?.reflectedAt || current.lessons[key]?.completedAt) write(markComplete(current, key, new Date().toISOString()));
+  }, []);
+  const reflect = useCallback((key: LessonKey) => write(recordReflection(read(), key, new Date().toISOString())), []);
   const quiz = useCallback(
     (key: LessonKey, correct: number, total: number) =>
       write(recordQuiz(read(), key, correct, total, new Date().toISOString())),
@@ -84,9 +90,9 @@ export function useProgress(): {
 
   const labPass = useCallback(
     (key: LessonKey, exerciseId: string, allIds: string[]) =>
-      write(recordLabPass(read(), key, exerciseId, allIds, new Date().toISOString())),
+      write(recordLabPass(read(), key, exerciseId, allIds, new Date().toISOString(), true)),
     [],
   );
 
-  return { progress, canPersist, complete, quiz, importText, labPass };
+  return { progress, canPersist, complete, reflect, quiz, importText, labPass };
 }

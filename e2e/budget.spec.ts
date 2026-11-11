@@ -4,7 +4,7 @@ import { simulationCopy } from "../lib/simulations/copy";
 import { scriptGzip, trackScripts } from "./helpers/script-budget";
 import { UX_LIMITS } from "../lib/build/ux-budget";
 
-for (const lang of ["en", "sw"] as const) for (const id of ["utxo", "channel-balances"] as const) {
+for (const lang of ["en", "sw"] as const) for (const id of ["utxo", "channel-balances", "savings-scenarios"] as const) {
   test(`${lang}/${id}: actual initial and activated script budgets`, async ({ page, context }, info) => {
     test.skip(info.project.name !== "desktop", "both projects download the same JavaScript assets");
     const scripts = trackScripts(context);

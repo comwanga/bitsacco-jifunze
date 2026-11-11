@@ -1,0 +1,145 @@
+{
+  "lesson": "multisig-inheritance",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "One 2-of-3 signer loses a key. What else must hold for recovery?",
+        "sw": "Msaini mmoja wa 2 kati ya 3 amepoteza ufunguo. Nini kingine kinahitajika?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Only a note saying two of three",
+            "sw": "Maandishi “mbili kati ya tatu” pekee"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The remaining keys and needed wallet configuration are available",
+            "sw": "Funguo zilizobaki na mpangilio unaohitajika vinapatikana"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The market price has risen",
+            "sw": "Bei ya soko imepanda"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Threshold availability includes usable independent keys and compatible recovery metadata.",
+        "sw": "Upatikanaji unahitaji funguo huru zinazotumika na taarifa za urejeshaji zinazolingana."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Which is not a true 2-of-3 arrangement?",
+        "sw": "Upi si mpangilio halisi wa 2 kati ya 3?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Three independent spending keys under a threshold policy",
+            "sw": "Funguo tatu huru chini ya sera ya kiwango"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Two usable independent signers",
+            "sw": "Wasaini wawili huru wanaopatikana"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Three copies of the same single key",
+            "sw": "Nakala tatu za ufunguo uleule"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Copies add backups, not independent signature requirements.",
+        "sw": "Nakala huongeza hifadhi, si mahitaji huru ya sahihi."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "What can two colluding signers do in ordinary 2-of-3 custody?",
+        "sw": "Wasaini wawili wanaoshirikiana kuiba wanaweza kufanya nini katika 2 kati ya 3 ya kawaida?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Spend without the third signer",
+            "sw": "Kutumia bila msaini wa tatu"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Prove every heir consented",
+            "sw": "Kuthibitisha kila mrithi amekubali"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Automatically satisfy local inheritance law",
+            "sw": "Kutimizia sheria ya mirathi moja kwa moja"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "A spending threshold does not enforce the whole governance or legal process.",
+        "sw": "Kiwango cha sahihi hakitekelezi utawala au mchakato wote wa sheria."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "What should an inheritance plan address separately from key access?",
+        "sw": "Mpango wa urithi ushughulikie nini tofauti na kufikia funguo?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Only device colour",
+            "sw": "Rangi ya kifaa pekee"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Lawful authority, entitlement and applicable local requirements",
+            "sw": "Mamlaka halali, haki na masharti ya eneo husika"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A guaranteed Bitcoin return",
+            "sw": "Faida ya Bitcoin iliyohakikishwa"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Local qualified review is needed; technical recovery is not a legal succession template.",
+        "sw": "Uhakiki wa mtaalamu wa eneo unahitajika; urejeshaji wa kiufundi si kiolezo cha sheria ya urithi."
+      }
+    }
+  ]
+}

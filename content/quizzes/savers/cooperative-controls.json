@@ -1,0 +1,145 @@
+{
+  "lesson": "cooperative-controls",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Liabilities start at 90,000; deposits add 10,000; withdrawals remove 8,000. Ending amount?",
+        "sw": "Madeni yanaanza 90,000; amana zinaongeza 10,000; utoaji unaondoa 8,000. Mwisho?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "22,000",
+            "sw": "22,000"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "92,000",
+            "sw": "92,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "100,000",
+            "sw": "100,000"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Member liabilities are 90,000 + 10,000 − 8,000; cash is recorded separately.",
+        "sw": "Madeni kwa wanachama ni 90,000 + 10,000 − 8,000; pesa hurekodiwa tofauti."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "A second 1,000 deposit posting has no second receipt. What is the effect?",
+        "sw": "Ingizo la pili la amana ya 1,000 halina risiti ya pili. Athari?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Assets rise automatically",
+            "sw": "Mali zinaongezeka moja kwa moja"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No possible problem",
+            "sw": "Hakuna tatizo linalowezekana"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Member liabilities are overstated by 1,000",
+            "sw": "Madeni kwa wanachama yamezidishwa kwa 1,000"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "An independent reconciliation can detect a ledger claim unsupported by assets.",
+        "sw": "Ulinganishaji huru unaweza kugundua dai la daftari lisilo na mali."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "What does a financial audit not guarantee?",
+        "sw": "Ukaguzi wa hesabu hauhakikishi nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "That every fraud or future failure is impossible",
+            "sw": "Kwamba kila wizi au hitilafu ya baadaye haiwezekani"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "That statements can be examined",
+            "sw": "Kwamba taarifa zinaweza kuchunguzwa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That scope and findings matter",
+            "sw": "Kwamba wigo na matokeo vina umuhimu"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Audit provides assurance within a scope, not complete prevention or a future solvency promise.",
+        "sw": "Ukaguzi hutoa uhakiki kwa wigo wake, si kuzuia kila jambo au kuahidi uwezo wa baadaye."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "When a digital vendor performs tasks, who still needs to assess institutional responsibility?",
+        "sw": "Mtoa huduma wa kidijitali akifanya kazi, nani bado atathmini wajibu wa taasisi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Nobody; software removes it",
+            "sw": "Hakuna; programu huondoa wajibu"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "The cooperative under its applicable duties",
+            "sw": "Ushirika chini ya wajibu wake unaotumika"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only the member who owns a phone",
+            "sw": "Mwanachama mwenye simu pekee"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Outsourcing tasks does not automatically transfer contracts, oversight and member-protection duties.",
+        "sw": "Kutoa kazi nje hakuhamishi moja kwa moja mikataba, uangalizi na ulinzi wa wanachama."
+      }
+    }
+  ]
+}

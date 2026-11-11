@@ -8,6 +8,7 @@ import { BaobabScene } from "@/components/intro/BaobabScene";
 import { flatLessons, getGlossary, getLesson, getLibrary, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
 import { introScript } from "@/lib/intro/shouldPlay";
+import { pathOrder } from "@/lib/content/navigation";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
@@ -23,7 +24,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       return { slug, title: fm.title, minutes: fm.minutes, level: fm.level };
     }),
   }));
-  const order = paths.map(({ r, lessons }) => ({ id: r.id, slugs: lessons.map((l) => l.slug) }));
+  const order = paths.map(({ r }) => pathOrder(r));
   const titles = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.title])));
   const pathTitles = Object.fromEntries(paths.map(({ r }) => [r.id, r.title[lang]]));
 

@@ -13,19 +13,22 @@ export function ResumeLink({
   lang,
   className,
   describedBy,
+  optionalSections,
 }: {
   roadmap: RoadmapId;
   slugs: string[];
   lang: Lang;
   className?: string;
   describedBy?: string;
+  optionalSections?: string[][];
 }) {
   const { progress } = useProgress();
-  const next = nextInPath(progress, { id: roadmap, slugs });
+  const next = nextInPath(progress, { id: roadmap, slugs, optionalSections });
   const started = slugs.some((s) => progress.lessons[`${roadmap}/${s}`]?.completedAt);
-  const label = next === null ? "resumeReview" : started ? "resumeContinue" : "resumeStart";
+  const choose = next === null && Boolean(optionalSections?.length);
+  const label = choose ? "chooseSpecialization" : next === null ? "resumeReview" : started ? "resumeContinue" : "resumeStart";
   return (
-    <Link data-resume aria-describedby={describedBy} href={`/${lang}/${roadmap}/${next ?? slugs[0]}/`} className={className}>
+    <Link data-resume aria-describedby={describedBy} href={choose ? `/${lang}/${roadmap}/#specializations` : `/${lang}/${roadmap}/${next ?? slugs[0]}/`} className={className}>
       {t(lang, label)}
     </Link>
   );

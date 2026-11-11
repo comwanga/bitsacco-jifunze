@@ -8,6 +8,8 @@ import { buildCatalog } from "@/lib/content/catalog";
 import { flatLessons, getLesson, getRoadmap, listRoadmaps } from "@/lib/content/load";
 import type { RoadmapId } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
+import { pathOrder } from "@/lib/content/navigation";
+import { SpecializationChoices } from "@/components/roadmap/SpecializationChoices";
 
 export const dynamicParams = false;
 
@@ -35,17 +37,21 @@ export default async function RoadmapPage({ params }: Params) {
 
   return (
     <>
-      <PathHeader path={{ id: r.id, title: r.title[lang], tagline: r.tagline[lang], description: r.description[lang] }} lang={lang} slugs={slugs} minutes={minutes} view="list" />
+      <PathHeader path={{ id: r.id, title: r.title[lang], tagline: r.tagline[lang], description: r.description[lang] }} lang={lang} slugs={slugs} optionalSections={pathOrder(r).optionalSections} minutes={minutes} view="list" />
 
       <div className="mx-auto max-w-3xl px-4 py-10">
+        <SpecializationChoices sections={r.sections.map((s) => ({ ...s, title: s.title[lang], description: s.description?.[lang] }))} lang={lang} prefix="s" />
         {r.sections.map((section) => (
-          <section key={section.id} className="mb-10" aria-labelledby={`s-${section.id}`}>
+          <section key={section.id} id={`s-${section.id}`} className="mb-10 scroll-mt-24" aria-labelledby={`title-${section.id}`}>
             <div className="flex flex-wrap items-baseline gap-x-3">
-              <h2 id={`s-${section.id}`} className="text-xl font-bold">
+              <h2 id={`title-${section.id}`} className="text-xl font-bold">
                 {section.title[lang]}
               </h2>
               <SectionProgress section={section.id} roadmap={r.id} slugs={section.lessons.map((e) => e.slug)} lang={lang} />
             </div>
+            {section.description && <p className="mt-2 text-[var(--muted)]">{section.description[lang]}</p>}
+            <details open={!section.optional} className="mt-4">
+            <summary className={section.optional ? "cursor-pointer font-semibold text-teal-700 dark:text-teal-400" : "hidden"}>{t(lang, "optionalLessons")}</summary>
             <ol className="mt-4 space-y-2">
               {section.lessons.map((entry) => {
                 const n = slugs.indexOf(entry.slug) + 1;
@@ -88,6 +94,7 @@ export default async function RoadmapPage({ params }: Params) {
                 );
               })}
             </ol>
+            </details>
           </section>
         ))}
 

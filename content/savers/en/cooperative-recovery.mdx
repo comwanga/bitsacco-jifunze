@@ -1,0 +1,75 @@
+---
+title: 'Institutional custody, disaster recovery and accountability'
+description: >-
+  Design a conditional operating plan that survives unavailable people, sites
+  and providers.
+level: advanced
+minutes: 24
+objectives:
+  - 'Map approval, signing, bookkeeping and independent review responsibilities'
+  - Test institutional custody against correlated failures and missing records
+  - 'Explain member reporting, incident authority and lawful recovery boundaries'
+resources:
+  - title: 'NCUA: risk categories (US supervisory context)'
+    url: >-
+      https://publishedguides.ncua.gov/examiner/Content/ExaminersGuide/Examination%26SupervisionContacts/Risk-Focused_Exam/Risk%20Categories.htm
+    kind: docs
+    language: en
+  - title: 'Bitcoin: wallet security'
+    url: 'https://bitcoin.org/en/secure-your-wallet'
+    kind: docs
+    language: en
+  - title: 'BIP 129: multisignature wallet setup'
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0129.mediawiki'
+    kind: docs
+    language: en
+  - title: 'ICA: guidance on cooperative principles'
+    url: >-
+      https://www.ica.coop/sites/default/files/2021-11/ICA%20Guidance%20Notes%20EN.pdf
+    kind: pdf
+    language: en
+reflection:
+  - >-
+    Could staff reconstruct member claims if the wallet survived but the ledger
+    did not?
+  - >-
+    Which emergency action has legitimate authority, and which would silently
+    bypass a security boundary?
+  - >-
+    The ledger restores correctly but signing capacity does not. Reverse the
+    failure. What distinct evidence demonstrates recovery of member records and
+    recovery of asset control?
+terms:
+  - multisig
+  - segregation-of-duties
+source:
+  type: original
+---
+
+## Permission is the first dependency
+
+This lesson is a paper design exercise for an institution that would first need to establish permission for its exact activity. It does not authorize custody, payments, treasury investment or lending. If legal authority, qualified operational capacity or member protection is missing, the responsible plan is to stop at simulation.
+
+Institutional custody includes more than storing a key. The institution must know whose assets and claims it records, who can authorize changes, how it detects errors, how it recovers and how members obtain redress. Member assets, institutional treasury assets and operating balances must be distinguished under applicable law and accounting requirements. A shared wallet alone does not establish that distinction.
+
+## Design duties around an actual transaction
+
+In a fictional conditional plan, an authorized officer requests a documented payment. A separate role validates the obligation and approval. Required signers independently verify actual destination, amount, change and fee against that approval. Operations broadcasts and monitors settlement; accounting records it; an independent reviewer reconciles assets and liabilities. Staff permissions, device custody and exception review should support this separation.
+
+Multisignature can restrict technical spending, but enough colluding signers can still spend. It cannot verify board authority, borrower repayment or the accuracy of member records. A policy with many signers can also fail when a sufficient number are unavailable at the same time. External custody shifts some tasks to a vendor but leaves contractual, solvency, concentration and recovery dependencies to assess.
+
+## Case: the flooded head office
+
+Fictional Mwangaza keeps two of three signing devices, their backups, its public wallet configuration and its only current member ledger in one office. Flooding destroys that site. One surviving key does not meet 2-of-3, and knowing a public balance would not reconstruct who is owed what. “Three devices” was not an independent continuity design.
+
+In a revised **paper** design, independent recovery material, documented wallet configuration and protected member-ledger backups survive in separately assessed failure domains. Access is still restricted, authorized and logged. A restore rehearsal checks both asset control and ledger integrity; one does not prove the other. Record how long recovery takes and whether the institution can meet member needs during that period.
+
+## Incident decisions must remain accountable
+
+Define incident authority, evidence preservation, member communications, escalation, service suspension and restoration criteria. Emergency access is not permission to collect all seed phrases, lower the threshold or bypass an origin or authorization check. Any exceptional powers need a legitimate pre-agreed basis, review and applicable legal support. If sufficient keys are permanently lost, a committee cannot vote coins back into existence.
+
+For a compromised key or vendor, assess whether other signers can safely establish a new policy and transfer remaining assets. Preserve records and investigate before declaring the situation resolved. A departure checklist must revoke staff and service access and evaluate old-wallet key exposure, not merely remove a person's name from a spreadsheet. Review financial effects, including fees, delays, liquidity and potential loss; notify affected members through appropriate lawful channels without exposing secrets.
+
+## Try it
+
+Conduct a tabletop exercise with fictional roles and no keys: loss of a site; death of a signer; ledger corruption; custodian withdrawal suspension; two colluding signers; a false emergency payment request. For each, record detection, authority, available resources, communications and recovery limits. **Worked reasoning:** a restored wallet with a missing member ledger cannot prove complete member claims; a restored ledger with insufficient keys cannot spend. Both records and access must be tested, and Bitcoin removes neither governance nor regulatory responsibility.

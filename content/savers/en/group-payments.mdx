@@ -1,0 +1,69 @@
+---
+title: Contribution payments and a ledger that agrees
+description: >-
+  Record obligations, sats received and conversion evidence without confusing
+  them.
+level: intermediate
+minutes: 20
+objectives:
+  - Separate the contribution unit from the asset received
+  - Reconcile a fictional Bitcoin contribution and fee policy
+  - >-
+    Handle failed, late, duplicate and refunded payments without erasing
+    evidence
+resources:
+  - title: 'Lightning Labs: understanding liquidity'
+    url: >-
+      https://docs.lightning.engineering/the-lightning-network/liquidity/understanding-liquidity
+    kind: docs
+    language: en
+  - title: 'FAO: group savings methods'
+    url: 'https://www.fao.org/4/y4094e/y4094e04.htm'
+    kind: book
+    language: en
+  - title: 'Bitcoin: privacy'
+    url: 'https://bitcoin.org/en/protect-your-privacy'
+    kind: docs
+    language: en
+reflection:
+  - Who bears a price change between sending and the agreed recognition time?
+  - >-
+    What is the minimum record a reviewer needs without exposing each member
+    publicly?
+  - >-
+    A member wants to exit after an exchange-rate change. Which records
+    establish their contribution, which establish treasury value, and which
+    agreed rule determines settlement?
+terms:
+  - sats
+source:
+  type: original
+---
+
+## Specify what a member owes
+
+A fixed contribution of 1,000 local units and a fixed contribution of 100,000 sats are different promises. If the exchange rate changes, they no longer have the same value. Agree the obligation, due time, accepted payment methods, recognition point and cost allocation before accepting payments. A rate should name its source, timestamp and whether it is a buy, sell or reference quote. A reference quote is not a guaranteed executable sale price.
+
+If a group accepts Bitcoin for a local-currency contribution, decide who bears rate movement before recognition and what happens to an overpayment or shortfall. Do not change a member's recognized contribution later merely because the treasury asset price moved, unless the agreed rules explicitly establish a different entitlement. Keep the original amount and the asset history separately.
+
+## Case: one member's contribution
+
+Fictional Rehema owes 1,000 local units. The group's paper policy recognizes value at receipt using an agreed example rate of **100 sats per local unit**. Its wallet receives **100,000 sats**, so the recognized contribution is **1,000 local units**. Record the member reference, date, received sats, quote and recognition rule. A sender-paid fee outside those sats does not increase the group's receipt.
+
+Later the group pays an illustrative on-chain treasury fee of 1,000 sats. Its asset balance becomes **99,000 sats**, before other activity. If policy assigns that fee to group expenses, Rehema's contribution record remains 1,000. At the same fictional quote, the remaining asset is worth 990 local units: the 10-unit cost is a treasury expense, not a missing member payment. Different fee allocation rules require an explicit, consistently applied policy.
+
+Now the quote changes to 80 sats per local unit. The same 99,000 sats is quoted at **1,237.50 local units**. This is a valuation change, not a second contribution or guaranteed distributable profit. If the group instead sells at a worse price or pays withdrawal costs, net proceeds differ.
+
+## Choose a suitable payment path
+
+On-chain payment recognition should state the group's confirmation policy and response to replacement or reorganization. A transaction ID is useful evidence, not a universal guarantee of finality. Lightning may suit small contributions, but needs working routes and receiving liquidity. A custodial Lightning provider can suspend access. Distinguish a pending invoice, a failed attempt and a settled receipt; no member should be charged twice because an app timed out.
+
+Allow a fair alternative where members lack devices, connectivity, technical confidence or an acceptable service. Using Bitcoin should not silently exclude members. A cash or mobile contribution needs receipts and reconciliation too. Verify payment requests through an agreed independent contact when an official announces a changed address or account.
+
+## Preserve an audit trail
+
+Reconcile opening asset balances + receipts − payments − fees = closing balances in each asset's own units. Reconcile member obligations separately. Record corrections with a linked reversal or adjustment rather than deleting the original. Refunds need authorization, destination verification and a rule for costs and currency. Keep member identities private where possible; a public transaction record can reveal group relationships.
+
+## Try it
+
+Write Rehema's contribution, fee and valuation rows. **Worked check:** contribution 1,000 local units; asset 100,000 then 99,000 sats; later quote 1,237.50 local units. Explain why adding 1,237.50 as a fresh contribution would double-count value. Use no real addresses or member data.

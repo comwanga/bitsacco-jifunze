@@ -4,14 +4,19 @@ import { t, type Lang } from "@/lib/i18n";
 import { ProgressTick } from "./ProgressTick";
 import { SectionProgress } from "./SectionProgress";
 import "./tree.css";
+import { SpecializationChoices } from "./SpecializationChoices";
 
 export function PathTree({ tree, lang }: { tree: TreePath; lang: Lang }) {
   return <div className="mx-auto max-w-5xl px-4 py-10">
-    {tree.sections.map((s) => <section key={s.id} className="mb-12" aria-labelledby={`tree-${s.id}`}>
+    <SpecializationChoices sections={tree.sections} lang={lang} prefix="tree-section" />
+    {tree.sections.map((s) => <section key={s.id} id={`tree-section-${s.id}`} className="mb-12 scroll-mt-24" aria-labelledby={`tree-${s.id}`}>
       <div className="flex flex-wrap items-baseline gap-x-3 md:justify-center">
         <h2 id={`tree-${s.id}`} className="text-xl font-bold">{s.title}</h2>
         <SectionProgress section={s.id} roadmap={tree.id} slugs={s.lessons.map((l) => l.slug)} lang={lang} />
       </div>
+      {s.description && <p className="mt-2 text-[var(--muted)] md:text-center">{s.description}</p>}
+      <details open={!s.optional} className="mt-4">
+      <summary className={s.optional ? "cursor-pointer font-semibold text-teal-700 dark:text-teal-400" : "hidden"}>{t(lang, "optionalLessons")}</summary>
       <ol className="learning-tree mt-6">
         {s.lessons.map((l) => <li key={l.slug} data-tree-lesson={l.slug} className="tree-node">
           <article className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 shadow-sm">
@@ -32,6 +37,7 @@ export function PathTree({ tree, lang }: { tree: TreePath; lang: Lang }) {
           </article>
         </li>)}
       </ol>
+      </details>
     </section>)}
   </div>;
 }

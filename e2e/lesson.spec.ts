@@ -48,9 +48,9 @@ test("on a phone, opening one lesson menu closes the other", async ({ page }, in
   await page.goto(LESSON);
   const course = page.locator("details[data-lesson-menu]").nth(0);
   const toc = page.locator("details[data-lesson-menu]").nth(1);
-  await course.locator("summary").click();
+  await course.locator(":scope > summary").click();
   await expect(course).toHaveAttribute("open", "");
-  await toc.locator("summary").click();
+  await toc.locator(":scope > summary").click();
   await expect(toc).toHaveAttribute("open", "");
   await expect(course).not.toHaveAttribute("open", "");
 });

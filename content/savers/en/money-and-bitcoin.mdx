@@ -8,6 +8,15 @@ objectives:
   - Explain who controls the shilling and who controls Bitcoin
   - Say in one sentence what problem Bitcoin was built to solve
 resources:
+  - title: "Bank of England: money creation in the modern economy"
+    url: "https://www.bankofengland.co.uk/quarterly-bulletin/2014/q1/money-creation-in-the-modern-economy"
+    kind: article
+    language: en
+    note: "Explains UK bank deposits and lending; monetary arrangements differ across countries."
+  - title: "Bitcoin developer reference: block chain"
+    url: "https://developer.bitcoin.org/reference/block_chain.html"
+    kind: docs
+    language: en
   - title: "Kujifunza Bitcoin, chapters 1 and 2: introduction and how Bitcoin works"
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
@@ -53,20 +62,22 @@ Cattle, salt and shells have all been money. They worked until they were too har
 
 ## Who controls the shilling
 
-The Central Bank of Kenya issues the shilling and decides how much of it exists. Banks and M-Pesa keep the records of who owns what. This works well most days, but it means a few institutions can freeze an account, reverse a payment or create more money. Over time prices rise, so 1,000 shillings buys less than it did ten years ago. That is <Term id="inflation" />.
+The Central Bank of Kenya issues banknotes and coins and conducts monetary policy. Money also includes commercial-bank deposits: bank lending can create a deposit, subject to financial and regulatory constraints. A mobile-money balance is another kind of claim on a provider, with its own rules; it is not the same as cash in your hand. Similar distinctions matter in other countries.
+
+These institutions support payments, saving and credit, but access depends on their systems and rules. A sustained rise in the general price level is <Term id="inflation" />: the same amount buys less. Its causes include demand, supply disruptions and monetary conditions; it is not simply proof that one institution printed too much.
 
 ## What Bitcoin changes
 
 <Term id="bitcoin">Bitcoin</Term> is money that no single company or government issues. Its rules are written in open software that anyone can read:
 
-- Only about 21 million bitcoin will ever exist.
-- New bitcoin is released on a fixed schedule that nobody can speed up.
-- Thousands of computers around the world, called <Term id="node">nodes</Term>, each keep a full copy of the record, the <Term id="blockchain" />, and check every payment against the rules.
+- Under the current consensus rules, issuance is limited to about 21 million bitcoin.
+- New issuance follows block height, not exact calendar dates. Blocks arrive at uneven times; no miner can make validating nodes accept a larger subsidy than the rules permit.
+- Computers called <Term id="node">nodes</Term> independently validate the shared <Term id="blockchain" />. Some retain its entire history; others discard older block data after checking it.
 
 In 2008 someone using the name Satoshi Nakamoto described this in a nine-page paper. The goal was money that two people can send to each other directly, without asking a bank for permission.
 
 <Callout type="tip" title="Bitcoin is not a company">
-There is no "Bitcoin office" to call. Nobody can freeze your bitcoin, but nobody can reset your password either. That freedom comes with responsibility, which the next lessons are about.
+There is no "Bitcoin office" that can reset a lost spending key. Self-custody reduces dependence on an account operator, but providers can freeze custodial accounts and theft, coercion, network disruption or lost keys can still prevent access. That responsibility is what the next lessons explore.
 </Callout>
 
 ## What Bitcoin does not promise

@@ -8,11 +8,11 @@ import { buildCatalog, filterCatalog } from "../../lib/content/catalog.ts";
 
 test("catalogue follows book order and identifies quizzes and exercises", () => {
   const entries = buildCatalog("sw");
-  expect(entries).toHaveLength(33);
+  expect(entries).toHaveLength(49);
   expect(entries[0]).toMatchObject({ roadmap: "savers", slug: "money-and-bitcoin", n: 1 });
   expect(entries.find((e) => e.slug === "routing-htlcs")?.types).toEqual(["reading", "quiz", "lab"]);
   expect(entries.find((e) => e.roadmap === "lightning" && e.slug === "introduction")?.types).not.toContain("lab");
-  expect(buildCatalog("en")).toHaveLength(33);
+  expect(buildCatalog("en")).toHaveLength(49);
 });
 
 test("search ignores case and diacritics and combines all filters", () => {

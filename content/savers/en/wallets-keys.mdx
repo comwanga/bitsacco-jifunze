@@ -12,7 +12,7 @@ resources:
     url: "/sw/library/#kujifunza-bitcoin"
     kind: book
     language: sw
-    note: "The Kiswahili edition of Mastering Bitcoin (7.2 MB PDF). The Kiswahili PDF awaits official publication. This link opens the Kiswahili library notice and credits, not a PDF download."
+    note: "The Kiswahili PDF awaits official publication. This link opens the Kiswahili library notice and credits, not a PDF download."
   - title: "Secure your wallet (bitcoin.org)"
     url: "https://bitcoin.org/en/secure-your-wallet"
     kind: article
@@ -50,7 +50,7 @@ Your bitcoin lives on the <Term id="blockchain" />, the shared record kept by no
 
 ## The seed phrase
 
-Most wallets show you 12 or 24 ordinary words when you first set them up. This <Term id="seed-phrase" /> can recreate every key the wallet will ever make. **Whoever knows these words owns the money**, on any phone, anywhere, forever. There is no customer care that can reset it.
+Many self-custodial on-chain wallets show you 12 or 24 words when you first set them up. This <Term id="seed-phrase" /> can recreate their keys with the correct wallet format and any separately configured passphrase. In an ordinary single-key wallet, someone with all the required secrets can spend the funds; that does not make them the lawful owner. There is no central service that can reset a lost key. Lightning and multisignature wallets can need additional recovery information.
 
 <Callout type="scam" title="Nobody real will ever ask for your words">
 No wallet company, no Bitsacco staff member and no "support agent" will ever ask for your seed phrase or private key. Anyone who asks is trying to steal from you.

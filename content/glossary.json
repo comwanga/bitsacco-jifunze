@@ -400,8 +400,8 @@
     "sw": "ukwasi",
     "en": "liquidity",
     "definition": {
-      "sw": "Kiasi kinachoweza kutumwa (ukwasi wa kutoka) au kupokelewa (ukwasi wa kuingia) kwenye chaneli.",
-      "en": "How much can be sent (outbound) or received (inbound) over a channel."
+      "sw": "Uwezo wa kutimiza malipo yanapodaiwa bila ucheleweshaji au hasara isiyokubalika. Kwa soko pia huhusu kufanya biashara bila kuathiri bei sana. Kwa Lightning, uwezo wa kutuma au kupokea hutegemea mwelekeo.",
+      "en": "Ability to meet a payment when due without an unacceptable delay or loss. Market liquidity also concerns trading without a large price impact. In Lightning, available sending/receiving capacity is direction-dependent."
     }
   },
   {
@@ -447,6 +447,69 @@
     "definition": {
       "sw": "Nodi ya Lightning inayounganisha shirikisho la Fedimint na mtandao wa Lightning.",
       "en": "A Lightning node that connects a Fedimint federation to the Lightning Network."
+    }
+  },
+  {
+    "id": "budget",
+    "sw": "bajeti",
+    "en": "budget",
+    "definition": {
+      "sw": "Mpango wa mapato, matumizi na muda wake. Kuhamisha kati ya akaunti zako si mapato mapya.",
+      "en": "A plan for income, expenses and their timing. Transfers between your own accounts are not new income."
+    }
+  },
+  {
+    "id": "purchasing-power",
+    "sw": "uwezo wa kununua",
+    "en": "purchasing power",
+    "definition": {
+      "sw": "Bidhaa na huduma zinazoweza kununuliwa kwa kiasi cha pesa; salio pekee halionyeshi uwezo huo.",
+      "en": "The goods and services a quantity of money can buy; a nominal balance alone does not show it."
+    }
+  },
+  {
+    "id": "solvency",
+    "sw": "uwezo wa mali kufidia madeni",
+    "en": "solvency",
+    "definition": {
+      "sw": "Uwezo wa kutimiza madeni; kulinganisha mali na madeni ni kipimo kimoja, tofauti na kuwa na pesa kwa tarehe fulani. Vipimo vya sheria hutofautiana.",
+      "en": "Ability to meet financial obligations; comparing assets and liabilities is one assessment, distinct from having cash at a deadline. Actual legal tests vary."
+    }
+  },
+  {
+    "id": "quorum",
+    "sw": "akidi",
+    "en": "quorum",
+    "definition": {
+      "sw": "Ushiriki wa chini unaohitajika kwa mkutano au uamuzi halali chini ya kanuni husika; ni tofauti na kura zinazohitajika kupitisha.",
+      "en": "The minimum participation needed for a valid meeting or decision under the applicable rules; different from votes needed to pass."
+    }
+  },
+  {
+    "id": "segregation-of-duties",
+    "sw": "mgawanyo wa majukumu",
+    "en": "segregation of duties",
+    "definition": {
+      "sw": "Kutenga kuomba, kuidhinisha, kulipa, kurekodi na kukagua ili mtu mmoja asidhibiti na kuficha mchakato mzima.",
+      "en": "Separating requesting, approving, paying, recording and reviewing so one person cannot control and conceal the entire process."
+    }
+  },
+  {
+    "id": "rosca",
+    "sw": "kikundi cha akiba cha zamu",
+    "en": "rotating savings and credit association",
+    "definition": {
+      "sw": "Mpango wa michango ya mara kwa mara inayounda fungu la mwanachama mmoja kwa kila zamu; anayepokea bado ana wajibu wa kuchangia. Kanuni hutofautiana.",
+      "en": "An arrangement where periodic contributions form a pot paid to one member each round; members remain obliged to contribute after receiving. Rules differ."
+    }
+  },
+  {
+    "id": "concentration-risk",
+    "sw": "hatari ya kutegemea chanzo kimoja",
+    "en": "concentration risk",
+    "definition": {
+      "sw": "Kutegemea mali, mtoa huduma au chanzo cha kushindwa kinachofanana. Programu kadhaa zinaweza kushiriki hatari ileile ya msingi.",
+      "en": "Exposure to a shared asset, counterparty or failure source. Several apps can still share the same underlying risk."
     }
   }
 ]

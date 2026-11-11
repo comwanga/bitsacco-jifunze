@@ -6,7 +6,8 @@ import { PathViewLinks } from "./PathViewLinks";
 
 const BRANCH: Record<TreePath["id"], DictKey> = { savers: "branchSavers", builders: "branchBuilders", lightning: "branchLightning" };
 
-export function PathHeader({ path, lang, slugs, minutes, view }: { path: Pick<TreePath, "id" | "title" | "tagline" | "description">; lang: Lang; slugs: string[]; minutes: number; view: "list" | "tree" }) {
+export function PathHeader({ path, lang, slugs, minutes, view, optionalSections }: { path: Pick<TreePath, "id" | "title" | "tagline" | "description">; lang: Lang; slugs: string[]; minutes: number; view: "list" | "tree"; optionalSections?: string[][] }) {
+  const introductory = optionalSections?.length ? slugs.filter((s) => !optionalSections.some((group) => group.includes(s))) : slugs;
   return <section className="bg-night px-4 pt-6 pb-10 text-white">
     <div className="mx-auto max-w-3xl">
       <p className="text-sm font-semibold text-dawn">{t(lang, BRANCH[path.id])}</p>
@@ -14,8 +15,9 @@ export function PathHeader({ path, lang, slugs, minutes, view }: { path: Pick<Tr
       <p className="mt-2 text-lg text-white/85">{path.tagline}</p>
       <p className="mt-3 max-w-prose text-white/75">{path.description}</p>
       <p className="mt-3 text-sm text-white/60">{slugs.length} {t(lang, "lessons")}, {minutes} {t(lang, "minutes")}</p>
-      <RoadmapProgress roadmap={path.id} slugs={slugs} lang={lang} />
-      <ResumeLink roadmap={path.id} slugs={slugs} lang={lang} describedBy="roadmap-title" className="mt-5 inline-block rounded-full bg-sun-deep px-5 py-2.5 font-semibold text-white" />
+      {optionalSections?.length ? <p className="mt-4 text-sm text-white/85">{t(lang, "introductionProgress")}</p> : null}
+      <RoadmapProgress roadmap={path.id} slugs={introductory} lang={lang} />
+      <ResumeLink roadmap={path.id} slugs={slugs} optionalSections={optionalSections} lang={lang} describedBy="roadmap-title" className="mt-5 inline-block rounded-full bg-sun-deep px-5 py-2.5 font-semibold text-white" />
       <PathViewLinks lang={lang} roadmap={path.id} view={view} />
     </div>
   </section>;

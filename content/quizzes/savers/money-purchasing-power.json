@@ -1,0 +1,145 @@
+{
+  "lesson": "money-purchasing-power",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "A basket rises from 1,000 to 1,100 and savings stay at 1,000. What can savings buy?",
+        "sw": "Kikapu kinapanda kutoka 1,000 hadi 1,100 na akiba inabaki 1,000. Inanunua kiasi gani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Exactly one basket",
+            "sw": "Kikapu kimoja kamili"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "About 0.909 baskets",
+            "sw": "Vikapu takriban 0.909"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "1.10 baskets",
+            "sw": "Vikapu 1.10"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Divide the unchanged balance by the new basket price: 1,000 / 1,100.",
+        "sw": "Gawa salio lisilobadilika kwa bei mpya: 1,000 / 1,100."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Savings grow 5% while the basket rises 10%. What is the approximate real change?",
+        "sw": "Akiba inaongezeka 5% huku kikapu kikipanda 10%. Mabadiliko halisi ni yapi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Positive 15%",
+            "sw": "Chanya 15%"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Exactly negative 5%",
+            "sw": "Hasi 5% kamili"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Negative 4.55% before costs",
+            "sw": "Hasi 4.55% kabla ya gharama"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Use 1.05 / 1.10 - 1. Simple subtraction is only an approximation.",
+        "sw": "Tumia 1.05 / 1.10 - 1. Kutoa asilimia moja katika nyingine ni makadirio tu."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Which distinction is correct?",
+        "sw": "Tofauti ipi ni sahihi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Inflation compares a price basket; depreciation compares currencies",
+            "sw": "Mfumuko hulinganisha kikapu cha bei; kushuka kwa sarafu hulinganisha sarafu"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Both measure only Bitcoin supply",
+            "sw": "Vyote hupima utoaji wa Bitcoin pekee"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Every price must change equally",
+            "sw": "Kila bei lazima ibadilike sawa"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Exchange-rate movements can affect prices but are not the same measurement.",
+        "sw": "Mabadiliko ya ubadilishaji yanaweza kuathiri bei lakini si kipimo kilekile."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "Does limited Bitcoin issuance guarantee more food for your sats later?",
+        "sw": "Kikomo cha utoaji wa Bitcoin kinahakikisha sats zako zitanunua chakula zaidi baadaye?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, regardless of demand",
+            "sw": "Ndiyo, bila kujali mahitaji"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; market demand and food prices remain uncertain",
+            "sw": "Hapana; mahitaji ya soko na bei za chakula bado hazina uhakika"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, after any fixed number of years",
+            "sw": "Ndiyo, baada ya idadi fulani ya miaka"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "A supply rule is not a purchasing-power or investment-return guarantee.",
+        "sw": "Kanuni ya utoaji si dhamana ya uwezo wa kununua wala faida."
+      }
+    }
+  ]
+}

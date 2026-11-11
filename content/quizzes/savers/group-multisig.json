@@ -1,0 +1,145 @@
+{
+  "lesson": "group-multisig",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Can the third signer veto two colluding signers in ordinary 2-of-3 custody?",
+        "sw": "Msaini wa tatu anaweza kuwazuia wawili wanaoshirikiana kuiba katika 2 kati ya 3 ya kawaida?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, every signer has a veto",
+            "sw": "Ndiyo, kila msaini ana kura ya kuzuia"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; two keys satisfy the spending threshold",
+            "sw": "Hapana; funguo mbili hutimiza kiwango"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only if the price drops",
+            "sw": "Tu bei ikishuka"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "A threshold does not enforce member consent or prevent threshold collusion.",
+        "sw": "Kiwango hakitekelezi ridhaa ya wanachama wala kuzuia ushirikiano wa wasaini wanaotosha."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "An official leaves. What does removing their name from minutes do to the old key?",
+        "sw": "Kiongozi anaondoka. Kuondoa jina kwenye kumbukumbu kunafanya nini kwa ufunguo wa zamani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Automatically revokes every backup",
+            "sw": "Huondoa nakala zote moja kwa moja"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Erases old signatures",
+            "sw": "Hufuta sahihi za zamani"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Does not revoke its technical spending ability",
+            "sw": "Hakuondoi uwezo wake wa kiufundi wa kutumia"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "A new policy and verified transfer may be needed; old-wallet funds remain governed by old keys.",
+        "sw": "Sera mpya na uhamisho uliohakikiwa vinaweza kuhitajika; pesa za zamani bado hutegemea funguo za zamani."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "What should a chair avoid collecting?",
+        "sw": "Mwenyekiti aepuke kukusanya nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Every signer's seed phrase in one place",
+            "sw": "Maneno ya siri ya kila msaini mahali pamoja"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Nonsecret approval reference numbers",
+            "sw": "Namba za rejea zisizo siri"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Aggregate expense reports",
+            "sw": "Ripoti za jumla za gharama"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Concentrating all secrets defeats independent custody and adds a common failure source.",
+        "sw": "Kukusanya siri zote huondoa kujitegemea na kuongeza chanzo cha kushindwa pamoja."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "One key is missing and a second signer is temporarily unreachable. What is true?",
+        "sw": "Ufunguo mmoja haupo na msaini wa pili hapatikani kwa muda. Ukweli ni upi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "All funds are necessarily destroyed",
+            "sw": "Pesa zote zimeharibika lazima"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Access can be delayed even without permanent loss of two keys",
+            "sw": "Upatikanaji unaweza kuchelewa bila funguo mbili kupotea milele"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The remaining signer can sign twice",
+            "sw": "Aliyebaki anaweza kusaini mara mbili"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Technical loss tolerance still depends on timely access to enough independent keys and configuration.",
+        "sw": "Uvumilivu wa kupotea bado unahitaji funguo huru za kutosha na mpangilio kwa wakati."
+      }
+    }
+  ]
+}

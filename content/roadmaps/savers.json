@@ -1,37 +1,238 @@
 {
   "id": "savers",
-  "title": { "sw": "Bitcoin kwa Wawekaji", "en": "Bitcoin for Savers" },
+  "title": {
+    "sw": "Bitcoin kwa Wawekaji",
+    "en": "Bitcoin for Savers"
+  },
   "tagline": {
-    "sw": "Kwa wanachama wa Bitsacco, vikundi vya chama na yeyote anayeanza na Bitcoin.",
-    "en": "For Bitsacco members, chama groups and anyone new to Bitcoin."
+    "sw": "Masomo manane ya utangulizi, kisha maeneo ya hiari ya fedha binafsi, vikundi na ushirika.",
+    "en": "Eight introductory lessons, then optional personal, community and cooperative finance modules."
   },
   "description": {
-    "sw": "Elewa pesa, sats, pochi na funguo, malipo ya Lightning, na jinsi ya kujikinga na matapeli. Hakuna ujuzi wa kiufundi unaohitajika.",
-    "en": "Understand money, sats, wallets and keys, Lightning payments, and how to stay safe from scams. No technical background needed."
+    "sw": "Anza na pesa, sats, pochi, malipo na usalama. Endelea na ustahimilivu wa kifedha, akiba ya jamii au fedha za ushirika bila kuhitaji programu.",
+    "en": "Start with money, sats, wallets, payments and safety. Continue into financial resilience, community savings or cooperative finance, without needing programming."
   },
   "sections": [
     {
       "id": "misingi",
-      "title": { "sw": "Misingi", "en": "The basics" },
-      "lessons": [{ "slug": "money-and-bitcoin" }, { "slug": "sats-and-volatility", "prerequisites": ["money-and-bitcoin"] }]
+      "title": {
+        "sw": "Misingi",
+        "en": "The basics"
+      },
+      "lessons": [
+        {
+          "slug": "money-and-bitcoin"
+        },
+        {
+          "slug": "sats-and-volatility",
+          "prerequisites": [
+            "money-and-bitcoin"
+          ]
+        }
+      ]
     },
     {
       "id": "pochi-na-funguo",
-      "title": { "sw": "Pochi na funguo", "en": "Wallets and keys" },
+      "title": {
+        "sw": "Pochi na funguo",
+        "en": "Wallets and keys"
+      },
       "lessons": [
-        { "slug": "wallets-keys", "prerequisites": ["money-and-bitcoin"] },
-        { "slug": "custody-and-fedimint", "prerequisites": ["wallets-keys"] }
+        {
+          "slug": "wallets-keys",
+          "prerequisites": [
+            "money-and-bitcoin"
+          ]
+        },
+        {
+          "slug": "custody-and-fedimint",
+          "prerequisites": [
+            "wallets-keys"
+          ]
+        }
       ]
     },
     {
       "id": "kutumia-kwa-usalama",
-      "title": { "sw": "Kutumia kwa usalama", "en": "Using it safely" },
-      "lessons": [{ "slug": "lightning-payments", "prerequisites": ["wallets-keys"] }, { "slug": "scams" }]
+      "title": {
+        "sw": "Kutumia kwa usalama",
+        "en": "Using it safely"
+      },
+      "lessons": [
+        {
+          "slug": "lightning-payments",
+          "prerequisites": [
+            "wallets-keys"
+          ]
+        },
+        {
+          "slug": "scams"
+        }
+      ]
     },
     {
       "id": "pamoja",
-      "title": { "sw": "Pamoja", "en": "Together" },
-      "lessons": [{ "slug": "saving-together", "prerequisites": ["custody-and-fedimint"] }, { "slug": "next-steps" }]
+      "title": {
+        "sw": "Pamoja",
+        "en": "Together"
+      },
+      "lessons": [
+        {
+          "slug": "saving-together",
+          "prerequisites": [
+            "custody-and-fedimint"
+          ]
+        },
+        {
+          "slug": "next-steps"
+        }
+      ]
+    },
+    {
+      "id": "individual-savings",
+      "optional": true,
+      "title": {
+        "sw": "Akiba binafsi na uhuru wa kifedha",
+        "en": "Individual savings and financial sovereignty"
+      },
+      "description": {
+        "sw": "Misingi → mazoezi ya kati → mipango ya juu. Bajeti, uwezo wa kununua, upatikanaji, utunzaji na urithi. Chagua kwa maamuzi ya familia.",
+        "en": "Foundations → intermediate practice → advanced planning. Budgeting, purchasing power, access, custody and succession. Choose this module for household decisions."
+      },
+      "lessons": [
+        {
+          "slug": "budget-resilience",
+          "prerequisites": [
+            "money-and-bitcoin"
+          ]
+        },
+        {
+          "slug": "money-purchasing-power",
+          "prerequisites": [
+            "budget-resilience",
+            "sats-and-volatility"
+          ]
+        },
+        {
+          "slug": "payments-liquidity",
+          "prerequisites": [
+            "money-purchasing-power",
+            "lightning-payments"
+          ]
+        },
+        {
+          "slug": "custody-recovery",
+          "prerequisites": [
+            "wallets-keys",
+            "custody-and-fedimint",
+            "scams"
+          ]
+        },
+        {
+          "slug": "planning-sovereignty",
+          "prerequisites": [
+            "payments-liquidity",
+            "custody-recovery"
+          ]
+        },
+        {
+          "slug": "multisig-inheritance",
+          "prerequisites": [
+            "planning-sovereignty"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "community-savings",
+      "optional": true,
+      "title": {
+        "sw": "Akiba ya jamii na fedha za pamoja",
+        "en": "Community savings and collective finance"
+      },
+      "description": {
+        "sw": "Misingi → utawala na malipo → utunzaji na hazina za juu. Linganisha miundo na ujaribu hitilafu kwa vikundi vya kubuni.",
+        "en": "Foundations → governance and payments → advanced group custody and treasury. Compare structures and rehearse failures with fictional groups."
+      },
+      "lessons": [
+        {
+          "slug": "savings-groups",
+          "prerequisites": [
+            "saving-together"
+          ]
+        },
+        {
+          "slug": "group-governance",
+          "prerequisites": [
+            "savings-groups"
+          ]
+        },
+        {
+          "slug": "group-payments",
+          "prerequisites": [
+            "group-governance",
+            "lightning-payments"
+          ]
+        },
+        {
+          "slug": "group-multisig",
+          "prerequisites": [
+            "group-payments",
+            "wallets-keys"
+          ]
+        },
+        {
+          "slug": "group-treasury",
+          "prerequisites": [
+            "group-multisig"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cooperative-finance",
+      "optional": true,
+      "title": {
+        "sw": "SACCO, vyama vya mikopo na fedha za ushirika",
+        "en": "SACCOs, credit unions and cooperative finance"
+      },
+      "description": {
+        "sw": "Misingi → mali, madeni na udhibiti → sera na urejeshaji wa taasisi. Visa vya elimu havitoi ruhusa ya kushughulikia pesa za wanachama.",
+        "en": "Foundations → balance sheets and controls → advanced institutional policy and recovery. Educational cases grant no permission to handle member funds."
+      },
+      "lessons": [
+        {
+          "slug": "cooperative-foundations",
+          "prerequisites": [
+            "saving-together"
+          ]
+        },
+        {
+          "slug": "cooperative-balance-sheet",
+          "prerequisites": [
+            "cooperative-foundations"
+          ]
+        },
+        {
+          "slug": "cooperative-controls",
+          "prerequisites": [
+            "cooperative-balance-sheet"
+          ]
+        },
+        {
+          "slug": "cooperative-bitcoin-policy",
+          "prerequisites": [
+            "cooperative-controls",
+            "custody-and-fedimint"
+          ]
+        },
+        {
+          "slug": "cooperative-recovery",
+          "prerequisites": [
+            "cooperative-bitcoin-policy"
+          ]
+        }
+      ]
     }
   ]
 }

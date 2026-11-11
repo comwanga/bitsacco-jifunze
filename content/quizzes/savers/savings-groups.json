@@ -1,0 +1,145 @@
+{
+  "lesson": "savings-groups",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Six members contribute 500 for six rounds and each receives one 3,000 pot. What is the automatic investment profit?",
+        "sw": "Wanachama sita wanatoa 500 kwa zamu sita na kila mmoja hupokea 3,000 mara moja. Faida ya moja kwa moja ni kiasi gani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "3,000 each",
+            "sw": "3,000 kila mmoja"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "None from rotation alone, before costs and losses",
+            "sw": "Hakuna kutokana na zamu pekee, kabla ya gharama na hasara"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "500 each round",
+            "sw": "500 kila zamu"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Each contributes and receives 3,000; timing access differs.",
+        "sw": "Kila mmoja huchangia na kupokea 3,000; muda wa kupata fungu hutofautiana."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "The first recipient stops the last five 500 contributions. Total missing?",
+        "sw": "Mpokeaji wa kwanza anaacha michango mitano ya mwisho ya 500. Jumla inayokosekana?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "500",
+            "sw": "500"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "3,000",
+            "sw": "3,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "2,500",
+            "sw": "2,500"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Five missed contributions of 500 total 2,500; later pots bear the gap.",
+        "sw": "Michango mitano ya 500 ni 2,500; mafungu ya baadaye yanabeba pengo."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Which group retains contributions in a fund rather than paying every round to one member?",
+        "sw": "Kikundi kipi huhifadhi michango badala ya kumpa mmoja kila zamu?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "An accumulating savings group",
+            "sw": "Kikundi kinachokusanya akiba"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every pure rotating group by definition",
+            "sw": "Kila kikundi cha zamu kwa ufafanuzi"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only a commercial bank",
+            "sw": "Benki ya biashara pekee"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Accumulating groups may lend or save toward goals; their rules still differ.",
+        "sw": "Vikundi vinavyokusanya vinaweza kukopesha au kuweka kwa malengo; kanuni hutofautiana."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "Does a shared regional name prove identical governance and legal status?",
+        "sw": "Jina la kikanda linalofanana linathibitisha utawala na hadhi sawa ya sheria?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, no further questions are needed",
+            "sw": "Ndiyo, hakuna maswali mengine"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; inspect actual rules, fund flow and jurisdiction",
+            "sw": "Hapana; kagua kanuni, mtiririko na mamlaka husika"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, if Bitcoin is used",
+            "sw": "Ndiyo, Bitcoin ikitumika"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Compare structures carefully rather than equating names with institutions.",
+        "sw": "Linganisha miundo kwa uangalifu badala ya kufananisha majina na taasisi."
+      }
+    }
+  ]
+}

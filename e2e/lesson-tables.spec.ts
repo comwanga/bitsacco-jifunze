@@ -34,8 +34,8 @@ for (const { lang, width, overflows } of CASES) test(`${lang} ${width}px: lesson
   await expect(table.locator("thead > tr")).toHaveCount(1);
   await expect(table.locator("tbody > tr")).toHaveCount(4);
   await expect(table.locator("tbody > tr > td:first-child")).toHaveText(lang === "sw"
-    ? ["Nani anashika funguo", "Inaweza kuzuiwa", "Ukipoteza simu", "Hatari kuu"]
-    : ["Who holds keys", "Can be frozen", "If you lose your phone", "Main risk"]);
+    ? ["Nani anashika funguo", "Vikwazo vya kupata pesa", "Ukipoteza simu", "Hatari kuu"]
+    : ["Who holds keys", "Access restrictions", "If you lose your phone", "Main risk"]);
 
   const extent = await region.evaluate(el => el.scrollWidth - el.clientWidth);
   const hasOverflow = extent > 0;

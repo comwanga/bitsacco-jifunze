@@ -1,0 +1,145 @@
+{
+  "lesson": "cooperative-bitcoin-policy",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "What should precede an institutional Bitcoin custody pilot?",
+        "sw": "Nini kitangulie jaribio la taasisi la kutunza Bitcoin?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A promise that members will profit",
+            "sw": "Ahadi kwamba wanachama watafaidika"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Verified authority for the exact jurisdiction, charter and activity",
+            "sw": "Mamlaka yaliyohakikiwa kwa eneo, hadhi na shughuli mahsusi"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only a working app demo",
+            "sw": "Programu kufanya kazi pekee"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Technical feasibility and member votes do not supply legal authorization.",
+        "sw": "Uwezekano wa kiufundi na kura havitoi ruhusa ya sheria."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Collateral 150,000 falls 50% against principal 100,000. Uncovered principal before costs?",
+        "sw": "Dhamana 150,000 inashuka 50% dhidi ya mkopo 100,000. Pengo kabla ya gharama?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No gap",
+            "sw": "Hakuna pengo"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "50,000",
+            "sw": "50,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "25,000",
+            "sw": "25,000"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Collateral becomes 75,000; the 100,000 principal exceeds it by 25,000.",
+        "sw": "Dhamana inakuwa 75,000; mkopo 100,000 unaizidi kwa 25,000."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Which pair should be evaluated separately?",
+        "sw": "Vipi vitathminiwe tofauti?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Institutional treasury holding and custody of member assets",
+            "sw": "Kushikilia hazina ya taasisi na kutunzia mali za wanachama"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "All legal regimes as identical",
+            "sw": "Mifumo yote ya sheria kama sawa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Every asset as an insured deposit",
+            "sw": "Kila mali kama amana yenye bima"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Different use cases change obligations and may have different permissions.",
+        "sw": "Matumizi tofauti hubadili wajibu na yanaweza kuwa na ruhusa tofauti."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "What conclusion can a responsible paper decision memo reach?",
+        "sw": "Andiko lenye wajibu la karatasi linaweza kuhitimisha nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Proceed because Bitcoin removes credit risk",
+            "sw": "Endelea kwa sababu Bitcoin huondoa hatari ya mkopo"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Do not proceed while authority or member protection is unresolved",
+            "sw": "Usiendelee mamlaka au ulinzi havijatatuliwa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Ignore accounting until after funds arrive",
+            "sw": "Puuza uhasibu hadi pesa zifike"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "An unresolved permission, reporting or protection question is material, not a technical detail to skip.",
+        "sw": "Swali la ruhusa, ripoti au ulinzi lisilotatuliwa ni muhimu, si jambo la kupita."
+      }
+    }
+  ]
+}

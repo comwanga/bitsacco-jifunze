@@ -9,7 +9,7 @@ objectives:
   - "Ask the right question of any Bitcoin service: who holds the keys?"
 resources:
   - title: "Fedimint"
-    url: "https://fedimint.org"
+    url: "https://fedimint.org/users/how-it-works"
     kind: docs
     language: en
   - title: "Kujifunza Bitcoin, chapter 7: authorization and multisig"
@@ -44,22 +44,22 @@ But the company can freeze your account, be hacked, or close down. Bitcoiners sa
 
 ## 2. You hold them: self-custody
 
-With <Term id="self-custody" />, your own wallet holds the keys and you keep the seed phrase. Nobody can freeze your money or spend it without you.
+With <Term id="self-custody" />, your own wallet holds the keys and you keep the seed phrase. There is no account operator who can freeze that wallet balance. Lost or stolen keys, coercion, network problems and restricted conversion services can still stop you using its value.
 
-But nobody can rescue you either. Lose the seed phrase, or let a thief see it, and the money is gone.
+There is no central key-reset service. Losing every usable key and backup can make funds inaccessible; someone who steals sufficient spending keys can take them. Losing only a backup does not destroy a still-working wallet, but it is a reason to arrange a safe replacement backup promptly.
 
 ## 3. Your community holds them: Fedimint
 
-<Term id="fedimint" /> sits between the two. A group of trusted people, called <Term id="guardian">guardians</Term>, run a <Term id="federation" /> together. The bitcoin is locked with <Term id="multisig" />, so most guardians must agree before any of it can move; no single guardian can run away with it.
+<Term id="fedimint" /> uses shared custody. Trusted operators called <Term id="guardian">guardians</Term> run a <Term id="federation" />. Its Bitcoin wallet uses <Term id="multisig" />: a configured number of signing keys is required. This spreads control but enough colluding or compromised signers can still take the funds.
 
-Members hold <Term id="ecash" />, digital notes backed by the federation's bitcoin. Ecash is easy to use and private: the guardians can't see who paid whom. It works a lot like a chama, where members already trust their officials, but with the rules enforced by software.
+Members hold <Term id="ecash" />, digital notes redeemable through the federation. Blind signatures improve payment privacy, but network, gateway and deposit/withdrawal information can still reveal activity. Members depend on the guardians and usable redemption services; software does not enforce every social rule a chama agrees on.
 
 The risk: if most guardians collude, are hacked or go offline together, members can lose access.
 
 | | Custodial | Self-custody | Fedimint |
 | --- | --- | --- | --- |
 | Who holds keys | A company | You | Several guardians together |
-| Can be frozen | Yes | No | Only if most guardians agree |
+| Access restrictions | Provider can restrict withdrawals | No account operator; key, network and other access risks remain | Guardian failures, sufficient collusion or service restrictions can block redemption |
 | If you lose your phone | Company restores access | Your seed phrase restores it | You need a safely backed-up wallet recovery key or seed and a supported recovery process. The federation's bitcoin alone is insufficient; recovery is not guaranteed. |
 | Main risk | The company fails or freezes you | You lose your seed phrase | Most guardians fail together |
 

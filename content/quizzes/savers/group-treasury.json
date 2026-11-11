@@ -1,0 +1,145 @@
+{
+  "lesson": "group-treasury",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "70,000 currency plus Bitcoin falling from 30,000 to 15,000, with sale cost 1,000, yields what?",
+        "sw": "Sarafu 70,000 na Bitcoin kutoka 30,000 hadi 15,000, gharama ya kuuza 1,000, vinatoa kiasi gani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "100,000",
+            "sw": "100,000"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "84,000 before other obligations",
+            "sw": "84,000 kabla ya wajibu mwingine"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "85,000 after all costs",
+            "sw": "85,000 baada ya gharama zote"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "70,000 + 15,000 − 1,000 = 84,000 under the fictional sale assumptions.",
+        "sw": "70,000 + 15,000 − 1,000 = 84,000 chini ya dhana za mauzo za kubuni."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Conversion is unavailable until after an 80,000 payout. With 70,000 accessible, timely shortfall?",
+        "sw": "Kubadilisha hakupatikani kabla ya malipo ya 80,000. Zinapatikana 70,000. Pengo la wakati?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No shortfall because assets have value",
+            "sw": "Hakuna pengo kwa sababu mali zina thamani"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1,000",
+            "sw": "1,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "10,000",
+            "sw": "10,000"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Quoted value is different from resources that can actually settle the obligation on time.",
+        "sw": "Thamani ya bei ni tofauti na rasilimali zinazolipa wajibu kwa wakati."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "What does a public treasury balance not establish?",
+        "sw": "Salio la hazina la umma halithibitishi nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "The absence of hidden member liabilities",
+            "sw": "Kutokuwepo kwa madeni yaliyofichwa kwa wanachama"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "That a balance was observed",
+            "sw": "Kwamba salio limeonekana"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That transactions can be inspected",
+            "sw": "Kwamba miamala inaweza kuchunguzwa"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Assets alone do not show all obligations or authorize an experiment.",
+        "sw": "Mali pekee hazionyeshi wajibu wote wala kuidhinisha jaribio."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "When can a paper-only Bitcoin experiment be a responsible result?",
+        "sw": "Jaribio la Bitcoin la karatasi pekee linaweza kuwa uamuzi wenye wajibu lini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Never; every group must deposit funds",
+            "sw": "Kamwe; kila kikundi lazima kiweke pesa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "When real obligations, consent or recovery make live exposure inappropriate",
+            "sw": "Wajibu halisi, ridhaa au urejeshaji vikifanya hatari halisi isifae"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Only after promising returns",
+            "sw": "Tu baada ya kuahidi faida"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Learning does not require risking essential group contributions.",
+        "sw": "Kujifunza hakuhitaji kuweka michango muhimu hatarini."
+      }
+    }
+  ]
+}

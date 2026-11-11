@@ -1,0 +1,145 @@
+{
+  "lesson": "payments-liquidity",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "10,000 falls 30%, then costs 2% plus 100 to convert. What remains?",
+        "sw": "10,000 zinashuka 30%, kisha gharama ni 2% na 100 kubadilisha. Zinabaki ngapi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "7,000",
+            "sw": "7,000"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "6,760",
+            "sw": "6,760"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "9,700",
+            "sw": "9,700"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "10,000 × 0.70 × 0.98 − 100 = 6,760; these are fictional sequential assumptions.",
+        "sw": "10,000 × 0.70 × 0.98 − 100 = 6,760; dhana hizi ni za kubuni kwa mfuatano."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "A Lightning payment screen times out. What should happen before retrying?",
+        "sw": "Skrini ya malipo ya Lightning inakwama. Ufanye nini kabla ya kujaribu tena?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Assume it failed and send repeatedly",
+            "sw": "Dhani imeshindwa na utume mara nyingi"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Publish the invoice and personal records",
+            "sw": "Tangaza ombi na rekodi binafsi"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Check payment status and recipient settlement",
+            "sw": "Kagua hali ya malipo na mpokeaji kulipwa"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "A connection failure does not alone prove payment failure.",
+        "sw": "Kukatika kwa muunganisho pekee hakuthibitishi malipo kushindwa."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Why can a Lightning wallet fail to receive despite a positive total balance?",
+        "sw": "Kwa nini pochi ya Lightning inaweza kushindwa kupokea licha ya salio chanya?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Directional liquidity and routing constraints",
+            "sw": "Uwezo wa mwelekeo wa malipo na masharti ya njia"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Every positive balance guarantees receipt",
+            "sw": "Kila salio chanya huhakikisha kupokea"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Sats cannot move between people",
+            "sw": "Sats haziwezi kuhamishwa kati ya watu"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Receiving capacity and usable routes differ from the total displayed balance.",
+        "sw": "Uwezo wa kupokea na njia zinazotumika ni tofauti na salio la jumla."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "A bill is due tomorrow but conversion is offline three days. What does a positive asset total establish?",
+        "sw": "Bili inadaiwa kesho lakini kubadilisha hakupatikani siku tatu. Jumla chanya ya mali inathibitisha nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Guaranteed timely payment",
+            "sw": "Malipo ya wakati yamehakikishwa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Value on paper, not timely liquidity",
+            "sw": "Thamani kwenye rekodi, si upatikanaji wa wakati"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That the recipient accepts every asset",
+            "sw": "Kwamba mpokeaji anakubali kila mali"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "A payment plan must test availability at the actual deadline.",
+        "sw": "Mpango wa malipo ujaribu upatikanaji kwa tarehe halisi."
+      }
+    }
+  ]
+}

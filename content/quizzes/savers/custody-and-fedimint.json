@@ -17,22 +17,22 @@
       "prompt": { "sw": "Hatari kuu ya kujitunzia ni ipi?", "en": "What is the main risk of self-custody?" },
       "options": [
         { "id": "a", "label": { "sw": "Kampuni inaweza kuzuia akaunti yako", "en": "A company can freeze your account" } },
-        { "id": "b", "label": { "sw": "Ukipoteza maneno ya siri, hakuna anayeweza kukuokoa", "en": "If you lose your seed phrase, nobody can rescue you" } },
+        { "id": "b", "label": { "sw": "Kupoteza funguo zote na nakala zinazohitajika kunaweza kufanya pesa zisifikiwe", "en": "Losing all required keys and backups can make funds inaccessible" } },
         { "id": "c", "label": { "sw": "Walinzi wanaweza kuona malipo yako", "en": "Guardians can see your payments" } }
       ],
       "answer": "b",
-      "explanation": { "sw": "Udhibiti kamili unakuja na wajibu kamili.", "en": "Full control comes with full responsibility." }
+      "explanation": { "sw": "Hakuna huduma kuu ya kurejesha funguo. Nakala iliyopotea pekee si sawa na kupoteza funguo zote; pochi inayofanya kazi inaweza bado kuruhusu kuhamisha pesa salama.", "en": "There is no central key-reset service. Losing only a backup is different from losing all keys; a working wallet may still allow funds to be moved safely." }
     },
     {
       "id": "q3",
       "prompt": { "sw": "Katika shirikisho la Fedimint, bitcoin inaweza kusonga lini?", "en": "In a Fedimint federation, when can the bitcoin move?" },
       "options": [
         { "id": "a", "label": { "sw": "Mlinzi yeyote mmoja akiamua", "en": "When any one guardian decides" } },
-        { "id": "b", "label": { "sw": "Walinzi wengi wakikubaliana", "en": "When most guardians agree" } },
+        { "id": "b", "label": { "sw": "Kiwango kilichowekwa cha sahihi za walinzi kikitimizwa", "en": "When the configured guardian signing threshold is met" } },
         { "id": "c", "label": { "sw": "Kamwe", "en": "Never" } }
       ],
       "answer": "b",
-      "explanation": { "sw": "Multisig inahitaji sahihi za walinzi wengi, kwa hiyo hakuna mmoja anayeweza kutoroka na pesa.", "en": "Multisig needs signatures from most guardians, so no single one can run off with the money." }
+      "explanation": { "sw": "Mpangilio wa funguo huamua sahihi zinazohitajika. Walinzi wa kutosha wakishirikiana kuiba wanaweza kuhamisha pesa; sahihi hazithibitishi idhini ya wanachama.", "en": "The key configuration determines the required signatures. Enough colluding guardians can move funds; signatures do not prove member authorization." }
     },
     {
       "id": "q4",

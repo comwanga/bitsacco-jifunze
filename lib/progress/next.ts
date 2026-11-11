@@ -2,7 +2,7 @@
 import type { RoadmapId } from "../content/schemas.ts";
 import type { LessonKey, Progress } from "./model.ts";
 
-export type PathOrder = { id: RoadmapId; slugs: string[] };
+export type PathOrder = { id: RoadmapId; slugs: string[]; optionalSections?: string[][] };
 export type NextUp = { roadmap: RoadmapId; slug: string; reason: "continue" | "start" };
 
 /** The most recent completion or quiz attempt, or null if there is none. */
@@ -20,6 +20,12 @@ const isDone = (p: Progress, path: PathOrder, slug: string) => Boolean(p.lessons
 
 /** First lesson in the path not yet completed; null when the whole path is done. */
 export function nextInPath(p: Progress, path: PathOrder): string | null {
+  if (path.optionalSections?.length) {
+    const recent = lastActivity({ ...p, lessons: Object.fromEntries(Object.entries(p.lessons).filter(([key]) => path.slugs.some((s) => key === `${path.id}/${s}`))) });
+    const chosen = path.optionalSections.find((slugs) => slugs.some((s) => recent?.key === `${path.id}/${s}`));
+    const sequence = chosen ?? path.slugs.filter((s) => !path.optionalSections!.some((group) => group.includes(s)));
+    return sequence.find((s) => !isDone(p, path, s)) ?? null;
+  }
   return path.slugs.find((s) => !isDone(p, path, s)) ?? null;
 }
 
@@ -39,5 +45,7 @@ export function continueLearning(p: Progress, paths: PathOrder[]): NextUp | null
   const [roadmap, slug] = last.key.split("/") as [RoadmapId, string];
   const current = paths.find((path) => path.id === roadmap && path.slugs.includes(slug));
   if (!current) return null;
+  // Finishing an introduction or chosen specialization leads to a choice, not a technical course.
+  if (current.optionalSections?.length) return upNext(p, current);
   return upNext(p, current) ?? paths.map((path) => upNext(p, path)).find((n) => n !== null) ?? null;
 }

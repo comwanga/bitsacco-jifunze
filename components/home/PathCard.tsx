@@ -3,6 +3,7 @@ import { RoadmapProgress } from "@/components/roadmap/RoadmapProgress";
 import type { Roadmap } from "@/lib/content/schemas";
 import { t, type DictKey, type Lang } from "@/lib/i18n";
 import { ResumeLink } from "./ResumeLink";
+import { pathOrder } from "@/lib/content/navigation";
 
 export type PathLesson = { slug: string; title: string; minutes: number; level: "beginner" | "intermediate" | "advanced" };
 
@@ -20,6 +21,8 @@ function levelRange(lang: Lang, lessons: PathLesson[]): string {
 export function PathCard({ roadmap, lessons, lang }: { roadmap: Roadmap; lessons: PathLesson[]; lang: Lang }) {
   const slugs = lessons.map((l) => l.slug);
   const minutes = lessons.reduce((m, l) => m + l.minutes, 0);
+  const { optionalSections } = pathOrder(roadmap);
+  const introductory = slugs.filter((s) => !optionalSections?.some((group) => group.includes(s)));
   return (
     <article data-path-card={roadmap.id} className="relative flex flex-col pl-6">
       <span
@@ -42,11 +45,13 @@ export function PathCard({ roadmap, lessons, lang }: { roadmap: Roadmap; lessons
           </li>
         ))}
       </ol>
-      <RoadmapProgress roadmap={roadmap.id} slugs={slugs} lang={lang} />
+      {optionalSections?.length ? <p className="mt-4 text-sm text-[#d9cbbb]">{t(lang, "introductionProgress")}</p> : null}
+      <RoadmapProgress roadmap={roadmap.id} slugs={introductory} lang={lang} />
       <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-6">
         <ResumeLink
           roadmap={roadmap.id}
           slugs={slugs}
+          optionalSections={optionalSections}
           lang={lang}
           describedBy={`path-${roadmap.id}`}
           className="inline-flex rounded-full bg-sun-deep px-5 py-2.5 font-semibold text-white hover:bg-[#b83c00]"

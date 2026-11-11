@@ -1,0 +1,145 @@
+{
+  "lesson": "cooperative-balance-sheet",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "20,000 cash plus 5,000 timely repayments against 30,000 withdrawals creates what gap?",
+        "sw": "Pesa 20,000 na malipo ya wakati 5,000 dhidi ya utoaji 30,000 huleta pengo gani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No gap because loans total 75,000",
+            "sw": "Hakuna kwa sababu mikopo ni 75,000"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "5,000 liquidity gap",
+            "sw": "Pengo la 5,000 la pesa za wakati"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "15,000 automatic profit",
+            "sw": "Faida ya moja kwa moja 15,000"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Only resources available before the deadline meet the immediate payment.",
+        "sw": "Rasilimali zinazopatikana kabla ya tarehe ndizo hulipa hitaji la sasa."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Separately, assets 100,000 lose 15,000 with liabilities 90,000 unchanged. Equity?",
+        "sw": "Kando, mali 100,000 zinapungua 15,000, madeni 90,000 hayabadiliki. Kinachobaki?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "10,000",
+            "sw": "10,000"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "5,000",
+            "sw": "5,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "−5,000",
+            "sw": "−5,000"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "85,000 assets − 90,000 liabilities = −5,000 in the simplified case.",
+        "sw": "Mali 85,000 − madeni 90,000 = −5,000 katika mfano rahisi."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Why is a loan receivable not the same as cash?",
+        "sw": "Kwa nini mkopo unaodaiwa si sawa na pesa taslimu?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Repayment can be delayed or fail",
+            "sw": "Malipo yanaweza kuchelewa au kushindwa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Loans never appear as assets",
+            "sw": "Mikopo haiwi mali kamwe"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Borrowers cannot face losses",
+            "sw": "Wakopaji hawawezi kupata hasara"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Credit and timing risk affect both asset value and availability.",
+        "sw": "Hatari ya kutolipwa na muda huathiri thamani na upatikanaji."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "Does switching loan denomination to sats eliminate credit risk?",
+        "sw": "Kubadili mkopo uwe wa sats huondoa hatari ya kutolipwa?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, Bitcoin collects debts automatically",
+            "sw": "Ndiyo, Bitcoin hukusanya madeni yenyewe"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; repayment capacity, contracts and currency mismatch remain",
+            "sw": "Hapana; uwezo, mikataba na kutolingana kwa sarafu hubaki"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, if a seed is backed up",
+            "sw": "Ndiyo, maneno ya siri yakiwa na nakala"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "A payment asset does not guarantee borrower income or lawful collection.",
+        "sw": "Mali ya malipo haihakikishi mapato ya mkopaji au kudai kwa sheria."
+      }
+    }
+  ]
+}

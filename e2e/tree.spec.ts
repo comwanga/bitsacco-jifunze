@@ -6,7 +6,7 @@ for (const lang of ["sw", "en"]) {
     test.setTimeout(60000);
     await page.emulateMedia({ reducedMotion: "reduce", colorScheme: info.project.name === "mobile" ? "dark" : "light" });
     if (info.project.name === "mobile") await page.setViewportSize({ width: 360, height: 800 });
-    for (const [id, count] of [["savers", 8], ["builders", 8], ["lightning", 17]] as const) {
+    for (const [id, count] of [["savers", 24], ["builders", 8], ["lightning", 17]] as const) {
       await page.goto(`/${lang}/tree/${id}/`);
       await expect(page.locator("[data-tree-lesson]")).toHaveCount(count);
       await expect(page.getByRole("link", { name: lang === "en" ? "Tree" : "Mti", exact: true })).toHaveAttribute("aria-current", "page");
@@ -19,7 +19,7 @@ for (const lang of ["sw", "en"]) {
   test(`trees work without JavaScript in ${lang}`, async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 360, height: 800 } });
     const page = await context.newPage();
-    for (const [id, count] of [["savers", 8], ["builders", 8], ["lightning", 17]] as const) {
+    for (const [id, count] of [["savers", 24], ["builders", 8], ["lightning", 17]] as const) {
       await page.goto(`/${lang}/tree/${id}/`);
       await expect(page.locator("[data-tree-lesson] h3 a")).toHaveCount(count);
       await page.locator("[data-tree-lesson] h3 a").first().click();
@@ -40,6 +40,6 @@ test("tree resumes progress and tolerates unavailable storage", async ({ page })
   await expect(page.locator('[data-section-progress="misingi"]')).toHaveText("1 / 2 done");
   await page.addInitScript(() => Object.defineProperty(window, "localStorage", { get() { throw new DOMException("blocked", "SecurityError"); } }));
   await page.reload();
-  await expect(page.locator("[data-tree-lesson]")).toHaveCount(8);
+  await expect(page.locator("[data-tree-lesson]")).toHaveCount(24);
   await expect(page.locator("[data-resume]")).toHaveText("Start");
 });

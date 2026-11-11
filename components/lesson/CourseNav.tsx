@@ -22,8 +22,9 @@ export function CourseNav({
         {roadmap.title[lang]}
       </Link>
       {roadmap.sections.map((section) => (
-        <div key={section.id} className="mt-4">
-          <p className="text-xs font-semibold text-[var(--muted)]">{section.title[lang]}</p>
+        <details key={section.id} open={!section.optional || section.lessons.some((l) => l.slug === current)} className="mt-4">
+          <summary className={section.optional ? "cursor-pointer text-xs font-semibold text-[var(--muted)]" : "hidden"}>{section.title[lang]}</summary>
+          {!section.optional && <p className="text-xs font-semibold text-[var(--muted)]">{section.title[lang]}</p>}
           <ol className="mt-1.5 space-y-0.5">
             {section.lessons.map(({ slug }) => {
               const here = slug === current;
@@ -45,7 +46,7 @@ export function CourseNav({
               );
             })}
           </ol>
-        </div>
+        </details>
       ))}
     </nav>
   );

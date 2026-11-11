@@ -1,0 +1,64 @@
+---
+title: 'Custody, privacy and a recovery rehearsal'
+description: >-
+  Choose responsibilities deliberately and test a fictional recovery plan
+  without exposing secrets.
+level: intermediate
+minutes: 20
+objectives:
+  - Compare provider recovery with responsibility for spending keys
+  - 'Separate a backup, an optional passphrase and wallet configuration'
+  - 'Identify phishing, metadata and correlated backup failure'
+resources:
+  - title: 'Bitcoin: wallet security'
+    url: 'https://bitcoin.org/en/secure-your-wallet'
+    kind: docs
+    language: en
+  - title: 'Bitcoin: privacy'
+    url: 'https://bitcoin.org/en/protect-your-privacy'
+    kind: docs
+    language: en
+  - title: 'Lightning Labs: recovery planning'
+    url: >-
+      https://docs.lightning.engineering/lightning-network-tools/lnd/recovery-planning-for-failure
+    kind: docs
+    language: en
+reflection:
+  - Which recovery step depends on a person or provider being available?
+  - What information can an observer infer without knowing a private key?
+  - >-
+    A recovery helper is trustworthy but unavailable during illness. Which
+    access failure remains, and how could a revised plan improve availability
+    without giving one person all spending secrets?
+terms:
+  - self-custody
+  - seed-phrase
+source:
+  type: original
+---
+
+## Ownership and operational control
+
+Custody is an arrangement for controlling access to assets. Legal ownership, authority to spend and technical ability to sign can belong to different people. A thief can possess a key without owning the funds. A custodian may control a wallet while owing assets to customers. Read withdrawal, identification, insolvency and complaints terms rather than assuming a friendly app is a protected savings account.
+
+Self-custody removes one account operator from the spending path but makes device, backup and recovery practices your responsibility. Hardware wallets can help isolate keys from a connected computer, but they do not fix a false recipient, a stolen backup or coercion. Check intended outputs and fees using the trusted signing device's own display. Do not treat every balance shown by a connected app as independently verified.
+
+## A backup must match the wallet
+
+For many on-chain single-key wallets, recovery needs the seed words in order and a compatible wallet format. An optional extra passphrase changes the derived wallet; losing it can make a correct seed insufficient. It is different from the app's screen-unlock PIN. Do not invent extra complexity without a way to recover it safely.
+
+Multisignature can require public wallet configuration as well as enough independent keys. Lightning can require implementation-specific channel recovery data and cooperation or time; the on-chain seed alone is not a universal recovery method. A custodial account instead depends on the provider's recovery process. Do not enter real seed words into Jifunze, a website form or a support chat.
+
+## Case: three backups, one disaster
+
+Fictional learner Luis keeps a phone, a paper seed and a USB backup in the same bag. Three objects are still one physical failure domain: the bag can be stolen. Uploading the paper photograph to the same account used on the phone adds a shared account compromise. A safer design must consider both loss and unauthorized access, not simply multiply copies.
+
+Public addresses can link transactions, purchases and people. Reusing an address or publishing a wallet's extended public key can expose much more history than intended. Public wallet configuration cannot normally sign payments alone, but it is sensitive for privacy. Avoid putting backups, balances or recovery locations in public posts. Keep evidence needed for your own records in access-controlled storage.
+
+## A practical threat model
+
+Name what you want to protect, who might take or block it, and which failures are plausible: fire, forgetfulness, device malware, coercion, a provider outage or an unavailable helper. Separate secrets from instructions. A family member may need to know that a recovery plan exists without seeing every secret today. Beware urgent support messages, fake wallet updates and requests to restore a wallet on a stranger's site. Verify software and support routes independently, using the project's official instructions.
+
+## Try it
+
+Use cards labelled DEVICE, BACKUP, OPTIONAL PASSPHRASE and INSTRUCTIONS, with **no real words or keys**. Write a recovery sequence, remove the device card, then remove the backup card too. State what remains possible. **Worked reasoning:** losing a device can be recoverable with complete compatible recovery material; losing every spending key and required recovery secret cannot be solved by an account password reset. If one working wallet remains, plan a careful move to a newly secured arrangement rather than assuming the funds are already lost.

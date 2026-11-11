@@ -20,7 +20,7 @@ export default async function TreePage({ params }: Params) {
   const tree = buildTree(lang, roadmap);
   const lessons = tree.sections.flatMap((s) => s.lessons);
   return <>
-    <PathHeader path={tree} lang={lang} slugs={lessons.map((l) => l.slug)} minutes={lessons.reduce((sum, l) => sum + l.minutes, 0)} view="tree" />
+    <PathHeader path={tree} lang={lang} slugs={lessons.map((l) => l.slug)} optionalSections={tree.sections.filter((s) => s.optional).map((s) => s.lessons.map((l) => l.slug))} minutes={lessons.reduce((sum, l) => sum + l.minutes, 0)} view="tree" />
     <PathTree tree={tree} lang={lang} />
   </>;
 }

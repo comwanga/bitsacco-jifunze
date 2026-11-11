@@ -1,0 +1,145 @@
+{
+  "lesson": "budget-resilience",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Amina has a positive monthly total but rent is due before income. What is missing?",
+        "sw": "Amina ana ziada ya mwezi lakini kodi inadaiwa kabla ya mapato. Kinachokosekana ni nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A higher Bitcoin price forecast",
+            "sw": "Utabiri wa bei kubwa ya Bitcoin"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A dated running cash balance",
+            "sw": "Salio la pesa kwa kila tarehe"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Another copy of the same budget total",
+            "sw": "Nakala nyingine ya jumla ileile"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Timing can create a shortfall even when the monthly total is positive.",
+        "sw": "Muda unaweza kuleta pengo hata jumla ya mwezi ikiwa chanya."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Moving 500 between your own accounts does what?",
+        "sw": "Kuhamisha 500 kati ya akaunti zako hufanya nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Creates 500 of new income",
+            "sw": "Huunda mapato mapya ya 500"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Pays every future emergency",
+            "sw": "Hulipa kila dharura ya baadaye"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Changes where existing money is kept",
+            "sw": "Hubadili mahali pesa zilizopo zinahifadhiwa"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Do not count a transfer as income a second time.",
+        "sw": "Usihesabu uhamisho kama mapato mara ya pili."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Which reserve comparison is most useful?",
+        "sw": "Ulinganisho upi wa akiba unasaidia zaidi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Net money accessible by the expense deadline",
+            "sw": "Pesa halisi zinazopatikana kabla ya bili kudaiwa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Only the largest displayed balance",
+            "sw": "Salio kubwa zaidi pekee"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "The most popular app logo",
+            "sw": "Nembo maarufu zaidi"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Access, safety, costs and the payment currency matter together.",
+        "sw": "Upatikanaji, usalama, gharama na sarafu ya bili vyote vina umuhimu."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "A known annual school bill is best described as what in this worksheet?",
+        "sw": "Bili ya shule ya mwaka inayojulikana ni nini katika zoezi hili?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "An unpredictable market return",
+            "sw": "Faida ya soko isiyotabirika"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A planned expense to budget for",
+            "sw": "Gharama inayojulikana ya kupangiwa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Proof every household needs the same reserve",
+            "sw": "Ushahidi kila familia inahitaji akiba sawa"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Planned expenses and unexpected emergencies need distinct planning; no universal amount is prescribed.",
+        "sw": "Gharama zilizopangwa na dharura zinahitaji mipango tofauti; hakuna kiasi kimoja kilichoagizwa."
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+---
+title: 'Group custody: signatures, authority and collusion'
+description: >-
+  Test a treasury signing policy against key loss, dishonest signers and
+  changing membership.
+level: advanced
+minutes: 22
+objectives:
+  - Separate member authorization from technical signing ability
+  - Assess threshold availability and common failure sources
+  - 'Plan key replacement, member departure and recovery rehearsal'
+resources:
+  - title: 'BIP 129: multisignature wallet setup'
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0129.mediawiki'
+    kind: docs
+    language: en
+  - title: 'Bitcoin: wallet security'
+    url: 'https://bitcoin.org/en/secure-your-wallet'
+    kind: docs
+    language: en
+  - title: 'CARE: village savings and loan associations'
+    url: 'https://www.care.org/our-work/economic-growth/savings-groups/vsla-101/'
+    kind: article
+    language: en
+reflection:
+  - Could enough signers move funds against the members' decision?
+  - What information must survive if every elected official changes?
+  - >-
+    Would raising 2-of-3 to 3-of-3 improve your fictional group overall? Compare
+    collusion, absence, coercion and payment deadlines rather than choosing from
+    security labels alone.
+terms:
+  - multisig
+source:
+  type: original
+---
+
+## A signature threshold is only one control
+
+A 2-of-3 wallet checks that two of three configured keys authorize a spend. It does not check whether the minutes are genuine, whether a member vote was fair or whether a payment is a permitted expense. Two dishonest signers can steal together. One honest signer cannot veto them. A policy requiring a member vote must therefore exist outside the signing script and be enforced through accountable people and records.
+
+Raising the threshold can reduce some collusion possibilities while increasing the chance that an absent signer blocks legitimate payments. Splitting one seed phrase into pieces is not the same as a standard multisignature arrangement. Copying a single seed onto three devices creates three ways to compromise the same key, not a 2-of-3 policy.
+
+## Case: Kijiji's three officials
+
+Fictional Kijiji appoints a treasurer, secretary and independent member as separate signers. Members first approve an eligible expense. The requester provides evidence; a reviewer checks destination, amount and fee; two authorized signers inspect the actual transaction; the bookkeeper records it; another member reconciles it. Small-group constraints must be acknowledged when roles overlap.
+
+The treasurer loses a key. The other two keys and the wallet configuration may allow spending, so one loss can be tolerated. But if the secretary is unreachable, access is still delayed. If the treasurer and secretary are compromised together, the third signer cannot stop a spend. Backups in one shared office or one cloud account make separate officials less independent than their titles suggest.
+
+## Preserve recovery information without exposing funds
+
+The group needs a compatible record of the wallet's threshold, public participant keys and script/derivation configuration, often represented by a descriptor or wallet export. Enough private recovery material must also survive. Public configuration cannot normally sign alone, but can reveal balances and history, so restrict its circulation. Use a chosen wallet's verified documentation and an appropriate test environment; Jifunze does not certify a custody product.
+
+Each signer should understand backups, device verification, coercion threats and how to refuse an unexplained request. No chairperson should collect every seed “for safety.” A member may see a financial report without receiving a key or every public wallet identifier. Financial transparency does not require exposing everyone's personal data.
+
+## Elections and departures change the threat model
+
+Removing an official's name from meeting minutes does not revoke their old key. If a threshold of former signers still has usable keys, it may still spend old-wallet funds. A transition can require generating a new independently verified policy and transferring funds, with member authorization and sufficient old-policy signatures. Check destination, fees, confirmations, records and any residual balances. Destroying a known copy does not prove no other copy exists.
+
+Specify what happens on death, departure, device compromise and disputed elections. Document who can convene recovery, who establishes authority and how members receive updates without revealing secrets. Multisignature cannot restore funds after every required key is lost or reverse a valid theft transaction.
+
+## Try it
+
+Use three key cards, an approval minute and a public-configuration card. Rehearse one absent official, one stolen key, two colluding officials and an election replacing two officials. **Worked check:** a normal 2-of-3 tolerates one missing key only when the other two and configuration are usable; two colluding keys can bypass the social approval. Write the control that addresses each failure, and identify any failure no remaining control can repair.

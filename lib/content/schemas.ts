@@ -18,6 +18,8 @@ export const RoadmapSchema = z.object({
       z.object({
         id: slug,
         title: LocalizedSchema,
+        description: LocalizedSchema.optional(),
+        optional: z.boolean().optional(),
         lessons: z.array(z.object({ slug, prerequisites: z.array(slug).optional() })).min(1),
       }),
     )

@@ -1,0 +1,145 @@
+{
+  "lesson": "group-governance",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Nine of 12 attend; quorum is eight; seven vote yes, two no. Ordinary majority-of-votes motion?",
+        "sw": "Tisa kati ya 12 wanahudhuria; akidi ni wanane; saba ndiyo, wawili hapana. Pendekezo la wingi wa kura?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Fails because everyone must attend",
+            "sw": "Limeshindwa kwa sababu wote lazima wawepo"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Passes under these fictional rules",
+            "sw": "Limepita chini ya kanuni hizi za kubuni"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Requires a Bitcoin signature instead",
+            "sw": "Linahitaji sahihi ya Bitcoin badala yake"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Nine meets quorum and seven exceeds half the votes cast.",
+        "sw": "Tisa hutimiza akidi na saba huzidi nusu ya kura zilizopigwa."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "The policy change instead requires two-thirds of all 12 members. Are seven yes votes sufficient?",
+        "sw": "Badiliko la sera linahitaji theluthi mbili za wanachama wote 12. Kura saba zinatosha?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, seven is always enough",
+            "sw": "Ndiyo, saba zinatosha kila mara"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes, the chair can ignore the rule",
+            "sw": "Ndiyo, mwenyekiti anaweza kupuuza kanuni"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No, eight yes votes are required",
+            "sw": "Hapana, kura nane zinahitajika"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "The denominator is all members, not just those voting.",
+        "sw": "Hesabu ni kwa wanachama wote, si waliopiga kura pekee."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Ledger says 5,000 received; independent receipts show 4,500. First response?",
+        "sw": "Daftari lina 5,000; risiti huru zina 4,500. Hatua ya kwanza?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Record and investigate the 500 discrepancy",
+            "sw": "Rekodi na chunguza tofauti ya 500"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Delete a receipt to force agreement",
+            "sw": "Futa risiti ili kulazimisha kulingana"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Publicly accuse a member immediately",
+            "sw": "Mtuhumu mwanachama hadharani mara moja"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "A discrepancy needs evidence and a fair correction process, not an invented entry.",
+        "sw": "Tofauti inahitaji ushahidi na marekebisho ya haki, si ingizo la kubuni."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "What does an extra transaction signature fail to prove by itself?",
+        "sw": "Sahihi ya ziada ya muamala haithibitishi nini yenyewe?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "That another key signed",
+            "sw": "Kwamba ufunguo mwingine umesaini"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "That a fair authorized member decision happened",
+            "sw": "Kwamba uamuzi wa haki wenye idhini ulifanyika"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That a transaction exists",
+            "sw": "Kwamba muamala upo"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Technical signatures and social authorization are separate controls.",
+        "sw": "Sahihi za kiufundi na idhini ya kijamii ni udhibiti tofauti."
+      }
+    }
+  ]
+}

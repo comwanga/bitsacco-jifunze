@@ -1,0 +1,61 @@
+---
+title: 'Payments, fees and money you can reach'
+description: >-
+  Trace a payment from savings to an actual expense, including conversion and
+  failure points.
+level: intermediate
+minutes: 18
+objectives:
+  - Distinguish a payment rail from an asset and a unit of account
+  - Calculate net proceeds after an illustrative price shock and costs
+  - 'Plan for confirmation delays, provider outages and Lightning liquidity'
+resources:
+  - title: 'Lightning Labs: understanding liquidity'
+    url: >-
+      https://docs.lightning.engineering/the-lightning-network/liquidity/understanding-liquidity
+    kind: docs
+    language: en
+  - title: 'Bitcoin: wallet security'
+    url: 'https://bitcoin.org/en/secure-your-wallet'
+    kind: docs
+    language: en
+reflection:
+  - >-
+    Which step in your fictional payment chain could stop before the recipient
+    is paid?
+  - Would a second app still depend on the same provider or internet connection?
+  - >-
+    Design two routes to the same fictional bill, then remove the shared phone
+    or provider. Are the routes truly independent, and when would you choose
+    neither?
+terms:
+  - liquidity
+source:
+  type: original
+---
+
+## A balance is not yet a paid bill
+
+A unit of account measures a bill; a payment rail carries value; an asset is what you hold. A school can quote fees in local currency while accepting a payment service that converts Bitcoin. The household still owes the quoted bill unless the contract says otherwise. An invoice being generated, a transaction being broadcast and a recipient having spendable funds are different events.
+
+Self-custodial on-chain payments need usable keys, connectivity and transaction fees. Miners select transactions; paying a fee does not guarantee an exact confirmation time. Fees depend strongly on transaction size and demand for block space, not simply a percentage of the amount sent. Confirm the address, network, amount and final destination on a trusted display. A copied address or a convincing screenshot is not evidence of settlement.
+
+## Lightning adds a different access path
+
+Lightning can settle small payments quickly when a usable route and sufficient directional liquidity exist. A displayed total balance does not guarantee the capacity to receive or send a particular payment. Channels have reserves and other constraints, routing can fail, and opening or closing can require on-chain fees and time. Custodial Lightning hides some operational work but adds provider withdrawal, availability and solvency risk. Wallet implementations have different limits and recovery requirements.
+
+Before retrying a payment after a connection failure, check its status and whether the recipient was paid. A stale screen can lead to duplicate attempts. Avoid sharing invoices or transaction histories publicly when they reveal personal details. Bitcoin transactions are publicly recorded; Lightning is not a blanket promise of anonymity.
+
+## Case: a family payment across borders
+
+Fictional siblings in Nairobi and Madrid compare how to deliver 7,000 local units for a family repair. One has Bitcoin worth 10,000 at the example starting quote. Assume it falls 30%, leaving a quoted value of 7,000. A fictional conversion fee of 2% leaves 6,860; a fixed cash-out cost of 100 leaves **6,760**. The repair is short by **240**. This is a stress test, not today's quote or a prediction. Real spreads, fee bases, rounding, taxes, limits and receiving costs must be checked separately.
+
+Even 10,000 displayed in a bank or mobile app may be inaccessible during an outage. Compare the **net amount available by the deadline**, not just a cheap advertised transfer fee. A foreign exchange provider, cooperative transfer or ordinary bank payment can be more suitable for a particular bill; Bitcoin need not be the chosen route.
+
+## Prepare the failure path
+
+List the deadline, acceptable recipient payment methods, verification steps, likely delays and a contact route that does not rely on the failed device. Do not assume a second app is independent if it uses the same custodian or network. Keep financial records without publishing account identifiers. A reserve plan is useful only if the authorized person can execute it during illness, a lost phone or a service outage.
+
+## Try it
+
+Repeat the case with no price change and the same fictional costs: 10,000 × 0.98 − 100 = **9,700**, leaving 2,700 after the repair. Then make the conversion service unavailable for three days while the bill is due tomorrow. Explain why arithmetic surplus and timely access are different tests.

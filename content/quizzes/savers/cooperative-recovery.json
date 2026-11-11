@@ -1,0 +1,145 @@
+{
+  "lesson": "cooperative-recovery",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Two of three keys and all backups are destroyed in one office. What does the surviving key establish?",
+        "sw": "Funguo mbili kati ya tatu na nakala zote zimeharibiwa ofisini. Ufunguo mmoja unaonyesha nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "That 2-of-3 spending remains possible alone",
+            "sw": "Kwamba matumizi ya 2 kati ya 3 yanawezekana kwa mmoja"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Insufficient keys for ordinary 2-of-3 recovery",
+            "sw": "Funguo hazitoshi kwa urejeshaji wa kawaida wa 2 kati ya 3"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That members can vote the coins back",
+            "sw": "Kwamba wanachama wanaweza kupiga kura kurejesha sarafu"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Separate devices are not independent if their recovery material shares the same failure site.",
+        "sw": "Vifaa tofauti havijitegemei taarifa za urejeshaji zikiwa eneo moja la hitilafu."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "A wallet is restored but member records are lost. What remains unresolved?",
+        "sw": "Pochi imerejeshwa lakini rekodi za wanachama zimepotea. Nini hakijatatuliwa?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Only the colour of the ledger",
+            "sw": "Rangi ya daftari pekee"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Nothing; assets prove every claim",
+            "sw": "Hakuna; mali huthibitisha kila dai"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Complete member entitlements and liabilities",
+            "sw": "Haki na madeni kamili kwa wanachama"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Asset control and complete institutional records require separate recovery tests.",
+        "sw": "Udhibiti wa mali na rekodi kamili vinahitaji majaribio tofauti."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "What is not a valid emergency shortcut?",
+        "sw": "Ipi si njia halali ya mkato wa dharura?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Silently collecting all seeds or bypassing authorization",
+            "sw": "Kukusanya maneno yote au kupita idhini kimya kimya"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Preserving incident evidence",
+            "sw": "Kuhifadhi ushahidi wa tukio"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Using approved escalation procedures",
+            "sw": "Kutumia taratibu zilizoidhinishwa za kupeleka tatizo juu"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Emergency response must keep legitimate authority and security boundaries.",
+        "sw": "Mwitikio wa dharura uhifadhi mamlaka halali na mipaka ya usalama."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "What does a tabletop exercise grant an institution?",
+        "sw": "Zoezi la mezani linaipa taasisi nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Automatic legal permission to custody funds",
+            "sw": "Ruhusa ya moja kwa moja ya kutunza pesa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Learning evidence, without legal authorization or a recovery guarantee",
+            "sw": "Ushahidi wa kujifunza, bila ruhusa ya sheria au dhamana ya urejeshaji"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Exemption from member reporting",
+            "sw": "Msamaha wa taarifa kwa wanachama"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Actual activity still requires authority, qualified capacity and member protection.",
+        "sw": "Shughuli halisi bado inahitaji mamlaka, uwezo wa kitaalamu na ulinzi wa wanachama."
+      }
+    }
+  ]
+}

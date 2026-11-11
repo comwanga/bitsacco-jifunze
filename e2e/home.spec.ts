@@ -58,7 +58,7 @@ test("library and glossary are cards with a clear action", async ({ page }) => {
   await expect(library).toHaveAttribute("href", "/en/library/");
   await expect(glossary).toHaveAttribute("href", "/en/glossary/");
   await expect(library.getByRole("heading", { name: "Library" })).toBeVisible();
-  await expect(glossary).toContainText("50 terms");
+  await expect(glossary).toContainText("57 terms");
   await expect(library).toContainText("Open the library");
   await glossary.focus();
   await expect(glossary).toBeFocused();

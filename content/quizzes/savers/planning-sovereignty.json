@@ -1,0 +1,145 @@
+{
+  "lesson": "planning-sovereignty",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "What determines the subsidy-halving interval under current rules?",
+        "sw": "Nini huamua kipindi cha kupunguza kiasi kipya nusu chini ya kanuni za sasa?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Exactly four calendar years",
+            "sw": "Miaka minne kamili ya kalenda"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "210,000 blocks",
+            "sw": "Bloku 210,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A price target voted on by miners",
+            "sw": "Lengo la bei linalopigiwa kura na wachimbaji"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Block timing varies; a height-based rule does not fix a calendar date or market price.",
+        "sw": "Muda wa bloku hutofautiana; kanuni ya idadi ya bloku haiweki tarehe au bei ya soko."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Noor has 8,000 currency and Bitcoin falling from 4,000 to 2,000 against a 13,200 bill. Shortfall?",
+        "sw": "Noor ana sarafu 8,000 na Bitcoin inashuka kutoka 4,000 hadi 2,000 dhidi ya bili ya 13,200. Pengo?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1,200",
+            "sw": "1,200"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No shortfall",
+            "sw": "Hakuna pengo"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "3,200 before costs",
+            "sw": "3,200 kabla ya gharama"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Available quoted resources total 10,000; 13,200 − 10,000 = 3,200.",
+        "sw": "Rasilimali kwa bei ya mfano ni 10,000; 13,200 − 10,000 = 3,200."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Which arrangement still concentrates asset-price risk?",
+        "sw": "Mpango upi bado unategemea hatari ya bei ya mali moja?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Bitcoin held through three different apps",
+            "sw": "Bitcoin kwenye programu tatu tofauti"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A comparison of independent failure sources",
+            "sw": "Ulinganisho wa vyanzo tofauti vya kushindwa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A dated expense plan",
+            "sw": "Mpango wa gharama wenye tarehe"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Several interfaces do not diversify the underlying Bitcoin price exposure.",
+        "sw": "Programu kadhaa hazigawi hatari ya bei ya Bitcoin yenyewe."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "What does self-custody realistically change?",
+        "sw": "Kujitunzia hubadili nini kwa uhalisia?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "It removes all laws and counterparties",
+            "sw": "Huondoa sheria na watu wote wa kufanya nao biashara"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "It reduces account-operator dependence while other dependencies remain",
+            "sw": "Hupunguza utegemezi kwa msimamizi huku utegemezi mwingine ukibaki"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It guarantees long-term purchasing power",
+            "sw": "Huhakikisha uwezo wa kununua wa muda mrefu"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Software, networks, physical security, counterparties and law still matter.",
+        "sw": "Programu, mitandao, usalama wa kimwili, washiriki wa biashara na sheria bado vina umuhimu."
+      }
+    }
+  ]
+}

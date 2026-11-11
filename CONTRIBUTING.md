@@ -53,8 +53,8 @@ Add the slug to `content/roadmaps/<roadmap>.json`. If only one language is ready
 - `<Term id="seed-phrase" />` shows a glossary term in the lesson's language and links to the glossary. Use `<Term id="wallet">Pochi</Term>` to control the wording, for example at the start of a sentence.
 - `<Callout type="tip|warning|scam" title="...">...</Callout>` for boxed notes.
 - End with a `## Try it` / `## Jaribu` activity. The reader adds the reflection, quiz and resources itself.
-
 - Every lesson's `reflection` is a required reasoning activity, with at least three paired English/Kiswahili prompts. Ask learners to explain a mechanism, test an assumption or failure case, and consider what evidence could change their answer. Include a level-appropriate scenario rather than only factual recall. The reader also asks learners to formulate their own question and self-confirm completion. It stores the confirmation timestamp, never their answers. Existing progress files remain compatible; old completed lessons are retained.
+- The three Savers specializations are sections of the same roadmap with `optional: true`, a bilingual `description`, and guided prerequisites. This means learners can choose their subject; the discussion activities **within** lessons are required. Keep the original eight-lesson introductory sequence intact. New sections must have unique IDs and acyclic prerequisites.
 
 ### Quizzes
 
@@ -82,6 +82,8 @@ Each lesson needs two sign-offs before `lastReviewed` is set:
 - a **technical reviewer** for accuracy.
 
 The maintainer has approved the existing Kiswahili wording. Independent human technical-content sign-off remains outstanding before a public-launch announcement. Missing `lastReviewed` dates must not be treated as evidence that the completed language review is still pending; do not set review dates without both required sign-offs. New or changed material still needs the applicable reviews.
+
+The project owner reports completing the expanded curriculum's educational review on 11 November 2026, covering Kiswahili, Bitcoin, financial concepts, community/cooperative savings and documentation. See the [owner review record](docs/audit/2026-11-11-owner-review.md). This records the completed owner review without inventing a reviewer identity or both formal sign-offs; independent technical sign-off and release authorization remain separate.
 
 Lessons explain how things work. They must never give financial or investment advice, promise returns, or tell readers what to buy.
 

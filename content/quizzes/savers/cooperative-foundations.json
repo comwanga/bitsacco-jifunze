@@ -1,0 +1,145 @@
+{
+  "lesson": "cooperative-foundations",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Njeri has 2,000 shares, 8,000 savings and a 5,000 loan. Can you infer a 10,000 immediate withdrawal right?",
+        "sw": "Njeri ana hisa 2,000, akiba 8,000 na mkopo 5,000. Unaweza kusema ana haki ya kutoa 10,000 sasa?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, every balance is withdrawable",
+            "sw": "Ndiyo, kila salio linaweza kutolewa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "No; inspect separate contracts, lawful terms and liquidity",
+            "sw": "Hapana; kagua mikataba, masharti halali na upatikanaji"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, ownership eliminates all restrictions",
+            "sw": "Ndiyo, umiliki huondoa vikwazo vyote"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Shares, deposits and loans are distinct relationships; totals alone do not establish withdrawal rights.",
+        "sw": "Hisa, amana na mikopo ni mahusiano tofauti; jumla haithibitishi haki ya kutoa."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Which is a cooperative principle?",
+        "sw": "Ipi ni kanuni ya ushirika?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Guaranteed profits",
+            "sw": "Faida zilizohakikishwa"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "A permanent unelected treasurer",
+            "sw": "Mweka hazina wa kudumu asiyechaguliwa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Democratic member control and accountability",
+            "sw": "Udhibiti wa wanachama wa kidemokrasia na uwajibikaji"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Principles guide governance; actual lawful procedures still need verification.",
+        "sw": "Kanuni huongoza utawala; taratibu halali bado zihakikiwe."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Does using a shared Bitcoin wallet automatically create a cooperative institution?",
+        "sw": "Kutumia pochi ya Bitcoin ya pamoja huunda taasisi ya ushirika moja kwa moja?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "No; organization, rights, obligations and law must be established",
+            "sw": "Hapana; muundo, haki, wajibu na sheria vibainishwe"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes, all wallet users become insured members",
+            "sw": "Ndiyo, wote huwa wanachama wenye bima"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Yes, signatures replace legal governance",
+            "sw": "Ndiyo, sahihi huchukua nafasi ya utawala wa sheria"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Technology does not by itself create a charter, elected board or member protections.",
+        "sw": "Teknolojia peke yake haiundi hadhi, bodi iliyochaguliwa au ulinzi."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "What does member ownership fail to guarantee?",
+        "sw": "Umiliki wa wanachama hauhakikishi nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "That members have an institutional stake",
+            "sw": "Kwamba wanachama wana sehemu ya taasisi"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Freedom from fraud, losses or insolvency",
+            "sw": "Kutokuwepo kwa udanganyifu, hasara au kufilisika"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "That governance deserves attention",
+            "sw": "Kwamba utawala unahitaji kuangaliwa"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Ownership needs controls, reporting, participation and independent review.",
+        "sw": "Umiliki unahitaji udhibiti, ripoti, ushiriki na ukaguzi huru."
+      }
+    }
+  ]
+}

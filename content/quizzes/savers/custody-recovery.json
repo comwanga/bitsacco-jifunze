@@ -1,0 +1,145 @@
+{
+  "lesson": "custody-recovery",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "Three backups in one bag protect against what poorly?",
+        "sw": "Nakala tatu kwenye begi moja hazilindi vizuri dhidi ya nini?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "A shared theft or fire event",
+            "sw": "Wizi au moto unaoathiri begi lote"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Only a change of language",
+            "sw": "Kubadili lugha pekee"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "An arithmetic error",
+            "sw": "Kosa la hesabu"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Copy count is different from independence of failure locations.",
+        "sw": "Idadi ya nakala ni tofauti na kujitegemea kwa maeneo ya hitilafu."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "Which recovery claim is sound?",
+        "sw": "Dai lipi la urejeshaji ni sahihi?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Every Lightning wallet needs only a seed",
+            "sw": "Kila pochi ya Lightning inahitaji maneno pekee"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Requirements depend on wallet type and configuration",
+            "sw": "Mahitaji hutegemea aina na mpangilio wa pochi"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A support agent should receive your words",
+            "sw": "Msaidizi apewe maneno yako"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Channel data, public policy metadata or an optional passphrase may also be needed.",
+        "sw": "Data ya chaneli, mpangilio wa umma au kaulimbiu ya ziada vinaweza kuhitajika."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "Does possessing a stolen spending key establish legal ownership?",
+        "sw": "Kuwa na ufunguo wa kutumia ulioibwa kunathibitisha umiliki halali?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Yes, software decides every legal question",
+            "sw": "Ndiyo, programu huamua kila swali la sheria"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Yes, if funds are moved quickly",
+            "sw": "Ndiyo, pesa zikihamishwa haraka"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "No; technical control and lawful ownership differ",
+            "sw": "Hapana; udhibiti wa kiufundi na umiliki halali hutofautiana"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "Custody planning must address both authority and access.",
+        "sw": "Mpango wa utunzaji uzingatie mamlaka na upatikanaji."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "Why protect an extended public key?",
+        "sw": "Kwa nini ulinde ufunguo wa umma uliopanuliwa?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "It may reveal linked balances and transaction history",
+            "sw": "Unaweza kufichua salio na historia zinazohusiana"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "It is a universal password reset",
+            "sw": "Ni njia ya jumla ya kubadili nenosiri"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "It guarantees anonymity",
+            "sw": "Unahakikisha kutotambulika"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "Public configuration is not normally a spending secret but can be privacy-sensitive.",
+        "sw": "Mpangilio wa umma kwa kawaida si siri ya kutumia pesa lakini una umuhimu kwa faragha."
+      }
+    }
+  ]
+}

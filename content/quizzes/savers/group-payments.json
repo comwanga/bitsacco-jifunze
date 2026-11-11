@@ -1,0 +1,145 @@
+{
+  "lesson": "group-payments",
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": {
+        "en": "At 100 sats per local unit, 100,000 sats recognizes what contribution?",
+        "sw": "Kwa sats 100 kwa kitengo cha eneo, sats 100,000 hutambua mchango gani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "100 local units",
+            "sw": "Vipimo 100"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "1,000 local units",
+            "sw": "Vipimo 1,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "100,000 local units",
+            "sw": "Vipimo 100,000"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Divide received sats by sats per unit: 100,000 / 100.",
+        "sw": "Gawa sats zilizopokelewa kwa sats kwa kitengo: 100,000 / 100."
+      }
+    },
+    {
+      "id": "q2",
+      "prompt": {
+        "en": "A later 1,000-sat group expense leaves what asset balance from 100,000?",
+        "sw": "Gharama ya kikundi ya sats 1,000 inaacha mali kiasi gani kutoka 100,000?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "100,000 sats, fees are imaginary",
+            "sw": "Sats 100,000, ada si halisi"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "101,000 sats",
+            "sw": "Sats 101,000"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "99,000 sats",
+            "sw": "Sats 99,000"
+          }
+        }
+      ],
+      "answer": "c",
+      "explanation": {
+        "en": "The asset fee reduces assets; member contribution treatment follows the agreed policy.",
+        "sw": "Ada hupunguza mali; mchango hutibiwa kwa sera iliyokubaliwa."
+      }
+    },
+    {
+      "id": "q3",
+      "prompt": {
+        "en": "99,000 sats at 80 sats per local unit is quoted at what value?",
+        "sw": "Sats 99,000 kwa sats 80 kwa kitengo zina bei ya kiasi gani?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "1,237.50 local units",
+            "sw": "Vipimo 1,237.50"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "792 local units",
+            "sw": "Vipimo 792"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "A new 1,237.50 contribution",
+            "sw": "Mchango mpya wa 1,237.50"
+          }
+        }
+      ],
+      "answer": "a",
+      "explanation": {
+        "en": "99,000 / 80 = 1,237.50; revaluation is not a new contribution.",
+        "sw": "99,000 / 80 = 1,237.50; kubadili thamani si mchango mpya."
+      }
+    },
+    {
+      "id": "q4",
+      "prompt": {
+        "en": "An official posts a new contribution address urgently. What is a useful control?",
+        "sw": "Kiongozi anatangaza anwani mpya ya michango kwa haraka. Udhibiti upi unasaidia?"
+      },
+      "options": [
+        {
+          "id": "a",
+          "label": {
+            "en": "Pay immediately because urgency proves identity",
+            "sw": "Lipa mara moja kwa sababu haraka huthibitisha utambulisho"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "en": "Verify through an agreed independent contact route",
+            "sw": "Hakiki kupitia njia nyingine huru iliyokubaliwa"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "en": "Post every member's private records publicly",
+            "sw": "Tangaza rekodi binafsi za wote"
+          }
+        }
+      ],
+      "answer": "b",
+      "explanation": {
+        "en": "Independent verification reduces impersonation risk without exposing member data.",
+        "sw": "Uhakiki huru hupunguza kujifanya mtu mwingine bila kufichua taarifa za wanachama."
+      }
+    }
+  ]
+}

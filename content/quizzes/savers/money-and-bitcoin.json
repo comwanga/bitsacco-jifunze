@@ -14,7 +14,7 @@
     },
     {
       "id": "q2",
-      "prompt": { "sw": "Nani hutoa shilingi ya Kenya?", "en": "Who issues the Kenyan shilling?" },
+      "prompt": { "sw": "Nani hutoa noti na sarafu za Kenya?", "en": "Who issues Kenya's banknotes and coins?" },
       "options": [
         { "id": "a", "label": { "sw": "Safaricom", "en": "Safaricom" } },
         { "id": "b", "label": { "sw": "Benki Kuu ya Kenya", "en": "The Central Bank of Kenya" } },
@@ -22,11 +22,11 @@
         { "id": "d", "label": { "sw": "Satoshi Nakamoto", "en": "Satoshi Nakamoto" } }
       ],
       "answer": "b",
-      "explanation": { "sw": "Benki Kuu hutoa shilingi na huamua kiasi chake. M-Pesa na benki hutunza rekodi tu.", "en": "The Central Bank issues the shilling and decides how much exists. M-Pesa and banks only keep records." }
+      "explanation": { "sw": "Benki Kuu hutoa pesa taslimu. Pesa pia hujumuisha amana za benki za biashara, ambazo zinaweza kuundwa kupitia mikopo chini ya masharti ya kifedha na kanuni za usimamizi.", "en": "The central bank issues cash. Money also includes commercial-bank deposits, which can be created through lending subject to financial and regulatory constraints." }
     },
     {
       "id": "q3",
-      "prompt": { "sw": "Bitcoin ngapi zitakazowahi kuwepo?", "en": "How many bitcoin will ever exist?" },
+      "prompt": { "sw": "Chini ya kanuni za sasa za makubaliano ya mtandao, kikomo cha utoaji wa Bitcoin ni kipi?", "en": "Under current consensus rules, what is Bitcoin's issuance limit?" },
       "options": [
         { "id": "a", "label": { "sw": "Hazina kikomo", "en": "There is no limit" } },
         { "id": "b", "label": { "sw": "Takriban milioni 21", "en": "About 21 million" } },

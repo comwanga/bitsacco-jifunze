@@ -1,0 +1,64 @@
+---
+title: 'Multisignature, inheritance and continuity'
+description: >-
+  Separate independent keys, recovery information and legal succession in a
+  fictional household plan.
+level: advanced
+minutes: 22
+objectives:
+  - Evaluate threshold availability and collusion in a 2-of-3 arrangement
+  - Explain why key backups alone may not reconstruct a multisignature wallet
+  - Design a no-secrets rehearsal for incapacity and inheritance
+resources:
+  - title: 'BIP 129: multisignature wallet setup'
+    url: 'https://github.com/bitcoin/bips/blob/master/bip-0129.mediawiki'
+    kind: docs
+    language: en
+  - title: 'Bitcoin: wallet security'
+    url: 'https://bitcoin.org/en/secure-your-wallet'
+    kind: docs
+    language: en
+  - title: 'Bitcoin: privacy'
+    url: 'https://bitcoin.org/en/protect-your-privacy'
+    kind: docs
+    language: en
+reflection:
+  - Can a trusted helper recover funds without being able to take them today?
+  - >-
+    Who can legitimately act during incapacity, and how would others verify that
+    authority?
+  - >-
+    Compare one lost key with one deceased signer whose key still exists. Why
+    can the technical and lawful recovery questions differ, and who must
+    establish each?
+terms:
+  - multisig
+source:
+  type: original
+---
+
+## Several keys change the failure pattern
+
+Multisignature requires a threshold of keys to authorize spending. In a fictional 2-of-3 wallet, any two independent keys can sign. One lost key can be tolerated if the other two remain usable; two lost keys can make spending impossible. Two colluding signers can also spend without the third. This is a technical spending rule, not proof that a family or institution approved the payment.
+
+Three devices holding copies of the same key are not three independent signers. Nor are three keys truly independent if one person can access all their backups. Device vendors, locations, accounts and helpers can share failure sources. Complexity brings coordination work, replacement costs and more chances to misunderstand recovery. Multisignature is not automatically appropriate for a small beginner balance.
+
+## What has to survive
+
+Recovery can require each necessary seed and any associated passphrase, plus the wallet policy: threshold, participants' public key information, derivation paths and script configuration. A compatible wallet descriptor or export can encode much of this. Public configuration generally cannot spend alone, but may expose balances and history. Protect its availability and privacy; do not place it beside every secret without considering the threat model.
+
+Use the selected wallet's documented recovery procedure. Do not assume every app supports the same descriptor, device or signing format. A paper saying “two of three” is not enough to reconstruct all addresses. If a key is compromised, the old key is not remotely revoked: a new wallet arrangement and a verified transfer may be needed. Old backups remain dangerous while funds still use the old policy.
+
+## Case: an unavailable relative
+
+Fictional siblings Priya and Arun and a trusted helper hold distinct keys. Priya's device is destroyed. Arun has a usable key, but the helper is abroad with no access to their backup. A 2-of-3 design has not lost two keys permanently, yet cannot meet today's payment deadline. The family needs an access plan, not simply a statement that one loss is tolerated.
+
+Next suppose Arun dies. Knowing his PIN is neither a complete recovery plan nor evidence of legal authority. Estate, family-property, tax and inheritance rules depend on jurisdiction and circumstances. A qualified local professional can help establish lawful instructions; this lesson supplies no legal template. Technical control and legal entitlement must be addressed separately. Making secrets publicly available in an estate document can expose them before distribution is authorized.
+
+## Continuity without immediate disclosure
+
+Document who should be notified, how authority is established, where nonsecret instructions are located, how enough recovery material becomes available and who checks the destination. Include illness or incapacity, not just death. Helpers should understand their duties without necessarily seeing enough secrets to spend alone. Review the plan after births, deaths, moves, device changes or broken relationships. A helper or professional can also fail; establish how replacement is considered.
+
+## Try it
+
+Draw three independent key cards and one public-configuration card. Rehearse: one key lost; two keys lost; two signers colluding; configuration missing; one signer deceased; all backups in one flooded building. **Worked check:** one lost key can still permit a 2-of-3 spend only if the remaining two keys and necessary configuration are available. None of those signatures establish legal ownership. Use fictional labels only, never real seed words or an actual payment.

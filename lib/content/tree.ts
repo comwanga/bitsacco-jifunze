@@ -5,7 +5,7 @@ import { ROADMAP_IDS, type RoadmapId } from "./schemas.ts";
 import type { SimulationEntry } from "../simulations/registry.ts";
 
 export type TreeLesson = CatalogEntry & { prerequisites: { slug: string; title: string; contentLang: Lang }[] };
-export type TreeSection = { id: string; title: string; lessons: TreeLesson[] };
+export type TreeSection = { id: string; title: string; description?: string; optional?: boolean; lessons: TreeLesson[] };
 export type TreePath = { id: RoadmapId; title: string; tagline: string; description: string; sections: TreeSection[] };
 
 export function buildTree(lang: Lang, id: string, root = CONTENT_ROOT): TreePath {
@@ -13,7 +13,7 @@ export function buildTree(lang: Lang, id: string, root = CONTENT_ROOT): TreePath
   const r = getRoadmap(id as RoadmapId, root);
   const entries = new Map(buildCatalog(lang, root).filter((l) => l.roadmap === id).map((l) => [l.slug, l]));
   return { id: r.id, title: r.title[lang], tagline: r.tagline[lang], description: r.description[lang],
-    sections: r.sections.map((s) => ({ id: s.id, title: s.title[lang], lessons: s.lessons.map((l) => ({
+    sections: r.sections.map((s) => ({ id: s.id, title: s.title[lang], description: s.description?.[lang], optional: s.optional, lessons: s.lessons.map((l) => ({
       ...entries.get(l.slug)!, prerequisites: (l.prerequisites ?? []).map((slug) => {
         const p = entries.get(slug);
         if (!p) throw new Error(`Unknown prerequisite: ${id}/${slug}`);

@@ -15,6 +15,7 @@ import { LazyLabBar } from "@/components/lab/LabIslands";
 import type { RoadmapId } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
 import { lessonKey } from "@/lib/progress/model";
+import { readingSequence } from "@/lib/content/navigation";
 
 export const dynamicParams = false;
 
@@ -45,12 +46,14 @@ export default async function LessonPage({ params }: Params) {
   const quizFile = getQuiz(roadmap.id, slug);
   const order = flatLessons(roadmap);
   const i = order.indexOf(slug);
+  const sequence = readingSequence(roadmap, slug);
+  const position = sequence.indexOf(slug);
   const neighbour = (s: string | undefined) =>
     s ? { href: `/${lang}/${roadmap.id}/${s}/`, title: getLesson(roadmap.id, s, lang).frontmatter.title } : undefined;
   const section = roadmap.sections.find((s) => s.lessons.some((x) => x.slug === slug))!;
   const titles = Object.fromEntries(order.map((s) => [s, getLesson(roadmap.id, s, lang).frontmatter.title]));
   const course = <CourseNav roadmap={roadmap} lang={lang} current={slug} titles={titles} />;
-  const toc = <Toc headings={extractHeadings(lesson.body)} lang={lang} contentLang={lesson.servedLang} next={neighbour(order[i + 1])} />;
+  const toc = <Toc headings={extractHeadings(lesson.body)} lang={lang} contentLang={lesson.servedLang} next={neighbour(sequence[position + 1])} />;
 
   return (
     <LessonShell lang={lang} course={course} toc={toc}>
@@ -120,7 +123,8 @@ export default async function LessonPage({ params }: Params) {
       <Resources lang={lang} items={fm.resources} />
       <SourceCredit lang={lang} fm={fm} />
       <div lang={lang}>
-        <PrevNext lang={lang} prev={neighbour(order[i - 1])} next={neighbour(order[i + 1])} />
+        <PrevNext lang={lang} prev={neighbour(sequence[position - 1])} next={neighbour(sequence[position + 1])} />
+        {roadmap.sections.some((s) => s.optional) && position === sequence.length - 1 && <Link href={`/${lang}/${roadmap.id}/#specializations`} className="mt-6 inline-block font-semibold text-teal-700 underline dark:text-teal-400">{t(lang, "chooseSpecialization")}</Link>}
       </div>
       </article>
     </LessonShell>

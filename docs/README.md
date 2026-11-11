@@ -4,16 +4,18 @@ Start with the [project README](../README.md) for learning paths, features and l
 
 ## Current guides
 
+- [11 November platform audit](audit/2026-11-11-platform.md): baseline, classified evidence, implementation, validation and remaining gates. [Curriculum design and sources](audit/2026-11-11-curriculum.md) includes the Savers specialization map and required discussion approach.
+
 - [Contributing](../CONTRIBUTING.md): content format, checks, translation and technical-review policy.
 - [Production operations](deployment/production.md): accepted release, Railway/DNS, deployment, rollback, monitoring and scaling.
 - [Staging safeguards](deployment/railway-staging.md): deployed baseline and separate authentication acceptance gates; older ingress evidence is labelled within the document.
 - [Lightning lab](../lab/README.md): demonstrated local WSL2/Docker setup, pairing and the separate Codespaces limitation.
 - [Account development](development/accounts.md): local compatibility stack and retained security/logging requirements; accounts are unavailable in public production.
 - [English book provenance and reproduction](deployment/mastering-bitcoin-generated.md): official source revision, license, generation, completeness checks and rendering limits. See also the [artifact manifest](../public/books/mastering-bitcoin-en-3rd-edition.source.json).
-- Performance limits: [general build budgets](../lib/build/budget.ts), [per-page UX budgets](../lib/build/ux-budget.ts) and [activated browser measurements](../e2e/budget.spec.ts). The original 100 KB JavaScript aspiration remains unmet by the React/Next runtime; the enforced limits pass without being raised.
+- Performance limits: [general build budgets](../lib/build/budget.ts), [per-page UX budgets](../lib/build/ux-budget.ts) and [activated browser measurements](../e2e/budget.spec.ts). The original 100 KiB JavaScript aspiration remains unmet by the React/Next runtime. The November audit records a measured increase of the general ceiling from 150 to 151 KiB; learner-page, lab, activated-simulation and first-lesson limits remain unchanged.
 - [Attributions](../ATTRIBUTIONS.md), [software license](../LICENSE), [curriculum license](../content/LICENSE), [font notices](../scripts/books/font-notices.txt) and [MathJax notice](../scripts/books/mathjax-LICENSE.txt).
 
-The maintainer's Kiswahili review is complete. Independent human technical-content sign-off remains outstanding before a launch announcement. Account-provider acceptance and the pending Kiswahili book are separate from anonymous public learning.
+The project owner's educational review of this expansion is complete, dated 11 November 2026. The [owner review record](audit/2026-11-11-owner-review.md) covers Kiswahili, Bitcoin, finance, community/cooperative savings and documentation, without inventing formal dual sign-offs. Independent technical-content sign-off remains outstanding before a launch announcement. Account-provider acceptance and the pending Kiswahili book remain separate from anonymous public learning.
 
 ## Historical records
 

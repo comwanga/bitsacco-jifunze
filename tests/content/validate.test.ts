@@ -1,9 +1,24 @@
 import path from "node:path";
-import { describe, expect, test } from "vitest";
+import fs from "node:fs";
+import os from "node:os";
+import { afterEach, describe, expect, test } from "vitest";
 import { validateContent, type Issue } from "../../lib/content/validate.ts";
 
 const BROKEN = path.join(import.meta.dirname, "../fixtures/broken");
 const CLEAN = path.join(import.meta.dirname, "../fixtures/content");
+const temporaryRoots: string[] = [];
+afterEach(() => { for (const root of temporaryRoots.splice(0)) fs.rmSync(root, { recursive: true, force: true }); });
+
+function withRoadmap(edit: (roadmap: { sections: { id: string; lessons: { slug: string; prerequisites?: string[] }[] }[] }) => void): Issue[] {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "jifunze-validation-"));
+  temporaryRoots.push(root);
+  fs.cpSync(CLEAN, root, { recursive: true });
+  const file = path.join(root, "roadmaps/savers.json");
+  const roadmap = JSON.parse(fs.readFileSync(file, "utf8"));
+  edit(roadmap);
+  fs.writeFileSync(file, JSON.stringify(roadmap));
+  return validateContent(root, { checksDir: path.join(CLEAN, "../lab/jifunze_lab/checks") }).filter((i) => i.level === "error");
+}
 
 const issues = validateContent(BROKEN);
 function find(rule: Issue["rule"], level: Issue["level"], fileFragment: string, msg?: RegExp) {
@@ -34,6 +49,23 @@ describe("rule 2: schema and roadmap integrity", () => {
   });
   test("missing lastReviewed is a warning", () => {
     expect(find(2, "warning", "sw/no-review.mdx", /lastReviewed/)).toHaveLength(1);
+  });
+  test("rejects self-dependency and prerequisite cycles, but permits a shared prerequisite", () => {
+    expect(withRoadmap((r) => { r.sections[0].lessons[0].prerequisites = ["alpha"]; })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ rule: 2, message: expect.stringMatching(/prerequisite cycle.*alpha.*alpha/) })]),
+    );
+    expect(withRoadmap((r) => {
+      r.sections[0].lessons[0].prerequisites = ["gamma"];
+      r.sections.flatMap((s) => s.lessons).find((l) => l.slug === "gamma")!.prerequisites = ["alpha"];
+    })).toEqual(expect.arrayContaining([expect.objectContaining({ rule: 2, message: expect.stringMatching(/prerequisite cycle/) })]));
+    expect(withRoadmap((r) => {
+      for (const l of r.sections.flatMap((s) => s.lessons)) if (l.slug !== "alpha") l.prerequisites = ["alpha"];
+    })).toEqual([]);
+  });
+  test("rejects repeated section IDs that would generate duplicate navigation anchors", () => {
+    expect(withRoadmap((r) => { r.sections[1].id = r.sections[0].id; })).toEqual(
+      expect.arrayContaining([expect.objectContaining({ rule: 2, message: expect.stringMatching(/duplicate section id/) })]),
+    );
   });
 });
 

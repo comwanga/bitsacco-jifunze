@@ -50,8 +50,11 @@ function subscribe(listener: () => void): () => void {
 }
 
 function write(next: Progress): void {
-  cache = next;
-  if (!saveProgress(next, getStorage())) persistable = false;
+  const storage = getStorage();
+  // Another tab may have written before its asynchronous storage event reached this tab.
+  // Merge the latest persisted snapshot before replacing it; retain in-memory work if storage is unavailable.
+  cache = mergeProgress(loadProgress(storage), next);
+  if (!saveProgress(cache, storage)) persistable = false;
   notify();
 }
 

@@ -263,6 +263,29 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
       issues.push({ level: "error", rule: 2, file: roadmapFile, message: "a lesson slug appears more than once" });
     }
 
+    const sectionIds = new Set<string>();
+    for (const section of roadmap.sections) {
+      if (sectionIds.has(section.id)) issues.push({ level: "error", rule: 2, file: roadmapFile, message: `duplicate section id "${section.id}"` });
+      sectionIds.add(section.id);
+    }
+    // Existence alone is insufficient: a cyclic reading order can never be satisfied.
+    const prerequisites = new Map(roadmap.sections.flatMap((s) => s.lessons).map((l) => [l.slug, l.prerequisites ?? []]));
+    const visited = new Set<string>();
+    const visiting: string[] = [];
+    function visit(slug: string): void {
+      const cycleStart = visiting.indexOf(slug);
+      if (cycleStart !== -1) {
+        issues.push({ level: "error", rule: 2, file: roadmapFile, message: `prerequisite cycle: ${[...visiting.slice(cycleStart), slug].join(" -> ")}` });
+        return;
+      }
+      if (visited.has(slug) || !slugSet.has(slug)) return;
+      visiting.push(slug);
+      for (const pre of prerequisites.get(slug) ?? []) visit(pre);
+      visiting.pop();
+      visited.add(slug);
+    }
+    for (const slug of slugs) visit(slug);
+
     for (const section of roadmap.sections) {
       for (const entry of section.lessons) {
         lessonKeys.add(`${roadmap.id}/${entry.slug}`);

@@ -16,16 +16,17 @@ LEARNER_UID = 1000
 def _reader(stream, cap: int, out: dict, key: str) -> None:
     chunks: list[bytes] = []
     size = 0
-    while True:
-        block = stream.read(8192)
-        if not block:
-            break
-        room = cap - size
-        if room > 0:
-            chunks.append(block[:room])
-            size += min(len(block), room)
-        if len(block) > max(room, 0):
-            out["truncated"] = True  # keep draining so the process isn't blocked on a full pipe
+    with stream:
+        while True:
+            block = stream.read(8192)
+            if not block:
+                break
+            room = cap - size
+            if room > 0:
+                chunks.append(block[:room])
+                size += min(len(block), room)
+            if len(block) > max(room, 0):
+                out["truncated"] = True  # keep draining so the process isn't blocked on a full pipe
     out[key] = b"".join(chunks)
 
 

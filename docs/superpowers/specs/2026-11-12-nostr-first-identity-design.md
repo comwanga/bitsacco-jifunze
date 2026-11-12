@@ -99,7 +99,7 @@ Recovery codes are offered once, right after the first sign-in, on the existing 
 | Situation | Path | Result |
 | --- | --- | --- |
 | Signer reinstalled, key restored from the signer's own backup | Sign in normally | Same account; nothing to do |
-| Key lost, recovery code available | Enter a code → 15-minute recovery session → set up a signer with a new key → approve the `replace` request | Same account and progress under the new key; all other sessions revoked; the old key can no longer sign in; a new set of codes is issued; a security event is recorded |
+| Key lost, recovery code available | Enter a code → 15-minute recovery session → set up a signer with a new key → approve the `replace` request | Same account and progress under the new key; every session revoked and a fresh one started; the old key can no longer reach the account; every earlier recovery code stops working and a new set is returned once in the same transaction; a security event is recorded |
 | Key lost, no code, progress still on a device | Create a new account with a new key; the device's progress merges into it (section 4.4) | New account with the same progress |
 | Key lost, no code, no device copy, export file kept | New account, then import the file | New account with the exported progress |
 | Key lost, nothing kept | New account | Progress is gone; the old account is unreachable and expires under the retention rule in 3.7 |
@@ -175,9 +175,10 @@ Both routes require a **full** session; a recovery session is refused. The accou
 
 - The body is validated with the same rules as `parseProgressFile`: known app and version, key pattern, integer scores, lab identifiers of at most 64 characters. Extra limits: 500 lessons per account, 100 lab identifiers per lesson, 64 KiB body for this route only.
 - Timestamps must be in the exact form the application writes, `YYYY-MM-DDTHH:MM:SS.sssZ` (UTC, milliseconds). Any other form is rejected with `400`; the client normalises an imported file before sending. A timestamp more than five minutes ahead of the server clock is also rejected, never rewritten. Section 5.3 explains why.
+- Quizzes are limited to 1,000 questions, and timestamps to the years 2000 to 2999.
 - Unknown but well-formed lesson keys are stored, so a renamed or retired lesson does not make a learner's file unsyncable.
 - `POST` is a merge, never a replacement, and is idempotent: sending the same document twice changes nothing.
-- Rate limit: 60 merges per minute per account and the general per-address limit. Responses are `Cache-Control: no-store`.
+- Rate limit: 60 merges and 120 reads per minute per account. Responses are `Cache-Control: no-store`.
 
 ### 5.3 Conflict resolution
 
@@ -202,7 +203,9 @@ on conflict (account_id, lesson_key) do update set
 excluded.quiz_at is null
 or (p.quiz_at is not null and (
      n(p) * d(excluded) >  n(excluded) * d(p)
-  or (n(p) * d(excluded) = n(excluded) * d(p) and p.quiz_at <= excluded.quiz_at)))
+  or (n(p) * d(excluded) = n(excluded) * d(p)
+      and (p.quiz_at < excluded.quiz_at
+           or (p.quiz_at = excluded.quiz_at and p.quiz_total >= excluded.quiz_total)))))
 ```
 
 Consequences:
@@ -232,7 +235,7 @@ Rules examined, with what the server must do to match:
 | --- | --- | --- |
 | Completion and discussion timestamps | Earliest wins, compared as **text** | Identical only when both are in the canonical UTC form, where text order equals time order. **Mismatch found:** for `2026-11-01T10:00:00+03:00` and `2026-11-01T08:00:00.000Z` the client keeps the second (smaller text) and the database keeps the first (earlier instant). Hence the canonical-form rule in 5.2. |
 | Quiz comparison | Higher `correct / total`; a total of 0 counts as ratio 0 | Integer cross-multiplication with the zero-total case handled as above. **Mismatch found in the first draft of this design:** plain cross-multiplication treats `0/0` as tying with every score. Corrected here. Totals are capped (`smallint`), so two different ratios cannot collide. |
-| Quiz tie-break | Equal ratio: the earlier attempt wins. Equal ratio **and** equal timestamp: the copy already held wins | Same: the stored row wins. **Existing client property, not a server defect:** in that exact case (for example 1/2 and 2/4 at the same millisecond) `mergeProgress` depends on argument order, in 24 of 800 generated cases. Two devices could then show different numbers for the same ratio indefinitely. It cannot lose progress. Stage 2 should decide whether to add a final deterministic tie-break (for example the larger total) on both sides. |
+| Quiz tie-break | Equal ratio: the earlier attempt wins. Equal ratio **and** equal timestamp: the copy already held wins | Same: the stored row wins. **Existing client property, not a server defect:** in that exact case (for example 1/2 and 2/4 at the same millisecond) `mergeProgress` depends on argument order, in 24 of 800 generated cases. Two devices could then show different numbers for the same ratio indefinitely. It cannot lose progress. **Decided and implemented in Stage 2:** when the ratio and the timestamp are both equal, the result with more questions wins, on the device and on the server alike. The merge is then a total order and property tests confirm it is commutative, associative and idempotent. |
 | Lab passes | Union, in insertion order | Union, sorted. Equal as sets; order carries no meaning. The response omits `lab` when the set is empty, as the client does. |
 | Missing values | Absent fields stay absent | `least` ignores nulls; the quiz columns stay null together. |
 | Future-dated timestamps | Kept as written | **Rejected, not rewritten** (changed from the first draft): rewriting would make the server differ from the device copy. |

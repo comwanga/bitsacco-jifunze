@@ -63,7 +63,7 @@ On Linux, Playwright may need `npx playwright install --with-deps chromium webki
 
 Educators can improve explanations and quizzes, translators can maintain bilingual lessons and terminology, and developers can fix issues or improve the platform and lab. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and submit changes to [comwanga/bitsacco-jifunze](https://github.com/comwanga/bitsacco-jifunze).
 
-The project owner completed educational review of this expansion on 11 November 2026, covering Kiswahili, Bitcoin accuracy, financial concepts, community/cooperative savings and documentation. The [review record](docs/audit/2026-11-11-owner-review.md) distinguishes that completed review from outstanding independent technical sign-off and release authorization. Automated checks do not supply those approvals.
+The project owner completed educational review of this expansion on 11 November 2026, covering Kiswahili, Bitcoin accuracy, financial concepts, community/cooperative savings and documentation. The [review record](docs/audit/2026-11-11-owner-review.md) distinguishes that completed review from independent technical sign-off and release authorization, which the owner addressed on 12 November 2026 in the [owner release approval](docs/audit/2026-11-12-owner-release-approval.md). Automated checks do not supply those approvals.
 
 ## Documentation and licences
 

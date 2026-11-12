@@ -74,6 +74,8 @@ Existing progress stays compatible: `reflectedAt` is an optional field in the ve
 | External acceptance: real GitHub consent and installed Nostr signer flows, Railway edge/DNS/TLS/logs, full-profile Eclair exercise, Codespaces rebuild, Kiswahili book publication | **Outstanding.** |
 | Production release authorization | **Not granted.** |
 
+**Update, 12 November 2026:** the owner subsequently waived the independent technical, specialist and assistive-technology reviews and approved release of the merged commit. See the [owner release approval](2026-11-12-owner-release-approval.md). The table above is the status at integration time.
+
 ## Signing
 
 All commits are SSH-signed and verify against the repository's allowed-signers file with the key `SHA256:bPPXDeLtQvvCK93cyzClgXpIY/m1IH8AQfiKgVlfAU4`, the key that signed the preceding history. Signing was never disabled and no private key or passphrase was accessed.

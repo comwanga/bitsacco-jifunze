@@ -28,6 +28,8 @@ for (const lang of ["en", "sw"] as const) {
     for (const path of scripts) {
       const text = await (await request.get(path)).text();
       expect(text, `${path} carries the sync module`).not.toContain("jifunze:progress:owner");
+      expect(text, `${path} carries remote signing`).not.toContain("nostrconnect://");
+      expect(text, `${path} carries NIP-46 RPC`).not.toContain("switch_relays");
     }
     const keys = await page.evaluate(() => Object.keys(localStorage));
     expect(keys).toContain("jifunze:progress:v1");

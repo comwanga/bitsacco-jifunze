@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { INTRO_MS, playIntro } from "../../lib/intro/shouldPlay.ts";
+import { INTRO_MS, introScript, playIntro } from "../../lib/intro/shouldPlay.ts";
 
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
@@ -19,6 +19,13 @@ function setup(reducedMotion = false) {
 }
 
 describe("homepage intro lifecycle", () => {
+  test("the pre-paint script uses the same start logic, without storage", () => {
+    for (const reducedMotion of [false, true]) {
+      const { classes, scene } = setup(reducedMotion);
+      new Function("document", introScript())({ currentScript: { parentElement: scene } });
+      expect(classes.has("intro-play")).toBe(!reducedMotion);
+    }
+  });
   test("plays on every mount even when storage is unavailable", () => {
     const { classes, scene } = setup();
     for (let visit = 0; visit < 3; visit++) {

@@ -15,6 +15,14 @@ async function expectPlaying(page: Page) {
   expect(sample.next).toBeGreaterThan(sample.first);
 }
 
+test("the scene starts before hydration even when application scripts cannot load", async ({ page }) => {
+  await page.route("**/_next/static/**/*.js", route => route.abort());
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/en/");
+  await expectPlaying(page);
+  expect(await page.getByRole("link", { name: "Start learning", exact: true }).evaluate(el => getComputedStyle(el).opacity)).toBe("1");
+});
+
 test("homepage replays on reload, client returns, another tab and a new session with old storage", async ({ page, context, browser }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/en/");

@@ -8,6 +8,7 @@ import { BaobabScene } from "@/components/intro/BaobabScene";
 import { flatLessons, getGlossary, getLesson, getLibrary, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
 import { IntroReplay } from "@/components/intro/IntroReplay";
+import { introScript } from "@/lib/intro/shouldPlay";
 import { pathOrder } from "@/lib/content/navigation";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
@@ -34,6 +35,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       {/* One dark backdrop under the three earth sections, so their fractional-pixel edges never show the page through. */}
       <div className="bg-earth">
         <IntroReplay>
+          <script dangerouslySetInnerHTML={{ __html: introScript() }} />
           <div className="h-[clamp(300px,46svh,560px)] bg-night md:h-[clamp(400px,62svh,640px)]">
             <BaobabScene lang={lang} />
           </div>

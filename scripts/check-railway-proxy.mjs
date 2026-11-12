@@ -25,7 +25,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // Two stand-ins: the current API answers the tester gate (GET only, as the real route does); a stale one has no such route.
 const echo = gate => `import http from 'node:http';http.createServer((req,res)=>{${gate}res.setHeader('Content-Type','application/json');`;
 fs.writeFileSync(path.join(fixture, "api-stale.mjs"), `${echo(`if(req.url==='/api/internal/tester-gate'){res.statusCode=404;return res.end();}`)}res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,stale:true}));}).listen(3001,'::');`);
-fs.writeFileSync(path.join(fixture, "api.mjs"), `${echo(`if(req.url==='/api/internal/tester-gate'){res.statusCode=req.method==='GET'&&!req.headers.cookie&&!req.headers.authorization?204:405;return res.end();}`)}res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,ip:req.headers['x-real-ip'],proto:req.headers['x-forwarded-proto'],xff:req.headers['x-forwarded-for']||'',forwarded:req.headers.forwarded||''}));}).listen(3001,'::');`);
+fs.writeFileSync(path.join(fixture, "api.mjs"), `${echo(`if(req.url==='/api/internal/tester-gate'){res.statusCode=req.method==='GET'&&!req.headers.cookie&&!req.headers.authorization&&!req.headers['x-jifunze-account']?204:405;return res.end();}`)}res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({peer:req.socket.remoteAddress,ip:req.headers['x-real-ip'],proto:req.headers['x-forwarded-proto'],xff:req.headers['x-forwarded-for']||'',forwarded:req.headers.forwarded||'',account:req.headers['x-jifunze-account']||''}));}).listen(3001,'::');`);
 fs.writeFileSync(path.join(fixture, "front.conf"), `server { listen 8080; access_log off; resolver 127.0.0.11 ipv6=off; location / { set $web http://web:8080; proxy_pass $web; proxy_set_header Host $http_host; proxy_set_header X-Real-IP $remote_addr; proxy_set_header X-Forwarded-Proto https; } }`);
 fs.writeFileSync(path.join(fixture, "index.html"), "<!doctype html><title>Synthetic static learning</title><p>Learning remains available</p>");
 
@@ -101,6 +101,10 @@ try {
   const second = JSON.parse(request(b, "front", "/api/me").body);
   equal(second.ip, ip(b), "second client retains its own identity");
   equal(second.ip !== info.ip, true, "clients cannot collapse into the front proxy's shared address");
+  // The real API answers 401 to an account condition that arrives without its session, as the gate subrequest would.
+  const conditioned = request(a, "front", "/api/me", ["X-Jifunze-Account: acct-fixture", "Cookie: fixture=1"]);
+  equal(conditioned.status, 200, "the tester gate never receives the account condition of the request it guards");
+  equal(JSON.parse(conditioned.body).account, "acct-fixture", "the guarded request still carries its account condition to the API");
   docker("restart", web); await ready();
   equal(JSON.parse(request(a, "front", "/api/me").body).ip, ip(a), "web restart renders the same configuration without duplicating directives");
   const directHeaders = ["X-Real-IP: 203.0.113.99", "X-Forwarded-Proto: https"];

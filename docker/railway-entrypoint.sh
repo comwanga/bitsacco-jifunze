@@ -103,6 +103,9 @@ location = /_jifunze_tester_gate {
   proxy_set_header Content-Length "";
   proxy_set_header Cookie "";
   proxy_set_header Authorization "";
+  # The gate asks only whether an allowlist exists. Without the cookie, the API would refuse the guarded
+  # request's account condition and nginx would block every signed-in request that carries one.
+  proxy_set_header X-Jifunze-Account "";
   proxy_set_header Host $host;
   proxy_connect_timeout 3s;
   proxy_pass $api/api/internal/tester-gate;

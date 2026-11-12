@@ -44,7 +44,7 @@ test("native tree links support keyboard navigation between views and lessons", 
   await expect(page.getByRole("tree")).toHaveCount(0);
   await page.getByRole("link", { name: "List", exact: true }).focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/en\/builders\/$/);
+  await expect(page).toHaveURL(/\/en\/list\/builders\/$/);
   await page.getByRole("link", { name: "Tree", exact: true }).focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/en\/tree\/builders\/$/);

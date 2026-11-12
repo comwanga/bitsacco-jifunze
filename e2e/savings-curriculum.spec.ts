@@ -14,9 +14,9 @@ for (const lang of ["en", "sw"] as const) {
     await expect(page.locator("[data-resume]")).toHaveText(t(lang, "chooseSpecialization"));
     await page.locator("[data-resume]").click();
     await expect(page).toHaveURL(/#specializations$/);
-    const section = page.locator("#s-cooperative-finance");
+    const section = page.locator("#tree-section-cooperative-finance");
     await section.getByText(t(lang, "optionalLessons"), { exact: true }).click();
-    await section.locator(`a[href="/${lang}/savers/cooperative-foundations/"]`).click();
+    await section.locator(`h3 a[href="/${lang}/savers/cooperative-foundations/"]`).click();
     await expect(page.locator(`a[href="/${lang}/savers/cooperative-balance-sheet/"]`).last()).toBeVisible();
     await page.goto(`/${lang}/savers/cooperative-recovery/`);
     await expect(page.getByRole("link", { name: t(lang, "chooseSpecialization"), exact: true })).toBeVisible();
@@ -51,9 +51,9 @@ for (const lang of ["en", "sw"] as const) {
     const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 360, height: 800 } });
     const page = await context.newPage();
     await page.goto(`/${lang}/savers/`);
-    const section = page.locator("#s-community-savings");
+    const section = page.locator("#tree-section-community-savings");
     await section.getByText(t(lang, "optionalLessons"), { exact: true }).click();
-    await section.locator(`a[href="/${lang}/savers/group-governance/"]`).click();
+    await section.locator(`h3 a[href="/${lang}/savers/group-governance/"]`).click();
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByRole("heading", { name: t(lang, "reflection"), exact: true })).toBeVisible();
     await context.close();

@@ -27,7 +27,7 @@ test("a lesson opened through in-app navigation reloads offline", async ({ page,
   test.skip(info.project.name !== "desktop", "one browser is enough for the service worker");
   await page.goto("/en/savers/");
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
-  await page.locator('main a[href="/en/savers/wallets-keys/"]').click();
+  await page.locator('[data-tree-lesson="wallets-keys"] h3 a').click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Wallets");
   await page.waitForFunction(async () => Boolean(await (await caches.open("pages-v1")).match("/en/savers/wallets-keys/")));
   await context.setOffline(true);

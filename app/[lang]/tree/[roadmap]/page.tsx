@@ -5,6 +5,7 @@ import { PathTree } from "@/components/roadmap/PathTree";
 import { buildTree } from "@/lib/content/tree";
 import { listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
+import { FeedbackLink } from "@/components/FeedbackLink";
 
 export const dynamicParams = false;
 export function generateStaticParams() { return listRoadmaps().map((r) => ({ roadmap: r.id })); }
@@ -22,5 +23,8 @@ export default async function TreePage({ params }: Params) {
   return <>
     <PathHeader path={tree} lang={lang} slugs={lessons.map((l) => l.slug)} optionalSections={tree.sections.filter((s) => s.optional).map((s) => s.lessons.map((l) => l.slug))} minutes={lessons.reduce((sum, l) => sum + l.minutes, 0)} view="tree" />
     <PathTree tree={tree} lang={lang} />
+    <div className="mx-auto max-w-5xl px-4 pb-10">
+      <FeedbackLink lang={lang} context={{ pathTitle: tree.title, pathname: `/${lang}/${roadmap}/` }} className="text-teal-700 dark:text-teal-400" />
+    </div>
   </>;
 }

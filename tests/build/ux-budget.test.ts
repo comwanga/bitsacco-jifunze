@@ -6,6 +6,7 @@ test("classifies every scoped route without confusing tree, lesson and live lab 
     for (const [route, kind, lab] of [
       ["index.html", "home", false], ["learn/index.html", "catalogue", false],
       ["savers/index.html", "roadmap", false], ["tree/builders/index.html", "tree", false],
+      ["list/builders/index.html", "roadmap", false],
       ["builders/utxos-transactions/index.html", "lesson", false],
       ["lightning/payment-channels/index.html", "lab", true],
       ["simulations/index.html", "simulation", false], ["simulations/utxo/index.html", "simulation", false],

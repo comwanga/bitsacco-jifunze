@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("roadmap badges distinguish reading lessons from labs", async ({ page }) => {
-  await page.goto("/en/lightning/");
+  await page.goto("/en/list/lightning/");
   const routing = page.locator('main a[href="/en/lightning/routing-htlcs/"]');
   await expect(routing.getByText("Lab", { exact: true })).toBeVisible();
   await expect(routing.getByText("Quiz", { exact: true })).toBeVisible();

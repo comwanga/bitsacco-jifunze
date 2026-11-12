@@ -11,9 +11,9 @@ export function siteNav(lang: Lang): NavItem[] {
     {
       href: p("learn/"),
       label: t(lang, "navPaths"),
-      match: [p("learn/"), p("savers/"), p("builders/"), p("tree/savers/"), p("tree/builders/"), p("simulations/")],
+      match: [p("learn/"), p("savers/"), p("builders/"), p("tree/savers/"), p("tree/builders/"), p("list/savers/"), p("list/builders/"), p("simulations/")],
     },
-    { href: p("lightning/"), label: t(lang, "navLabs"), match: [p("lightning/"), p("tree/lightning/")] },
+    { href: p("lightning/"), label: t(lang, "navLabs"), match: [p("lightning/"), p("tree/lightning/"), p("list/lightning/")] },
     { href: p("library/"), label: t(lang, "navLibrary"), match: [p("library/")] },
     { href: p("glossary/"), label: t(lang, "navGlossary"), match: [p("glossary/")] },
     { href: p("progress/"), label: t(lang, "navProgress"), match: [p("progress/")] },

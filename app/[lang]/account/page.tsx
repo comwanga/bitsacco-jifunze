@@ -3,6 +3,7 @@ import { AccountUnavailable } from "@/components/account/AccountUnavailable";
 import type { Metadata } from "next";
 import { AccountHome } from "@/components/account/AccountHome";
 import { accountCopy } from "@/lib/account-copy";
+import { learningIdentityCopy } from "@/lib/learning-identity-copy";
 import type { Lang } from "@/lib/i18n";
 
 type Params = { params: Promise<{ lang: string }> };
@@ -20,7 +21,7 @@ export default async function AccountHomePage({ params }: Params) {
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8 pb-16">
       <h1 className="text-3xl font-extrabold tracking-tight">{c.homeHeading}</h1>
-      <AccountHome lang={lang} />
+      <AccountHome lang={lang} copy={{ account: learningIdentityCopy[lang].account, details: learningIdentityCopy[lang].details }} />
     </div>
   );
 }

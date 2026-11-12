@@ -29,6 +29,14 @@ async function signer(page: Page, key: Uint8Array, mode: "approve" | "invalid" =
 
 const hasSession = async (context: BrowserContext) => (await context.cookies()).some((c) => c.name === SESSION_COOKIE);
 
+test("a generated learning identity is denied by the tester allowlist", async ({ page, context }) => {
+  await page.goto("/en/account/signin/");
+  await page.locator("[data-save-progress]").click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText(accountCopy.en.error_challenge_invalid);
+  expect(await hasSession(context)).toBe(false);
+  expect(await page.evaluate(() => localStorage.getItem("jifunze:identity:v1"))).toMatch(/^[0-9a-f]{64}$/);
+});
+
 for (const lang of LANGS) {
   const c = accountCopy[lang];
   const tester = TESTERS[lang];
@@ -65,7 +73,7 @@ for (const lang of LANGS) {
 
   test(`${lang}: a listed Nostr identity signs up and returns to the same account`, async ({ page }) => {
     await signer(page, tester.nostrKey);
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(page).toHaveURL(new RegExp(`/${lang}/account/welcome/$`));
     await expect(page.locator("[data-codes] li")).toHaveCount(10);
@@ -73,7 +81,7 @@ for (const lang of LANGS) {
     const account = await whoAmI(page);
     await signOut(page, lang);
 
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(page).toHaveURL(new RegExp(`/${lang}/account/$`));
     expect((await whoAmI(page)).id).toBe(account.id);
@@ -81,7 +89,7 @@ for (const lang of LANGS) {
 
   test(`${lang}: an unlisted Nostr identity with a valid signature gets the spent-challenge message and no session`, async ({ page, context }) => {
     await signer(page, new Uint8Array(randomBytes(32)));
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(alert(page)).toHaveText(c.error_challenge_invalid);
     expect(await hasSession(context)).toBe(false);
@@ -90,7 +98,7 @@ for (const lang of LANGS) {
 
   test(`${lang}: a listed Nostr key with an invalid signature is refused`, async ({ page, context }) => {
     await signer(page, tester.nostrKey, "invalid");
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(alert(page)).toHaveText(c.error_nostr_invalid);
     expect(await hasSession(context)).toBe(false);

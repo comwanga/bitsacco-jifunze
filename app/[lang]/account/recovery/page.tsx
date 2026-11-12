@@ -3,6 +3,7 @@ import { AccountUnavailable } from "@/components/account/AccountUnavailable";
 import type { Metadata } from "next";
 import { Recovery } from "@/components/account/Recovery";
 import { accountCopy } from "@/lib/account-copy";
+import { learningIdentityCopy } from "@/lib/learning-identity-copy";
 import type { Lang } from "@/lib/i18n";
 
 type Params = { params: Promise<{ lang: string }> };
@@ -20,7 +21,7 @@ export default async function RecoveryPage({ params }: Params) {
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8 pb-16">
       <h1 className="text-3xl font-extrabold tracking-tight">{c.recoveryHeading}</h1>
-      <Recovery lang={lang} />
+      <Recovery lang={lang} recoveryLead={learningIdentityCopy[lang].recoveryLead} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { signedEvent } from "../api/test/nostr-helper";
 import { accountCopy } from "../lib/account-copy";
 import { accountSecurityCopy } from "../lib/account-security-copy";
+import { learningIdentityCopy } from "../lib/learning-identity-copy";
 import { syncCopy } from "../lib/sync-copy";
 import { discussionCopy } from "../lib/discussion-copy";
 import { t } from "../lib/i18n";
@@ -17,7 +18,7 @@ test("recovery inputs mask codes and never forward private-key or seed-shaped te
     const requests: string[] = [];
     const track = (r: import("@playwright/test").Request) => { if (r.url().includes("/api/")) requests.push(r.url()); };
     page.on("request", track);
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByText(c.useRecoveryCode).click();
     const input = page.getByLabel(c.recoveryCodeLabel);
     await expect(input).toHaveAttribute("type", "password");
@@ -49,7 +50,7 @@ async function signer(page: Page) {
   return { use: (next: ReturnType<typeof key>) => { current = next; }, mode: (next: string) => { mode = next; }, key: () => current, calls: () => calls };
 }
 async function signup(page: Page, lang: "en" | "sw") {
-  await page.goto(`/${lang}/account/signin/`);
+  await page.goto(`/${lang}/account/signin/#own`);
   await page.getByRole("button", { name: accountCopy[lang].continueNostr }).click();
   const codes = page.locator("[data-codes] li");
   await expect(codes).toHaveCount(10);
@@ -85,6 +86,7 @@ for (const lang of ["en", "sw"] as const) {
     page.on("request", (r) => {
       if (/\/api\/auth\/nostr\/(reauth|replace)$/.test(r.url())) proofs.push(Buffer.from(r.headers().authorization?.slice(6) ?? "", "base64").toString("utf8"));
     });
+    await expect(page.getByRole("button", { name: c.newCodes, exact: true })).toBeEnabled();
     await page.getByRole("button", { name: c.newCodes, exact: true }).focus();
     await page.keyboard.press("Enter");
     await expect(page.getByText(s.reauthHelp)).toBeVisible();
@@ -125,8 +127,10 @@ for (const lang of ["en", "sw"] as const) {
     expect(await apiStatus(page, "/api/me/progress")).toBe(403);
     const recoverySession = await browser.newContext({ storageState: await context.storageState() });
     const recoveryPage = await recoverySession.newPage(); await recoveryPage.goto(`/${lang}/account/recovery/`);
+    await page.getByText(learningIdentityCopy[lang].ownSigner, { exact: true }).click();
+    await page.getByLabel(learningIdentityCopy[lang].advancedLead, { exact: true }).check();
     await expect(page.getByText(s.replaceHelp)).toBeVisible();
-    await expect(page.locator("main input")).toHaveCount(0); // no key, seed or password field
+    await expect(page.locator('main input:not([type="checkbox"])')).toHaveCount(0); // no key, seed or password field
     signing.use(key());
     await page.getByRole("button", { name: s.replace, exact: true }).click();
     await expect(page.getByText(s.replaceWarning)).toBeVisible();
@@ -189,7 +193,7 @@ for (const lang of ["en", "sw"] as const) {
     expect(await page.evaluate((k) => JSON.parse(localStorage.getItem(k)!).lessons["savers/retained"].completedAt, PROGRESS)).toBe("unreadable-import");
     expect(await page.evaluate(() => localStorage.getItem("jifunze:progress:owner:v1"))).toBeNull();
     // The same public identity now creates a new account; the deleted server progress does not return.
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(page).toHaveURL(new RegExp(`/${lang}/account/welcome/$`));
     expect((await whoAmI(page)).id).not.toBe(original.id);
@@ -203,7 +207,7 @@ test("sign out everywhere keeps device progress and revokes both real sessions",
   await signup(page, "en");
   const another = await browser.newContext(); const other = await another.newPage();
   const otherSigner = await signer(other); otherSigner.use(signing.key());
-  await other.goto("/en/account/signin/"); await other.getByRole("button", { name: accountCopy.en.continueNostr }).click();
+  await other.goto("/en/account/signin/#own"); await other.getByRole("button", { name: accountCopy.en.continueNostr }).click();
   await expect(other).toHaveURL(/\/en\/account\/$/);
   await complete(page, "en");
   await page.goto("/en/account/");

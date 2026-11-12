@@ -46,7 +46,7 @@ Key replacement rotates the recovery codes in the same transaction: every earlie
 
 ### Learner account controls (Stage 4)
 
-`components/account/AccountSecurity.tsx` loads only after `/api/me` confirms a Nostr identity. Regenerating recovery codes, replacing a key from a full session, and deleting an account first request a fresh proof from the existing identity. A separate confirmation then performs the change; confirming identity alone changes no key or codes. A rejected, expired or mismatched proof cannot advance the flow. Key replacement from a restricted recovery session uses the recovery code as its authority and asks the learner to select a new identity inside their signer.
+`components/account/AccountSecurity.tsx` loads only after `/api/me` confirms a Nostr identity. Regenerating recovery codes, replacing a key from a full session, and deleting an account first request a fresh proof from the existing identity. A separate confirmation then performs the change; confirming identity alone changes no key or codes. A rejected, expired or mismatched proof cannot advance the flow. Key replacement from a restricted recovery session uses the recovery code as its authority. The built-in flow sets up this device's learning identity; advanced users can select an identity inside their own signer.
 
 The controls recheck the current account and session scope before acting. Known-account requests also carry `X-Jifunze-Account`, a non-secret **expectation**, not an account selector or credential. The API compares it with the authenticated cookie's account and returns `409 account_changed` before calling any handler if they differ. This closes the gap where another tab signs in after a page's check but before its mutation, including a progress upload. A caller cannot use the header to read or write another account; no cookie still means `401`. The condition is optional for compatibility with existing clients, which remain scoped to their cookie. The browser uses it whenever it already knows the account. The value never appears in the interface or request logs.
 
@@ -54,7 +54,7 @@ The controls recheck the current account and session scope before acting. Known-
 - A missing response to a sensitive action is treated as an uncertain outcome, not a failed transaction. The confirmation button is disabled and the learner is directed to check the account before starting another attempt.
 - Deletion explains the permanent server-side loss and requires an unchecked confirmation box. The device copy is kept by default. Requested removal requires the latest local copy to be covered by a confirmed server response; unsupported timestamps, work made during a request and other learners' copies are retained. A kept copy belonging to the deleted account loses that owner marker so it can later be added to a new account by explicit consent.
 - Sign out everywhere confirms the scope and retains local work. It cannot remotely erase another device's copy. The existing device-only sign-out retains its shared-device removal option and now rechecks the latest copy after the logout response.
-- The recovery form masks codes, clears a submitted code from component state, and refuses text outside the recovery-code format before any request. Lost-key guidance distinguishes recovery of this account from restoration of a secret key. Initial code saving can be skipped only through an explicit explanation of the consequences.
+- The recovery form masks codes, clears a submitted code from component state, and refuses text outside the recovery-code format before any request. Lost-key guidance distinguishes recovery of this account from restoration of a secret key. Initial code saving requires the backup acknowledgment before Continue; the earlier skip link was removed with Option A.
 - Beginner guidance keeps anonymous learning available, explains backups separate from the phone and each learner's identity on shared phones, and makes no supported-signer claim.
 
 Run the complete compatibility suite serially, followed by the learner lifecycle suite. Each invocation starts a fresh API. This separation preserves the real recovery limit of five attempts per source per 15 minutes; tests and production rate limits are unchanged.
@@ -69,7 +69,7 @@ See the [Stage 4 implementation record](../audit/2026-11-12-learner-account-expe
 
 ### Remote signing with a signer app (Stage 5, NIP-46)
 
-The sign-in page offers "Use a signer app" beside the browser-signer (NIP-07) path. The learner pairs through a `nostrconnect://` link, the same link as a QR code, or a pasted `bunker://` address. Remote signing only replaces *who signs*: the result is the same NIP-98 event, posted to the same `verify`, `reauth` and `replace` routes and verified by the same server code. There is no second server-side authentication model.
+The advanced sign-in section offers "Use a signer app" beside the browser-signer (NIP-07) path. The learner pairs through a `nostrconnect://` link, the same link as a QR code, or a pasted `bunker://` address. Remote signing only replaces *who signs*: the result is the same NIP-98 event, posted to the same `verify`, `reauth` and `replace` routes and verified by the same server code. There is no second server-side authentication model.
 
 - **Loading.** `components/account/RemoteSigning.tsx` and `lib/nostr/remote.ts` (with `nostr-tools` 2.25.2 and the QR encoder) are imported only after the learner presses the button. No other page downloads them, and no relay socket exists outside an active attempt.
 - **One attempt, in memory.** Each attempt generates its own client key and pairing secret. Nothing is written to browser storage. Completion, cancellation, failure, a 120-second deadline and leaving the page all close the sockets, reject pending calls and zero the key buffers. An attempt signs at most one event, and a retry starts with new credentials, so a late answer to an earlier attempt has nothing to arrive at.
@@ -84,6 +84,18 @@ npm run e2e:remote-account   # same build and TEST_DATABASE_URL as e2e:account
 ```
 
 That suite drives the real browser code, real NIP-44 encryption, real signatures and the real API against a **simulated** signer and relay. It is not evidence of interoperability with any signer application or phone. No signer application is named as supported until one has passed live acceptance on a device. The [Stage 5 acceptance review](../audit/2026-11-12-nip46-acceptance.md) records the relay checks, the open risks and the staging procedure for real signer applications.
+
+### Built-in Jifunze learning identity (Option A)
+
+The default sign-in action is **Save my progress / Hifadhi maendeleo yangu**. It creates a dedicated learning key in this browser's IndexedDB before using the existing NIP-98 challenge flow. Existing matching sessions continue directly; an expired session can be reopened using the retained device key without repeating onboarding. Browser and remote signers remain in the advanced section (`#own` opens it; `#remote` remains the popup bridge).
+
+The [security assessment and implementation evidence](../audit/2026-11-12-learning-identity.md) explains storage loss, XSS/device compromise and recovery limitations. IndexedDB is not encrypted by Jifunze and is not a secure enclave. Recovery codes recover account access, not the original signing key. They cannot undo compromise. The UI warns against funds or primary Nostr identity reuse and requires the backup acknowledgment before the onboarding Continue button works. At device sign-out, removing the local identity is checked by default, separately from removing confirmed progress. Keeping an identity permits later sign-in; a borrowed/unlocked browser is not a private account boundary.
+
+Recovery creates or uses this browser's learning identity and submits the existing replacement proof, preserving the account/progress and rotating codes and sessions atomically. Learners using external signers select that advanced option during recovery. No API routes, schema, account proof rules, sync ownership rules or tester gates change. Staging rejects generated keys until an operator explicitly allowlists the **public** key shown in advanced details; this implementation does not enroll testers or deploy anything. Production accounts remain disabled.
+
+```bash
+npm run e2e:device-account # real browser + API + throwaway PostgreSQL, fresh API/recovery limits
+```
 
 ## Server copy of progress
 
@@ -121,7 +133,7 @@ Stage 3 connects the device copy to the account copy (`lib/progress/sync.ts`, `c
 - **Timestamps:** an imported file's readable timestamps are rewritten as the same instant in the canonical UTC form. An unreadable one stays on the device unchanged and is left out of the upload; no time is invented. If the device clock is ahead, values still in the server's future are held back and sent once that time has passed.
 - **Persistence visibility (Stage 4):** a small polite live status below lesson completion distinguishes local saving, pending work, confirmed account saving, offline work, a merge decision, another account's device copy and an ended session. Anonymous status is rendered with the lesson and loads no sync code. Signed-in status uses the existing lazy module and local storage events, not another polling loop. An expired-session marker lets later lessons explain the pause without retrying the API. No account id appears in this status.
 - **Confirmation accuracy (Stage 4):** a successful HTTP response is not enough to report everything saved. The server document must cover the latest canonical device copy. Otherwise the result remains `pending`, the dirty marker stays set, and the copy cannot be removed during sign-out or deletion. Withheld imported/future values do not start an endless two-second retry loop. A busy cross-tab lock is also pending, never a success.
-- **Not built yet:** phone signing (NIP-46). No learner's progress is sent to a Nostr relay.
+- No learner's progress is sent to a Nostr relay. Phone signing is available through the advanced NIP-46 flow described above.
 
 ## Logs
 

@@ -1,19 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type ApiErrorCode, type Me } from "./api";
 import { ErrorAlert, RecoveryCodes, RetryError, SignedOutPrompt, textLink } from "./parts";
 
-type State = { kind: "loading" } | { kind: "codes"; codes: string[]; nostr: boolean } | { kind: "signedOut" } | { kind: "issued" } | { kind: "error"; code: ApiErrorCode };
+type State = { kind: "loading" } | { kind: "codes"; codes: string[]; nostr: boolean; learning: boolean } | { kind: "signedOut" } | { kind: "issued" } | { kind: "error"; code: ApiErrorCode };
 
 /**
  * A new account lands here once. The API issues the first set of codes exactly once per account (409 after),
  * so a reload shows "already shown" instead of new codes. The ref keeps a double-run effect from asking twice.
  */
-export function Welcome({ lang, exitGuidance }: { lang: Lang; exitGuidance: ReactNode }) {
+export function Welcome({ lang, copy: l }: { lang: Lang; copy: { welcomeLead: string; limits: string } }) {
   const c = accountCopy[lang];
   const [state, setState] = useState<State>({ kind: "loading" });
   const asked = useRef(false);
@@ -23,10 +23,15 @@ export function Welcome({ lang, exitGuidance }: { lang: Lang; exitGuidance: Reac
     setState({ kind: "loading" });
     const me = await apiFetch<Me>("/api/me");
     if (!me.ok) { setState(me.code === "unauthenticated" ? { kind: "signedOut" } : { kind: "error", code: me.code }); return; }
-    const res = await apiFetch<{ codes?: unknown }>("/api/me/recovery-codes/initial", { method: "POST" });
+    let learning = false;
+    try {
+      const id = await (await import("@/lib/nostr/device-identity")).deviceIdentity();
+      learning = !!id && me.data.identities.some((i) => i.provider === "nostr" && i.pubkey === id.pubkey);
+    } catch { /* External signers need no local identity. Recovery codes remain necessary if storage was lost. */ }
+    const res = await apiFetch<{ codes?: unknown }>("/api/me/recovery-codes/initial", { method: "POST", expectedAccount: me.data.account.id });
     if (res.ok) {
       const codes = Array.isArray(res.data?.codes) ? res.data.codes.filter((x): x is string => typeof x === "string") : [];
-      setState(codes.length ? { kind: "codes", codes, nostr: me.data.identities.some((i) => i.provider === "nostr") } : { kind: "error", code: "internal" });
+      setState(codes.length ? { kind: "codes", codes, nostr: me.data.identities.some((i) => i.provider === "nostr"), learning } : { kind: "error", code: "internal" });
     } else if (res.code === "unauthenticated") setState({ kind: "signedOut" });
     else if (res.code === "codes_already_issued") setState({ kind: "issued" });
     else setState({ kind: "error", code: res.code });
@@ -37,6 +42,15 @@ export function Welcome({ lang, exitGuidance }: { lang: Lang; exitGuidance: Reac
     asked.current = true;
     void issue();
   }, []);
+
+  useEffect(() => {
+    if (state.kind !== "codes") return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    const forget = () => setState({ kind: "issued" });
+    window.addEventListener("beforeunload", warn);
+    window.addEventListener("pagehide", forget);
+    return () => { window.removeEventListener("beforeunload", warn); window.removeEventListener("pagehide", forget); };
+  }, [state.kind]);
 
   switch (state.kind) {
     case "loading":
@@ -67,9 +81,9 @@ export function Welcome({ lang, exitGuidance }: { lang: Lang; exitGuidance: Reac
     case "codes":
       return (
         <>
-          <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{state.nostr ? c.nostrWelcomeLead : c.welcomeLead}</p>
+          <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{state.learning ? l.welcomeLead : state.nostr ? c.nostrWelcomeLead : c.welcomeLead}</p>
+          <p className="mt-4">{l.limits}</p>
           <RecoveryCodes lang={lang} codes={state.codes} focusOnShow={false} onContinue={() => router.push(`/${lang}/account/`)} />
-          {exitGuidance}
         </>
       );
   }

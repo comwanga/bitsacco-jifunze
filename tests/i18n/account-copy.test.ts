@@ -4,6 +4,12 @@ import { accountCopy, errorText } from "../../lib/account-copy.ts";
 import { nostrOnboardingCopy } from "../../lib/nostr-onboarding-copy.ts";
 import { syncCopy } from "../../lib/sync-copy.ts";
 import { accountSecurityCopy } from "../../lib/account-security-copy.ts";
+import { learningIdentityCopy } from "../../lib/learning-identity-copy.ts";
+
+test("learning identity copy has complete nonempty bilingual parity", () => {
+  expect(Object.keys(learningIdentityCopy.en).sort()).toEqual(Object.keys(learningIdentityCopy.sw).sort());
+  for (const copy of Object.values(learningIdentityCopy)) expect(Object.values(copy).every((v) => v.trim())).toBe(true);
+});
 
 test("Nostr onboarding copy has complete nonempty bilingual parity", () => {
   expect(Object.keys(nostrOnboardingCopy.en).sort()).toEqual(Object.keys(nostrOnboardingCopy.sw).sort());

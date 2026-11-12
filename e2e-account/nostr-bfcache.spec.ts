@@ -38,7 +38,7 @@ for (const lang of LANGS) {
     const calls = await signer(page);
     let challenges = 0;
     page.on("request", (request) => { if (new URL(request.url()).pathname === "/api/auth/nostr/challenge") challenges++; });
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     const original = await cacheState(page);
     const button = page.getByRole("button", { name: c.continueNostr, exact: true });
     await button.click();
@@ -69,7 +69,7 @@ for (const lang of LANGS) {
     const calls = await signer(page, approval);
     let challenges = 0;
     page.on("request", (request) => { if (new URL(request.url()).pathname === "/api/auth/nostr/challenge") challenges++; });
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     const original = await cacheState(page);
     const button = page.getByRole("button", { name: c.continueNostr, exact: true });
     await expect(button).toBeEnabled();

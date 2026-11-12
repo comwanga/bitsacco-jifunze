@@ -12,7 +12,7 @@ import { generateSecretKey } from "nostr-tools/pure";
 type Simulator = Awaited<ReturnType<typeof simulatedSigner>>;
 async function entry(page: Page, lang: "en" | "sw" = "en") {
   const c = remoteSigningCopy[lang];
-  await page.goto(`/${lang}/account/signin/`);
+  await page.goto(`/${lang}/account/signin/#own`);
   await page.getByRole("button", { name: c.choose, exact: true }).click();
   await expect(page.getByRole("heading", { name: c.heading })).toBeFocused();
 }
@@ -37,7 +37,7 @@ for (const lang of ["en", "sw"] as const) {
     const consoleText: string[] = []; page.on("console", (m) => consoleText.push(m.text()));
     const remote = await simulatedSigner(context);
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     expect(api).toEqual([]); expect(sockets).toEqual([]);
     for (const script of scripts) expect(await (await request.get(script)).text()).not.toContain("switch_relays");
     await page.getByRole("button", { name: c.choose }).focus(); await page.keyboard.press("Enter");
@@ -182,7 +182,7 @@ test("a session appearing during remote sign-in cannot be replaced by its late s
   await entry(page); await pair(page, remote);
   await expect.poll(() => remote.requests.includes("sign_event")).toBe(true);
   const other = await context.newPage(); await browserIdentity(other);
-  await other.goto("/en/account/signin/"); await other.getByRole("button", { name: accountCopy.en.continueNostr }).click();
+  await other.goto("/en/account/signin/#own"); await other.getByRole("button", { name: accountCopy.en.continueNostr }).click();
   await expect(other.locator("[data-codes] li")).toHaveCount(10); const current = await whoAmI(other);
   remote.release();
   await expect(page.locator("[data-remote-signing] [role=alert]")).toHaveText(accountCopy.en.error_account_changed);
@@ -191,10 +191,10 @@ test("a session appearing during remote sign-in cannot be replaced by its late s
 
 test("a learner switch during popup signing is refused by the server and leaves the new learner untouched", async ({ page, context, browser }) => {
   const key = await browserIdentity(page), remote = await simulatedSigner(context); remote.use(key);
-  await page.goto("/en/account/signin/"); await page.getByRole("button", { name: accountCopy.en.continueNostr }).click();
+  await page.goto("/en/account/signin/#own"); await page.getByRole("button", { name: accountCopy.en.continueNostr }).click();
   await expect(page.locator("[data-codes] li")).toHaveCount(10); await finishWelcome(page, "en");
   const occupied = await browser.newContext(), other = await occupied.newPage(); await browserIdentity(other);
-  await other.goto("/en/account/signin/"); await other.getByRole("button", { name: accountCopy.en.continueNostr }).click();
+  await other.goto("/en/account/signin/#own"); await other.getByRole("button", { name: accountCopy.en.continueNostr }).click();
   await expect(other.locator("[data-codes] li")).toHaveCount(10); const second = await whoAmI(other);
   const s = accountSecurityCopy.en, c = remoteSigningCopy.en; remote.mode("hold");
   await page.getByRole("button", { name: accountCopy.en.newCodes, exact: true }).click();
@@ -216,7 +216,7 @@ test("a learner switch during popup signing is refused by the server and leaves 
 
 test("account reauthentication uses the existing identity and retains the account condition through popup signing", async ({ page, context }) => {
   const key = await browserIdentity(page), remote = await simulatedSigner(context); remote.use(key);
-  await page.goto("/en/account/signin/"); await page.getByRole("button", { name: accountCopy.en.continueNostr }).click();
+  await page.goto("/en/account/signin/#own"); await page.getByRole("button", { name: accountCopy.en.continueNostr }).click();
   await expect(page.locator("[data-codes] li")).toHaveCount(10); await finishWelcome(page, "en");
   const before = await whoAmI(page), s = accountSecurityCopy.en, c = remoteSigningCopy.en;
   await page.getByRole("button", { name: accountCopy.en.newCodes, exact: true }).click();

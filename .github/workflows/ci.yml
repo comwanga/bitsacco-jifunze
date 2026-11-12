@@ -130,6 +130,8 @@ jobs:
         run: npm run e2e:account -- --workers=1
       - name: Learner account lifecycle (fresh API, real recovery limits)
         run: npm run e2e:learner-account
+      - name: Built-in learning identity (browser storage and recovery, fresh API)
+        run: npm run e2e:device-account
       - name: Remote signing (simulated signer and relay, not signer-app interoperability)
         run: npm run e2e:remote-account
       - name: Tester allowlist browser checks (real API, fake GitHub)

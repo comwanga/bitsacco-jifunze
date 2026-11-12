@@ -48,7 +48,7 @@ type Codes =
   | { kind: "done" }
   | { kind: "error"; code: ApiErrorCode };
 
-export function AccountHome({ lang }: { lang: Lang }) {
+export function AccountHome({ lang, copy: l }: { lang: Lang; copy: { account: string; details: string } }) {
   const c = accountCopy[lang];
   const [load, setLoad] = useState<Load>({ kind: "loading" });
   const [codes, setCodes] = useState<Codes>({ kind: "idle" });
@@ -178,8 +178,8 @@ export function AccountHome({ lang }: { lang: Lang }) {
         <ul className="mt-3 space-y-2">
           {me.identities.map((id) => (
             <li key={`${id.provider}-${id.linkedAt}`}>
-              <span className="font-semibold">{id.provider === "nostr" ? c.nostr : c.github}</span>
-              {id.provider === "nostr" && <span translate="no" className="block break-all font-mono" data-nostr-pubkey>{id.pubkey}</span>}
+              <span className="font-semibold">{id.provider === "nostr" ? l.account : c.github}</span>
+              {id.provider === "nostr" && <details className="mt-2"><summary className="cursor-pointer underline">{l.details}</summary><span translate="no" className="block break-all font-mono" data-nostr-pubkey>{id.pubkey}</span></details>}
               {id.handle && (
                 <>
                   {": "}
@@ -198,7 +198,7 @@ export function AccountHome({ lang }: { lang: Lang }) {
 
       {!ended && Panel && <Panel lang={lang} accountId={me.account.id} />}
 
-      {me.identities.some((i) => i.provider === "nostr") && <Suspense fallback={<Loading lang={lang} />}><AccountSecurity lang={lang} accountId={me.account.id} onSessionEnded={() => setEnded(true)} /></Suspense>}
+      {me.identities.some((i) => i.provider === "nostr") && <Suspense fallback={<Loading lang={lang} />}><AccountSecurity lang={lang} accountId={me.account.id} pubkey={me.identities.find((i) => i.provider === "nostr")?.pubkey} onSessionEnded={() => setEnded(true)} /></Suspense>}
 
       {!ended && !me.identities.some((i) => i.provider === "nostr") && <section aria-labelledby="codes-section-heading" className={`mt-6 ${card}`}>
         <h2 id="codes-section-heading" className="text-xl font-bold">

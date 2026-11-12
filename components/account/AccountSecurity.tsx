@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { accountSecurityCopy } from "@/lib/account-security-copy";
 import { accountCopy, errorText } from "@/lib/account-copy";
+import { learningIdentityCopy } from "@/lib/learning-identity-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type Me } from "./api";
 import { remoteSigningCopy } from "@/lib/remote-signing-copy";
@@ -17,8 +18,12 @@ type State = { kind: "idle" } | { kind: "reauth" | "confirm"; action: Action } |
 const sync = () => import("@/lib/progress/sync");
 
 /** Loaded after /me confirms a Nostr account. Sensitive actions always have a separate, deliberate confirmation. */
-export default function AccountSecurity({ lang, accountId, recovery = false, onSessionEnded }: { lang: Lang; accountId: string; recovery?: boolean; onSessionEnded?: () => void }) {
+export default function AccountSecurity({ lang, accountId, pubkey, recovery = false, onSessionEnded }: { lang: Lang; accountId: string; pubkey?: string; recovery?: boolean; onSessionEnded?: () => void }) {
   const c = accountSecurityCopy[lang], a = accountCopy[lang];
+  const l = learningIdentityCopy[lang];
+  const [device, setDevice] = useState<boolean | null>(null);
+  const [ownSigner, setOwnSigner] = useState(false);
+  const builtIn = !ownSigner && (recovery || device);
   const [state, setState] = useState<State>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -29,7 +34,15 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
   const locked = useRef(false);
   const focusRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
-  const actionsRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLFieldSetElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    void import("@/lib/nostr/device-identity").then((m) => m.deviceIdentity()).then((id) => {
+      if (active) setDevice(!!id && id.pubkey === pubkey);
+    }).catch(() => { if (active) setDevice(false); });
+    return () => { active = false; };
+  }, [pubkey]);
 
   useEffect(() => { if (state.kind === "reauth" || state.kind === "confirm") focusRef.current?.focus(); }, [state]);
   useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
@@ -44,7 +57,7 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
   }, [state.kind]);
 
   function start(action: Action) {
-    if (locked.current) return;
+    if (locked.current || device === null) return;
     setError(null); setConfirmed(false); setRemoveLocal(false); setUncertain(false);
     setState({ kind: recovery || action === "logout" ? "confirm" : "reauth", action });
   }
@@ -56,8 +69,8 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
     if (code === "account_changed") { setState({ kind: "changed" }); onSessionEnded?.(); return; }
     if (changing && (code === "network" || code === "internal")) setUncertain(true);
     if (code === "unauthenticated") { void sync().then((m) => m.sessionExpired()).catch(() => {}); setState({ kind: "signedOut" }); onSessionEnded?.(); }
-    setError(code === "no-signer" ? c.noSigner : code === "declined" ? c.declined
-      : changing && (code === "network" || code === "internal") ? c.uncertain : errorText(lang, code));
+    setError(code === "no-signer" ? builtIn ? l.missing : c.noSigner : code === "declined" ? c.declined
+      : changing && (code === "network" || code === "internal") ? builtIn ? l.uncertain : c.uncertain : errorText(lang, code));
   }
 
   async function currentAccount(): Promise<boolean> {
@@ -72,7 +85,16 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
   }
 
   async function proof<T>(purpose: "reauth" | "replace", source?: ReturnType<typeof openRemoteSigner>): Promise<ProofResult<T>> {
-    if (!source) return prove<T>(purpose, lang, () => setSigning(true), accountId);
+    if (!source) {
+      if (!builtIn) return prove<T>(purpose, lang, () => setSigning(true), accountId);
+      const m = await import("@/lib/nostr/device-identity");
+      const id = purpose === "replace" ? await m.ensureIdentity() : await m.deviceIdentity();
+      if (!id || (purpose === "reauth" && id.pubkey !== pubkey)) {
+        setError(l.missing); return { ok: false, status: 0, code: "no-signer" };
+      }
+      const prepared = await prepareProof<T>(purpose, lang, accountId);
+      return prepared.ok ? prepared.data.complete(id.signer, () => {}) : prepared;
+    }
     const prepared = await prepareProof<T>(purpose, lang, accountId, { remote: true, signal: source.signal });
     if (!prepared.ok) return prepared;
     await source.ready;
@@ -90,7 +112,7 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
       const res = await proof("reauth", source);
       if (res.ok) setState({ kind: "confirm", action });
       else failure(res.code);
-    } catch { setError(remoteSigningCopy[lang][source ? "cancelled" : "popup"]); }
+    } catch { setError(builtIn ? l.storage : remoteSigningCopy[lang][source ? "cancelled" : "popup"]); }
     finally { source?.close(); locked.current = false; setPending(false); setSigning(false); }
   }
 
@@ -153,7 +175,7 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
         setState({ kind: "done", message: c.loggedOut });
       }
       onSessionEnded?.();
-    } catch { setError(c.uncertain); setUncertain(true); }
+    } catch { setError(builtIn ? l.uncertain : c.uncertain); setUncertain(true); }
     finally { source?.close(); locked.current = false; setPending(false); setSigning(false); }
   }
 
@@ -167,38 +189,40 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
   }
   if (state.kind === "codes") return <div data-account-security>
     <StatusNote>{state.outcome ? state.outcome === "unchanged" ? c.unchanged : c.replaced : a.newCodesDone}</StatusNote>
-    <p className="mt-3">{c.backupHelp}</p>
+    <p className="mt-3">{builtIn ? l.backupHelp : c.backupHelp}</p>
+    <p className="mt-3">{l.limits}</p>
     <RecoveryCodes lang={lang} codes={state.codes} focusOnShow onContinue={continueToAccount} />
   </div>;
 
   const action = state.kind === "idle" ? null : state.action;
   return <section aria-labelledby="security-heading" className={`mt-6 ${card}`} data-account-security>
-    <h2 id="security-heading" className="text-xl font-bold">{recovery ? c.replace : c.heading}</h2>
-    {recovery && state.kind === "idle" && <p className="mt-3">{c.replaceHelp}</p>}
-    {!recovery && state.kind === "idle" && <p className="mt-3 text-[var(--muted)]">{a.nostrCodesHelp}</p>}
-    {state.kind === "idle" ? <div ref={actionsRef} tabIndex={-1} className="mt-4 flex flex-wrap gap-3">
+    <h2 id="security-heading" className="text-xl font-bold">{recovery ? l.renewHeading : c.heading}</h2>
+    {recovery && state.kind === "idle" && <p className="mt-3">{builtIn ? l.renewHelp : c.replaceHelp}</p>}
+    {!recovery && state.kind === "idle" && <p className="mt-3 text-[var(--muted)]">{device ? l.backupHelp : a.nostrCodesHelp}</p>}
+    {state.kind === "idle" && <details className="mt-4"><summary className="cursor-pointer underline">{l.ownSigner}</summary><label className="mt-3 flex items-start gap-3"><input type="checkbox" checked={ownSigner} onChange={(e) => setOwnSigner(e.target.checked)} />{l.advancedLead}</label></details>}
+    {state.kind === "idle" ? <fieldset disabled={device === null} ref={actionsRef} tabIndex={-1} className="mt-4 flex flex-wrap gap-3">
       {!recovery && <button type="button" className={secondaryBtn} onClick={() => start("codes")}>{a.newCodes}</button>}
-      <button type="button" className={secondaryBtn} onClick={() => start("replace")}>{c.replace}</button>
+      <button type="button" className={secondaryBtn} onClick={() => start("replace")}>{builtIn ? l.renew : c.replace}</button>
       {!recovery && <button type="button" className={secondaryBtn} onClick={() => start("delete")}>{c.delete}</button>}
       <button type="button" className={secondaryBtn} onClick={() => start("logout")}>{c.logoutAll}</button>
-    </div> : <div ref={focusRef} tabIndex={-1} className="mt-4 space-y-4">
+    </fieldset> : <div ref={focusRef} tabIndex={-1} className="mt-4 space-y-4">
       {state.kind === "reauth" ? <>
-        <p>{c.reauthHelp}</p>
-        <button type="button" disabled={pending} className={primaryBtn} onClick={() => void reauthenticate(state.action)}>{c.reauth}</button>
-        <button type="button" disabled={pending} className={secondaryBtn} onClick={() => void reauthenticate(state.action, true)}>{remoteSigningCopy[lang].sensitive}</button>
+        <p>{builtIn ? l.confirmHelp : c.reauthHelp}</p>
+        <button type="button" disabled={pending} className={primaryBtn} onClick={() => void reauthenticate(state.action)}>{builtIn ? l.confirm : c.reauth}</button>
+        {!builtIn && <button type="button" disabled={pending} className={secondaryBtn} onClick={() => void reauthenticate(state.action, true)}>{remoteSigningCopy[lang].sensitive}</button>}
       </> : <>
         {!recovery && action !== "logout" && <p>{c.confirmed}</p>}
-        {action === "replace" && <><p>{c.replaceHelp}</p><p>{c.prepare}</p><p>{c.replaceWarning}</p></>}
-        {action === "codes" && <><p>{a.newCodesReady}</p><p>{c.backupHelp}</p></>}
+        {action === "replace" && (builtIn ? <p>{l.renewHelp}</p> : <><p>{c.replaceHelp}</p><p>{c.prepare}</p><p>{c.replaceWarning}</p></>)}
+        {action === "codes" && <><p>{a.newCodesReady}</p><p>{builtIn ? l.backupHelp : c.backupHelp}</p></>}
         {action === "delete" && <>
-          <p>{c.deleteHelp}</p><p>{c.localHelp}</p>
+          <p>{builtIn ? l.deleteHelp : c.deleteHelp}</p><p>{c.localHelp}</p>
           <p><button type="button" disabled={pending} onClick={() => void download()} className={secondaryBtn}>{c.download}</button></p>
           <label className="flex items-start gap-3"><input type="checkbox" className="mt-1 h-5 w-5 shrink-0" disabled={pending} checked={removeLocal} onChange={(e) => setRemoveLocal(e.target.checked)} />{c.removeLocal}</label>
           <label className="flex items-start gap-3"><input type="checkbox" className="mt-1 h-5 w-5 shrink-0" disabled={pending} checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />{c.deleteConfirm}</label>
         </>}
-        {action === "logout" && <p>{c.logoutHelp}</p>}
-        <button type="button" disabled={pending || uncertain || (action === "delete" && !confirmed)} className={primaryBtn} onClick={() => action && void perform(action)}>{pending ? c.working : action === "replace" ? c.replaceConfirm : action === "delete" ? c.delete : action === "logout" ? c.logoutConfirm : a.newCodesConfirm}</button>
-        {action === "replace" && <button type="button" disabled={pending || uncertain} className={secondaryBtn} onClick={() => void perform("replace", true)}>{remoteSigningCopy[lang].sensitive}</button>}
+        {action === "logout" && <p>{device ? l.logoutHelp : c.logoutHelp}</p>}
+        <button type="button" disabled={pending || uncertain || (action === "delete" && !confirmed)} className={primaryBtn} onClick={() => action && void perform(action)}>{pending ? c.working : action === "replace" ? builtIn ? l.renew : c.replaceConfirm : action === "delete" ? c.delete : action === "logout" ? c.logoutConfirm : a.newCodesConfirm}</button>
+        {action === "replace" && !builtIn && <button type="button" disabled={pending || uncertain} className={secondaryBtn} onClick={() => void perform("replace", true)}>{remoteSigningCopy[lang].sensitive}</button>}
       </>}
       <button type="button" disabled={pending} className={`${secondaryBtn} ml-3`} onClick={cancel}>{c.cancel}</button>
     </div>}

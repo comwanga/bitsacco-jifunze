@@ -4,6 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { accountCopy } from "../lib/account-copy";
 import { nostrOnboardingCopy } from "../lib/nostr-onboarding-copy";
 import { accountSecurityCopy } from "../lib/account-security-copy";
+import { learningIdentityCopy } from "../lib/learning-identity-copy";
 import { signedEvent } from "../api/test/nostr-helper";
 import { finishWelcome, LANGS, SESSION_COOKIE, signOut, submitRecoveryCode, whoAmI } from "./helpers";
 
@@ -35,7 +36,7 @@ for (const lang of LANGS) {
   test(`${lang}: beginner onboarding explains self-custody without collecting keys`, async ({ page }) => {
     const requests: string[] = [];
     page.on("request", (r) => { if (new URL(r.url()).pathname.startsWith("/api/")) requests.push(r.url()); });
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     const existing = page.getByRole("radio", { name: c.nostrExisting });
     await expect(existing).toBeChecked();
     await existing.focus();
@@ -58,7 +59,7 @@ for (const lang of LANGS) {
     await expect(page.getByRole("button", { name: c.continueNostr })).toBeEnabled();
   });
   test(`${lang}: no signer has an accessible fallback and keeps GitHub and recovery available`, async ({ page, context }) => {
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await expect(page.getByText(c.nostrNoSigner)).toBeVisible();
     await expect(page.getByRole("button", { name: c.continueNostr })).toBeDisabled();
     await expect(page.getByRole("link", { name: c.continueGithub })).toBeVisible();
@@ -69,7 +70,7 @@ for (const lang of LANGS) {
 
   test(`${lang}: real signed fake NIP-07 login, recovery codes once, returning account and recovery scope`, async ({ page, context }) => {
     const calls = await signer(page);
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     const seen: string[] = [];
     page.on("request", (r) => seen.push(r.url()));
     await page.getByRole("button", { name: c.continueNostr }).focus();
@@ -88,7 +89,7 @@ for (const lang of LANGS) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(seen.some((u) => u.startsWith("wss:"))).toBe(false);
     await signOut(page, lang);
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(page).toHaveURL(new RegExp(`/${lang}/account/$`));
     expect((await whoAmI(page)).id).toBe(initial.id);
@@ -103,7 +104,9 @@ for (const lang of LANGS) {
       expect((await whoAmI(page)).scope).toBe("recovery");
       for (const recoveryLang of LANGS) {
         await page.goto(`/${recoveryLang}/account/recovery/`);
-        await expect(page.getByRole("heading", { name: accountSecurityCopy[recoveryLang].replace })).toBeVisible();
+        await expect(page.getByRole("heading", { name: learningIdentityCopy[recoveryLang].renewHeading })).toBeVisible();
+        await page.getByText(learningIdentityCopy[recoveryLang].ownSigner, { exact: true }).click();
+        await page.getByLabel(learningIdentityCopy[recoveryLang].advancedLead, { exact: true }).check();
         await expect(page.getByText(accountSecurityCopy[recoveryLang].replaceHelp)).toBeVisible();
         await expect(page.getByRole("link", { name: c.replaceGithub })).toHaveCount(0);
       }
@@ -115,7 +118,7 @@ for (const lang of LANGS) {
     test(`${lang}: ${mode} announces failure without creating a session`, async ({ page, context }) => {
       await signer(page, mode);
       if (mode === "expired") await page.clock.setFixedTime(new Date(Date.now() - 61_000));
-      await page.goto(`/${lang}/account/signin/`);
+      await page.goto(`/${lang}/account/signin/#own`);
       await page.getByRole("button", { name: c.continueNostr }).click();
       const text = mode === "decline" ? c.nostrDeclined : mode === "invalid" ? c.error_nostr_invalid : mode === "expired" ? c.error_nostr_expired : c.nostrFailed;
       await expect(page.getByRole("main").getByRole("alert")).toHaveText(text);
@@ -129,7 +132,7 @@ for (const lang of LANGS) {
   test(`${lang}: connection failure keeps sign-in available without creating a session`, async ({ page, context }) => {
     await signer(page);
     await page.route("**/api/auth/nostr/challenge", (route) => route.abort("connectionfailed"));
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     await page.getByRole("button", { name: c.continueNostr }).click();
     await expect(page.getByRole("main").getByRole("alert")).toHaveText(c.error_network);
     await expect(page.getByRole("button", { name: c.continueNostr })).toBeEnabled();
@@ -138,7 +141,7 @@ for (const lang of LANGS) {
 
   test(`${lang}: duplicate activation requests only one signature and exposes pending status`, async ({ page }) => {
     const calls = await signer(page, "pending");
-    await page.goto(`/${lang}/account/signin/`);
+    await page.goto(`/${lang}/account/signin/#own`);
     const button = page.getByRole("button", { name: c.continueNostr });
     await button.evaluate((el) => { (el as HTMLButtonElement).click(); (el as HTMLButtonElement).click(); });
     await expect(page.getByRole("status").filter({ hasText: c.nostrPending })).toBeVisible();
@@ -150,7 +153,7 @@ for (const lang of LANGS) {
 
 test("only public event fields are sent even if a signer returns an unexpected property", async ({ page }) => {
   await signer(page, "extra");
-  await page.goto("/en/account/signin/");
+  await page.goto("/en/account/signin/#own");
   const request = page.waitForRequest((r) => new URL(r.url()).pathname === "/api/auth/nostr/verify");
   await page.getByRole("button", { name: accountCopy.en.continueNostr }).click();
   const authorization = (await request).headers().authorization!;

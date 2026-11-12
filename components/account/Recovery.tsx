@@ -16,7 +16,7 @@ type Codes = { kind: "idle" } | { kind: "working" } | { kind: "shown"; codes: st
 const AccountSecurity = lazy(() => import("./AccountSecurity"));
 
 /** The restricted 15-minute session after a code: attach a new Nostr identity, or use retained GitHub compatibility. */
-export function Recovery({ lang }: { lang: Lang }) {
+export function Recovery({ lang, recoveryLead }: { lang: Lang; recoveryLead: string }) {
   const c = accountCopy[lang];
   const [load, setLoad] = useState<Load>({ kind: "loading" });
   const [codes, setCodes] = useState<Codes>({ kind: "idle" });
@@ -63,7 +63,7 @@ export function Recovery({ lang }: { lang: Lang }) {
 
   const github = me.identities.find((i) => i.provider === "github");
   if (me.identities.some((i) => i.provider === "nostr")) return <>
-    {!recovered && <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.recoveryLead}</p>}
+    {!recovered && <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{recoveryLead}</p>}
     <Suspense fallback={<Loading lang={lang} />}><AccountSecurity lang={lang} accountId={me.account.id} recovery onSessionEnded={() => setRecovered(true)} /></Suspense>
     {!recovered && <p className="mt-6"><SignOutLink lang={lang} /></p>}
   </>;

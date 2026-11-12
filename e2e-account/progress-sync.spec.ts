@@ -31,7 +31,7 @@ async function device(browser: Browser, key: NonNullable<Key>): Promise<{ contex
 
 /** Signs in with the device's current key and ends on the account page. */
 async function signIn(page: Page): Promise<void> {
-  await page.goto(`/${lang}/account/signin/`);
+  await page.goto(`/${lang}/account/signin/#own`);
   await page.getByRole("button", { name: c.continueNostr }).click();
   await page.waitForURL(new RegExp(`/${lang}/account/(welcome/)?$`));
   if (page.url().endsWith("/welcome/")) {

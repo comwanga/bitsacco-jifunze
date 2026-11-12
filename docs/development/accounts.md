@@ -44,6 +44,21 @@ Stage 1 of the Nostr-first identity design (`docs/superpowers/specs/2026-11-12-n
 
 Key replacement rotates the recovery codes in the same transaction: every earlier code stops working and the response carries a fresh set once, in `codes`. A caller must show them to the learner; they cannot be read again. The account pages do not use these routes yet: the recovery and account screens for Nostr are Stage 4 of the design. No secret key, seed phrase or signer password is ever sent to the API.
 
+## Server copy of progress
+
+Stage 2 of the design adds a server copy of a learner's progress (`api/migrations/0002_progress.sql`, `api/src/progress.ts`). The site does not use it yet: synchronisation from the browser is Stage 3, so the device copy remains the only one a learner sees.
+
+| Route | Session | Behaviour |
+| --- | --- | --- |
+| `GET /api/me/progress` | full | The account's progress as a version 1 document, the same format as the device copy and the export file |
+| `POST /api/me/progress` | full | Merges a version 1 document (some or all lessons) into the account's copy and returns the merged whole |
+
+- The account is always the session's. No path, query or body field can name another account, and a recovery session reaches neither route.
+- `POST` only ever adds: earliest completion, earliest discussion confirmation, best quiz, union of lab passes. It applies the same rules as `mergeProgress` in `lib/progress/model.ts`, including the final tie-break (same ratio at the same instant: more questions wins), so a stale, repeated or reordered request cannot remove or change newer work. There is no way to un-complete a lesson through this API.
+- Timestamps must be exactly what the site writes: UTC with milliseconds, for example `2026-11-12T08:15:30.123Z`. Any other form, an impossible date, or a time more than five minutes ahead of the server is refused with `400`. The device compares timestamps as text and the database as instants; the two only agree in this form.
+- Limits: 64 KiB per request (this route only), 500 lessons per account, 100 lab passes per lesson, lab identifiers up to 64 characters, quizzes up to 1,000 questions, 60 merges and 120 reads per minute per account. A request that would exceed a per-account limit is rolled back whole.
+- Deleting the account deletes its progress. Nothing is sent to a Nostr relay or any other service, and request logs carry the route only.
+
 ## Logs
 
 Both nginx and the API log to the containers' stdout and stderr (`docker compose logs`).

@@ -2,6 +2,7 @@ import { ApiError } from "./errors.ts";
 import type { Route } from "./http.ts";
 import { githubRoutes } from "./github-routes.ts";
 import { nostrRoutes } from "./nostr-routes.ts";
+import { progressRoutes } from "./progress.ts";
 import { recoveryRoutes } from "./recovery.ts";
 import type { Config } from "./config.ts";
 import { deleteAccountRoute } from "./delete-route.ts";
@@ -30,7 +31,7 @@ export const testerGateRoute: Route = {
 
 export const routes: Route[] = [
   healthRoute, testerGateRoute, meRoute, logoutRoute, logoutAllRoute, deleteAccountRoute(),
-  ...githubRoutes(), ...nostrRoutes(), ...recoveryRoutes(),
+  ...githubRoutes(), ...nostrRoutes(), ...recoveryRoutes(), ...progressRoutes(),
 ];
 
 /** The routes a deployment actually serves: without a configured GitHub App, no GitHub path exists at all. */

@@ -31,12 +31,12 @@ async function rejects(p: PromiseLike<unknown>, code: string): Promise<void> {
 const hash = () => Buffer.alloc(32, 7);
 
 describe("migrations", () => {
-  it("migrate applies 0001 once and records it in schema_migrations; a second run applies nothing", async () => {
+  it("migrate applies each migration once, in order, and records it; a second run applies nothing", async () => {
     await resetTestDb(sql);
-    expect(await migrate(sql, dir)).toEqual(["0001_accounts.sql"]);
+    expect(await migrate(sql, dir)).toEqual(["0001_accounts.sql", "0002_progress.sql"]);
     expect(await migrate(sql, dir)).toEqual([]);
     const rows = await sql`select name from schema_migrations`;
-    expect(rows.map((r) => r.name)).toEqual(["0001_accounts.sql"]);
+    expect(rows.map((r) => r.name).sort()).toEqual(["0001_accounts.sql", "0002_progress.sql"]);
   });
 
   it("identities enforce unique (provider, provider_uid) and unique (account_id, provider)", async () => {
@@ -120,12 +120,12 @@ describe("migrations", () => {
     );
   });
 
-  it("two concurrent migrate() calls on a fresh schema both resolve and apply 0001 once", async () => {
+  it("two concurrent migrate() calls on a fresh schema both resolve and apply each migration once", async () => {
     await resetTestDb(sql);
     const results = await Promise.all([migrate(sql, dir), migrate(sql, dir)]);
-    expect(results.flat()).toEqual(["0001_accounts.sql"]);
+    expect(results.flat().sort()).toEqual(["0001_accounts.sql", "0002_progress.sql"]);
     const rows = await sql`select name from schema_migrations`;
-    expect(rows).toHaveLength(1);
+    expect(rows).toHaveLength(2);
   });
 
   it("a broken 0002 rolls back and is not recorded, while 0001 stays applied", async () => {

@@ -17,6 +17,8 @@ export type Route = {
   auth: Auth;
   recoveryAllowed?: boolean;
   body?: ZodType;
+  /** A larger body limit for this route only; every other route keeps MAX_BODY_BYTES. */
+  maxBodyBytes?: number;
   handler: (ctx: Ctx) => Promise<Reply>;
 };
 export type Ctx = {
@@ -138,16 +140,16 @@ function sendJson(res: ServerResponse, status: number, json: unknown): void {
   res.end(text);
 }
 
-/** Reads at most MAX_BODY_BYTES; throws payload_too_large without consuming the rest of the stream. */
-async function readBody(req: IncomingMessage): Promise<Buffer> {
+/** Reads at most `limit` bytes; throws payload_too_large without consuming the rest of the stream. */
+async function readBody(req: IncomingMessage, limit: number): Promise<Buffer> {
   const declared = req.headers["content-length"];
-  if (declared !== undefined && Number(declared) > MAX_BODY_BYTES) throw new ApiError(413, "payload_too_large");
+  if (declared !== undefined && Number(declared) > limit) throw new ApiError(413, "payload_too_large");
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
     const buf = chunk as Buffer;
     size += buf.length;
-    if (size > MAX_BODY_BYTES) {
+    if (size > limit) {
       req.pause();
       throw new ApiError(413, "payload_too_large");
     }
@@ -222,7 +224,7 @@ export function createServer(routes: Route[], deps: Deps): Server {
       // 4. size and content type
       let raw: Buffer = Buffer.alloc(0);
       if (method !== "GET") {
-        raw = await readBody(req);
+        raw = await readBody(req, route.maxBodyBytes ?? MAX_BODY_BYTES);
         if (raw.length > 0 && !isJsonContentType(req.headers["content-type"])) throw new ApiError(400, "bad_request");
       }
 

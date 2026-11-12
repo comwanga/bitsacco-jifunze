@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { simulatedSigner } from "./signer";
@@ -66,12 +67,52 @@ for (const lang of ["en", "sw"] as const) {
 
 test("bunker connection validates a signed proof and cleans up", async ({ page, context }) => {
   const remote = await simulatedSigner(context), c = remoteSigningCopy.en;
-  await entry(page); await page.getByLabel(c.bunker, { exact: true }).check();
+  await entry(page); await page.getByText(c.bunker, { exact: true }).click();
   await page.getByLabel(c.address, { exact: true }).fill(remote.bunker());
-  await page.getByRole("button", { name: c.start }).click();
+  await page.getByRole("button", { name: c.bunkerStart }).click();
   await expect(page.locator("[data-codes] li")).toHaveCount(10);
   await expect.poll(() => remote.sockets.size).toBe(0);
   expect(remote.requests).toEqual(["connect", "switch_relays", "get_public_key", "sign_event"]);
+});
+
+test("a bunker address with one unreachable relay still signs in through the other", async ({ page, context }) => {
+  const remote = await simulatedSigner(context), c = remoteSigningCopy.en; remote.unreachable("down.nsec.app");
+  await entry(page); await page.getByText(c.bunker, { exact: true }).click();
+  await page.getByLabel(c.address, { exact: true }).fill(remote.bunker(["wss://down.nsec.app/", "wss://relay.nsec.app/"]));
+  await page.getByRole("button", { name: c.bunkerStart }).click();
+  await expect(page.locator("[data-codes] li")).toHaveCount(10);
+  expect(remote.urls).toContain("wss://down.nsec.app/");
+  await expect.poll(() => remote.sockets.size).toBe(0);
+});
+
+test("with no signer app and one pairing relay unreachable, the link leaves the attempt running and pairing still completes", async ({ page, context }) => {
+  const remote = await simulatedSigner(context), c = remoteSigningCopy.en; remote.unreachable("relay.nsec.app");
+  await entry(page); await page.getByRole("button", { name: c.start, exact: true }).click();
+  const link = page.getByRole("link", { name: c.open, exact: true }); await expect(link).toBeVisible();
+  await expect(page.getByText(c.noApp, { exact: true })).toBeVisible();
+  const uri = (await link.getAttribute("href"))!;
+  expect(new URL(uri).searchParams.getAll("relay")).toEqual(["wss://relay.nsec.app/", "wss://relay.primal.net/"]);
+  await link.click(); // headless Chromium has no handler for the scheme, like a phone without a signer app
+  await expect(link).toBeVisible(); await expect(page.getByRole("status").filter({ hasText: c.waiting })).toBeVisible();
+  await remote.pair(uri);
+  await expect(page.locator("[data-codes] li")).toHaveCount(10);
+  await expect.poll(() => remote.sockets.size).toBe(0);
+});
+
+test("a mistyped bunker address is refused before any connection, with a plain message", async ({ page, context }) => {
+  const remote = await simulatedSigner(context), c = remoteSigningCopy.en;
+  await entry(page); await page.getByText(c.bunker, { exact: true }).click();
+  await page.getByLabel(c.address, { exact: true }).fill("nsec1notanaddress");
+  await page.getByRole("button", { name: c.bunkerStart }).click();
+  await expect(page.locator("[data-remote-signing] [role=alert]")).toHaveText(c.badAddress);
+  expect(remote.urls).toEqual([]); expect(await page.getByLabel(c.address, { exact: true }).inputValue()).toBe("");
+});
+
+test("only the two sign-in pages of the export may open relay WebSockets", () => {
+  const pages = (fs.readdirSync("out", { recursive: true }) as string[]).filter((f) => f.endsWith(".html")).map((f) => f.replaceAll("\\", "/"));
+  const allowed = pages.filter((f) => /connect-src[^;"]*wss:/.test(fs.readFileSync(`out/${f}`, "utf8")));
+  expect(pages.length).toBeGreaterThan(100);
+  expect(allowed.sort()).toEqual(["en/account/signin/index.html", "sw/account/signin/index.html"]);
 });
 
 test("a signer's validated relay switch keeps the attempt alive and closes every socket afterwards", async ({ page, context }) => {

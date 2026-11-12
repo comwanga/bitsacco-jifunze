@@ -9,7 +9,7 @@ export async function simulatedSigner(context: BrowserContext) {
   const transport = generateSecretKey(); let identity = generateSecretKey();
   const sockets = new Map<WebSocketRoute, Map<string, { authors?: string[]; "#p"?: string[] }>>();
   let mode: "approve" | "decline" | "bad-signature" | "wrong-identity" | "hold" | "unsafe-switch" | "switch" = "approve";
-  const held: (() => void)[] = [], requests: string[] = [], closed: WebSocketRoute[] = [], urls: string[] = [], seen = new Set<string>();
+  const held: (() => void)[] = [], requests: string[] = [], closed: WebSocketRoute[] = [], urls: string[] = [], seen = new Set<string>(), dead = new Set<string>();
   function deliver(event: Event) {
     for (const [socket, filters] of sockets) for (const [id, f] of filters) {
       if (f.authors && !f.authors.includes(event.pubkey)) continue;
@@ -23,7 +23,9 @@ export async function simulatedSigner(context: BrowserContext) {
     conversation.fill(0); deliver(event);
   }
   await context.routeWebSocket("wss://**", (socket) => {
-    sockets.set(socket, new Map()); urls.push(socket.url());
+    urls.push(socket.url());
+    if (dead.has(new URL(socket.url()).host)) { void socket.close({ code: 1013, reason: "fixture unreachable" }); return; }
+    sockets.set(socket, new Map());
     socket.onClose(() => { closed.push(socket); sockets.delete(socket); });
     socket.onMessage((raw) => {
       const m = JSON.parse(String(raw));
@@ -59,7 +61,9 @@ export async function simulatedSigner(context: BrowserContext) {
     mode: (value: typeof mode) => { mode = value; },
     use: (key: Uint8Array) => { identity = key; },
     key: () => identity,
-    bunker: () => `bunker://${getPublicKey(transport)}?relay=${encodeURIComponent("wss://relay.nsec.app/")}&secret=fixture-one-use`,
+    /** Hosts whose relay closes every connection at once. */
+    unreachable: (host: string) => { dead.add(host); },
+    bunker: (relays = ["wss://relay.nsec.app/"]) => `bunker://${getPublicKey(transport)}?${relays.map((r) => `relay=${encodeURIComponent(r)}`).join("&")}&secret=fixture-one-use`,
     async pair(uri: string, wrongSecret = false, waitForSubscription = true) {
       const url = new URL(uri);
       if (waitForSubscription) await expect.poll(() => [...sockets.values()].some((f) => [...f.values()].some((x) => x["#p"]?.includes(url.hostname)))).toBe(true);

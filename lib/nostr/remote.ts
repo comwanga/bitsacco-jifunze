@@ -9,7 +9,9 @@ import type { ProofTemplate } from "@/components/account/nostr-proof";
 
 export type RemoteFailure = "cancelled" | "timeout" | "disconnected" | "invalid" | "declined";
 export class RemoteError extends Error { constructor(readonly reason: RemoteFailure) { super(reason); } }
-export const PAIRING_RELAYS = ["wss://relay.nsec.app/"];
+// The curated pairing list. An attempt needs only one of them: see docs/audit/2026-11-12-nip46-acceptance.md
+// for the live checks behind this choice. Third-party services; the owner confirms them before release.
+export const PAIRING_RELAYS = ["wss://relay.nsec.app/", "wss://relay.primal.net/"];
 const PERMISSIONS = ["get_public_key", "sign_event:27235"];
 
 /** Pinned SDK close() closes only a subscription. Own all sockets, pending calls and key buffers as well. */
@@ -30,7 +32,7 @@ export function remoteAttempt(origin: string, address?: string) {
   const key = generateSecretKey();
   const controller = new AbortController();
   const deadline = Date.now() + 120_000;
-  let disposed = false, signer: BunkerSigner | undefined, identity: string | undefined, used = false, era = 0;
+  let disposed = false, signer: BunkerSigner | undefined, identity: string | undefined, used = false, era = 0, live = 0;
   let allowed = new Set(relayList(bunker?.relays ?? PAIRING_RELAYS));
   let fail!: (e: RemoteError) => void;
   const failed = new Promise<never>((_, reject) => { fail = reject; });
@@ -54,13 +56,20 @@ export function remoteAttempt(origin: string, address?: string) {
       if (!allowed.has(normalized) || disposed) throw new RemoteError("invalid");
       super(normalized, protocols);
       // A socket retired by an approved relay switch belongs to an earlier era; its close is not a failure.
-      const opened = era;
-      this.addEventListener("close", () => { if (!disposed && opened === era) close("disconnected"); });
+      // One unreachable relay among several is not a failure either: the attempt ends when none is left.
+      const opened = era; let counted = true; live++;
+      const lost = () => {
+        if (!counted) return;
+        counted = false;
+        if (!disposed && opened === era && --live === 0) close("disconnected");
+      };
+      this.addEventListener("close", lost);
       this.addEventListener("message", (event) => {
         try {
           if (typeof event.data !== "string" || event.data.length > 100_000) throw new Error();
           const m = JSON.parse(event.data);
-          if (Array.isArray(m) && (m[0] === "CLOSED" || m[0] === "AUTH")) { close("disconnected"); event.stopImmediatePropagation(); return; }
+          // A relay that refuses the subscription or demands authentication is unusable for this attempt.
+          if (Array.isArray(m) && (m[0] === "CLOSED" || m[0] === "AUTH")) { event.stopImmediatePropagation(); lost(); if (!disposed) this.close(); return; }
           if (!Array.isArray(m) || !["EVENT", "EOSE", "OK"].includes(m[0]) || typeof m[1] !== "string") throw new Error();
           if (m[0] === "EVENT") {
             const e = m[2];
@@ -96,7 +105,7 @@ export function remoteAttempt(origin: string, address?: string) {
     }
   }
   const pool = new PrivatePool({ verifyEvent, websocketImplementation: QuietSocket, maxWaitForConnection: 10_000, enablePing: false, enableReconnect: false,
-    allowConnectingToRelay: (url) => !disposed && allowed.has(relayURL(url)), onRelayConnectionFailure: () => close("disconnected") });
+    allowConnectingToRelay: (url) => !disposed && allowed.has(relayURL(url)) });
   let secret = Array.from(crypto.getRandomValues(new Uint8Array(32)), (n) => n.toString(16).padStart(2, "0")).join("");
   let uri = bunker ? "" : createNostrConnectURI({ clientPubkey: getPublicKey(key), relays: [...allowed], secret, perms: PERMISSIONS, name: "Bitsacco Jifunze", url: origin });
   secret = "";
@@ -124,7 +133,7 @@ export function remoteAttempt(origin: string, address?: string) {
         const relays = relayList(next);
         if (JSON.stringify([...allowed].sort()) !== JSON.stringify([...relays].sort())) {
           const pointer = { ...signer.bp, relays };
-          allowed = new Set(relays); era++;
+          allowed = new Set(relays); era++; live = 0;
           forgetSigner(signer); pool.destroy();
           signer = BunkerSigner.fromBunker(key, pointer, params);
         }
@@ -133,7 +142,11 @@ export function remoteAttempt(origin: string, address?: string) {
       if (!/^[0-9a-f]{64}$/.test(identity)) throw new RemoteError("invalid");
       uri = "";
       return identity;
-    } catch (e) { close(e instanceof RemoteError ? e.reason : "invalid"); throw e instanceof RemoteError ? e : new RemoteError("invalid"); }
+    } catch (e) {
+      // No relay accepted a request (AggregateError from publishing): a transport failure, not a bad signer.
+      const reason = e instanceof RemoteError ? e.reason : e instanceof AggregateError ? "disconnected" : "invalid";
+      close(reason); throw new RemoteError(reason);
+    }
   })();
   void ready.catch(() => {});
   return {
@@ -144,7 +157,7 @@ export function remoteAttempt(origin: string, address?: string) {
         await ready; active();
         if (used || !authenticationTemplate(template, origin)) throw new RemoteError("invalid");
         used = true;
-        const expected = JSON.stringify(template);
+        const expected = JSON.stringify({ created_at: template.created_at, kind: template.kind, tags: template.tags, content: template.content });
         const event = await race(signer!.signEvent(template));
         if (event.pubkey !== identity || JSON.stringify({ created_at: event.created_at, kind: event.kind, tags: event.tags, content: event.content }) !== expected || !verifyEvent(event)) throw new RemoteError("invalid");
         return event;

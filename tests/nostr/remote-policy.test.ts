@@ -1,9 +1,15 @@
 import { expect, test } from "vitest";
 import { authenticationTemplate, bunkerAddress, relayList, relayURL } from "../../lib/nostr/remote-policy";
 
-for (const value of ["ws://relay.nsec.app", "wss://localhost/", "wss://foo.local/", "wss://127.1/", "wss://2130706433/", "wss://10.0.0.1/", "wss://172.16.0.1/", "wss://192.168.1.1/", "wss://169.254.1.1/", "wss://100.64.1.1/", "wss://224.0.0.1/", "wss://[::1]/", "wss://[::ffff:127.0.0.1]/", "wss://[fe80::1]/", "wss://[fc00::1]/", "wss://user:password@relay.nsec.app", "wss://relay.nsec.app/#secret", "wss://relay.nsec.app/\n", "https://relay.nsec.app"]) {
+for (const value of ["ws://relay.nsec.app", "wss://localhost/", "wss://app.localhost/", "wss://foo.local/", "wss://db.internal/", "wss://0.1.2.3/", "wss://[::]/", "wss://[ff02::1]/", "wss://127.1/", "wss://2130706433/", "wss://10.0.0.1/", "wss://172.16.0.1/", "wss://192.168.1.1/", "wss://169.254.1.1/", "wss://100.64.1.1/", "wss://224.0.0.1/", "wss://[::1]/", "wss://[::ffff:127.0.0.1]/", "wss://[fe80::1]/", "wss://[fc00::1]/", "wss://user:password@relay.nsec.app", "wss://relay.nsec.app/#secret", "wss://relay.nsec.app/\n", "https://relay.nsec.app"]) {
   test(`rejects unsafe relay ${JSON.stringify(value)}`, () => expect(() => relayURL(value)).toThrow());
 }
+test("accepts public names, ports and public address literals", () => {
+  expect(relayURL("wss://relay.primal.net")).toBe("wss://relay.primal.net/");
+  expect(relayURL("wss://relay.nsec.app:4443/path")).toBe("wss://relay.nsec.app:4443/path");
+  expect(relayURL("wss://8.8.8.8/")).toBe("wss://8.8.8.8/");
+  expect(relayURL("wss://[2001:4860:4860::8888]/")).toBe("wss://[2001:4860:4860::8888]/");
+});
 test("bounds and deduplicates relay lists", () => {
   expect(relayList(["wss://relay.nsec.app", "wss://relay.nsec.app/"])).toEqual(["wss://relay.nsec.app/"]);
   expect(() => relayList([])).toThrow(); expect(() => relayList(Array(6).fill("wss://relay.nsec.app"))).toThrow();

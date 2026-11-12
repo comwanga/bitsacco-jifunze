@@ -17,6 +17,7 @@ import { t, type Lang } from "@/lib/i18n";
 import { lessonKey } from "@/lib/progress/model";
 import { readingSequence } from "@/lib/content/navigation";
 import { syncCopy } from "@/lib/sync-copy";
+import { FeedbackLink } from "@/components/FeedbackLink";
 
 export const dynamicParams = false;
 
@@ -123,6 +124,7 @@ export default async function LessonPage({ params }: Params) {
       </div>
       <Resources lang={lang} items={fm.resources} />
       <SourceCredit lang={lang} fm={fm} />
+      <div lang={lang} className="mt-6"><FeedbackLink lang={lang} context={{ pathTitle: roadmap.title[lang], lessonTitle: fm.title, pathname: `/${lang}/${roadmap.id}/${slug}/` }} className="text-teal-700 dark:text-teal-400" /></div>
       <div lang={lang}>
         <PrevNext lang={lang} prev={neighbour(sequence[position - 1])} next={neighbour(sequence[position + 1])} />
         {roadmap.sections.some((s) => s.optional) && position === sequence.length - 1 && <Link href={`/${lang}/${roadmap.id}/#specializations`} className="mt-6 inline-block font-semibold text-teal-700 underline dark:text-teal-400">{t(lang, "chooseSpecialization")}</Link>}

@@ -26,9 +26,10 @@ for (const file of files.filter(f => /\.(html|js|txt|xml|json|webmanifest)$/.tes
   const text = fs.readFileSync(path.join(root, file), "utf8");
   check(!/https?:\/\/(staging\.bitsaccojifunze\.xyz|jifunze\.bitsacco\.com|www\.bitsaccojifunze\.xyz)|[a-z0-9-]+\.railway\.internal|postgres(?:ql)?:\/\/|-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----|gh[opsu]_[A-Za-z0-9]{30,}/.test(text), `unexpected staging/backend origin or credential pattern in ${file}`);
 }
-for (const lang of ["en", "sw"]) for (const suffix of ["account/", "account/signin/", "account/welcome/", "account/recovery/", "account/signout/"]) {
-  const html = fs.readFileSync(path.join(root, lang, suffix, "index.html"), "utf8");
-  check(html.includes("data-account-unavailable"), `interactive account page exported: ${lang}/${suffix}`);
-  check(!/<(?:input|button)\b/.test(html.split('<main id="main"')[1].split("</main>")[0]), `account controls exported: ${lang}/${suffix}`);
+// Jifunze is account-free: no account page, sign-in control or account link may be exported.
+check(!files.some(f => String(f).split(path.sep).includes("account")), "an account page was exported");
+for (const file of files.filter(f => String(f).endsWith(".html"))) {
+  const html = fs.readFileSync(path.join(root, file), "utf8");
+  check(!html.includes('/account/"') && !html.includes("data-save-progress") && !html.includes("/api/auth/"), `account link or sign-in control in ${file}`);
 }
-console.log(`Public export passed: ${urls.length} indexable pages with canonical, Open Graph and matching translations; ${files.length} files; no staging/backend origins or common secret patterns; 10 non-interactive account pages`);
+console.log(`Public export passed: ${urls.length} indexable pages with canonical, Open Graph and matching translations; ${files.length} files; no staging/backend origins or common secret patterns; no account pages, links or sign-in controls`);

@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS_AVAILABLE } from "../lib/site";
 import fs from "node:fs";
 import { t } from "../lib/i18n";
 
@@ -17,18 +16,20 @@ for (const lang of ["en", "sw"] as const) test(`${lang}: local progress import a
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("jifunze:progress:v1")!).lessons)).toEqual(progress.lessons);
 });
 
-test.describe("anonymous public release", () => {
-  test.skip(ACCOUNTS_AVAILABLE, "requires the public-origin export");
+test.describe("account-free learning", () => {
   for (const lang of ["en", "sw"] as const) {
-    test(`${lang}: account URLs explain availability without calling an API`, async ({ page }) => {
+    test(`${lang}: retired account URLs answer not found and offer no sign-in`, async ({ page }) => {
       const api: string[] = [];
       page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url()); });
       for (const route of ["", "signin/", "welcome/", "recovery/", "signout/"]) {
-        await page.goto(`/${lang}/account/${route}`);
-        await expect(page.locator("[data-account-unavailable]")).toBeVisible();
-        await expect(page.locator('a[href*="/api/"], main input, main button')).toHaveCount(0);
-        await expect(page.locator('header a[href*="/account/"]:not([hreflang])')).toHaveCount(0);
+        const response = await page.goto(`/${lang}/account/${route}`);
+        expect(response!.status()).toBe(404);
+        await expect(page.locator('a[href*="/api/"], a[href*="/account/"], form, input, [data-save-progress]')).toHaveCount(0);
       }
+      // No page links to an account, and the header offers feedback where the account link used to be.
+      await page.goto(`/${lang}/`);
+      await expect(page.locator('a[href*="/account/"]')).toHaveCount(0);
+      await expect(page.locator("header [data-header-feedback]").first()).toHaveAttribute("href", /^mailto:/);
       expect(api).toEqual([]);
       await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
       const cached = await page.evaluate(async () => {

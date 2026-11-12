@@ -118,16 +118,8 @@ jobs:
         run: npm audit --omit=dev --prefix api --audit-level=low
       - name: API tests (PostgreSQL)
         run: npm run api:test
-      - name: Build account acceptance export
-        env:
-          SITE_ORIGIN: http://127.0.0.1:4352
-        run: npm run build
-      - name: Install Chromium for browser checks
-        run: npx playwright install --with-deps chromium
-      - name: Account browser checks (real API, fake GitHub)
-        run: npm run e2e:account
-      - name: Tester allowlist browser checks (real API, fake GitHub)
-        run: npm run e2e:allowlist
+      # The site is account-free: it has no account pages and never calls this API. The API, its image and the
+      # proxy rules are retained but unused until a separate cleanup decision, so their own checks still run.
       - name: Validate the compose file
         run: docker compose config -q
       - name: Railway nginx ingress contract (synthetic, not live Railway acceptance)
@@ -136,13 +128,6 @@ jobs:
       # limiter (realip on and off, forged headers), and that no callback code or state reaches any log.
       - name: nginx proxy checks (client address, log redaction)
         run: bash scripts/check-proxy.sh
-      - name: Keep browser traces on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: account-playwright-traces
-          path: test-results/
-          retention-days: 7
 
   lab:
     runs-on: ubuntu-latest

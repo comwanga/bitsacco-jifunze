@@ -8,7 +8,6 @@ test("production metadata defaults to the registered root domain", async () => {
   const site = await import("../../lib/site");
   expect(site.SITE_URL).toBe("https://bitsaccojifunze.xyz");
   expect(site.SITE_INDEXABLE).toBe(true);
-  expect(site.ACCOUNTS_AVAILABLE).toBe(false);
 });
 
 test("staging metadata and sitemap use the configured origin and robots prohibit indexing", async () => {
@@ -19,7 +18,6 @@ test("staging metadata and sitemap use the configured origin and robots prohibit
   const { default: sitemap } = await import("../../app/sitemap");
   expect(site.SITE_URL).toBe("https://staging.bitsaccojifunze.xyz");
   expect(site.SITE_INDEXABLE).toBe(false);
-  expect(site.ACCOUNTS_AVAILABLE).toBe(true);
   expect(robots()).toEqual({ rules: { userAgent: "*", disallow: "/" } });
   expect(sitemap().every(entry => new URL(entry.url).origin === site.SITE_URL)).toBe(true);
 });

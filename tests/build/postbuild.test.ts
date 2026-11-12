@@ -11,6 +11,12 @@ import { pageWeight } from "../../lib/build/budget.ts";
 const sha = (s: string) => `'sha256-${crypto.createHash("sha256").update(s, "utf8").digest("base64")}'`;
 
 describe("csp", () => {
+  test("only the explicit sign-in policy permits remote relay WebSockets", () => {
+    expect(buildCsp([], { nostrSignin: true })).toContain("connect-src 'self' wss:");
+    expect(buildCsp([])).not.toContain("wss:");
+    expect(buildCsp([], { lab: true })).not.toContain("wss:");
+    expect(buildCsp([], { pdfReader: true })).not.toContain("wss:");
+  });
   test("only the book reader permits native blob frames; objects and external frames stay blocked", () => {
     expect(buildCsp([], { pdfReader: true })).toContain("frame-src blob:");
     expect(buildCsp([], { pdfReader: true })).toContain("object-src 'none'");

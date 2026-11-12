@@ -5,7 +5,9 @@ import { accountSecurityCopy } from "@/lib/account-security-copy";
 import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type Me } from "./api";
-import { prove, type ProofError } from "./nostr-proof";
+import { remoteSigningCopy } from "@/lib/remote-signing-copy";
+import { openRemoteSigner } from "@/lib/nostr/remote-popup";
+import { prepareProof, prove, type ProofError, type ProofResult } from "./nostr-proof";
 import { card, primaryBtn, RecoveryCodes, secondaryBtn, SignedOutPrompt, StatusNote, textLink } from "./parts";
 
 type Action = "codes" | "replace" | "delete" | "logout";
@@ -69,15 +71,27 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
     return true;
   }
 
-  async function reauthenticate(action: Action) {
+  async function proof<T>(purpose: "reauth" | "replace", source?: ReturnType<typeof openRemoteSigner>): Promise<ProofResult<T>> {
+    if (!source) return prove<T>(purpose, lang, () => setSigning(true), accountId);
+    const prepared = await prepareProof<T>(purpose, lang, accountId, { remote: true, signal: source.signal });
+    if (!prepared.ok) return prepared;
+    await source.ready;
+    if (!await currentAccount()) return { ok: false, status: 409, code: "account_changed" };
+    return prepared.data.complete(source, () => setSigning(true));
+  }
+
+  async function reauthenticate(action: Action, remotely = false) {
     if (locked.current) return;
     locked.current = true; setError(null); setPending(true);
+    let source: ReturnType<typeof openRemoteSigner> | undefined;
     try {
+      if (remotely) source = openRemoteSigner(lang); // before an await: keep the deliberate popup gesture
       if (!await currentAccount()) return;
-      const res = await prove("reauth", lang, () => setSigning(true), accountId);
+      const res = await proof("reauth", source);
       if (res.ok) setState({ kind: "confirm", action });
       else failure(res.code);
-    } finally { locked.current = false; setPending(false); setSigning(false); }
+    } catch { setError(remoteSigningCopy[lang][source ? "cancelled" : "popup"]); }
+    finally { source?.close(); locked.current = false; setPending(false); setSigning(false); }
   }
 
   async function download() {
@@ -90,13 +104,15 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
     } catch { setError(errorText(lang, "internal")); }
   }
 
-  async function perform(action: Action) {
+  async function perform(action: Action, remotely = false) {
     if (locked.current || uncertain || (action === "delete" && !confirmed)) return;
     locked.current = true; setError(null); setPending(true);
+    let source: ReturnType<typeof openRemoteSigner> | undefined;
     try {
+      if (remotely && action === "replace") source = openRemoteSigner(lang);
       if (!await currentAccount()) return;
       if (action === "replace") {
-        const result = await prove<{ codes: string[]; outcome: "replaced" | "unchanged" }>("replace", lang, () => setSigning(true), accountId);
+        const result = await proof<{ codes: string[]; outcome: "replaced" | "unchanged" }>("replace", source);
         if (!result.ok) {
           if (result.code === "reauth_required") setState({ kind: "reauth", action });
           failure(result.code, true); return;
@@ -138,7 +154,7 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
       }
       onSessionEnded?.();
     } catch { setError(c.uncertain); setUncertain(true); }
-    finally { locked.current = false; setPending(false); setSigning(false); }
+    finally { source?.close(); locked.current = false; setPending(false); setSigning(false); }
   }
 
   if (state.kind === "signedOut") return <SignedOutPrompt lang={lang} />;
@@ -169,6 +185,7 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
       {state.kind === "reauth" ? <>
         <p>{c.reauthHelp}</p>
         <button type="button" disabled={pending} className={primaryBtn} onClick={() => void reauthenticate(state.action)}>{c.reauth}</button>
+        <button type="button" disabled={pending} className={secondaryBtn} onClick={() => void reauthenticate(state.action, true)}>{remoteSigningCopy[lang].sensitive}</button>
       </> : <>
         {!recovery && action !== "logout" && <p>{c.confirmed}</p>}
         {action === "replace" && <><p>{c.replaceHelp}</p><p>{c.prepare}</p><p>{c.replaceWarning}</p></>}
@@ -181,6 +198,7 @@ export default function AccountSecurity({ lang, accountId, recovery = false, onS
         </>}
         {action === "logout" && <p>{c.logoutHelp}</p>}
         <button type="button" disabled={pending || uncertain || (action === "delete" && !confirmed)} className={primaryBtn} onClick={() => action && void perform(action)}>{pending ? c.working : action === "replace" ? c.replaceConfirm : action === "delete" ? c.delete : action === "logout" ? c.logoutConfirm : a.newCodesConfirm}</button>
+        {action === "replace" && <button type="button" disabled={pending || uncertain} className={secondaryBtn} onClick={() => void perform("replace", true)}>{remoteSigningCopy[lang].sensitive}</button>}
       </>}
       <button type="button" disabled={pending} className={`${secondaryBtn} ml-3`} onClick={cancel}>{c.cancel}</button>
     </div>}

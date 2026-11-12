@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { ACCOUNT_KEY } from "@/lib/progress/keys";
-import { apiFetch, safeReturn } from "./api";
+import { safeReturn } from "./api";
 import { secondaryBtn } from "./parts";
 
 type Signer = { signEvent: (event: { created_at: number; kind: number; tags: string[][]; content: string }) => Promise<unknown> };
@@ -49,37 +49,10 @@ export function NostrSignIn({ lang, returnTo, disabled, onBusyChange, onboarding
     locked.current = true;
     onBusyChange(true); setError(null); setStatus(c.nostrPending);
     try {
-      const challenge = await apiFetch<{ challengeId: string; nonce: string; url: string }>("/api/auth/nostr/challenge", { method: "POST", body: { lang, returnTo } });
-      if (!challenge.ok) { setError(errorText(lang, challenge.code)); return; }
-      if (challenge.data.url !== window.location.origin + "/api/auth/nostr/verify") { setError(c.nostrFailed); return; }
-      const rawBody = JSON.stringify({ challengeId: challenge.data.challengeId, nonce: challenge.data.nonce });
-      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawBody));
-      const hash = Array.from(new Uint8Array(digest), (n) => n.toString(16).padStart(2, "0")).join("");
-      const template = { created_at: Math.floor(Date.now() / 1000), kind: 27235, tags: [["u", challenge.data.url], ["method", "POST"], ["payload", hash]], content: "" };
-      const expectedTime = template.created_at;
-      const expectedTags = JSON.stringify(template.tags);
-      let event: unknown;
-      try {
-        event = await signer.signEvent(template);
-      } catch (err) {
-        const reason = err as { code?: unknown; message?: unknown };
-        setError(reason?.code === 4001 || (typeof reason?.message === "string" && /reject|denied|declin|cancel/i.test(reason.message)) ? c.nostrDeclined : c.nostrFailed);
-        return;
-      }
-      const signed = event as { id?: unknown; pubkey?: unknown; sig?: unknown; created_at?: unknown; kind?: unknown; tags?: unknown; content?: unknown } | null;
-      if (!signed || signed.created_at !== expectedTime || signed.kind !== 27235 || signed.content !== ""
-        || JSON.stringify(signed.tags) !== expectedTags
-        || typeof signed.id !== "string" || !/^[0-9a-f]{64}$/.test(signed.id)
-        || typeof signed.pubkey !== "string" || !/^[0-9a-f]{64}$/.test(signed.pubkey)
-        || typeof signed.sig !== "string" || !/^[0-9a-f]{128}$/.test(signed.sig)) {
-        setError(c.error_nostr_invalid); return;
-      }
+      const { prove } = await import("./nostr-proof");
+      const result = await prove<{ redirect: string }>("signin", lang, () => setStatus(c.nostrPending), undefined, { returnTo });
+      if (!result.ok) { setError(result.code === "declined" ? c.nostrDeclined : result.code === "no-signer" || ("signer" in result && result.signer) ? c.nostrFailed : errorText(lang, result.code)); return; }
       setStatus(c.nostrApproved);
-      // Forward only standard public proof fields; never serialize arbitrary signer properties.
-      const bytes = new TextEncoder().encode(JSON.stringify(signed, ["id", "pubkey", "sig", "created_at", "kind", "tags", "content"]));
-      const authorization = "Nostr " + btoa(Array.from(bytes, (b) => String.fromCharCode(b)).join(""));
-      const result = await apiFetch<{ redirect: string }>("/api/auth/nostr/verify", { method: "POST", rawBody, authorization });
-      if (!result.ok) { setError(errorText(lang, result.code)); return; }
       // A hint for the progress sync that someone is signed in. It holds no token; the account id is asked for later.
       try { window.localStorage.setItem(ACCOUNT_KEY, "?"); } catch { /* storage unavailable: sync stays off */ }
       // A full navigation starts account state fresh with the server's HttpOnly session cookie.

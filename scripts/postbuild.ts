@@ -28,7 +28,7 @@ const pages = htmlFiles(OUT);
 // 1. CSP
 for (const file of pages) {
   const html = fs.readFileSync(file, "utf8");
-  fs.writeFileSync(file, injectCsp(html, buildCsp(inlineScriptHashes(html), { lab: html.includes("data-jifunze-lab"), pdfReader: html.includes("data-pdf-reader") })));
+  fs.writeFileSync(file, injectCsp(html, buildCsp(inlineScriptHashes(html), { lab: html.includes("data-jifunze-lab"), pdfReader: html.includes("data-pdf-reader"), nostrSignin: /[\\/](en|sw)[\\/]account[\\/]signin[\\/]index\.html$/.test(file) && html.includes("data-nostr-signin") })));
 }
 
 // 2. Service worker version

@@ -5,10 +5,11 @@ import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, dropQueryParams, githubStart, queryParam, safeReturn } from "./api";
 import { ErrorAlert, primaryBtn, secondaryBtn } from "./parts";
+import { RemoteEntry } from "./RemoteEntry";
 import { NostrSignIn } from "./NostrSignIn";
 
 /** `github` is fixed at build time: the button exists only where the deployment mounts the GitHub routes. */
-export function SignIn({ lang, github, onboarding }: { lang: Lang; github: boolean; onboarding: ReactNode }) {
+export function SignIn({ lang, github, onboarding, remoteLabel }: { lang: Lang; github: boolean; onboarding: ReactNode; remoteLabel: string }) {
   const c = accountCopy[lang];
   // The server-rendered link already works without JavaScript; the browser adds a safe ?return= if one was given.
   const [returnTo, setReturnTo] = useState(`/${lang}/account/`);
@@ -76,6 +77,7 @@ export function SignIn({ lang, github, onboarding }: { lang: Lang; github: boole
         </a>
       </p>}
       <NostrSignIn lang={lang} returnTo={returnTo} disabled={authBusy} onBusyChange={setNostrBusy} onboarding={onboarding} />
+      <RemoteEntry lang={lang} returnTo={returnTo} label={remoteLabel} disabled={authBusy} onBusyChange={setNostrBusy} />
       <details className="mt-8 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5">
         <summary className="cursor-pointer font-semibold">{c.useRecoveryCode}</summary>
         <form method="post" onSubmit={submit} noValidate className="mt-4">

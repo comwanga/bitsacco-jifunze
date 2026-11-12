@@ -15,6 +15,7 @@
     "e2e": "playwright test",
     "e2e:account": "playwright test -c playwright.account.config.ts",
     "e2e:learner-account": "playwright test -c playwright.learner-account.config.ts",
+    "e2e:remote-account": "playwright test -c playwright.remote-account.config.ts",
     "e2e:allowlist": "playwright test -c playwright.allowlist.config.ts",
     "api:typecheck": "tsc -p api --noEmit",
     "api:test": "vitest run --config api/vitest.config.ts",
@@ -22,8 +23,10 @@
   },
   "dependencies": {
     "@mdx-js/mdx": "3.1.1",
+    "@paulmillr/qr": "0.3.0",
     "gray-matter": "4.0.3",
     "next": "16.4.4",
+    "nostr-tools": "2.25.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "remark-gfm": "4.0.1",

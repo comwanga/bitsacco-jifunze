@@ -19,7 +19,7 @@ export type Me = {
  * API requires. Never throws. An error body that is not the API's JSON shape counts as "network", because the
  * account service was not reached, except a 5xx: a proxy answered, so the reader's own connection works.
  */
-export async function apiFetch<T = unknown>(path: string, init: { method?: "GET" | "POST"; body?: unknown; rawBody?: string; authorization?: string; expectedAccount?: string } = {}): Promise<ApiResult<T>> {
+export async function apiFetch<T = unknown>(path: string, init: { method?: "GET" | "POST"; body?: unknown; rawBody?: string; authorization?: string; expectedAccount?: string; signal?: AbortSignal } = {}): Promise<ApiResult<T>> {
   const headers: Record<string, string> = { "X-Jifunze": "1" };
   if (init.body !== undefined || init.rawBody !== undefined) headers["Content-Type"] = "application/json";
   if (init.authorization) headers.Authorization = init.authorization;
@@ -32,6 +32,7 @@ export async function apiFetch<T = unknown>(path: string, init: { method?: "GET"
       body: init.rawBody ?? (init.body === undefined ? undefined : JSON.stringify(init.body)),
       credentials: "same-origin",
       cache: "no-store",
+      signal: init.signal,
     });
   } catch {
     return { ok: false, status: 0, code: "network" };

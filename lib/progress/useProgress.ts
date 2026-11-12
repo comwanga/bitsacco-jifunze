@@ -13,6 +13,7 @@ import {
   type ParseError,
   type Progress,
 } from "./model.ts";
+import { ACCOUNT_KEY, DIRTY_KEY } from "./keys.ts";
 import { getStorage, loadProgress, saveProgress, STORAGE_KEY } from "./storage.ts";
 
 const SERVER_SNAPSHOT: Progress = emptyProgress();
@@ -41,9 +42,27 @@ function onStorage(e: StorageEvent): void {
   }
 }
 
+/**
+ * Signed-in learners only: notes unsent work, then loads the sync code. Without the sign-in marker this returns
+ * at once, so an anonymous learner never downloads that code and never calls the account service.
+ */
+function syncSoon(wrote: boolean): void {
+  try {
+    const storage = getStorage();
+    if (!storage?.getItem(ACCOUNT_KEY)) return;
+    if (wrote) storage.setItem(DIRTY_KEY, "1");
+  } catch {
+    return;
+  }
+  void import("./sync.ts").then((m) => m.requestSync(wrote)).catch(() => {});
+}
+
 function subscribe(listener: () => void): () => void {
   listeners.add(listener);
-  if (listeners.size === 1) window.addEventListener("storage", onStorage);
+  if (listeners.size === 1) {
+    window.addEventListener("storage", onStorage);
+    syncSoon(false);
+  }
   return () => {
     listeners.delete(listener);
     if (listeners.size === 0) window.removeEventListener("storage", onStorage);
@@ -57,6 +76,7 @@ function write(next: Progress): void {
   cache = mergeProgress(loadProgress(storage), next);
   if (!saveProgress(cache, storage)) persistable = false;
   notify();
+  syncSoon(true);
 }
 
 export function useProgress(): {

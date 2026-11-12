@@ -1,18 +1,22 @@
 # Railway staging safeguards
 
-Last verified during production acceptance on **2026-11-06**. Staging remains separate from the [anonymous production service](production.md).
+Last verified on **2026-11-12**, after the Nostr Stage 1–5 deployment. Staging remains separate from the [anonymous production service](production.md).
 
 | Item | Verified state |
 | --- | --- |
 | Project / environment | `bitsacco-jifunze` / `staging` (`1b138f86-2127-4c52-9142-868ecdf75460`) |
 | Public origin | `https://staging.bitsaccojifunze.xyz`; noindex/nofollow, robots disallow all |
 | Services | Public NGINX web; private Node API; private PostgreSQL |
-| Web/API source | `deploy/railway-staging`, `af5559514cb475cef4d7cb6df7624db72713aeb0` |
-| Web deployment | `4549aec0-324e-4032-9c57-306ceef68c79` |
-| API deployment | `7ad5f149-4785-4461-8365-13a64fadecd7` |
-| PostgreSQL deployment | `f8ac6eaf-5174-4157-9064-8304c295fe4e` |
+| Web/API source | `deploy/railway-staging`, `00fa0f04c1a17fffb753908babc81bfdda7bd585` (CI run 43237483512 passed) |
+| Web deployment | `8cb86f78-b5a5-47d0-a6da-0083600796f4` |
+| API deployment | `ca404d36-5b6c-48e5-aa70-247065f80fd2`; boot lines `auth_methods nostr=true github=true`, `tester_allowlist enforced=true github=0 nostr=0 invalid=[]` |
+| PostgreSQL deployment | `f8ac6eaf-5174-4157-9064-8304c295fe4e` (unchanged); migration `0002_progress` applied; 0 accounts, identities, sessions and progress rows |
 | Status / deployment triggers | All three SUCCESS; web/API automatic deployment disabled, no triggers |
-| Authentication | `STAGING_AUTH_ENABLED=0`; tester allowlist closed; no provider acceptance claimed |
+| Authentication | `STAGING_AUTH_ENABLED=0`; neither tester variable is set, so nobody can authenticate; no signer acceptance claimed |
+| Rollback | Redeploy web `3ec6b0d077811eefacc0ebf43595b916e4449040` (was `28fb5b94`) and API `af5559514cb475cef4d7cb6df7624db72713aeb0` (was `7ad5f149`) with `serviceInstanceDeployV2`. The added table is unused by the earlier API and can stay |
+| Production | `public-web` `04b97643` at `3ec6b0d`, unchanged; no API or database |
+
+To begin real signer acceptance ([procedure](../audit/2026-11-12-nip46-acceptance.md)): set `TESTER_NOSTR_PUBKEYS` with `--skip-deploys`, redeploy the API at the exact commit and confirm the boot line's count, then set `STAGING_AUTH_ENABLED=1` on web with `--skip-deploys` and redeploy web at the same commit. Each step needs authorization.
 
 Before any authorized staging change, capture environment/service IDs, source SHA, deployment IDs, domains, trigger settings, configuration ETag and redacted variable comparisons. Production acceptance preserved ETag `8f3a697a57105d8e9b93c5ce9fe823e46a2d68e4d9ae01879c3e70e55c2a4c77`. Do not log secrets. Deploy only the exact reviewed SHA, verify its actual deployment metadata, and compare the baseline afterward. Never infer the source commit from a branch label or variable save.
 

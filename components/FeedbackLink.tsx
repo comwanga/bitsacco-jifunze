@@ -1,7 +1,7 @@
 import type { Lang } from "@/lib/i18n";
 import { FEEDBACK_EMAIL, feedbackCopy, feedbackHref, type FeedbackContext } from "@/lib/feedback";
 
-/** Server-rendered mailto + native disclosure: works without JavaScript, account access or clipboard permission. */
+/** Server-rendered mailto + native disclosure: works without JavaScript or clipboard permission. */
 export function FeedbackLink({ lang, context, className = "" }: { lang: Lang; context?: FeedbackContext; className?: string }) {
   const c = feedbackCopy[lang];
   return <div data-feedback className={`relative flex flex-wrap items-center gap-x-2 text-[15px] ${className}`}>

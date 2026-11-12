@@ -14,8 +14,8 @@ export const FEEDBACK_EMAIL = feedbackRecipient(process.env.JIFUNZE_FEEDBACK_EMA
 export type FeedbackContext = { pathTitle: string; lessonTitle?: string; pathname: string };
 
 export const feedbackCopy = {
-  en: { send: "Send Feedback", copy: "Copy email address", email: "Feedback email address", help: "Select this address and copy it into your email app.", note: "Include only your feedback, not passwords or recovery codes." },
-  sw: { send: "Tuma Maoni", copy: "Nakili anwani ya barua pepe", email: "Anwani ya barua pepe ya maoni", help: "Chagua anwani hii kisha uinakili katika programu yako ya barua pepe.", note: "Andika maoni yako tu, si nywila au misimbo ya kurejesha." },
+  en: { send: "Send Feedback", copy: "Copy email address", email: "Feedback email address", help: "Select this address and copy it into your email app.", note: "Write only your feedback. Never send passwords, seed words or private keys." },
+  sw: { send: "Tuma Maoni", copy: "Nakili anwani ya barua pepe", email: "Anwani ya barua pepe ya maoni", help: "Chagua anwani hii kisha uinakili katika programu yako ya barua pepe.", note: "Andika maoni yako tu. Usitume kamwe nywila, maneno ya siri wala funguo za siri." },
 } satisfies Record<Lang, Record<string, string>>;
 
 const plain = (text: string) => text.replace(/[\u0000-\u001f\u007f]/g, " ").trim();

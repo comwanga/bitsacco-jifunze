@@ -53,3 +53,28 @@ for (const lang of ["sw", "en"] as const) {
     } finally { await context.close(); }
   });
 }
+
+for (const lang of ["sw", "en"] as const) {
+  test(`${lang}: the header offers feedback where the account link used to be, on wide and phone screens`, async ({ page }) => {
+    const c = feedbackCopy[lang], api: string[] = [];
+    page.on("request", (r) => { if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url()); });
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto(`/${lang}/savers/wallets-keys/?account=PRIVATE_QUERY#PRIVATE_FRAGMENT`);
+    const wide = page.locator("header [data-header-feedback]:visible");
+    await expect(wide).toHaveCount(1); await expect(wide).toHaveText(c.send);
+    const mail = new URL((await wide.getAttribute("href"))!);
+    expect(mail.protocol).toBe("mailto:"); expect(mail.pathname).toBe(FEEDBACK_EMAIL);
+    expect([...mail.searchParams.keys()]).toEqual(["subject", "body"]);
+    expect(decodeURIComponent(mail.href)).not.toMatch(/PRIVATE|wallets-keys/); // the shared header carries no page or learner context
+    await wide.focus(); await expect(wide).toBeFocused();
+    await expect(page.locator('a[href*="/account/"]')).toHaveCount(0);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.locator("header [data-header-feedback]:visible")).toHaveCount(0); // inside the closed menu
+    await page.locator("header summary").click();
+    const inMenu = page.locator("header nav [data-header-feedback]:visible");
+    await expect(inMenu).toHaveCount(1); await expect(inMenu).toHaveText(c.send);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+    expect(api).toEqual([]);
+  });
+}

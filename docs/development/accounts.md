@@ -46,7 +46,7 @@ Key replacement rotates the recovery codes in the same transaction: every earlie
 
 ## Server copy of progress
 
-Stage 2 of the design adds a server copy of a learner's progress (`api/migrations/0002_progress.sql`, `api/src/progress.ts`). The site does not use it yet: synchronisation from the browser is Stage 3, so the device copy remains the only one a learner sees.
+Stage 2 of the design adds a server copy of a learner's progress (`api/migrations/0002_progress.sql`, `api/src/progress.ts`). The browser side is described under "Progress synchronisation in the browser" below.
 
 | Route | Session | Behaviour |
 | --- | --- | --- |
@@ -58,6 +58,27 @@ Stage 2 of the design adds a server copy of a learner's progress (`api/migration
 - Timestamps must be exactly what the site writes: UTC with milliseconds, for example `2026-11-12T08:15:30.123Z`. Any other form, an impossible date, or a time more than five minutes ahead of the server is refused with `400`. The device compares timestamps as text and the database as instants; the two only agree in this form.
 - Limits: 64 KiB per request (this route only), 500 lessons per account, 100 lab passes per lesson, lab identifiers up to 64 characters, quizzes up to 1,000 questions, 60 merges and 120 reads per minute per account. A request that would exceed a per-account limit is rolled back whole.
 - Deleting the account deletes its progress. Nothing is sent to a Nostr relay or any other service, and request logs carry the route only.
+
+## Progress synchronisation in the browser
+
+Stage 3 connects the device copy to the account copy (`lib/progress/sync.ts`, `components/account/ProgressSync.tsx`). The device copy stays the one the site reads; nothing about anonymous learning changes.
+
+- **Anonymous learners:** no request to the account service, no sync code downloaded, no sync state stored. A browser test asserts all three.
+- **Loading:** the sync code is fetched on demand, and only when the browser holds a sign-in marker (`jifunze:account:v1`, which is `?` or the account id and never a token). It is not part of any page's first load.
+- **A sync** posts the device copy to `POST /api/me/progress` and merges the answer back into whatever is stored at that moment, so work written during the request is kept. It runs after sign-in, about two seconds after a local change, when the connection returns, when the tab becomes visible again, and at once when the page is being left with unsent work. A page load does not ask again within five minutes unless something is unsent.
+- **Offline or failed:** the change is already on the device and is marked unsent (`jifunze:sync:dirty:v1`); it goes up on the next successful sync. A `401` clears the sign-in marker and stops syncing; the device copy is left as it is.
+- **Whose copy it is** (`jifunze:progress:owner:v1`):
+
+  | Device copy | Signed-in account | Behaviour |
+  | --- | --- | --- |
+  | Empty | Any | Becomes that account's copy; saved progress is restored |
+  | Made without an account | Any | Nothing is sent. The account page asks; only "Add it to my account" links it |
+  | The same account's | That account | Synced |
+  | Another account's | A different account | Never merged and never uploaded. It can be downloaded, and replaced only after an explicit confirmation |
+
+- **Sign-out:** when the device holds this account's progress, the learner chooses to remove it from the device (the default) or keep a copy. It is removed only after a final sync has confirmed the account holds everything; otherwise it is kept and the page says so.
+- **Timestamps:** an imported file's readable timestamps are rewritten as the same instant in the canonical UTC form. An unreadable one stays on the device unchanged and is left out of the upload; no time is invented. If the device clock is ahead, values still in the server's future are held back and sent once that time has passed.
+- **Not built yet:** phone signing (NIP-46), and the recovery and key-replacement screens. No learner's progress is sent to a Nostr relay.
 
 ## Logs
 

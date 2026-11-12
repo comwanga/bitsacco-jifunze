@@ -123,6 +123,11 @@ const en = {
   signOutLead: "Sign out of your Jifunze account on this device?",
   signingOut: "Signing you out…",
   signedOutDone: "You are signed out. Your lessons and the progress saved on this device are still here.",
+  signOutProgress: "Your progress on this device",
+  signOutRemove: "Remove it from this device. It stays saved in your account.",
+  signOutKeep: "Keep a copy on this device.",
+  signedOutRemoved: "You are signed out. Your progress is saved in your account and has been removed from this device.",
+  signedOutUnsent: "You are signed out. Some progress could not be saved to your account, so it was kept on this device. Sign in again on this device to save it.",
   signInAgain: "Sign in again",
 };
 
@@ -239,6 +244,11 @@ const sw: AccountCopy = {
   signOutLead: "Ungependa kutoka kwenye akaunti yako ya Jifunze kwenye kifaa hiki?",
   signingOut: "Tunakutoa kwenye akaunti…",
   signedOutDone: "Umetoka kwenye akaunti. Masomo yako na maendeleo yaliyohifadhiwa kwenye kifaa hiki bado yapo.",
+  signOutProgress: "Maendeleo yako kwenye kifaa hiki",
+  signOutRemove: "Yaondoe kwenye kifaa hiki. Yanabaki yamehifadhiwa kwenye akaunti yako.",
+  signOutKeep: "Bakiza nakala kwenye kifaa hiki.",
+  signedOutRemoved: "Umetoka kwenye akaunti. Maendeleo yako yamehifadhiwa kwenye akaunti yako na yameondolewa kwenye kifaa hiki.",
+  signedOutUnsent: "Umetoka kwenye akaunti. Baadhi ya maendeleo hayakuweza kuhifadhiwa kwenye akaunti yako, kwa hiyo yamebakizwa kwenye kifaa hiki. Ingia tena kwenye kifaa hiki ili kuyahifadhi.",
   signInAgain: "Ingia tena",
 };
 

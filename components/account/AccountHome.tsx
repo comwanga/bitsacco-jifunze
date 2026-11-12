@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type ApiErrorCode, type ApiResult, dropQueryParams, formatDate, githubStart, queryParam, type Me } from "./api";
+import { ACCOUNT_KEY } from "@/lib/progress/keys";
 import { card, ErrorAlert, Loading, primaryBtn, RecoveryCodes, RetryError, secondaryBtn, SignedOutPrompt, SignOutLink, StatusNote } from "./parts";
+
+// The progress panel, its text and the sync code are fetched only once an account is confirmed.
+type Panel = (typeof import("./ProgressSync"))["default"];
 
 // Set just before the reader is sent to GitHub to confirm it is them, so the page can offer the new codes on return.
 // Only ever read to show a confirmation button: coming back never generates codes by itself.
@@ -80,6 +84,15 @@ export function AccountHome({ lang }: { lang: Lang }) {
 
   // Back from confirming with GitHub: move focus to the question the reader came back to answer.
   const signedIn = load.kind === "me" && load.me.scope === "full";
+  const [Panel, setPanel] = useState<Panel | null>(null);
+  useEffect(() => {
+    if (signedIn) void import("./ProgressSync").then((m) => setPanel(() => m.default)).catch(() => {});
+  }, [signedIn]);
+  // The session is gone (expired, or ended elsewhere): stop syncing. The device copy is left as it is.
+  useEffect(() => {
+    if (load.kind !== "signedOut") return;
+    try { window.localStorage.removeItem(ACCOUNT_KEY); } catch { /* storage unavailable */ }
+  }, [load.kind]);
   useEffect(() => {
     if (signedIn && codes.kind === "confirm") confirmRef.current?.focus();
   }, [signedIn, codes.kind]);
@@ -177,6 +190,8 @@ export function AccountHome({ lang }: { lang: Lang }) {
           ))}
         </ul>
       </section>
+
+      {Panel && <Panel lang={lang} accountId={me.account.id} />}
 
       <section aria-labelledby="codes-section-heading" className={`mt-6 ${card}`}>
         <h2 id="codes-section-heading" className="text-xl font-bold">

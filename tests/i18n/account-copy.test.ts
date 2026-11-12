@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import { MESSAGES } from "../../api/src/errors.ts";
 import { accountCopy, errorText } from "../../lib/account-copy.ts";
 import { nostrOnboardingCopy } from "../../lib/nostr-onboarding-copy.ts";
+import { syncCopy } from "../../lib/sync-copy.ts";
 
 test("Nostr onboarding copy has complete nonempty bilingual parity", () => {
   expect(Object.keys(nostrOnboardingCopy.en).sort()).toEqual(Object.keys(nostrOnboardingCopy.sw).sort());
@@ -28,4 +29,9 @@ test("every API error code has its own Kiswahili and English message", () => {
 test("an unknown error code falls back to the general message", () => {
   expect(errorText("sw", "something_new")).toBe(accountCopy.sw.error_internal);
   expect(errorText("en", null)).toBe(accountCopy.en.error_internal);
+});
+
+test("progress sync copy has complete matching nonempty language keys", () => {
+  expect(Object.keys(syncCopy.en).sort()).toEqual(Object.keys(syncCopy.sw).sort());
+  for (const copy of Object.values(syncCopy)) expect(Object.values(copy).every((v) => typeof v === "string" && v.trim())).toBe(true);
 });

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { accountCopy, errorText } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
+import { ACCOUNT_KEY } from "@/lib/progress/keys";
 import { apiFetch, safeReturn } from "./api";
 import { secondaryBtn } from "./parts";
 
@@ -79,6 +80,8 @@ export function NostrSignIn({ lang, returnTo, disabled, onBusyChange, onboarding
       const authorization = "Nostr " + btoa(Array.from(bytes, (b) => String.fromCharCode(b)).join(""));
       const result = await apiFetch<{ redirect: string }>("/api/auth/nostr/verify", { method: "POST", rawBody, authorization });
       if (!result.ok) { setError(errorText(lang, result.code)); return; }
+      // A hint for the progress sync that someone is signed in. It holds no token; the account id is asked for later.
+      try { window.localStorage.setItem(ACCOUNT_KEY, "?"); } catch { /* storage unavailable: sync stays off */ }
       // A full navigation starts account state fresh with the server's HttpOnly session cookie.
       window.location.assign(safeReturn(lang, result.data.redirect));
       navigating.current = true;

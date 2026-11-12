@@ -1,4 +1,4 @@
-/* Mbuyu sunrise. Default (no html.intro-play) = final frame. */
+/* Mbuyu sunrise. Default (no .intro-play) = final frame. */
 .mbuyu {
   display: block;
   width: 100%;
@@ -45,7 +45,7 @@
   transform-origin: center;
 }
 
-/* ---- First-visit sequence (~3.4s) ---- */
+/* ---- Homepage visit sequence (~3.4s) ---- */
 .intro-play .mbuyu .mb-sun {
   animation: mb-sun-up 3.4s ease-out both;
 }
@@ -80,26 +80,13 @@
 .intro-play .mbuyu .mb-birds {
   animation: mb-fly 5s linear 0.6s both;
 }
-.intro-play .hero-copy > * {
-  animation: mb-rise 0.7s ease-out both;
-}
-.intro-play .hero-copy > :nth-child(1) {
-  animation-delay: 3.1s;
-}
-.intro-play .hero-copy > :nth-child(2) {
-  animation-delay: 3.25s;
-}
-.intro-play .hero-copy > :nth-child(3) {
-  animation-delay: 3.4s;
-}
-.intro-play .hero-copy > :nth-child(n + 4) {
-  animation-delay: 3.55s;
+/* Tap or key press: jump to the final frame. */
+.intro-skip .mbuyu * {
+  animation: none !important;
 }
 
-/* Tap or key press: jump to the final frame. */
-.intro-skip .mbuyu *,
-.intro-skip .hero-copy > * {
-  animation: none !important;
+@media (prefers-reduced-motion: reduce) {
+  .intro-play .mbuyu * { animation: none !important; }
 }
 
 @keyframes mb-sun-up {
@@ -162,11 +149,5 @@
   100% {
     opacity: 0;
     transform: translate(-260px, -40px);
-  }
-}
-@keyframes mb-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
   }
 }

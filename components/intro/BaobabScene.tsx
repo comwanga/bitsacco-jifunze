@@ -3,8 +3,8 @@ import "./baobab.css";
 
 /**
  * The Mbuyu (baobab) sunrise scene. Server-rendered SVG.
- * Without the `intro-play` class on <html> it shows the final frame: sun up, tree grown.
- * The inline intro script (lib/intro/shouldPlay.ts) adds the class on a first visit only.
+ * Without `intro-play` on the homepage section it shows the final frame: sun up, tree grown.
+ * IntroReplay starts the same CSS sequence each time the homepage mounts.
  */
 export function BaobabScene({ lang }: { lang: Lang }) {
   const branches = [

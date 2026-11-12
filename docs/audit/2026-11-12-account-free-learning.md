@@ -17,7 +17,7 @@ Branch `feat/account-free-learning`, based on `main` (`3ec6b0d`), the commit pro
 
 **Added**
 
-- The feedback link from the reviewed feedback commit, unchanged in behaviour: a server-rendered `mailto:` link with lesson title and page address, and a copy-address fallback that works without JavaScript.
+- A server-rendered `mailto:` feedback link with public lesson title and page address. The owner's 13 November follow-up simplifies it to a single link: the earlier copy-address disclosure, address field and helper text are removed. Clicking opens the learner's email application, including without JavaScript.
 - "Send Feedback" / "Tuma Maoni" in the header where "Account" was: after the language switch on wide screens, last in the menu on phones. The header link carries no page or learner context.
 - The footer link and the link beside lesson navigation stay. The lesson link is the only one that names the lesson.
 
@@ -65,5 +65,5 @@ The owner-authorized web deployment replaced the rejected build with `0490523`, 
 
 - A learner who bookmarked an account address gets the ordinary 404 page.
 - Progress lives only in the browser. Clearing browser data or losing the phone loses it unless the learner exported a file. The progress page says so.
-- Feedback depends on the learner having a mail app; the copy-address fallback covers the rest.
-- The Kiswahili helper text of the feedback link is pending owner review; the two action labels are the owner's wording.
+- Feedback opens the learner's configured email application.
+- The only feedback action labels are the owner's wording: "Send Feedback" / "Tuma Maoni". The earlier helper/privacy text and email-body field labels are removed; their pending language review no longer applies. Earlier acceptance records describe their stated commits.

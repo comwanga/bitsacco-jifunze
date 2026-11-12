@@ -70,6 +70,6 @@ The project owner completed educational review of this expansion on 11 November 
 - [Documentation index](docs/README.md): current guides and clearly marked historical records.
 - [Production operations](docs/deployment/production.md): Railway, domain, deployment, rollback, monitoring and scaling.
 - [Staging safeguards](docs/deployment/railway-staging.md) and [Lightning lab](lab/README.md).
-- [Account development and logs](docs/development/accounts.md): retained local stack and security requirements.
+- [Feedback](docs/development/feedback.md) and the [account-free learning decision](docs/audit/2026-11-12-account-free-learning.md).
 - [Book provenance and reproduction](docs/deployment/mastering-bitcoin-generated.md).
 - Code: [MIT](LICENSE). Curriculum: [CC BY-SA 4.0](content/LICENSE). Adapted works and separate notices: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).

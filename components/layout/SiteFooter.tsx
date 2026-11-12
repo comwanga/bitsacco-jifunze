@@ -3,10 +3,12 @@ import { REPO_URL } from "@/lib/site";
 import { siteCopy } from "@/lib/site-copy";
 import { t, type DictKey, type Lang } from "@/lib/i18n";
 import { BrandLockup } from "./BrandLockup";
+import type { ReactNode } from "react";
+import { FeedbackLink } from "@/components/FeedbackLink";
 
 type FooterLink = { label: string; href: string; external?: boolean };
 
-function Group({ id, title, links }: { id: string; title: string; links: FooterLink[] }) {
+function Group({ id, title, links, children }: { id: string; title: string; links: FooterLink[]; children?: ReactNode }) {
   const cls = "inline-block py-1 text-[15px] text-white/75 underline-offset-4 hover:text-white hover:underline";
   return (
     <div>
@@ -27,6 +29,7 @@ function Group({ id, title, links }: { id: string; title: string; links: FooterL
             )}
           </li>
         ))}
+        {children && <li>{children}</li>}
       </ul>
     </div>
   );
@@ -63,7 +66,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
               l("navGlossary", p("glossary/")),
               { label: t(lang, "footerCredits"), href: `${REPO_URL}/blob/main/ATTRIBUTIONS.md`, external: true },
             ]}
-          />
+          ><FeedbackLink lang={lang} className="text-white/75 hover:text-white" /></Group>
           <Group
             id="footer-project"
             title={c.footerProject}

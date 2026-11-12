@@ -1,6 +1,7 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FeedbackLink } from "@/components/FeedbackLink";
 import { ProgressTick } from "@/components/roadmap/ProgressTick";
 import { PathHeader } from "@/components/roadmap/PathHeader";
 import { SectionProgress } from "@/components/roadmap/SectionProgress";
@@ -114,6 +115,7 @@ export default async function RoadmapPage({ params }: Params) {
             </Link>
           </p>
         </section>
+        <FeedbackLink lang={lang} context={{ pathTitle: r.title[lang], pathname: `/${lang}/${r.id}/` }} className="text-teal-700 dark:text-teal-400" />
       </div>
     </>
   );

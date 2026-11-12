@@ -1,5 +1,7 @@
 # Account development and security boundaries
 
+> **Retired from the site on 2026-11-12.** Jifunze is account-free: it has no account pages, sign-in or account link, and never calls this API. The API in `api/`, its image, the Compose services and the proxy rules are kept unused until a separate cleanup decision; see the [decision record](../audit/2026-11-12-account-free-learning.md). The rest of this page describes that retained stack, not anything a learner can reach.
+
 This guide is for the retained local account compatibility stack. The public website has no account API, sign-in or database. Staging authentication remains disabled. Authentication/provider acceptance is separate unfinished work; see the [staging record](../deployment/railway-staging.md) and [production runbook](../deployment/production.md). Run these commands from the repository root.
 
 Local account exports must use a local `SITE_ORIGIN` so the public-origin build does not replace sign-in with its anonymous explanation. Pass the local origin explicitly when building the web image; no production configuration should be copied into this stack.

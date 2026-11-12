@@ -15,7 +15,10 @@ x-logging: &logging
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      args:
+        JIFUNZE_FEEDBACK_EMAIL: ${JIFUNZE_FEEDBACK_EMAIL:-}
     logging: *logging
     ports:
       - "127.0.0.1:8080:8080"

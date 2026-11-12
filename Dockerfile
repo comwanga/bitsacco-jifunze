@@ -11,6 +11,9 @@ COPY . .
 # These are public metadata, never credentials. Railway provides the same origin to the API at runtime.
 ARG SITE_ORIGIN
 ENV SITE_ORIGIN=$SITE_ORIGIN
+# Public recipient, embedded in the static export. Empty uses the application's single default.
+ARG JIFUNZE_FEEDBACK_EMAIL
+ENV JIFUNZE_FEEDBACK_EMAIL=$JIFUNZE_FEEDBACK_EMAIL
 RUN NODE_OPTIONS=--max-old-space-size=768 npm run build
 
 FROM nginxinc/nginx-unprivileged:stable-alpine AS runner

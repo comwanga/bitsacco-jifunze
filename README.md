@@ -10,20 +10,22 @@ Bitsacco Jifunze is a Kiswahili-first, bilingual Bitcoin education platform. Lea
 - **Bitcoin kwa Wajenzi / Bitcoin for Builders — 8 lessons:** regtest, transactions, keys, Lightning, Fedimint and contributing to open-source projects.
 - **Lightning kwa Wajenzi / Lightning for Builders — 17 lessons:** adapted from *Mastering the Lightning Network*, with interactive exercises.
 
-All 49 lessons are available in Kiswahili and English, with learning trees, quizzes, a glossary and fictional practice simulations. Every lesson includes required open-ended discussion: explain reasoning, test an assumption and formulate a question of your own. Learners self-confirm the activity before new lesson completion; answers stay with learners and existing completions remain valid. New and changed content awaits human language/subject review.
+All 49 lessons are available in Kiswahili and English, with learning trees, quizzes, a glossary and fictional practice simulations. Every lesson includes required open-ended discussion: explain reasoning, test an assumption and formulate a question of your own. Learners self-confirm the activity before new lesson completion; answers stay with learners and existing completions remain valid. The owner's educational review and release decisions are linked under Contributing below.
 
-The educational library includes the whitepaper in both languages and an in-app English *Mastering Bitcoin*, third-edition PDF reader and download. The Kiswahili book awaits official publication. See the [platform audit](docs/audit/2026-11-11-platform.md) and [curriculum, primary sources and review map](docs/audit/2026-11-11-curriculum.md).
+The educational library includes the whitepaper in both languages and an in-app English *Mastering Bitcoin*, third-edition PDF reader and download. The Kiswahili book awaits official publication. See the [curriculum, primary sources and review guide](docs/content-guide.md).
 
 Learning progress stays in the browser and can be exported and imported. Previously opened lessons support offline reading; interactive simulations work offline after their modules have been loaded. The book is downloaded only on request and is not included in the offline lesson cache.
+
+**Send Feedback / Tuma Maoni** opens the learner's email application. It is a plain email link in the header, footer and beside learning material. Lesson feedback includes the public lesson title and address.
 
 <details>
 <summary>Preview the learning paths and Lightning tree</summary>
 
-These screenshots show the previous public release, before the specialization expansion. Current lesson counts and review status are above.
+Screenshots show the account-free production site, refreshed on 13 November 2026.
 
 **Three learning paths in Kiswahili**
 
-![Savers, Bitcoin Builders and Lightning Builders cards showing 8, 8 and 17 lessons](docs/images/learning-paths-sw.png)
+![Savers, Bitcoin Builders and Lightning Builders cards showing 24, 8 and 17 lessons](docs/images/learning-paths-sw.png)
 
 **Lightning learning tree**
 
@@ -57,19 +59,19 @@ npx playwright install chromium webkit
 npm run e2e                # browser, offline, accessibility and interaction checks
 ```
 
-On Linux, Playwright may need `npx playwright install --with-deps chromium webkit`. Run resource-intensive suites sequentially. Browser tests use the static export, not the development server. Public learning requires no backend; the optional [account development stack](docs/development/accounts.md) is separate from production.
+On Linux, Playwright may need `npx playwright install --with-deps chromium webkit`. Run resource-intensive suites sequentially. Browser tests use the static export, not the development server. Public learning requires no backend. The unused API remains separately checked in CI; its [maintenance and security notes](docs/development/retained-api.md) describe that retained code.
 
 ## Contributing
 
 Educators can improve explanations and quizzes, translators can maintain bilingual lessons and terminology, and developers can fix issues or improve the platform and lab. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and submit changes to [comwanga/bitsacco-jifunze](https://github.com/comwanga/bitsacco-jifunze).
 
-The project owner completed educational review of this expansion on 11 November 2026, covering Kiswahili, Bitcoin accuracy, financial concepts, community/cooperative savings and documentation. The [review record](docs/audit/2026-11-11-owner-review.md) distinguishes that completed review from independent technical sign-off and release authorization, which the owner addressed on 12 November 2026 in the [owner release approval](docs/audit/2026-11-12-owner-release-approval.md). Automated checks do not supply those approvals.
+The project owner completed educational review of the expansion on 11 November 2026 and waived separate independent reviews for that release on 12 November. The [current review guide](docs/content-guide.md#review-status) distinguishes these decisions from the two documented sign-offs required to set a lesson's `lastReviewed` date. New or changed material follows [Contributing](CONTRIBUTING.md#reviewers).
 
 ## Documentation and licences
 
-- [Documentation index](docs/README.md): current guides and clearly marked historical records.
+- [Documentation index](docs/README.md): current operating, content and development guides.
 - [Production operations](docs/deployment/production.md): Railway, domain, deployment, rollback, monitoring and scaling.
 - [Staging safeguards](docs/deployment/railway-staging.md) and [Lightning lab](lab/README.md).
-- [Feedback](docs/development/feedback.md) and the [account-free learning decision](docs/audit/2026-11-12-account-free-learning.md).
+- [Feedback](docs/development/feedback.md) and [curriculum/content review](docs/content-guide.md).
 - [Book provenance and reproduction](docs/deployment/mastering-bitcoin-generated.md).
 - Code: [MIT](LICENSE). Curriculum: [CC BY-SA 4.0](content/LICENSE). Adapted works and separate notices: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).

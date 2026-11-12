@@ -1,25 +1,29 @@
 # Production operations
 
-Recorded after live acceptance on 2026-11-06 for release [`39fa78a34deece8f3ed6eedd162725557de9829e`](https://github.com/comwanga/bitsacco-jifunze/commit/39fa78a34deece8f3ed6eedd162725557de9829e). Recheck Railway before operational changes; this is a dated deployment record, not continuous monitoring.
+Verified 13 November 2026 (Africa/Nairobi). Deployment and CI timestamps use UTC. These are point-in-time observations; recheck Railway before a later release.
 
 ## Running service
 
-| Item | Accepted configuration |
+| Item | Verified state |
 | --- | --- |
-| Public website | <https://bitsaccojifunze.xyz> (apex only; no www) |
+| Public origin | <https://bitsaccojifunze.xyz> (apex only) |
 | Railway project | `bitsacco-jifunze` / `9a7612e6-649f-44ca-91db-45977f0a8c41` |
 | Environment | `production` / `efc4e6ac-67f5-4e98-bffa-89095e2ef0d0` |
 | Service | `public-web` / `f2834873-d0f4-4248-aa52-ba5db5625a53` |
-| Accepted deployment | `c64a885a-18bd-41bc-aa3b-be8b8447d4f0` |
-| Source | `comwanga/bitsacco-jifunze`, `main`, exact release SHA above |
-| Build/runtime | Root [Dockerfile](../../Dockerfile); Next.js static export served by non-root NGINX |
-| Capacity | One replica, 0.25 vCPU, 96 MiB (100,663,296 bytes), SFO region |
+| Deployed commit | `078807ca96914cca67379ff46e9b1aef88ea1d5a`, merge of [PR #26](https://github.com/comwanga/bitsacco-jifunze/pull/26) |
+| Deployment | `6fc46ae1-dd08-4e33-8663-278fcf44de0e`, SUCCESS |
+| Image | `sha256:4b47d6de74bf8a1240c5bd71f10a530fafeffb8f622774a2f3d2b5a5e867866d` |
+| Previous deployment | `04b97643-9ff7-45dd-ab39-433c68a2437b` / `3ec6b0d`; rollback-eligible before and after this release |
+| Runtime | Root Dockerfile; Next.js static export; non-root NGINX |
+| Capacity | One SFO replica, 0.25 vCPU, 96 MiB |
 | Port / startup health | `8080` / `/en/` |
-| Deployment control | Automatic deployment disabled; no repository triggers |
+| Deployment control | Automatic deployment disabled; zero repository triggers |
 
-Production has no API, database, persistent volume, application secrets or shared environment variables. Public learning has no account, invitation or learner-count limit. The Lightning lab runs in the learner's own environment, not on Railway.
+Production is account-free and has no API, database, persistent volume, application secret or shared environment variable. All `/api` and `/api/*` routes, including health, return 404/no-store without a session cookie. The Lightning lab runs in the learner's environment.
 
-The only configured application variables are:
+## Configuration
+
+The application variables are:
 
 ```text
 SITE_ORIGIN=https://bitsaccojifunze.xyz
@@ -28,55 +32,35 @@ JIFUNZE_SITE_MODE=static
 PORT=8080
 ```
 
-Railway supplies the environment name `production`. Supply `SITE_ORIGIN` to both the Docker build argument and runtime; the build records its origin. The [entrypoint](../../docker/railway-entrypoint.sh) rejects an origin/export/environment mismatch, account mode and backend/proxy-trust settings. Do not copy `API_HOST`, database/OAuth/tester variables, `RAILWAY_TRUST_MODEL` or `TRUSTED_PROXY_CIDRS` into production. Every `/api` route returns 404/no-store without a session cookie. Future authenticated production needs a separate security review; the isolated-staging trust exception does not apply.
+Railway supplies the `production` environment name. Feedback uses the application's public default recipient, `mwanga@bitsacco.com`; an optional `JIFUNZE_FEEDBACK_EMAIL` override is a build-time public value requiring a rebuild. See [Feedback](../development/feedback.md).
 
-## Controlled deployment and rollback
+The existing entrypoint rejects API/proxy-trust settings, an incorrect production origin, the account site mode and an export-origin mismatch. Supply `SITE_ORIGIN` at both build and runtime. Do not copy staging variables or services into production.
 
-1. Obtain approval for the exact reviewed commit and any resource/configuration change. Check that its GitHub CI passed; a green branch name is insufficient.
-2. Save production deployment/source/settings/domain state and a redacted [staging baseline](railway-staging.md). Scope every action to the production environment and `public-web`; never clone staging or copy its variables.
-3. Keep automatic deployments disabled. Use Railway's existing GitHub source integration and an exact-commit deployment (`serviceInstanceDeployV2` with the production service ID, environment ID and approved `commitSha`, or a dashboard action that can select that exact commit). Inspect staged changes before applying them. If the integration cannot fetch that SHA, stop; do not substitute a revision or upload another checkout.
-4. Confirm Railway's actual fetched/deployed SHA, Docker build, NGINX startup and `/en/` health. Retain the four public variables and approved limits. Do not create another service or public hostname. A service creation method that spans all environments must not be used: the initial service was created with an environment-scoped changeset.
-5. Check the real HTTPS site, both languages, canonical/sitemap origins, security headers, `/api` rejection/no cookies, navigation, offline/progress, PDFs and accessibility. For browser checks against a remote target, use the matching deployed export for asset/budget inspection; do not substitute an unrelated local build. Compare staging afterward.
+## Deployment and rollback
 
-On a failed source fetch/build, wrong SHA, unsafe variables or failed health check, stop the affected production deployment and retain logs. For API/session exposure, stop production immediately; detach only its domain if needed to prevent exposure. Never route traffic to staging. For later releases, restore the retained previously accepted production image/configuration and reverify SHA, origin, health and API isolation. The first release had no prior production deployment; image availability must be checked before relying on rollback. Do not change staging or rewrite Git history.
+1. Confirm approval for the intended release and a successful CI run on its exact SHA. The current release passed [CI run 43315504797](https://github.com/comwanga/bitsacco-jifunze/actions/runs/43315504797) (`check`, `account`, `lab`).
+2. Capture the production service/configuration, public variables, limits, domains, active deployment and rollback eligibility. Capture the [staging baseline](railway-staging.md) separately. Do not log raw secret values.
+3. Keep automatic deployment off. Use `serviceInstanceDeployV2` with the production environment/service IDs above and the full reviewed `commitSha`. A source branch label or stored source-configuration SHA is not proof of the fetched commit; the existing configuration can retain an older pin. Do not substitute a checkout or update unrelated settings.
+4. Confirm the deployment's actual `meta.commitHash`, image digest, successful NGINX startup and health. Retain the existing origin, static mode, domain and capacity.
+5. Verify both languages, canonical/sitemap/robots metadata, HTTPS and CSP/security headers, API rejection/no cookies, feedback, quizzes, progress import/export, offline reading and accessibility. Tests that inspect asset sizes must use the actual deployed export; do not call an unrelated local build a production measurement.
+6. Compare production settings and the complete staging baseline afterward. Record the exact result in this guide.
 
-## Domain and HTTPS
+Before relying on rollback, recheck `canRollback` for the previous successful deployment and retain its SHA/image identity. On failed health, a wrong SHA or API/session exposure, stop the affected rollout and restore the retained accepted production image/configuration, then repeat origin, health and API-isolation checks. Never direct production traffic to staging. Rollback eligibility is a point-in-time provider observation, not a future guarantee.
 
-The maintainer added these Namecheap records; nameservers, mail and staging records were preserved:
+Ordinary source deployments do not require DNS changes. Preserve the apex ALIAS/verification records, nameservers, mail and staging records. Diagnose DNS/TLS failures against Railway's current domain status; do not bypass certificate validation or create another public hostname as a workaround.
 
-| Type | Host | Value | TTL |
-| --- | --- | --- | --- |
-| ALIAS | `@` | `xhtl8e9c.up.railway.app` | 5 minutes |
-| TXT | `_railway-verify` | Railway ownership value for this production custom domain | 5 minutes |
+## Live acceptance
 
-Retrieve the exact ownership value from Railway if repairing DNS; do not invent or replace it. The ALIAS target is a hostname, not a promised static IP. Production custom-domain ID: `a6d0a82f-f1ae-4fef-84f9-5f68c0efb6d8`, port 8080. Acceptance recorded ACTIVE, ownership verified and DNS PROPAGATED. Independently validated TLS covered the apex; HTTP redirected to matching HTTPS. Railway manages the certificate; continue checking expiry and HTTPS rather than assuming renewal succeeded.
+The owner authorized this production deployment on 13 November 2026. Live Chromium checks on the official HTTPS origin passed **36 cases**, with **two declared mobile skips** for shared static-metadata/service-worker cases already covered on desktop. Coverage includes English/Kiswahili feedback as a single mailto link, keyboard/no-JavaScript use, responsive layout and axe scans, quizzes, stale-tab progress, export/import and quiz import order, offline reloads, retired account routes and deliberate-only local-lab contact.
 
-For DNS/TLS failures, compare actual public resolution and Railway's record/certificate status. Do not bypass TLS validation, change nameservers or replace ALIAS with an apex CNAME that conflicts with mail. Any DNS rollback needs maintainer approval and affects only the production ALIAS and its ownership TXT. Preserve the previous zone records; never restore a partial public-DNS snapshot as an entire zone.
+All 130 sitemap pages returned 200 with production canonical URLs, indexable metadata, security headers, the strict page CSP and no session cookies or account/copy controls. The 20 HTTP acceptance checks also verified robots/sitemap behavior, HTTP-to-HTTPS redirection, API rejection/no-store, all ten retired account URLs, and the English book's MIME, 9,112,090-byte length and source-manifest SHA-256. Performance budgets belong to the successful exact-commit CI build; no live production performance score is inferred from functional browser checks. Phone coverage is device emulation, not physical-device or screen-reader certification.
 
-## Monitoring and scaling
+The public variables, limits, domain, deployment controls and staging services were preserved. Raw operator evidence remains locally under ignored `.superpowers/production-release-2026-11-13/`; a fresh clone does not require those files to build the site.
 
-Use `production` → `public-web` → Metrics and deployment logs. Railway exposes [CPU, memory, disk and network metrics](https://docs.railway.com/observability/metrics); these do not establish application latency/error-rate monitoring. Check valid HTTPS responses from `/en/` and `/sw/`, logs and resource use daily during initial operation and after busy periods. Review billed usage/egress daily for the first week. Startup health is not continuous uptime monitoring.
+## Operations
 
-At acceptance, no custom notification rules or external uptime monitor were configured; email/in-app delivery was not verified enabled. Inspect supported account notification channels before proposing alerts. Do not claim Lighthouse scores, physical-device Safari certification or continuous availability from the browser results below.
+Use Railway metrics and logs for the `production` / `public-web` instance. The `/en/` startup health check is not continuous external monitoring. External uptime monitoring was not configured at this release; the owner previously accepted that operational limitation.
 
-The existing Hobby plan bills actual usage; no separate $10 allocation or workspace-wide spending-limit change was approved. On 2026-11-06 at 20:28 UTC, production had accrued approximately $0.015 including verification traffic; sampled peak RAM was 60.51 MiB and CPU usage 0.007992 vCPU, within the limits. These are historical samples, not a forecast or spending cap. Consult [current pricing](https://docs.railway.com/pricing) before any cost decision; repeated 9.1 MB book downloads can materially increase egress.
+Investigate measured resource pressure before proposing capacity changes. CPU/RAM changes, extra replicas, plan changes and DNS changes need their own authorization. Existing limits do not constitute an egress spending cap; consult current provider pricing before a cost decision.
 
-If sustained CPU saturation causes slow responses, investigate before proposing 0.5 vCPU. If repeated memory pressure/OOMs occur, propose the smallest justified increase (for example 128 MiB). More replicas need evidence and approval; extra CPU/RAM does not reduce egress charges. Record the time window, affected routes, resource trend, response timings and expected cost. Do not scale automatically, upgrade the plan or set workspace-wide shutdown controls that could stop staging.
-
-## Recorded live acceptance and remaining gate
-
-The post-merge [CI run](https://github.com/comwanga/bitsacco-jifunze/actions/runs/42246086439) passed frontend, account and lab jobs against the release SHA. On the official HTTPS origin, using the matching deployed export, existing Playwright suites recorded:
-
-| Suite | Passed | Expected skips |
-| --- | ---: | ---: |
-| Desktop Chromium | 125 | 8 |
-| Mobile Chromium emulation | 73 | 52 |
-| WebKit table matrix | 8 | 0 |
-
-There were zero final failures. An earlier mobile attempt failed DNS resolution before application assertions; it was retained separately and the unchanged complete run passed after normal DNS recovered. All 96 sitemap pages returned 200 with matching deployed HTML, production canonical/Open Graph/language metadata and no session cookies. HTTPS, headers, API denial, bilingual learning, quizzes, trees, simulations, local progress/export/import, offline lessons, keyboard table scrolling and tested Axe assertions passed. The three advertised PDFs opened/downloaded on desktop/mobile emulation with matching checksums. These results are not physical-device certification, PDF/UA certification, a Lighthouse score or a new full external-link audit.
-
-The English *Mastering Bitcoin* PDF remains 9,112,090 bytes, 406 pages, SHA-256 `aedbf60fc15e199903d3bfede1268dae4aa75922f764fb44b1d400eb0d255511`; see [provenance and reproduction](mastering-bitcoin-generated.md). It loads on request and is excluded from lesson caches. The Kiswahili book remains pending publication, with no active download. Staging's ETag, service deployments, variables, source settings and domains matched the pre-provisioning baseline after acceptance.
-
-The detailed operator evidence is retained locally under ignored `.superpowers/production-execution/` (`LIVE-ACCEPTANCE.md`, `acceptance-summary.json`, browser logs and configuration/DNS comparisons); it is not needed to build the repository and is not claimed available to a fresh clone. This section preserves its essential release identifiers, outcomes and limitations.
-
-The website is publicly accessible. Maintainer Kiswahili review is complete. **Independent human technical-content sign-off remains outstanding before a public-launch announcement.** Automated checks do not supply the two-reviewer approval required by [CONTRIBUTING.md](../../CONTRIBUTING.md#reviewers).
+The [content guide](../content-guide.md#review-status) records the owner's curriculum review and waived independent reviews without inventing formal sign-offs. The Kiswahili book remains pending publication. [PDF provenance](mastering-bitcoin-generated.md) documents the currently published English edition.

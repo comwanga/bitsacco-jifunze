@@ -81,9 +81,9 @@ Each lesson needs two sign-offs before `lastReviewed` is set:
 - a **Kiswahili reviewer** for wording and clarity, and
 - a **technical reviewer** for accuracy.
 
-The maintainer has approved the existing Kiswahili wording. Independent human technical-content sign-off remains outstanding before a public-launch announcement. Missing `lastReviewed` dates must not be treated as evidence that the completed language review is still pending; do not set review dates without both required sign-offs. New or changed material still needs the applicable reviews.
+The maintainer has approved the existing Kiswahili wording. Missing `lastReviewed` dates must not be treated as evidence that the completed language review is still pending; do not set review dates without both required sign-offs. New or changed material still needs the applicable reviews.
 
-The project owner reports completing the expanded curriculum's educational review on 11 November 2026, covering Kiswahili, Bitcoin, financial concepts, community/cooperative savings and documentation. See the [owner review record](docs/audit/2026-11-11-owner-review.md). This records the completed owner review without inventing a reviewer identity or both formal sign-offs; independent technical sign-off and release authorization remain separate.
+The project owner completed the expanded curriculum's educational review on 11 November 2026 and waived the separate independent reviews for that release on 12 November. See the [current review status](docs/content-guide.md#review-status). This does not invent reviewer identities or both formal sign-offs, and it does not change the policy for setting `lastReviewed` or reviewing future content changes.
 
 Lessons explain how things work. They must never give financial or investment advice, promise returns, or tell readers what to buy.
 

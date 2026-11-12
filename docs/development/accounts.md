@@ -38,11 +38,11 @@ Stage 1 of the Nostr-first identity design (`docs/superpowers/specs/2026-11-12-n
 | --- | --- | --- |
 | `POST /api/auth/nostr/challenge` with `purpose` `signin`, `reauth` or `replace` | none for `signin`; full for `reauth`; full or recovery for `replace` | Issues the challenge and the URL to sign for |
 | `POST /api/auth/nostr/reauth` | full | The account's own key confirms; refreshes this session's re-authentication time. Another key is refused (`nostr_key_mismatch`) and the challenge is spent |
-| `POST /api/auth/nostr/replace` | recovery, or full re-authenticated within 10 minutes | Attaches the newly proven key to this session's account, revokes every session and starts a fresh one. A key held by another account is refused (`identity_in_use`) |
+| `POST /api/auth/nostr/replace` | recovery, or full re-authenticated within 10 minutes | Attaches the newly proven key to this session's account, revokes every session and starts a fresh one, and replaces the recovery codes. A key held by another account is refused (`identity_in_use`) and nothing changes |
 | `POST /api/auth/logout/all` | any | Revokes every session of the account |
 | `POST /api/me/delete` with `{"confirm":true}` | full, re-authenticated within 10 minutes | Deletes the account with its identities, sessions, challenges and recovery codes |
 
-Key replacement does not issue recovery codes itself; the fresh session can request a new set from `POST /api/me/recovery-codes`. The account pages do not use these routes yet: the recovery and account screens for Nostr are Stage 4 of the design. No secret key, seed phrase or signer password is ever sent to the API.
+Key replacement rotates the recovery codes in the same transaction: every earlier code stops working and the response carries a fresh set once, in `codes`. A caller must show them to the learner; they cannot be read again. The account pages do not use these routes yet: the recovery and account screens for Nostr are Stage 4 of the design. No secret key, seed phrase or signer password is ever sent to the API.
 
 ## Logs
 

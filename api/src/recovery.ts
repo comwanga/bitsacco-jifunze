@@ -106,6 +106,28 @@ export async function issueCodes(
   return codes;
 }
 
+/**
+ * For a flow that replaces the account's sign-in key, inside its transaction. `dropCodes` runs early, before the
+ * session row is locked, so locks are taken in the order a redemption takes them (codes, then sessions).
+ * `writeCodes` then stores a fresh set and returns its plaintext once. If the transaction fails, the old codes stay.
+ */
+export async function dropCodes(tx: Sql, accountId: string): Promise<void> {
+  await tx`delete from recovery_codes where account_id = ${accountId}`;
+}
+export async function writeCodes(tx: Sql, cfg: Config, accountId: string): Promise<string[]> {
+  const pepper = cfg.peppers.get(cfg.currentPepper);
+  if (!pepper) throw new Error("current recovery pepper is not configured");
+  const codes = generateCodes();
+  const setId = randomUUID();
+  for (const c of codes) {
+    await tx`
+      insert into recovery_codes (code_hash, pepper_version, account_id, set_id)
+      values (${hashCode(pepper, normaliseCode(c)!)}, ${cfg.currentPepper}, ${accountId}, ${setId})`;
+  }
+  await tx`update accounts set recovery_codes_issued_at = now() where id = ${accountId}`;
+  return codes;
+}
+
 /** Atomically marks the matching unused code as used (checked under every pepper version); returns its account. */
 export async function consumeCode(sql: Sql, cfg: Config, normalised: string): Promise<string | null> {
   const hashes = [...cfg.peppers.values()].map((p) => hashCode(p, normalised));

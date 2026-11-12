@@ -214,8 +214,18 @@ describe("Nostr key replacement", () => {
     expect(c.url).toBe(ORIGIN + "/api/auth/nostr/replace");
     const r = await prove(c, K2, recovery.cookie);
     expect(r.status).toBe(200);
-    expect(await r.json()).toEqual({ redirect: "/en/account/", outcome: "replaced" });
+    const body = await r.json() as { redirect: string; outcome: string; codes: string[] };
+    expect(body).toMatchObject({ redirect: "/en/account/", outcome: "replaced" });
     const fresh = pair(r, SESSION_COOKIE);
+    // Recovery codes rotate with the key: none of the old set works any more, the new set is shown once and works.
+    expect(body.codes).toHaveLength(10);
+    expect(body.codes.some((code) => recovery.codes.includes(code))).toBe(false);
+    expect(Number((await sql`select count(*) as n from recovery_codes where account_id = ${before.accountId}`)[0]!.n)).toBe(10);
+    expect(Number((await sql`select count(*) as n from recovery_codes where account_id = ${before.accountId} and used_at is not null`)[0]!.n)).toBe(0);
+    for (const old of recovery.codes.slice(0, 3)) {
+      expect(await errorCode(await post("/api/auth/recovery", JSON.stringify({ code: old })))).toBe("recovery_invalid");
+    }
+    expect((await get("/api/me", fresh)).status).toBe(200); // refused old codes ended nothing
     const session = await readSession(sql, fresh.split("=")[1]);
     expect(session).toMatchObject({ accountId: before.accountId, scope: "full" });
     expect(await nostrKeyOf(before.accountId)).toBe(pub(K2));
@@ -230,6 +240,22 @@ describe("Nostr key replacement", () => {
     expect(await errorCode(await prove(c, K2, fresh))).toBe("challenge_invalid");
     const events = await sql<{ detail: Record<string, string> }[]>`select detail from security_events where event = 'identity_replaced'`;
     expect(events.map((e) => e.detail)).toEqual([{ provider: "nostr", outcome: "replaced" }]);
+    // A new code opens a recovery session for the same account.
+    const again = await post("/api/auth/recovery", JSON.stringify({ code: body.codes[0] }));
+    expect(again.status).toBe(200);
+    expect((await readSession(sql, pair(again, SESSION_COOKIE).split("=")[1]))).toMatchObject({ accountId: before.accountId, scope: "recovery" });
+  });
+
+  it("a refused replacement leaves the existing recovery codes working", async () => {
+    const victim = await signIn(K1);
+    const a = await signIn(K2);
+    const recovery = await recover(a.accountId);
+    const taken = await prove(await challenge("replace", recovery.cookie), K1, recovery.cookie);
+    expect(taken.status).toBe(409); // K1 belongs to the other account: everything rolls back
+    expect(Number((await sql`select count(*) as n from recovery_codes where account_id = ${a.accountId}`)[0]!.n)).toBe(10);
+    const second = await post("/api/auth/recovery", JSON.stringify({ code: recovery.codes[1] }));
+    expect(second.status).toBe(200);
+    expect(await nostrKeyOf(victim.accountId)).toBe(pub(K1));
   });
 
   it("from a full session only after a fresh re-authentication", async () => {
@@ -313,7 +339,9 @@ describe("Nostr key replacement", () => {
     const a = await signIn(K1);
     const ra = await recover(a.accountId);
     const same = await prove(await challenge("replace", ra.cookie), K1, ra.cookie);
-    expect(((await same.json()) as { outcome: string }).outcome).toBe("unchanged");
+    const sameBody = (await same.json()) as { outcome: string; codes: string[] };
+    expect(sameBody.outcome).toBe("unchanged");
+    expect(sameBody.codes).toHaveLength(10); // rotated here too: the redeemed set is retired as a whole
     expect(await nostrKeyOf(a.accountId)).toBe(pub(K1));
 
     const gh = await signInWithGithub(sql, { id: 4242, login: "octo", avatarUrl: "" }, "en", null);
@@ -407,6 +435,7 @@ describe("sensitive data", () => {
     const c = await challenge("replace", recovery.cookie);
     const r = await prove(c, K2, recovery.cookie);
     expect(r.status).toBe(200);
+    const issued = ((await r.clone().json()) as { codes: string[] }).codes;
     const fresh = pair(r, SESSION_COOKIE);
     await prove(await challenge("reauth", fresh), K2, fresh);
     await post("/api/auth/logout/all", "", fresh);
@@ -414,6 +443,7 @@ describe("sensitive data", () => {
     const secrets = [
       pub(K1), pub(K2), c.nonce, c.pre.split("=")[1]!, a.cookie.split("=")[1]!, recovery.cookie.split("=")[1]!, fresh.split("=")[1]!,
       ...recovery.codes, ...recovery.codes.map((code) => code.replace(/-/g, "")),
+      ...issued, ...issued.map((code) => code.replace(/-/g, "")),
       Buffer.from(K1).toString("hex"), Buffer.from(K2).toString("hex"),
     ];
     for (const secret of secrets) expect(written).not.toContain(secret);

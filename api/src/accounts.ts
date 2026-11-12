@@ -1,7 +1,9 @@
+import type { Config } from "./config.ts";
 import { errorCode } from "./db.ts";
 import { consumeNostrChallenge } from "./challenges.ts";
 import { ApiError } from "./errors.ts";
 import type { Session, Sql } from "./http.ts";
+import { dropCodes, writeCodes } from "./recovery.ts";
 import { createSession, markReauth, revokeOtherSessions, revokeSession } from "./sessions.ts";
 
 type GithubUser = { id: number; login: string; avatarUrl: string };
@@ -210,13 +212,18 @@ export async function reauthWithNostr(sql: Sql, pubkey: string, proof: NostrProo
  * session as it is), refuse a key that belongs to another account (409 identity_in_use), swap the identity, revoke
  * every session of the account and start a fresh full one. Any failure rolls all of it back, the challenge included.
  * The account is always the session's: there is no way to name another one.
+ *
+ * Recovery codes are rotated in the same transaction: every earlier code stops working (the one just redeemed, any
+ * copy a thief may hold) and a fresh set is returned once, so the learner is never left believing old codes still
+ * protect the account, and never left with none.
  */
 export async function replaceNostrIdentity(
   sql: Sql,
+  cfg: Config,
   pubkey: string,
   proof: NostrProof,
   session: Pick<Session, "accountId" | "tokenHash" | "scope">,
-): Promise<{ outcome: "replaced" | "unchanged"; cookie: string; returnTo: string }> {
+): Promise<{ outcome: "replaced" | "unchanged"; cookie: string; returnTo: string; codes: string[] }> {
   const accountId = session.accountId;
   try {
     return await sql.begin(async (tx) => {
@@ -227,6 +234,7 @@ export async function replaceNostrIdentity(
       const ch = await consumeNostrChallenge(tx, proof.challengeId, proof.nonce, proof.preauth, "replace",
         { accountId, tokenHash: session.tokenHash });
       if (!ch) throw new ApiError(401, "challenge_invalid");
+      await dropCodes(tx, accountId); // before the session lock: the order a redemption locks in
       const [live] = await tx<{ fresh: boolean }[]>`
         select (scope = 'recovery' or reauth_at > now() - interval '10 minutes') as fresh from sessions
         where token_hash = ${session.tokenHash} and account_id = ${accountId} and scope = ${session.scope}
@@ -259,11 +267,13 @@ export async function replaceNostrIdentity(
       }
       await revokeOtherSessions(tx, accountId); // every session, the initiating one included
       const fresh = await createSession(tx, accountId, "full");
+      const codes = await writeCodes(tx, cfg, accountId);
       await logEvent(tx, accountId, "identity_replaced", { provider: "nostr", outcome });
-      return { outcome, cookie: fresh.cookie, returnTo: ch.returnTo };
+      return { outcome, cookie: fresh.cookie, returnTo: ch.returnTo, codes };
     });
   } catch (e) {
-    if (errorCode(e) === "55P03") throw new ApiError(409, "replace_conflict");
+    // 55P03 lock_not_available (NOWAIT or lock_timeout); 40P01 deadlock_detected against a concurrent redemption.
+    if (errorCode(e) === "55P03" || errorCode(e) === "40P01") throw new ApiError(409, "replace_conflict");
     throw e;
   }
 }

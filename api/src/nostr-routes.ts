@@ -86,7 +86,7 @@ export function nostrRoutes(
     },
   }, {
     // Attaches a newly proven key to this session's account: after a recovery code, or from a re-authenticated
-    // full session. The old key stops working for this account.
+    // full session. The old key stops working for this account, and so does every earlier recovery code.
     method: "POST", path: PATHS.replace, auth: "any", recoveryAllowed: true,
     handler: async (ctx) => {
       if (!replaces.hit(ctx.ip)) throw new ApiError(429, "rate_limited");
@@ -97,8 +97,9 @@ export function nostrRoutes(
           { accountId: session.accountId, tokenHash: session.tokenHash });
         throw new ApiError(401, "challenge_invalid");
       }
-      const result = await replaceNostrIdentity(ctx.sql, pubkey, proof, session);
-      return { status: 200, json: { redirect: result.returnTo, outcome: result.outcome }, setCookies: [result.cookie, clearPreauth] };
+      const result = await replaceNostrIdentity(ctx.sql, ctx.cfg, pubkey, proof, session);
+      // The new recovery codes are shown once, here; every earlier code has stopped working.
+      return { status: 200, json: { redirect: result.returnTo, outcome: result.outcome, codes: result.codes }, setCookies: [result.cookie, clearPreauth] };
     },
   }];
 }

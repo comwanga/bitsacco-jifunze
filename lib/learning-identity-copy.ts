@@ -2,7 +2,7 @@ import type { Lang } from "./i18n";
 
 // The beginner journey: no signer, relay or key vocabulary. Server pages pass these strings as props or render
 // them as HTML, and the account controls load them on demand, so no page's initial script carries this file.
-// Kiswahili strings are implementation drafts pending owner review.
+// Owner confirmed completed Kiswahili review on 2026-11-12; actual review date is unspecified.
 const en = {
   lead: "Save your learning progress so you can carry on later and get it back if this phone is lost. You can also keep learning without saving.",
   save: "Save my progress",

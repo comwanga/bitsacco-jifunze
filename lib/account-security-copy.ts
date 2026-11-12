@@ -1,6 +1,6 @@
 import type { Lang } from "./i18n";
 
-// Loaded with the account controls, never in a learner page's initial JavaScript. Kiswahili review is pending.
+// Loaded with the account controls, never in a learner page's initial JavaScript. Owner review confirmed 2026-11-12; review date unspecified.
 const en = {
   heading: "Account safety",
   reauthHelp: "To protect your account, first confirm with the Nostr identity already linked here. Approve the request in that signer. This does not change your key or create another account.",

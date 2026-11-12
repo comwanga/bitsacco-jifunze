@@ -2,7 +2,7 @@ import type { Lang } from "./i18n.ts";
 
 // Copy for the progress panel on the account page. Kept out of lib/account-copy.ts, which every account page
 // loads: this module arrives only with the panel, after an account is confirmed. The Kiswahili is recorded in
-// content/terminology-review.json as awaiting review.
+// content/terminology-review.json: owner review confirmed 2026-11-12; actual review date unspecified.
 
 const en = {
   syncLocal: "Progress is saved on this device.",

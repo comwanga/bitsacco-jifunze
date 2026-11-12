@@ -1,6 +1,8 @@
 # Railway staging safeguards
 
-Last verified during production acceptance on **2026-11-06**. Staging remains separate from the [anonymous production service](production.md).
+Current account-free web deployment and acceptance were verified on **2026-11-12**. See the [deployment and 27-step acceptance record](../audit/2026-11-12-account-free-staging-acceptance.md) for exact commits, service IDs and limitations. Staging remains separate from the [anonymous production service](production.md).
+
+Web runs `0490523` in deployment `83a2a4d8-344d-4fa2-8a2b-e98459be80fe`; API remains at `b702a14` in deployment `54f04926-aa26-4f44-8e31-099ad715b4e8`. PostgreSQL is unchanged. At this checkpoint `STAGING_AUTH_ENABLED=1` still forwards API routes, although no page calls them and the enforced tester allowlist is empty. Disabling forwarding remains a separate configuration decision. The table below is the **historical 2026-11-06 snapshot**, not the current deployment state.
 
 | Item | Verified state |
 | --- | --- |

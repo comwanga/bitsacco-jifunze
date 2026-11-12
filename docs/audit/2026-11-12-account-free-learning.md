@@ -24,7 +24,7 @@ Branch `feat/account-free-learning`, based on `main` (`3ec6b0d`), the commit pro
 **Unchanged**
 
 - Lessons, quizzes, simulations, the Lightning lab, the library, the glossary and offline reading.
-- Local progress: the same storage key and file format (`jifunze:progress:v1`, version 1), the progress page, and export and import. Nothing is migrated or cleared. The progress page already says progress is saved on this device only.
+- Local progress: the same storage key and file format (`jifunze:progress:v1`, version 1), the progress page, and export and import. Nothing is migrated or cleared. The progress page already says progress is saved on this device only. The follow-up audit retains the independent quiz-merge fix from #20: when percentage and timestamp tie, keep the attempt with more questions so local import order cannot change the result.
 - Performance budgets. No budget was raised.
 
 ## Kept unused, pending a separate cleanup decision
@@ -46,6 +46,8 @@ Suggested follow-up, each needing its own decision: remove `api/` and the proxy 
 
 None of #18 to #25 should merge into `main`. Their commits stay in Git on their branches.
 
+The [completed scope audit](2026-11-12-superseded-account-stack.md) records the independent quiz-merge fix retained from #20 and the feedback already retained from #25. No curriculum edits were found. Account API/proxy fixes remain available in their original branches for a separate cleanup decision.
+
 | Pull request | Recommendation |
 | --- | --- |
 | #18 design, #19 to #22 Nostr API, progress storage, progress sync, account experience | Close as superseded by this decision |
@@ -57,7 +59,7 @@ The staging acceptance record for the rejected experience exists only as local c
 
 ## Staging
 
-Staging still runs the rejected build (`b702a14`). It is safe meanwhile: authentication cannot succeed with an empty allowlist. Deploying this branch's web image to staging replaces the account pages with 404 and adds the header feedback link. That deployment, and any merge to `main`, need separate authorization.
+The owner-authorized web deployment replaced the rejected build with `0490523`, deployment `83a2a4d8-344d-4fa2-8a2b-e98459be80fe`. The [committed acceptance record](2026-11-12-account-free-staging-acceptance.md) records 27/27 live Chromium checks, including English/Kiswahili desktop and emulated phone sessions. The API and database were not redeployed. The proxy still has authentication forwarding enabled at that checkpoint, with the tester allowlist enforced and empty. The later quiz-merge fix is not part of this deployed commit. Any subsequent deployment or merge to `main` remains separate.
 
 ## Risks
 

@@ -1,6 +1,6 @@
 # Generated English third-edition PDF
 
-The English PDF and in-app reader are integrated in production release `39fa78a34deece8f3ed6eedd162725557de9829e`. This is a generated edition from verified official open-source material, not a purchased, third-party or publisher-branded PDF. It supersedes the [earlier online-only artifact search](mastering-bitcoin-sources.md). See [production acceptance](production.md) for live verification.
+The English PDF and in-app reader were first published in release `39fa78a34deece8f3ed6eedd162725557de9829e` and remain available in the current site. This is a generated edition from verified official open-source material, not a purchased, third-party or publisher-branded PDF. See [production operations](production.md) for the currently deployed commit and live verification.
 
 ## Source and permission
 
@@ -49,6 +49,6 @@ Read is explicit and disabled until hydration. One same-origin fetch verifies MI
 
 The service worker bypasses `/books/` even for direct navigations: the entire book is neither precached nor saved in lesson caches. Ordinary learning/library/reader-page visits do not fetch the PDF. Explicit downloads can be kept by learners independently of lesson caching. The build verifies the artifact against its manifest; a truncated or replaced file fails the build.
 
-Kiswahili publication remains pending [Bitsacco PR #107](https://github.com/bitsacco/bitsacco/pull/107). No unmerged PDF is copied or advertised. The same reader can be reused after a verified publication. Previously reviewed Swahili educational content, anonymous accounts-unavailable behavior, static API rejection and staging isolation remain unchanged.
+Kiswahili publication remains pending [Bitsacco PR #107](https://github.com/bitsacco/bitsacco/pull/107). No unmerged PDF is copied or advertised. The same reader can be reused after a verified publication. Previously reviewed Swahili educational content, account-free learning, static API rejection and staging isolation remain unchanged.
 
-The [historical integration review](mastering-bitcoin-integration-review.md) records packaged-build/browser results and rendering limitations; [production operations](production.md) records the accepted deployed SHA and live checks. Reproduction is a publishing task, not part of ordinary site development; do not replace the checked-in artifact merely to update documentation.
+[Production operations](production.md) records the accepted deployed SHA and live checks. The verification and rendering limits above identify this artifact; reproduction is a publishing task, not part of ordinary site development. Do not replace the checked-in artifact merely to update documentation.

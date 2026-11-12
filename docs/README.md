@@ -1,34 +1,21 @@
 # Documentation
 
-Start with the [project README](../README.md) for learning paths, features and local development.
+Start with the [project README](../README.md) for the learning paths, feedback and local development.
 
-## Current guides
+- [Contributing](../CONTRIBUTING.md): bilingual lessons, schemas, quizzes, exercises and reviewer policy.
+- [Curriculum and content review](content-guide.md): implemented specializations, primary sources, required discussion and current review status.
+- [Production operations](deployment/production.md): deployed commit, isolation, exact-commit deployment, rollback and live acceptance.
+- [Staging operations](deployment/railway-staging.md): current services, allowlist/proxy state and controlled web deployment.
+- [Lightning lab](../lab/README.md): the learner's local Docker/WSL2 lab and connection instructions.
+- [Feedback](development/feedback.md): the plain email link and its public build-time recipient.
+- [Retained API maintenance](development/retained-api.md): unused API checks and security/logging constraints; no learner account interface.
+- [English book provenance and reproduction](deployment/mastering-bitcoin-generated.md): source revision, license, artifact verification and generation. The [source manifest](../public/books/mastering-bitcoin-en-3rd-edition.source.json) identifies the published PDF.
+- [Attributions](../ATTRIBUTIONS.md), [code license](../LICENSE), [curriculum license](../content/LICENSE), [font notices](../scripts/books/font-notices.txt) and [MathJax notice](../scripts/books/mathjax-LICENSE.txt).
 
-- [11 November platform audit](audit/2026-11-11-platform.md): baseline, classified evidence, implementation, validation and remaining gates. [Curriculum design and sources](audit/2026-11-11-curriculum.md) includes the Savers specialization map and required discussion approach.
+## Performance
 
-- [Contributing](../CONTRIBUTING.md): content format, checks, translation and technical-review policy.
-- [Production operations](deployment/production.md): accepted release, Railway/DNS, deployment, rollback, monitoring and scaling.
-- [Staging safeguards](deployment/railway-staging.md): deployed baseline and separate authentication acceptance gates; older ingress evidence is labelled within the document.
-- [Lightning lab](../lab/README.md): demonstrated local WSL2/Docker setup, pairing and the separate Codespaces limitation.
-- [Account-free learning decision](audit/2026-11-12-account-free-learning.md): why Jifunze has no accounts, what was removed and what is kept unused. [Feedback](development/feedback.md): the email link that replaced the account link.
-- [Account-free staging acceptance](audit/2026-11-12-account-free-staging-acceptance.md): deployed commit, 27 live checks and evidence limits. [Superseded account-stack audit](audit/2026-11-12-superseded-account-stack.md): disposition of #18–#25 and the independent local-progress fix retained in #26.
-- [Retired account stack](development/accounts.md): the unused API and its security/logging requirements, kept until a cleanup decision.
-- [English book provenance and reproduction](deployment/mastering-bitcoin-generated.md): official source revision, license, generation, completeness checks and rendering limits. See also the [artifact manifest](../public/books/mastering-bitcoin-en-3rd-edition.source.json).
-- Performance limits: [general build budgets](../lib/build/budget.ts), [per-page UX budgets](../lib/build/ux-budget.ts) and [activated browser measurements](../e2e/budget.spec.ts). The original 100 KiB JavaScript aspiration remains unmet by the React/Next runtime. The November audit records a measured increase of the general ceiling from 150 to 151 KiB; learner-page, lab, activated-simulation and first-lesson limits remain unchanged.
-- [Attributions](../ATTRIBUTIONS.md), [software license](../LICENSE), [curriculum license](../content/LICENSE), [font notices](../scripts/books/font-notices.txt) and [MathJax notice](../scripts/books/mathjax-LICENSE.txt).
+The source definitions are the authority for current limits: [build budgets](../lib/build/budget.ts) and [per-page UX budgets](../lib/build/ux-budget.ts). Run `npm run build` and `npm run check:ux-budget`; CI also checks activated simulation chunks with [browser measurements](../e2e/budget.spec.ts). The 151 KiB general JavaScript ceiling includes the measured curriculum-navigation allowance; stricter learner-page UX limits remain unchanged. The original 100 KiB aspiration is a warning threshold, not an achieved runtime size.
 
-The project owner's educational review of this expansion is complete, dated 11 November 2026. The [owner review record](audit/2026-11-11-owner-review.md) covers Kiswahili, Bitcoin, finance, community/cooperative savings and documentation, without inventing formal dual sign-offs. On 12 November 2026 the owner waived the separate independent reviews and approved release of the merged commit; see the [owner release approval](audit/2026-11-12-owner-release-approval.md). No independent reviewer sign-off or review date was recorded. Account-provider acceptance and the pending Kiswahili book remain separate from anonymous public learning.
+## Documentation maintenance
 
-## Historical records
-
-These records preserve decisions, measured results and unresolved limitations at their stated commits. They are not deployment instructions or promises that proposed features are available. Historical hostnames, budgets and “not yet deployed” statements must be read in that context.
-
-- [Original two-roadmap v1 proposal](history/v1-spec.md).
-- [Lightning design](superpowers/specs/2026-11-03-lightning-lab-design.md); the current lab guide records the actual topology and security limits.
-- [Phase 1 UX design](superpowers/specs/2026-11-03-phase-1-ux-design.md) and [implementation/completion record](superpowers/plans/2026-11-03-phase-1-ux.md).
-- [Phase 2 UX design](superpowers/specs/2026-11-03-phase-2-ux-design.md) and [implementation report](superpowers/reports/2026-11-03-phase-2-ux-implementation.md): learning trees, simulation scope, offline and performance evidence.
-- [Account/community design](superpowers/specs/2026-11-04-phase-3-design.md), [GitHub/session/recovery contract](superpowers/plans/2026-11-04-phase-3-increment-2a.md), and [investigations](superpowers/spikes/2026-11-04-phase-3/README.md). The latter's scripts and [permanent fixture provenance](../api/test/fixtures/README.md) retain authentication/privacy evidence; not all proposals were implemented or released.
-- Nostr [execution decisions](superpowers/plans/2026-11-04-phase-3-increment-2b.md), [implementation report](superpowers/plans/2026-11-04-phase-3-increment-2b-report.md) and [review corrections](superpowers/plans/2026-11-04-phase-3-increment-2b-review-fixes.md): custody boundaries, test provenance and outstanding real-signer acceptance.
-- Public release [preparation](deployment/public-release.md), [online-only candidate review](deployment/final-release-review.md), [book artifact search](deployment/mastering-bitcoin-sources.md) and [local PDF integration review](deployment/mastering-bitcoin-integration-review.md). Current production and book guides supersede their pending-publication/deployment statements.
-
-Superseded implementation checklists were removed where retained designs and reports cover their useful guidance. Their original text remains in [the production release history](https://github.com/comwanga/bitsacco-jifunze/tree/39fa78a34deece8f3ed6eedd162725557de9829e/docs/superpowers/plans). Security decisions, actual test reports, licenses and resource provenance were retained. Other historical records stay at their existing paths to preserve references; the v1 proposal moved out of the repository root.
+Current guides describe the account-free application. Completed implementation plans, superseded release proposals, obsolete investigation artifacts and old audit files have been removed. Their original versions remain in Git history. Keep the operating guides, source/license provenance and content-review references current instead of adding duplicate dated checklists.

@@ -4,7 +4,7 @@ The curriculum in `content/` is released under [CC BY-SA 4.0](https://creativeco
 
 ## Discussion-based learning
 
-The required open-ended activities draw pedagogical inspiration from [Chaincode Labs' Bitcoin Protocol Development seminar](https://chaincode.gitbook.io/seminars/bitcoin-protocol-development), including its topic readings, design-trade-off discussions and learner-generated questions. Jifunze's questions and additional explanations are newly authored for its audiences, not reproductions or translations of Chaincode's question bank. Links do not imply endorsement or permission to relicense third-party material. The [curriculum record](docs/audit/2026-11-11-curriculum.md) maps the technical topics and research sources.
+The required open-ended activities draw pedagogical inspiration from [Chaincode Labs' Bitcoin Protocol Development seminar](https://chaincode.gitbook.io/seminars/bitcoin-protocol-development), including its topic readings, design-trade-off discussions and learner-generated questions. Jifunze's questions and additional explanations are newly authored for its audiences, not reproductions or translations of Chaincode's question bank. Links do not imply endorsement or permission to relicense third-party material. The [curriculum guide](docs/content-guide.md) maps the technical topics and research sources.
 
 ## Mastering the Lightning Network
 

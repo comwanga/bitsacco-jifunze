@@ -137,6 +137,16 @@ Use at least two independent signers: one Android application and one web or rem
 19. Stay in the signer for 30 seconds, then 90 seconds, before approving. Record the result each time.
 20. Repeat step A with battery saver on.
 
+**G. Offline progress, shared devices and account changes (added for the staging acceptance)**
+
+21. Signed in, switch the phone to aeroplane mode and complete a lesson step. **Pass:** the status reports the work is kept on this device and waiting. Switch back online. **Pass:** the status reports it saved to the account, and it appears on a second device after a reload.
+22. On one browser, learner A signs in and completes a step, then signs out choosing to keep the copy on the device. Learner B signs in with a different identity. **Pass:** B is told the device holds another account's progress and is asked before anything is added; nothing of A's appears in B's account without that consent.
+23. With A signed in on one tab, sign in as B in another tab of the same browser, then return to A's tab and press a sensitive action. **Pass:** "Account changed. Reload before continuing."; nothing changes for B.
+24. From a full session, choose key replacement: confirm with the current identity, then approve with a signer holding a new identity. **Pass:** the same account and progress, the new public key, new recovery codes shown once, other sessions ended, earlier codes refused.
+25. Delete the account: confirm with the current identity and tick the confirmation. **Pass:** signed out; the same identity signing in again creates a new empty account; the device copy is kept unless removal was chosen.
+
+For every signer in section A, also record which pairing relay carried the connection (the signer's own connection screen usually shows it), whether pairing completed, and whether a valid proof came back. This is the only evidence that counts as relay interoperability; a reachable relay alone does not.
+
 A signer application is named as supported only after it passes A to E on a real device. Investigate and correct only failures that can be reproduced; record the rest.
 
 ## Checks

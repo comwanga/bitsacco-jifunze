@@ -42,7 +42,10 @@ function better(a: QuizScore | undefined, b: QuizScore | undefined): QuizScore |
   const rb = b.total > 0 ? b.correct / b.total : 0;
   if (rb > ra) return b;
   if (ra > rb) return a;
-  return a.at <= b.at ? a : b;
+  if (a.at !== b.at) return a.at < b.at ? a : b;
+  // Same ratio at the same instant: the attempt with more questions wins, so the result never depends on which
+  // copy is merged into which. The account API applies the identical rule.
+  return b.total > a.total ? b : a;
 }
 
 export function recordQuiz(p: Progress, key: LessonKey, correct: number, total: number, now: string): Progress {

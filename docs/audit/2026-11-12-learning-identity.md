@@ -1,5 +1,7 @@
 # Built-in learning identity: security assessment
 
+This preserves the original implementation assessment and its historical verification. The [final acceptance report](2026-11-12-final-learning-identity-feedback-acceptance.md) supersedes current-state claims below, including the original no-commit checkpoint. Owner-review annotations were updated from the explicit confirmation recorded on 2026-11-12.
+
 ## Decision before completing implementation
 
 Keep the existing NIP-98 challenge verifier, PostgreSQL accounts/progress, HttpOnly sessions, recovery scope and identity replacement transaction. Generate a separate secp256k1 learning key with `nostr-tools/pure` in the browser, commit it to IndexedDB before authentication, and submit only signed, purpose-bound proofs. A public key or browser marker is never authentication.
@@ -32,7 +34,7 @@ Local checks use the real browser application, API and fresh throwaway PostgreSQ
 
 An account owner marker prevents server-side mixing; it is not encryption of locally retained progress. A learner who deliberately retains local work leaves it readable to people using that browser/profile. Unsynchronized work remains on the device to avoid data loss and the UI warns about it. A shared/unlocked profile, deliberately retained signing identity, malicious extension, same-origin compromise or compromised device cannot provide confidentiality between people. Use the default sign-out removal on shared devices; export unsent work privately before clearing site data. Do not interpret the isolation tests as protection against these threats.
 
-Kiswahili additions remain drafts pending owner review. Chromium automation is not physical-phone or live external-signer interoperability acceptance. Nothing was deployed.
+Owner confirmation recorded 2026-11-12 supersedes the implementation-time pending review: the learning identity/account Kiswahili review is completed; actual review date unspecified. Chromium automation is not physical-phone or live external-signer interoperability acceptance. Nothing was deployed.
 
 ### Completed checks
 
@@ -55,6 +57,10 @@ Kiswahili additions remain drafts pending owner review. Chromium automation is n
 
 ### Remaining acceptance and operational limits
 
-Kiswahili wording needs owner/native-language review. Real phones, Firefox/Safari authenticated flows and real external signer applications have not been certified by these local Chromium/simulated-signer checks. Browser-storage loss of **unsynchronized** work cannot be recovered from PostgreSQL; keep a private progress export when offline. Recovery codes and device-key deletion do not defeat an unlocked/compromised profile, XSS, malware, profile backups or forensic recovery.
+The owner confirmed completed Kiswahili review of the learning identity/account experience on 2026-11-12; actual review date unspecified. This is owner review, not independent specialist certification. New feedback helper copy and the separately recorded advanced remote-signer terminology are outside that attestation. Real phones, Firefox/Safari authenticated flows and real external signer applications have not been certified by these local Chromium/simulated-signer checks. Browser-storage loss of **unsynchronized** work cannot be recovered from PostgreSQL; keep a private progress export when offline. Recovery codes and device-key deletion do not defeat an unlocked/compromised profile, XSS, malware, profile backups or forensic recovery.
 
 Staging configuration, tester enrollment and production were not changed. Generated staging identities still require explicit operator allowlisting of the public key. The working tree is on `feat/learning-identity`; no commit, push or deployment was made. The pre-existing `debug.log` was left alone.
+
+## Final-integration addendum — 2026-11-12
+
+The owner confirmed the learning identity/account Kiswahili review is complete. `confirmationDate` records 2026-11-12 and `reviewDate` remains null, as expressly requested. Earlier completed checks above are historical evidence from the implementation task, not fresh executions for final feedback integration. The implementation was preserved in SSH-signed commit `f3bf8f2abc58ef7ac3141520e370dd72b3f4db97`. See [final acceptance report](2026-11-12-final-learning-identity-feedback-acceptance.md) for new checks, focused security/privacy findings and staging blockers.

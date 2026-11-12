@@ -1,26 +1,26 @@
 # Railway staging safeguards
 
-Last verified on **2026-11-12**, after the Nostr Stage 1–5 deployment. Staging remains separate from the [anonymous production service](production.md).
+Last re-verified **2026-11-12: 17:46 UTC metadata/browser observations and 18:01 UTC running-API allowlist/read-only database counts**; rollback metadata was inspected at 17:33 UTC. No deployment, variable, allowlist or service changes were made in this finalization. See the [final acceptance record](../audit/2026-11-12-final-learning-identity-feedback-acceptance.md) for scope and blocked scenarios.
 
 | Item | Verified state |
 | --- | --- |
 | Project / environment | `bitsacco-jifunze` / `staging` (`1b138f86-2127-4c52-9142-868ecdf75460`) |
 | Public origin | `https://staging.bitsaccojifunze.xyz`; noindex/nofollow, robots disallow all |
 | Services | Public NGINX web; private Node API; private PostgreSQL |
-| Web/API source | `deploy/railway-staging`, `00fa0f04c1a17fffb753908babc81bfdda7bd585` (CI run 43237483512 passed) |
-| Web deployment | `8cb86f78-b5a5-47d0-a6da-0083600796f4` |
-| API deployment | `ca404d36-5b6c-48e5-aa70-247065f80fd2`; boot lines `auth_methods nostr=true github=true`, `tester_allowlist enforced=true github=0 nostr=0 invalid=[]` |
-| PostgreSQL deployment | `f8ac6eaf-5174-4157-9064-8304c295fe4e` (unchanged); migration `0002_progress` applied; 0 accounts, identities, sessions and progress rows |
+| Web/API source | `deploy/railway-staging`, `a480c762cbbc91360274d5ec19a7e5a64467b423`; the later learning-identity/feedback commits are not deployed |
+| Web deployment | `5da76575-a7c2-4d94-8b4b-73d904112fbf`, SUCCESS |
+| API deployment | `96c450ad-1eb3-462f-a607-e1b474f48efa`, SUCCESS; staging origin and private database domain verified |
+| PostgreSQL deployment | `f8ac6eaf-5174-4157-9064-8304c295fe4e`, SUCCESS; fresh read-only counts at 18:01:55 UTC: **0 accounts, 0 identities, 0 sessions, 0 progress rows, 0 recovery-code rows** |
 | Status / deployment triggers | All three SUCCESS; web/API automatic deployment disabled, no triggers |
-| Authentication | `STAGING_AUTH_ENABLED=0`; neither tester variable is set, so nobody can authenticate; no signer acceptance claimed |
-| Rollback | Redeploy web `3ec6b0d077811eefacc0ebf43595b916e4449040` (was `28fb5b94`) and API `af5559514cb475cef4d7cb6df7624db72713aeb0` (was `7ad5f149`) with `serviceInstanceDeployV2`. The added table is unused by the earlier API and can stay |
+| Authentication | **`STAGING_AUTH_ENABLED=1`**, trust model `isolated-staging`; current configuration has 0 GitHub / 0 Nostr testers, so no tester can authenticate. This supersedes the earlier authentication-off snapshot; no authenticated acceptance claimed |
+| Rollback | Railway reports `canRollback=true` for current web/API images and earlier `00fa0f04` targets (`32eff7c2-e56c-4f62-9058-6d294edafda7` web; `ca404d36-5b6c-48e5-aa70-247065f80fd2` API). Eligibility inspected, not executed; this is not a database restore drill |
 | Production | `public-web` `04b97643` at `3ec6b0d`, unchanged; no API or database |
 
-To begin real signer acceptance ([procedure](../audit/2026-11-12-nip46-acceptance.md)): set `TESTER_NOSTR_PUBKEYS` with `--skip-deploys`, redeploy the API at the exact commit and confirm the boot line's count, then set `STAGING_AUTH_ENABLED=1` on web with `--skip-deploys` and redeploy web at the same commit. Each step needs authorization.
+To begin built-in identity/feedback acceptance, obtain explicit authorization to publish/deploy the reviewed signed frontend and enroll only approved generated public keys through the existing tester allowlist. Preserve other entries and verify the unchanged API or any authorized configuration-only API redeployment at its exact SHA. Authentication is already enabled; do not toggle it or infer permission for any variable/deployment change. Advanced signer acceptance has its [separate procedure](../audit/2026-11-12-nip46-acceptance.md). Each state-changing step needs explicit authorization.
 
-Before any authorized staging change, capture environment/service IDs, source SHA, deployment IDs, domains, trigger settings, configuration ETag and redacted variable comparisons. Production acceptance preserved ETag `8f3a697a57105d8e9b93c5ce9fe823e46a2d68e4d9ae01879c3e70e55c2a4c77`. Do not log secrets. Deploy only the exact reviewed SHA, verify its actual deployment metadata, and compare the baseline afterward. Never infer the source commit from a branch label or variable save.
+Before any authorized staging change, capture environment/service IDs, source SHA, deployment IDs, domains, trigger settings, configuration ETag and redacted variable comparisons. The read-only baseline has staging ETag `8f3a697a57105d8e9b93c5ce9fe823e46a2d68e4d9ae01879c3e70e55c2a4c77` and production ETag `ffc7b383dcacb52396c7a67aea11a724509c12ee332ad4c65b2d0564f74cc831`; both remained unchanged in the 17:46 UTC recheck. Do not log secrets. Deploy only the exact reviewed SHA, verify its actual deployment metadata, and compare the baseline afterward. Never infer the source commit from a branch label or variable save.
 
-Keep API/database private, authentication disabled and tester variables unchanged unless separately authorized. Do not duplicate this environment into production. The explicit isolated-staging proxy trust decision below accepts a trusted private co-tenant boundary; it does **not** approve future authenticated production. Live GitHub consent, real Nostr signer acceptance, durable off-service database backups and account-release log/privacy acceptance remain separate gates. The static production site has no account database to back up.
+Keep API/database private and preserve the current authentication flag and tester variables unless separately authorized. Do not duplicate this environment into production. The explicit isolated-staging proxy trust decision below accepts a trusted private co-tenant boundary; it does **not** approve future authenticated production. Live GitHub consent, real Nostr signer acceptance, durable off-service database backups and account-release log/privacy acceptance remain separate gates. The static production site has no account database to back up.
 
 ## Historical preparation and ingress evidence (2026-11-05)
 

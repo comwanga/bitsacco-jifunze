@@ -55,7 +55,7 @@ The controls recheck the current account and session scope before acting. Known-
 - Deletion explains the permanent server-side loss and requires an unchecked confirmation box. The device copy is kept by default. Requested removal requires the latest local copy to be covered by a confirmed server response; unsupported timestamps, work made during a request and other learners' copies are retained. A kept copy belonging to the deleted account loses that owner marker so it can later be added to a new account by explicit consent.
 - Sign out everywhere confirms the scope and retains local work. It cannot remotely erase another device's copy. The existing device-only sign-out retains its shared-device removal option and now rechecks the latest copy after the logout response.
 - The recovery form masks codes, clears a submitted code from component state, and refuses text outside the recovery-code format before any request. Lost-key guidance distinguishes recovery of this account from restoration of a secret key. Initial code saving can be skipped only through an explicit explanation of the consequences.
-- Beginner guidance keeps anonymous learning available, explains backups separate from the phone and each learner's identity on shared phones, and makes no supported-signer claim. Phone signing is still Stage 5.
+- Beginner guidance keeps anonymous learning available, explains backups separate from the phone and each learner's identity on shared phones, and makes no supported-signer claim.
 
 Run the complete compatibility suite serially, followed by the learner lifecycle suite. Each invocation starts a fresh API. This separation preserves the real recovery limit of five attempts per source per 15 minutes; tests and production rate limits are unchanged.
 
@@ -66,6 +66,24 @@ npm run e2e:allowlist
 ```
 
 See the [Stage 4 implementation record](../audit/2026-11-12-learner-account-experience.md) for checks, limitations and remaining release gates. New and changed Kiswahili remains pending owner review in `content/terminology-review.json`.
+
+### Remote signing with a signer app (Stage 5, NIP-46)
+
+The sign-in page offers "Use a signer app" beside the browser-signer (NIP-07) path. The learner pairs through a `nostrconnect://` link, the same link as a QR code, or a pasted `bunker://` address. Remote signing only replaces *who signs*: the result is the same NIP-98 event, posted to the same `verify`, `reauth` and `replace` routes and verified by the same server code. There is no second server-side authentication model.
+
+- **Loading.** `components/account/RemoteSigning.tsx` and `lib/nostr/remote.ts` (with `nostr-tools` 2.25.2 and the QR encoder) are imported only after the learner presses the button. No other page downloads them, and no relay socket exists outside an active attempt.
+- **One attempt, in memory.** Each attempt generates its own client key and pairing secret. Nothing is written to browser storage. Completion, cancellation, failure, a 120-second deadline and leaving the page all close the sockets, reject pending calls and zero the key buffers. An attempt signs at most one event, and a retry starts with new credentials, so a late answer to an earlier attempt has nothing to arrive at.
+- **What a signer may be asked.** Only `get_public_key` and `sign_event` for kind 27235, with a template limited to this origin's three proof routes. The returned event must match the template exactly, carry the paired identity and verify before it is sent. The server then verifies it again; a connection alone proves nothing.
+- **Relays.** `wss:` to public hosts only; a signer's `switch_relays` answer is validated in full before any connection. A relay closing, or sending `CLOSED` or `AUTH`, ends the attempt with a retry message. There is no reconnection inside an attempt.
+- **Challenges.** A remote challenge and its browser cookie live 120 seconds (`remote: true` on the challenge request) instead of 300. Single use and session binding are unchanged.
+- **Account condition.** Remote sign-in sends `X-Jifunze-Account: anonymous` when it starts signed out. This asserts only that the browser still has no session: if another learner signs in during pairing, the late proof answers `409 account_changed` and their session stands. The value is never an account id and grants no access. Re-authentication and key replacement keep the account id condition as before.
+- **Sensitive actions.** The content security policy permits `wss:` on the two sign-in pages only. The account page therefore opens the sign-in page in a new window for pairing and receives the signed event by same-origin `postMessage`; the challenge, the account condition and the request stay with the account page.
+
+```bash
+npm run e2e:remote-account   # same build and TEST_DATABASE_URL as e2e:account
+```
+
+That suite drives the real browser code, real NIP-44 encryption, real signatures and the real API against a **simulated** signer and relay. It is not evidence of interoperability with any signer application or phone. No signer application is named as supported until one has passed live acceptance on a device.
 
 ## Server copy of progress
 

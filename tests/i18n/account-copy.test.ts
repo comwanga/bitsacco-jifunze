@@ -3,6 +3,7 @@ import { MESSAGES } from "../../api/src/errors.ts";
 import { accountCopy, errorText } from "../../lib/account-copy.ts";
 import { nostrOnboardingCopy } from "../../lib/nostr-onboarding-copy.ts";
 import { syncCopy } from "../../lib/sync-copy.ts";
+import { accountSecurityCopy } from "../../lib/account-security-copy.ts";
 
 test("Nostr onboarding copy has complete nonempty bilingual parity", () => {
   expect(Object.keys(nostrOnboardingCopy.en).sort()).toEqual(Object.keys(nostrOnboardingCopy.sw).sort());
@@ -34,4 +35,9 @@ test("an unknown error code falls back to the general message", () => {
 test("progress sync copy has complete matching nonempty language keys", () => {
   expect(Object.keys(syncCopy.en).sort()).toEqual(Object.keys(syncCopy.sw).sort());
   for (const copy of Object.values(syncCopy)) expect(Object.values(copy).every((v) => typeof v === "string" && v.trim())).toBe(true);
+});
+
+test("account security copy has complete nonempty bilingual parity", () => {
+  expect(Object.keys(accountSecurityCopy.en).sort()).toEqual(Object.keys(accountSecurityCopy.sw).sort());
+  for (const copy of Object.values(accountSecurityCopy)) expect(Object.values(copy).every((v) => v.trim())).toBe(true);
 });

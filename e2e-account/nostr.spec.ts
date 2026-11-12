@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { accountCopy } from "../lib/account-copy";
 import { nostrOnboardingCopy } from "../lib/nostr-onboarding-copy";
+import { accountSecurityCopy } from "../lib/account-security-copy";
 import { signedEvent } from "../api/test/nostr-helper";
 import { finishWelcome, LANGS, SESSION_COOKIE, signOut, submitRecoveryCode, whoAmI } from "./helpers";
 
@@ -102,7 +103,8 @@ for (const lang of LANGS) {
       expect((await whoAmI(page)).scope).toBe("recovery");
       for (const recoveryLang of LANGS) {
         await page.goto(`/${recoveryLang}/account/recovery/`);
-        await expect(page.getByText(accountCopy[recoveryLang].error_nostr_lifecycle_pending)).toBeVisible();
+        await expect(page.getByRole("heading", { name: accountSecurityCopy[recoveryLang].replace })).toBeVisible();
+        await expect(page.getByText(accountSecurityCopy[recoveryLang].replaceHelp)).toBeVisible();
         await expect(page.getByRole("link", { name: c.replaceGithub })).toHaveCount(0);
       }
     }

@@ -35,14 +35,23 @@ export default function ProgressSync({ lang, accountId }: { lang: Lang; accountI
 
   useEffect(() => {
     let current = true;
+    let unsubscribe: (() => void) | undefined;
     void sync().then((m) => {
       if (!current) return;
       m.signedIn(accountId);
+      m.showStatus();
+      unsubscribe = m.subscribeStatus(() => {
+        if (!current) return;
+        const owns = m.ownership(accountId), status = m.persistenceStatus();
+        setView((v) => v?.confirmReplace || (owns === "unclaimed" && v?.result === "declined") ? v : {
+          owns, result: status === "expired" || status === "local" ? "signed-out" : status === "other" || status === "unclaimed" ? null : status, confirmReplace: false,
+        });
+      });
       const owns = m.ownership(accountId);
       if (owns !== "mine") setView({ owns, result: null, confirmReplace: false });
       else void run((s) => s.syncNow(), false);
     }).catch(() => { if (current) setView({ owns: "mine", result: "offline", confirmReplace: false }); });
-    return () => { current = false; };
+    return () => { current = false; unsubscribe?.(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per signed-in account
   }, [accountId]);
 
@@ -61,9 +70,10 @@ export default function ProgressSync({ lang, accountId }: { lang: Lang; accountI
 
   const status = (r: View["result"]): string | null =>
     r === "working" ? c.syncWorking
-      : r === "synced" || r === "busy" ? c.syncSaved
+      : r === "synced" ? c.syncSaved
+        : r === "busy" || r === "pending" ? c.syncPending
         : r === "offline" ? c.syncOffline
-          : r === "error" || r === "signed-out" ? c.syncError
+          : r === "signed-out" ? c.syncExpired : r === "error" ? c.syncError
             : null;
 
   return (

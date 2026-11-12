@@ -42,7 +42,30 @@ Stage 1 of the Nostr-first identity design (`docs/superpowers/specs/2026-11-12-n
 | `POST /api/auth/logout/all` | any | Revokes every session of the account |
 | `POST /api/me/delete` with `{"confirm":true}` | full, re-authenticated within 10 minutes | Deletes the account with its identities, sessions, challenges and recovery codes |
 
-Key replacement rotates the recovery codes in the same transaction: every earlier code stops working and the response carries a fresh set once, in `codes`. A caller must show them to the learner; they cannot be read again. The account pages do not use these routes yet: the recovery and account screens for Nostr are Stage 4 of the design. No secret key, seed phrase or signer password is ever sent to the API.
+Key replacement rotates the recovery codes in the same transaction: every earlier code stops working and the response carries a fresh set once, in `codes`. The Stage 4 account and recovery pages use these routes and show those codes before leaving the replacement flow. No secret key, seed phrase or signer password is ever sent to the API.
+
+### Learner account controls (Stage 4)
+
+`components/account/AccountSecurity.tsx` loads only after `/api/me` confirms a Nostr identity. Regenerating recovery codes, replacing a key from a full session, and deleting an account first request a fresh proof from the existing identity. A separate confirmation then performs the change; confirming identity alone changes no key or codes. A rejected, expired or mismatched proof cannot advance the flow. Key replacement from a restricted recovery session uses the recovery code as its authority and asks the learner to select a new identity inside their signer.
+
+The controls recheck the current account and session scope before acting. Known-account requests also carry `X-Jifunze-Account`, a non-secret **expectation**, not an account selector or credential. The API compares it with the authenticated cookie's account and returns `409 account_changed` before calling any handler if they differ. This closes the gap where another tab signs in after a page's check but before its mutation, including a progress upload. A caller cannot use the header to read or write another account; no cookie still means `401`. The condition is optional for compatibility with existing clients, which remain scoped to their cookie. The browser uses it whenever it already knows the account. The value never appears in the interface or request logs.
+
+- Replacement preserves the account and server progress, ends earlier sessions and shows the atomic response's new codes once. Codes remain in component memory, never a URL or browser storage. Copy/download remain deliberate actions; download URLs are revoked. Leaving warns while codes are displayed, and page-hide clears the component's codes so a restored page does not offer that set again.
+- A missing response to a sensitive action is treated as an uncertain outcome, not a failed transaction. The confirmation button is disabled and the learner is directed to check the account before starting another attempt.
+- Deletion explains the permanent server-side loss and requires an unchecked confirmation box. The device copy is kept by default. Requested removal requires the latest local copy to be covered by a confirmed server response; unsupported timestamps, work made during a request and other learners' copies are retained. A kept copy belonging to the deleted account loses that owner marker so it can later be added to a new account by explicit consent.
+- Sign out everywhere confirms the scope and retains local work. It cannot remotely erase another device's copy. The existing device-only sign-out retains its shared-device removal option and now rechecks the latest copy after the logout response.
+- The recovery form masks codes, clears a submitted code from component state, and refuses text outside the recovery-code format before any request. Lost-key guidance distinguishes recovery of this account from restoration of a secret key. Initial code saving can be skipped only through an explicit explanation of the consequences.
+- Beginner guidance keeps anonymous learning available, explains backups separate from the phone and each learner's identity on shared phones, and makes no supported-signer claim. Phone signing is still Stage 5.
+
+Run the complete compatibility suite serially, followed by the learner lifecycle suite. Each invocation starts a fresh API. This separation preserves the real recovery limit of five attempts per source per 15 minutes; tests and production rate limits are unchanged.
+
+```bash
+npm run e2e:account -- --workers=1
+npm run e2e:learner-account
+npm run e2e:allowlist
+```
+
+See the [Stage 4 implementation record](../audit/2026-11-12-learner-account-experience.md) for checks, limitations and remaining release gates. New and changed Kiswahili remains pending owner review in `content/terminology-review.json`.
 
 ## Server copy of progress
 
@@ -78,7 +101,9 @@ Stage 3 connects the device copy to the account copy (`lib/progress/sync.ts`, `c
 
 - **Sign-out:** when the device holds this account's progress, the learner chooses to remove it from the device (the default) or keep a copy. It is removed only after a final sync has confirmed the account holds everything; otherwise it is kept and the page says so.
 - **Timestamps:** an imported file's readable timestamps are rewritten as the same instant in the canonical UTC form. An unreadable one stays on the device unchanged and is left out of the upload; no time is invented. If the device clock is ahead, values still in the server's future are held back and sent once that time has passed.
-- **Not built yet:** phone signing (NIP-46), and the recovery and key-replacement screens. No learner's progress is sent to a Nostr relay.
+- **Persistence visibility (Stage 4):** a small polite live status below lesson completion distinguishes local saving, pending work, confirmed account saving, offline work, a merge decision, another account's device copy and an ended session. Anonymous status is rendered with the lesson and loads no sync code. Signed-in status uses the existing lazy module and local storage events, not another polling loop. An expired-session marker lets later lessons explain the pause without retrying the API. No account id appears in this status.
+- **Confirmation accuracy (Stage 4):** a successful HTTP response is not enough to report everything saved. The server document must cover the latest canonical device copy. Otherwise the result remains `pending`, the dirty marker stays set, and the copy cannot be removed during sign-out or deletion. Withheld imported/future values do not start an endless two-second retry loop. A busy cross-tab lock is also pending, never a success.
+- **Not built yet:** phone signing (NIP-46). No learner's progress is sent to a Nostr relay.
 
 ## Logs
 

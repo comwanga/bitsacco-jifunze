@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type ApiErrorCode, type ApiResult, githubStart, type Me } from "./api";
@@ -13,12 +13,14 @@ function toLoad(res: ApiResult<Me>): Load {
   return res.code === "unauthenticated" ? { kind: "signedOut" } : { kind: "error", code: res.code };
 }
 type Codes = { kind: "idle" } | { kind: "working" } | { kind: "shown"; codes: string[] } | { kind: "done" } | { kind: "error"; code: ApiErrorCode };
+const AccountSecurity = lazy(() => import("./AccountSecurity"));
 
-/** The restricted 15-minute session after a recovery code: replace GitHub, make new codes, or sign out. */
+/** The restricted 15-minute session after a code: attach a new Nostr identity, or use retained GitHub compatibility. */
 export function Recovery({ lang }: { lang: Lang }) {
   const c = accountCopy[lang];
   const [load, setLoad] = useState<Load>({ kind: "loading" });
   const [codes, setCodes] = useState<Codes>({ kind: "idle" });
+  const [recovered, setRecovered] = useState(false);
 
   // The first load starts in the loading state; a retry sets it again before asking.
   function retry() {
@@ -60,6 +62,11 @@ export function Recovery({ lang }: { lang: Lang }) {
   }
 
   const github = me.identities.find((i) => i.provider === "github");
+  if (me.identities.some((i) => i.provider === "nostr")) return <>
+    {!recovered && <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.recoveryLead}</p>}
+    <Suspense fallback={<Loading lang={lang} />}><AccountSecurity lang={lang} accountId={me.account.id} recovery onSessionEnded={() => setRecovered(true)} /></Suspense>
+    {!recovered && <p className="mt-6"><SignOutLink lang={lang} /></p>}
+  </>;
   return (
     <>
       <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{c.recoveryLead}</p>

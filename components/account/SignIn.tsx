@@ -45,13 +45,19 @@ export function SignIn({ lang, github, onboarding }: { lang: Lang; github: boole
       inputRef.current?.focus();
       return;
     }
+    // Only a recovery code belongs in this form. Never forward keys, seed words or signer passwords.
+    if (!/^[A-Z2-7]{16}$/.test(code.toUpperCase().replace(/[-\s]/g, ""))) {
+      setCode(""); setFormError(c.error_recovery_invalid); inputRef.current?.focus(); return;
+    }
     setBusy(true);
     setFormError(null);
-    const res = await apiFetch("/api/auth/recovery", { method: "POST", body: { code: code.trim() } });
+    const submitted = code.trim(); setCode("");
+    const res = await apiFetch("/api/auth/recovery", { method: "POST", body: { code: submitted } });
     if (res.ok) {
       // Stay in the language the code was entered in. The API's redirect names the account's saved language,
       // which can differ, so it is not followed. A full page load on purpose: the recovery page starts fresh
       // with the new session cookie.
+      try { window.localStorage.removeItem("jifunze:account:v1"); } catch { /* storage unavailable */ }
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign(`/${lang}/account/recovery/`);
       return;
@@ -83,7 +89,7 @@ export function SignIn({ lang, github, onboarding }: { lang: Lang; github: boole
             ref={inputRef}
             id="recovery-code"
             name="code"
-            type="text"
+            type="password"
             inputMode="text"
             autoComplete="one-time-code"
             autoCapitalize="characters"

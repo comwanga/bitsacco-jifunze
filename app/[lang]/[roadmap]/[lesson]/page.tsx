@@ -16,6 +16,7 @@ import type { RoadmapId } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
 import { lessonKey } from "@/lib/progress/model";
 import { readingSequence } from "@/lib/content/navigation";
+import { syncCopy } from "@/lib/sync-copy";
 
 export const dynamicParams = false;
 
@@ -118,7 +119,7 @@ export default async function LessonPage({ params }: Params) {
       )}
 
       <div lang={lang}>
-        <MarkComplete lessonKey={key} lang={lang} />
+        <MarkComplete lessonKey={key} lang={lang} localStatus={syncCopy[lang].syncLocal} />
       </div>
       <Resources lang={lang} items={fm.resources} />
       <SourceCredit lang={lang} fm={fm} />

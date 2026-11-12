@@ -43,6 +43,8 @@ async function signIn(page: Page): Promise<void> {
 const panel = (page: Page) => page.locator("[data-progress-sync]");
 
 async function complete(page: Page, slug: string): Promise<void> {
+  // Switching tabs is a real learner action; do not ask Chromium to click a background document.
+  await page.bringToFront();
   await page.goto(`/${lang}/savers/${slug}/`);
   await page.getByRole("button", { name: discussionCopy[lang].confirm, exact: true }).click();
   await page.getByRole("button", { name: t(lang, "markComplete"), exact: true }).click();
@@ -113,6 +115,7 @@ test("progress made before signing in joins the account only after an explicit y
   await panel(d.page).getByRole("button", { name: s.syncNotNow }).click();
   await expect(panel(d.page)).toContainText(s.syncSeparate);
   await d.page.goto(`/${lang}/savers/sats-and-volatility/`); // keeps learning, signed in, without having agreed
+  await expect(d.page.locator("[data-progress-status]")).toHaveText(s.syncConsent);
   await d.page.waitForTimeout(3_000);
   expect(await inAccount(d.page)).toEqual({});
   expect(await onDevice(d.page)).toEqual(before); // untouched
@@ -148,6 +151,7 @@ test("on a shared device a second learner never receives, overwrites or uploads 
   await expect(panel(shared.page)).toContainText(s.syncOther);
   expect(await inAccount(shared.page)).toEqual({}); // nothing of the first learner reached this account
   await shared.page.goto(`/${lang}/savers/wallets-keys/`);
+  await expect(shared.page.locator("[data-progress-status]")).toHaveText(s.syncOther);
   await shared.page.waitForTimeout(3_000);
   expect(calls.filter((x) => x === "POST /api/me/progress")).toEqual([]); // and nothing is uploaded from this copy
   expect(await inAccount(shared.page)).toEqual({});
@@ -188,18 +192,26 @@ test("two tabs, offline work, reconnection and an ended session lose nothing", a
   await d.page.getByRole("button", { name: t(lang, "markComplete"), exact: true }).click();
   await expect(d.page.locator('p[aria-live="polite"]').filter({ hasText: t(lang, "markedComplete") })).toBeVisible();
   await d.page.waitForTimeout(3_000);
+  await expect(d.page.locator("[data-progress-status]")).toHaveText(s.syncOffline);
   expect((await onDevice(d.page))["savers/lightning-payments"]?.completedAt).toBeTruthy();
   expect(await stored(d.page, "jifunze:sync:dirty:v1")).toBe("1");
   // Back online: it is sent without the learner doing anything.
   await d.context.setOffline(false);
   await expect.poll(async () => (await inAccount(d.page))?.["savers/lightning-payments"]?.completedAt, { timeout: 20_000 }).toBeTruthy();
   await expect.poll(() => stored(d.page, "jifunze:sync:dirty:v1")).toBeNull();
+  await expect(d.page.locator("[data-progress-status]")).toHaveText(s.syncSaved);
 
   // The session is ended elsewhere. The next lesson is still saved on the device; syncing stops quietly.
   const ended = await d.page.evaluate(async () => (await fetch("/api/auth/logout/all", { method: "POST", headers: { "X-Jifunze": "1" }, credentials: "same-origin" })).status);
   expect(ended).toBe(204);
   await complete(d.page, "saving-together");
   await expect.poll(() => stored(d.page, "jifunze:account:v1"), { timeout: 15_000 }).toBeNull();
+  await expect(d.page.locator("[data-progress-status]")).toHaveText(s.syncExpired);
+  const pausedCalls = apiCalls(d.context);
+  await d.page.reload();
+  await expect(d.page.locator("[data-progress-status]")).toHaveText(s.syncExpired);
+  await d.page.waitForTimeout(2_500);
+  expect(pausedCalls).toEqual([]);
   expect((await onDevice(d.page))["savers/saving-together"]?.completedAt).toBeTruthy();
   expect(await stored(d.page, "jifunze:sync:dirty:v1")).toBe("1"); // still to be sent
   expect(Object.keys(await onDevice(d.page))).toHaveLength(4);

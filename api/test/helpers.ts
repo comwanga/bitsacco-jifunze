@@ -1,7 +1,7 @@
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import type { Config } from "../src/config.ts";
-import type { ErrorLogLine, ReadSession, Route, Sql } from "../src/http.ts";
+import type { ErrorLogLine, LogLine, ReadSession, Route, Sql } from "../src/http.ts";
 import { createServer } from "../src/http.ts";
 
 export const ORIGIN = "https://jifunze.test";
@@ -26,13 +26,13 @@ export function fakeConfig(over: Partial<Config> = {}): Config {
 
 export async function startServer(
   routes: Route[],
-  opts: { readSession?: ReadSession; cfg?: Config; logError?: (l: ErrorLogLine) => void } = {},
+  opts: { readSession?: ReadSession; cfg?: Config; logError?: (l: ErrorLogLine) => void; log?: (l: LogLine) => void } = {},
 ): Promise<{ base: string; close: () => Promise<void>; server: Server }> {
   const server = createServer(routes, {
     cfg: opts.cfg ?? fakeConfig(),
     sql: {} as unknown as Sql,
     readSession: opts.readSession ?? (async () => null),
-    log: () => {},
+    log: opts.log ?? (() => {}),
     logError: opts.logError ?? (() => {}),
   });
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));

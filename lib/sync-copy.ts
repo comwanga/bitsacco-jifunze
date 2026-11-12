@@ -5,6 +5,10 @@ import type { Lang } from "./i18n.ts";
 // content/terminology-review.json as awaiting review.
 
 const en = {
+  syncLocal: "Progress is saved on this device.",
+  syncConsent: "Progress is on this device only. It will join your account only if you choose to add it.",
+  syncPending: "Progress is on this device; some changes are not yet confirmed as saved to your account.",
+  syncExpired: "Account saving is paused because your session ended. Progress stays on this device.",
   syncHeading: "Progress on this device",
   syncWorking: "Saving your progress to your account…",
   syncSaved: "Your progress on this device is saved to your account.",
@@ -26,6 +30,10 @@ const en = {
 export type SyncCopy = Record<keyof typeof en, string>;
 
 const sw: SyncCopy = {
+  syncLocal: "Maendeleo yanahifadhiwa kwenye kifaa hiki.",
+  syncConsent: "Maendeleo yanahifadhiwa kwenye kifaa hiki pekee. Yataongezwa kwenye akaunti yako ukiamua kuyaongeza tu.",
+  syncPending: "Maendeleo yamehifadhiwa kwenye kifaa hiki; baadhi ya mabadiliko bado hayajathibitishwa kuwa yamehifadhiwa kwenye akaunti yako.",
+  syncExpired: "Kuhifadhi kwenye akaunti kumesitishwa kwa sababu kipindi chako kimeisha. Maendeleo yanabaki kwenye kifaa hiki.",
   syncHeading: "Maendeleo kwenye kifaa hiki",
   syncWorking: "Tunahifadhi maendeleo yako kwenye akaunti yako…",
   syncSaved: "Maendeleo yako kwenye kifaa hiki yamehifadhiwa kwenye akaunti yako.",

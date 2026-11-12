@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
-import { ACCOUNT_KEY } from "@/lib/progress/keys";
+import { ACCOUNT_KEY, STATUS_KEY } from "@/lib/progress/keys";
 import { apiFetch, type ApiErrorCode } from "./api";
 import { ErrorAlert, primaryBtn, StatusNote, textLink } from "./parts";
 
@@ -47,23 +47,25 @@ export function SignOut({ lang }: { lang: Lang }) {
     setState({ kind: "working" });
     // A last sync while the session still exists, so nothing written here is left behind unsaved.
     let saved = false;
+    let account: string | null = null;
     try {
+      account = window.localStorage.getItem(ACCOUNT_KEY);
       if (await deviceIsLinked()) saved = (await (await sync()).syncNow()) === "synced";
     } catch { /* the sync code could not be loaded: treat the work as unsent */ }
-    const res = await apiFetch("/api/auth/logout", { method: "POST" });
+    const res = await apiFetch("/api/auth/logout", { method: "POST", expectedAccount: account && account !== "?" ? account : undefined });
     // 401: there was no session to end, which is the outcome the reader asked for.
     if (!res.ok && res.code !== "unauthenticated") {
       setState({ kind: "error", code: res.code });
       return;
     }
     let outcome: Outcome = "kept";
-    try { window.localStorage.removeItem(ACCOUNT_KEY); } catch { /* storage unavailable */ }
+    try { window.localStorage.removeItem(ACCOUNT_KEY); window.localStorage.removeItem(STATUS_KEY); } catch { /* storage unavailable */ }
     if (linked) {
       try {
         const m = await sync();
         m.signedOut(); // also removes the sync timer and listeners
         if (remove) {
-          if (saved) { m.forgetDevice(); outcome = "removed"; }
+          if (saved && account && m.canForgetDevice(account)) { m.forgetDevice(); outcome = "removed"; }
           else outcome = "unsent";
         }
       } catch { if (remove) outcome = "unsent"; }

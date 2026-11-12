@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type ApiErrorCode, type ApiResult, dropQueryParams, formatDate, githubStart, queryParam, type Me } from "./api";
@@ -9,6 +9,7 @@ import { card, ErrorAlert, Loading, primaryBtn, RecoveryCodes, RetryError, secon
 
 // The progress panel, its text and the sync code are fetched only once an account is confirmed.
 type Panel = (typeof import("./ProgressSync"))["default"];
+const AccountSecurity = lazy(() => import("./AccountSecurity"));
 
 // Set just before the reader is sent to GitHub to confirm it is them, so the page can offer the new codes on return.
 // Only ever read to show a confirmation button: coming back never generates codes by itself.
@@ -53,6 +54,7 @@ export function AccountHome({ lang }: { lang: Lang }) {
   const [codes, setCodes] = useState<Codes>({ kind: "idle" });
   const [pageError, setPageError] = useState<string | null>(null);
   const [replaced, setReplaced] = useState(false);
+  const [ended, setEnded] = useState(false);
   const confirmRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -91,7 +93,10 @@ export function AccountHome({ lang }: { lang: Lang }) {
   // The session is gone (expired, or ended elsewhere): stop syncing. The device copy is left as it is.
   useEffect(() => {
     if (load.kind !== "signedOut") return;
-    try { window.localStorage.removeItem(ACCOUNT_KEY); } catch { /* storage unavailable */ }
+    try {
+      if (window.localStorage.getItem(ACCOUNT_KEY)) void import("@/lib/progress/sync").then((m) => m.sessionExpired());
+      window.localStorage.removeItem(ACCOUNT_KEY);
+    } catch { /* storage unavailable */ }
   }, [load.kind]);
   useEffect(() => {
     if (signedIn && codes.kind === "confirm") confirmRef.current?.focus();
@@ -160,13 +165,13 @@ export function AccountHome({ lang }: { lang: Lang }) {
   return (
     <>
       {banner}
-      {me.notices.map((n) => (
+      {!ended && me.notices.map((n) => (
         <p key={n.at} className="mt-6 rounded-xl border-l-4 border-sun-deep bg-dawn/20 p-4">
           {c.noticeCodeUsed.replace("{date}", formatDate(lang, n.at))}
         </p>
       ))}
 
-      <section aria-labelledby="identity-heading" className={`mt-6 ${card}`}>
+      {!ended && <section aria-labelledby="identity-heading" className={`mt-6 ${card}`}>
         <h2 id="identity-heading" className="text-xl font-bold">
           {c.identityHeading}
         </h2>
@@ -189,11 +194,13 @@ export function AccountHome({ lang }: { lang: Lang }) {
             </li>
           ))}
         </ul>
-      </section>
+      </section>}
 
-      {Panel && <Panel lang={lang} accountId={me.account.id} />}
+      {!ended && Panel && <Panel lang={lang} accountId={me.account.id} />}
 
-      <section aria-labelledby="codes-section-heading" className={`mt-6 ${card}`}>
+      {me.identities.some((i) => i.provider === "nostr") && <Suspense fallback={<Loading lang={lang} />}><AccountSecurity lang={lang} accountId={me.account.id} onSessionEnded={() => setEnded(true)} /></Suspense>}
+
+      {!ended && !me.identities.some((i) => i.provider === "nostr") && <section aria-labelledby="codes-section-heading" className={`mt-6 ${card}`}>
         <h2 id="codes-section-heading" className="text-xl font-bold">
           {c.codesSection}
         </h2>
@@ -224,12 +231,12 @@ export function AccountHome({ lang }: { lang: Lang }) {
           ? <StatusNote focus>{c.nostrSignInAgain}</StatusNote>
           : <ErrorAlert lang={lang} code={codes.code} focus />)}
         {codes.kind === "done" && <StatusNote focus>{c.newCodesDone}</StatusNote>}
-      </section>
+      </section>}
       {codes.kind === "shown" && <RecoveryCodes lang={lang} codes={codes.codes} focusOnShow onContinue={() => setCodes({ kind: "done" })} />}
 
-      <p className="mt-8">
+      {!ended && <p className="mt-8">
         <SignOutLink lang={lang} />
-      </p>
+      </p>}
     </>
   );
 }

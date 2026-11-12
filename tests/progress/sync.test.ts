@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { emptyProgress, mergeProgress, parseProgressFile, type LessonProgress, type Progress } from "../../lib/progress/model.ts";
-import { ACCOUNT_KEY, DIRTY_KEY } from "../../lib/progress/keys.ts";
+import { ACCOUNT_KEY, DIRTY_KEY, STATUS_KEY } from "../../lib/progress/keys.ts";
 import { STORAGE_KEY } from "../../lib/progress/storage.ts";
 
 // The sync module against an in-memory account service that behaves like the real one (Stage 2): it merges with
@@ -53,6 +53,8 @@ async function fakeFetch(url: string, init: RequestInit = {}): Promise<Response>
   const reply = (status: number, json: unknown) => new Response(JSON.stringify(json), { status, headers: { date: new Date(server.now).toUTCString(), "content-type": "application/json" } });
   if (typeof server.fail === "number") return reply(server.fail, { error: { code: "internal" } });
   if (!server.session) return reply(401, { error: { code: "unauthenticated" } });
+  const expected = (init.headers as Record<string, string>)["X-Jifunze-Account"];
+  if (expected && expected !== server.session) return reply(409, { error: { code: "account_changed" } });
   if (url === "/api/me") return reply(200, { scope: "full", account: { id: server.session } });
   if (url !== "/api/me/progress") return reply(404, {});
   const stored = server.accounts.get(server.session) ?? emptyProgress();
@@ -76,7 +78,7 @@ const use = (d: Device) => { device = d; vi.stubGlobal("window", windowFor(d)); 
 const listeners = new Map<string, Set<() => void>>();
 const target = { addEventListener: (t: string, f: () => void) => void (listeners.get(t) ?? listeners.set(t, new Set()).get(t)!).add(f), removeEventListener: (t: string, f: () => void) => void listeners.get(t)?.delete(f) };
 const windowFor = (d: Device) => ({ localStorage: d, dispatchEvent: () => true, ...target });
-const fire = (type: string) => { for (const f of listeners.get(type) ?? []) f(); };
+const fire = (type: string, event?: unknown) => { for (const f of listeners.get(type) ?? []) (f as (event?: unknown) => void)(event); };
 const visibility = { state: "visible" };
 
 beforeEach(async () => {
@@ -244,8 +246,9 @@ test("work written while a sync is in flight is neither overwritten nor forgotte
   await Promise.resolve();
   device.write({ "savers/during": { completedAt: T(3), lab: { passed: ["e9"] } } }); // the learner keeps working
   release();
-  expect(await running).toBe("synced");
-  expect(await again).toBe("synced");
+  expect(await running).toBe("pending");
+  expect(await again).toBe("pending");
+  expect(sync.canForgetDevice("acct-a")).toBe(false);
   expect(server.posts()).toHaveLength(1);
   expect(Object.keys(device.progress().lessons).sort()).toEqual(["savers/during", "savers/first", "savers/remote"]);
   expect(sync.unsent()).toBe(true); // the later write is still to be sent
@@ -253,6 +256,7 @@ test("work written while a sync is in flight is neither overwritten nor forgotte
   expect(await sync.syncNow()).toBe("synced");
   expect(server.accounts.get("acct-a")!.lessons["savers/during"]).toEqual({ completedAt: T(3), lab: { passed: ["e9"] } });
   expect(sync.unsent()).toBe(false);
+  expect(sync.canForgetDevice("acct-a")).toBe(true);
 });
 
 test("imported timestamps are sent as the same instant in canonical form; unreadable ones stay on the device", async () => {
@@ -263,7 +267,9 @@ test("imported timestamps are sent as the same instant in canonical form; unread
     "savers/unreadable": { completedAt: "yesterday", reflectedAt: T(1), lab: { passed: ["e1"] } },
     "savers/only-unreadable": { completedAt: "not a date" },
   })));
-  expect(await sync.syncNow()).toBe("synced");
+  expect(await sync.syncNow()).toBe("pending");
+  expect(sync.unsent()).toBe(true);
+  expect(sync.canForgetDevice("acct-a")).toBe(false);
   const sent = server.posts()[0]!.body as Progress;
   expect(sent.lessons["savers/offset"]).toEqual({ completedAt: "2026-10-01T07:00:00.000Z", quiz: { correct: 1, total: 2, at: "2026-10-01T07:30:00.000Z" } });
   expect(sent.lessons["savers/unreadable"]).toEqual({ reflectedAt: T(1), lab: { passed: ["e1"] } }); // no completion time is invented
@@ -281,7 +287,9 @@ test("a device whose clock is ahead keeps its work and sends what the server can
   device.setItem(sync.OWNER_KEY, "acct-a");
   const ahead = new Date(server.now + 3 * 3_600_000).toISOString(); // three hours in the server's future
   device.write({ "savers/past": { completedAt: T(1) }, "savers/ahead": { completedAt: ahead, reflectedAt: T(1) } });
-  expect(await sync.syncNow()).toBe("synced");
+  expect(await sync.syncNow()).toBe("pending");
+  expect(sync.unsent()).toBe(true);
+  expect(sync.canForgetDevice("acct-a")).toBe(false);
   expect(server.posts()).toHaveLength(2); // refused once, then sent without the future time
   const stored = server.accounts.get("acct-a")!.lessons;
   expect(stored["savers/past"]).toEqual({ completedAt: T(1) });
@@ -303,7 +311,7 @@ test("values the account would refuse stay on the device and do not block the re
   expect(Object.keys(sync.uploadable(p)).sort()).toEqual(["app", "lessons", "version"]);
 });
 
-test("requests carry no account identifier and use the same-origin session only", async () => {
+test("progress bodies cannot select an account; a same-origin expectation guards the cookie's scope", async () => {
   server.session = "acct-secret-id";
   device.setItem(ACCOUNT_KEY, "?");
   device.write({ "savers/a": { completedAt: T(1) } });
@@ -314,6 +322,7 @@ test("requests carry no account identifier and use the same-origin session only"
     expect(["/api/me", "/api/me/progress"]).toContain(c.url);
     expect(JSON.stringify(c.body ?? {})).not.toContain("acct-secret-id");
     expect(c.headers["X-Jifunze"]).toBe("1");
+    expect(c.headers["X-Jifunze-Account"]).toBe(c.method === "POST" ? "acct-secret-id" : undefined);
     expect(Object.keys(c.headers).map((h) => h.toLowerCase())).not.toContain("authorization");
   }
   expect(server.posts().every((c) => c.keepalive)).toBe(true);
@@ -378,7 +387,7 @@ test("leaving the page sends unsent work at once; stop() removes the timer and l
   fire("visibilitychange");
   await vi.advanceTimersByTimeAsync(10);
   expect(server.posts()).toHaveLength(1); // did not wait for the two-second timer
-  expect([...listeners.values()].reduce((n, s) => n + s.size, 0)).toBe(2);
+  expect([...listeners.values()].reduce((n, s) => n + s.size, 0)).toBe(4); // online, offline, visibility, cross-tab status
   device.write({ "savers/b": { completedAt: T(2) } });
   sync.requestSync(true);
   sync.stop();
@@ -411,4 +420,90 @@ test("an empty device copy is never treated as someone else's, whoever signed in
   expect(device.getItem(sync.OWNER_KEY)).toBe("acct-a");
   expect(Object.keys(device.progress().lessons)).toEqual(["savers/a"]);
   expect(server.accounts.has("acct-b")).toBe(false);
+});
+
+test("persistence status distinguishes anonymous, consent, foreign, pending, confirmed, offline and expired without extra requests", async () => {
+  expect(sync.persistenceStatus()).toBe("local");
+  device.write({ "savers/a": { completedAt: T(1) } });
+  signedInAs("acct-a");
+  expect(sync.persistenceStatus()).toBe("unclaimed");
+  device.setItem(sync.OWNER_KEY, "acct-b");
+  expect(sync.persistenceStatus()).toBe("other");
+  device.setItem(sync.OWNER_KEY, "acct-a");
+  expect(sync.persistenceStatus()).toBe("pending");
+  await sync.syncNow();
+  expect(sync.persistenceStatus()).toBe("synced");
+  device.write({ "savers/b": { completedAt: T(2) } });
+  expect(sync.persistenceStatus()).toBe("pending");
+  online.value = false;
+  expect(sync.persistenceStatus()).toBe("offline");
+  online.value = true;
+  server.session = null;
+  await sync.syncNow();
+  expect(sync.persistenceStatus()).toBe("expired");
+  const calls = server.calls.length;
+  sync.showStatus(); sync.requestSync(false); fire("online");
+  expect(server.calls).toHaveLength(calls);
+  expect(device.getItem(STATUS_KEY)).toBe("expired");
+});
+
+test("another tab holding the sync lock is never described as a confirmed save", async () => {
+  signedInAs("acct-a");
+  vi.stubGlobal("navigator", { onLine: true, locks: { request: (_: unknown, _options: unknown, callback: (lock: null) => string) => callback(null) } });
+  expect(await sync.syncNow()).toBe("busy");
+  expect(sync.persistenceStatus()).toBe("pending");
+  expect(sync.canForgetDevice("acct-a")).toBe(false);
+  expect(server.calls).toEqual([]);
+});
+
+test("a write after the final sync prevents removal; deletion keeps and releases only the deleted account's copy", async () => {
+  signedInAs("acct-a");
+  await sync.syncNow();
+  expect(sync.canForgetDevice("acct-a")).toBe(true);
+  device.write({ "savers/new": { completedAt: T(1) } });
+  expect(sync.canForgetDevice("acct-a")).toBe(false);
+  sync.accountDeleted("acct-a", true);
+  expect(device.progress().lessons["savers/new"]).toBeDefined();
+  expect(device.getItem(sync.OWNER_KEY)).toBeNull();
+  expect(device.getItem(ACCOUNT_KEY)).toBeNull();
+  device.setItem(sync.OWNER_KEY, "acct-b");
+  sync.accountDeleted("acct-a", true);
+  expect(device.getItem(sync.OWNER_KEY)).toBe("acct-b");
+  expect(device.progress().lessons["savers/new"]).toBeDefined();
+});
+
+test("withheld timestamps do not start an endless two-second retry loop", async () => {
+  vi.useFakeTimers();
+  signedInAs("acct-a");
+  device.setItem(sync.OWNER_KEY, "acct-a");
+  device.write({ "savers/a": { completedAt: "unreadable" } });
+  expect(await sync.syncNow()).toBe("pending");
+  await vi.advanceTimersByTimeAsync(60_000);
+  expect(server.posts()).toHaveLength(1);
+  expect(sync.canForgetDevice("acct-a")).toBe(false);
+});
+
+test("storage availability probes cannot create a status feedback loop between tabs", () => {
+  sync.showStatus();
+  const changed = vi.fn();
+  const unsubscribe = sync.subscribeStatus(changed);
+  // Every status read invokes getStorage(), which writes/removes this probe in the real browser.
+  for (let i = 0; i < 20; i++) fire("storage", { key: "jifunze:probe" });
+  fire("storage", { key: "unrelated" });
+  expect(changed).not.toHaveBeenCalled();
+  for (const key of [ACCOUNT_KEY, sync.OWNER_KEY, DIRTY_KEY, STATUS_KEY, STORAGE_KEY, null]) fire("storage", { key });
+  expect(changed).toHaveBeenCalledTimes(6);
+  unsubscribe();
+});
+
+test("a stale account marker cannot upload one learner's progress into a newly active session", async () => {
+  signedInAs("acct-a");
+  device.setItem(sync.OWNER_KEY, "acct-a");
+  device.write({ "savers/private-a": { completedAt: T(1) } });
+  server.session = "acct-b"; // cookie changed, before the other tab could update the local sign-in marker
+  expect(await sync.syncNow()).toBe("signed-out");
+  expect(server.accounts.has("acct-b")).toBe(false);
+  expect(device.progress().lessons["savers/private-a"]).toBeDefined();
+  expect(sync.unsent()).toBe(true);
+  expect(sync.persistenceStatus()).toBe("expired");
 });

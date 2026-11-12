@@ -1,5 +1,6 @@
 import { nostrOnboardingCopy } from "@/lib/nostr-onboarding-copy";
 import type { Lang } from "@/lib/i18n";
+import { accountSecurityCopy } from "@/lib/account-security-copy";
 
 const link = "font-semibold text-[var(--accent)] underline decoration-2 underline-offset-4";
 
@@ -13,5 +14,6 @@ export function NostrOnboarding({ lang }: { lang: Lang }) {
       <li><p>{c.nostrBackupStep}</p><a className={link} href="https://guides.getalby.com/user-guide/browser-extension/features/master-key" target="_blank" rel="noopener noreferrer">{c.nostrBackupGuide}</a><p className="mt-2">{c.nostrPublicHelp}</p><p className="mt-2">{c.nostrLossHelp}</p></li>
       <li>{c.nostrReturnStep}</li>
     </ol>
+    <p>{accountSecurityCopy[lang].backupHelp}</p>
   </div>;
 }

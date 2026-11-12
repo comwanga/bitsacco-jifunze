@@ -13,7 +13,7 @@ import {
   type ParseError,
   type Progress,
 } from "./model.ts";
-import { ACCOUNT_KEY, DIRTY_KEY } from "./keys.ts";
+import { ACCOUNT_KEY, DIRTY_KEY, STATUS_KEY } from "./keys.ts";
 import { getStorage, loadProgress, saveProgress, STORAGE_KEY } from "./storage.ts";
 
 const SERVER_SNAPSHOT: Progress = emptyProgress();
@@ -49,7 +49,10 @@ function onStorage(e: StorageEvent): void {
 function syncSoon(wrote: boolean): void {
   try {
     const storage = getStorage();
-    if (!storage?.getItem(ACCOUNT_KEY)) return;
+    if (!storage?.getItem(ACCOUNT_KEY)) {
+      if (storage?.getItem(STATUS_KEY) === "expired") void import("./sync.ts").then((m) => m.showStatus()).catch(() => {});
+      return;
+    }
     if (wrote) storage.setItem(DIRTY_KEY, "1");
   } catch {
     return;

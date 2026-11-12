@@ -10,6 +10,7 @@ export type ErrorCode =
   | "bad_request"
   | "payload_too_large"
   | "unauthenticated"
+  | "account_changed"
   | "recovery_scope"
   | "reauth_required"
   | "recovery_invalid"
@@ -63,6 +64,7 @@ export const MESSAGES: Record<ErrorCode, { sw: string; en: string }> = {
     sw: "Tafadhali ingia kwanza ili uendelee.",
     en: "Please sign in first to continue.",
   },
+  account_changed: { sw: "Akaunti imebadilika. Pakia upya kabla ya kuendelea.", en: "Account changed. Reload before continuing." },
   recovery_scope: {
     sw: "Umeingia kwa njia ya kurejesha akaunti, ambayo inaruhusu hatua chache tu. Weka kitambulisho kipya cha kuingia kwanza.",
     en: "You signed in through account recovery, which allows only a few actions. Please set up a new way to sign in first.",

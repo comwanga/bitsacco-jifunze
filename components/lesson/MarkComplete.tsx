@@ -4,7 +4,7 @@ import { t, type Lang } from "@/lib/i18n";
 import type { LessonKey } from "@/lib/progress/model";
 import { useProgress } from "@/lib/progress/useProgress";
 
-export function MarkComplete({ lessonKey, lang }: { lessonKey: LessonKey; lang: Lang }) {
+export function MarkComplete({ lessonKey, lang, localStatus }: { lessonKey: LessonKey; lang: Lang; localStatus: string }) {
   const { progress, complete, canPersist } = useProgress();
   const doneAt = progress.lessons[lessonKey]?.completedAt;
   const ready = Boolean(progress.lessons[lessonKey]?.reflectedAt);
@@ -26,7 +26,7 @@ export function MarkComplete({ lessonKey, lang }: { lessonKey: LessonKey; lang: 
         </button>
       )}
       {!doneAt && !ready && <p id="completion-requires-reflection" className="mt-2 text-sm text-[var(--muted)]"><a href="#reflect" className="underline">{t(lang, "reflectionRequired")}</a></p>}
-      {!canPersist && <p className="mt-2 text-sm text-[var(--muted)]">{t(lang, "cannotPersist")}</p>}
+      <p lang={lang} data-progress-status={canPersist ? "local" : undefined} role="status" aria-live="polite" className="mt-2 text-sm text-[var(--muted)]">{canPersist ? localStatus : t(lang, "cannotPersist")}</p>
     </div>
   );
 }

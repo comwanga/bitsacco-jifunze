@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { accountCopy } from "@/lib/account-copy";
 import type { Lang } from "@/lib/i18n";
 import { apiFetch, type ApiErrorCode, type Me } from "./api";
@@ -13,7 +13,7 @@ type State = { kind: "loading" } | { kind: "codes"; codes: string[]; nostr: bool
  * A new account lands here once. The API issues the first set of codes exactly once per account (409 after),
  * so a reload shows "already shown" instead of new codes. The ref keeps a double-run effect from asking twice.
  */
-export function Welcome({ lang }: { lang: Lang }) {
+export function Welcome({ lang, exitGuidance }: { lang: Lang; exitGuidance: ReactNode }) {
   const c = accountCopy[lang];
   const [state, setState] = useState<State>({ kind: "loading" });
   const asked = useRef(false);
@@ -69,6 +69,7 @@ export function Welcome({ lang }: { lang: Lang }) {
         <>
           <p className="mt-2 max-w-prose text-lg text-[var(--muted)]">{state.nostr ? c.nostrWelcomeLead : c.welcomeLead}</p>
           <RecoveryCodes lang={lang} codes={state.codes} focusOnShow={false} onContinue={() => router.push(`/${lang}/account/`)} />
+          {exitGuidance}
         </>
       );
   }

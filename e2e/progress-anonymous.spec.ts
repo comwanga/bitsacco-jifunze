@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { discussionCopy } from "../lib/discussion-copy";
 import { t } from "../lib/i18n";
+import { syncCopy } from "../lib/sync-copy";
 
 // The account sync must cost an anonymous learner nothing: no request to the account service, no sync code
 // downloaded, and no sync state written, while progress is saved on the device exactly as before.
@@ -14,6 +15,7 @@ for (const lang of ["en", "sw"] as const) {
       if (u.pathname.startsWith("/_next/static/") && u.pathname.endsWith(".js")) scripts.add(u.pathname);
     });
     await page.goto(`/${lang}/savers/money-and-bitcoin/`);
+    await expect(page.locator("[data-progress-status]")).toHaveText(syncCopy[lang].syncLocal);
     await page.getByRole("button", { name: discussionCopy[lang].confirm, exact: true }).click();
     await page.getByRole("button", { name: t(lang, "markComplete"), exact: true }).click();
     await expect(page.locator('p[aria-live="polite"]').filter({ hasText: t(lang, "markedComplete") })).toBeVisible();

@@ -40,7 +40,7 @@ export type Ctx = {
 };
 export type Reply = { status: number; json?: unknown; redirect?: string; setCookies?: string[] };
 
-export type LogLine = { method: string; route: string; status: number; ms: number; accountId?: string };
+export type LogLine = { method: string; route: string; status: number; ms: number };
 export type ErrorLogLine = { method: string; route: string; name: string; stack: string };
 export type Deps = {
   cfg: Config;
@@ -171,10 +171,8 @@ export function createServer(routes: Route[], deps: Deps): Server {
   return createHttpServer((req, res) => {
     const started = Date.now();
     let routeTemplate = "(unmatched)";
-    let accountId: string | undefined;
     res.once("finish", () => {
       const line: LogLine = { method: req.method ?? "", route: routeTemplate, status: res.statusCode, ms: Date.now() - started };
-      if (accountId) line.accountId = accountId;
       log(line);
     });
 
@@ -233,11 +231,18 @@ export function createServer(routes: Route[], deps: Deps): Server {
       let session = await readSession(sql, cookies[SESSION_COOKIE]);
       // The one gate for sessions that already exist: removing a tester ends their access on every route.
       if (session && !(await accountAllowed(sql, cfg.testerAllowlist, session.accountId))) session = null;
-      if (session) accountId = session.accountId;
       if (route.auth !== "public") {
         if (!session) throw new ApiError(401, "unauthenticated");
         // A recovery session reaches only routes that opt in, whether auth is "full" or "any".
         if (session.scope === "recovery" && !route.recoveryAllowed) throw new ApiError(403, "recovery_scope");
+      }
+
+      // A precondition, never an account selector or authentication credential. The cookie remains the
+      // authority. A cached page must not act on a new learner's session after a cross-tab sign-in.
+      const expectedAccount = headerValue(req.headers["x-jifunze-account"]);
+      if (expectedAccount !== undefined) {
+        if (!session) throw new ApiError(401, "unauthenticated");
+        if (expectedAccount !== session.accountId) throw new ApiError(409, "account_changed");
       }
 
       // 6. zod

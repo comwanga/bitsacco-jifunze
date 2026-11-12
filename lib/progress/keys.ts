@@ -4,3 +4,5 @@
 export const ACCOUNT_KEY = "jifunze:account:v1";
 /** "1" while something written on this device has not been confirmed by the account. */
 export const DIRTY_KEY = "jifunze:sync:dirty:v1";
+/** Non-secret persistence status; an expired session stays visible without retrying the API. */
+export const STATUS_KEY = "jifunze:sync:status:v1";

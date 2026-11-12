@@ -64,7 +64,10 @@ test.describe("header and footer layout", () => {
             await expect(page.getByRole("main").getByRole("alert")).toContainText(accountCopy[lang].error_internal);
           }
           if (!ACCOUNTS_AVAILABLE && route.startsWith("account/")) await expect(page.locator("[data-account-unavailable]")).toBeVisible();
-          if (route === "account/signin/" && ACCOUNTS_AVAILABLE) await expect(page.locator("#nostr-help")).toBeVisible();
+          if (route === "account/signin/" && ACCOUNTS_AVAILABLE) {
+            await expect(page.locator("[data-save-progress]")).toBeVisible();
+            await expect(page.getByRole("button", { name: accountCopy[lang].continueNostr, exact: true })).toHaveCount(0);
+          }
           await expect(page.getByRole("contentinfo")).toHaveCount(1);
           const layout = await page.evaluate(() => {
             const rect = (el: Element) => {

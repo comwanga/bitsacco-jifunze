@@ -241,8 +241,10 @@ export function createServer(routes: Route[], deps: Deps): Server {
       // authority. A cached page must not act on a new learner's session after a cross-tab sign-in.
       const expectedAccount = headerValue(req.headers["x-jifunze-account"]);
       if (expectedAccount !== undefined) {
-        if (!session) throw new ApiError(401, "unauthenticated");
-        if (expectedAccount !== session.accountId) throw new ApiError(409, "account_changed");
+        // "anonymous" (never an account id) lets a sign-in attempt require that the browser is still signed
+        // out. It grants no access: a route that needs a session still answers 401 below.
+        if (!session && expectedAccount !== "anonymous") throw new ApiError(401, "unauthenticated");
+        if (session && expectedAccount !== session.accountId) throw new ApiError(409, "account_changed");
       }
 
       // 6. zod

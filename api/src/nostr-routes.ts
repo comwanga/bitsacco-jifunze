@@ -22,6 +22,7 @@ const challengeBody = z.object({
   lang: z.enum(["sw", "en"]),
   returnTo: z.string().max(200).optional(),
   purpose: z.enum(["signin", "reauth", "replace"]).optional(),
+  remote: z.literal(true).optional(),
 }).strict();
 const proofBody = z.object({ challengeId: z.uuid(), nonce: z.string().regex(/^[A-Za-z0-9_-]{43}$/) }).strict();
 
@@ -49,7 +50,7 @@ export function nostrRoutes(
     method: "POST", path: "/api/auth/nostr/challenge", auth: "public", body: challengeBody,
     handler: async ({ body, sql, cfg, ip, session }) => {
       if (!starts.hit(ip)) throw new ApiError(429, "rate_limited");
-      const { lang, returnTo, purpose = "signin" } = body as z.infer<typeof challengeBody>;
+      const { lang, returnTo, purpose = "signin", remote } = body as z.infer<typeof challengeBody>;
       let binding: { accountId: string; sessionTokenHash: Buffer } | undefined;
       if (purpose !== "signin") {
         // The challenge belongs to the session that asks for it. Re-authentication is for a full session only;
@@ -58,9 +59,10 @@ export function nostrRoutes(
         if (purpose === "reauth" && session.scope !== "full") throw new ApiError(403, "recovery_scope");
         binding = { accountId: session.accountId, sessionTokenHash: session.tokenHash };
       }
-      const ch = await createNostrChallenge(sql, lang, safeReturn(returnTo ?? null, lang), purpose, binding);
+      const lifetime = remote ? 120 : 300;
+      const ch = await createNostrChallenge(sql, lang, safeReturn(returnTo ?? null, lang), purpose, binding, lifetime);
       return { status: 200, json: { challengeId: ch.challengeId, nonce: ch.nonce, url: cfg.siteOrigin + PATHS[purpose] },
-        setCookies: [`${PREAUTH_COOKIE}=${ch.preauth}; ${COOKIE_ATTRS}; Max-Age=300`] };
+        setCookies: [`${PREAUTH_COOKIE}=${ch.preauth}; ${COOKIE_ATTRS}; Max-Age=${lifetime}`] };
     },
   }, {
     method: "POST", path: PATHS.signin, auth: "public",

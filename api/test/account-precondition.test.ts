@@ -13,6 +13,7 @@ async function fixture() {
   const writes: string[] = [], logs: LogLine[] = [];
   const session = (accountId: string): Session => ({ accountId, scope: "full", tokenHash: Buffer.alloc(32), reauthAt: new Date() });
   const server = await startServer([
+    { method: "POST", path: "/api/public", auth: "public", handler: async () => ({ status: 204 }) },
     { method: "GET", path: "/api/current", auth: "full", handler: async (c) => ({ status: 200, json: { id: c.session!.accountId } }) },
     { method: "POST", path: "/api/write", auth: "full", handler: async (c) => { writes.push(c.session!.accountId); return { status: 204 }; } },
   ], {
@@ -60,4 +61,12 @@ test("authenticated request logs contain no account, cookie or expectation ident
   expect(s.logs).toHaveLength(2);
   for (const line of s.logs) expect(Object.keys(line).sort()).toEqual(["method", "ms", "route", "status"]);
   expect(JSON.stringify(s.logs)).not.toMatch(/acct-a|acct-b|token-a|token-b|X-Jifunze-Account/i);
+});
+
+test("an anonymous sign-in condition rejects a session that appeared during pairing without granting protected access", async () => {
+  const s = await fixture();
+  expect((await fetch(`${s.base}/api/public`, { method: "POST", headers: headers(undefined, "anonymous") })).status).toBe(204);
+  expect((await fetch(`${s.base}/api/public`, { method: "POST", headers: headers("token-b", "anonymous") })).status).toBe(409);
+  expect((await fetch(`${s.base}/api/write`, { method: "POST", headers: headers(undefined, "anonymous") })).status).toBe(401);
+  expect(s.writes).toEqual([]);
 });

@@ -9,14 +9,14 @@ const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 
 /** `binding` is the initiating session: required for reauth and replace, absent for signin (a schema check enforces both). */
 export async function createNostrChallenge(
-  sql: Sql, lang: Lang, returnTo: string, purpose: Purpose = "signin", binding?: { accountId: string; sessionTokenHash: Buffer },
+  sql: Sql, lang: Lang, returnTo: string, purpose: Purpose = "signin", binding?: { accountId: string; sessionTokenHash: Buffer }, lifetimeSeconds = 300,
 ): Promise<{ challengeId: string; nonce: string; preauth: string }> {
   const nonce = randomBytes(32).toString("base64url");
   const preauth = randomBytes(32).toString("base64url");
   const [row] = await sql<{ id: string }[]>`
     insert into auth_challenges (purpose, provider, secret_hash, binding_hash, lang, return_to, account_id, session_token_hash, expires_at)
     values (${purpose}, 'nostr', ${sha256(nonce)}, ${sha256(preauth)}, ${lang}, ${returnTo},
-      ${binding?.accountId ?? null}, ${binding?.sessionTokenHash ?? null}, now() + interval '5 minutes')
+      ${binding?.accountId ?? null}, ${binding?.sessionTokenHash ?? null}, now() + ${Math.min(300, lifetimeSeconds)} * interval '1 second')
     returning id`;
   return { challengeId: row!.id, nonce, preauth };
 }

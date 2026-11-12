@@ -204,3 +204,16 @@ it("builds the exact HTTP URL from SITE_ORIGIN without weakening cookie security
   expect((result.json as { url: string }).url).toBe("http://localhost:8080/api/auth/nostr/verify");
   expect(result.setCookies![0]).toContain("Secure");
 });
+
+it("remote challenges expire after two minutes, remain single-use, and retain independent proof verification", async () => {
+  const c = await challenge({ remote: true });
+  const [row] = await sql`select extract(epoch from expires_at - created_at)::int as lifetime from auth_challenges`;
+  expect(row!.lifetime).toBe(120);
+  expect(c.response.headers.get("set-cookie")).toContain("Max-Age=120");
+  expect((await login(c)).status).toBe(200);
+  expect((await login(c)).status).toBe(401);
+  const expired = await challenge({ remote: true });
+  await sql`update auth_challenges set expires_at = now() - interval '1 second' where id = ${expired.body.challengeId}`;
+  expect((await login(expired)).status).toBe(401);
+  expect(await count("accounts")).toBe(1);
+});

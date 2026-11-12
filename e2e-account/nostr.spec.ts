@@ -47,7 +47,9 @@ for (const lang of LANGS) {
     await expect(page.getByText(c.nostrLossHelp)).toBeVisible();
     await expect(page.getByRole("link", { name: c.nostrGuide })).toHaveAttribute("href", "https://guides.getalby.com/user-guide/browser-extension/features/nostr");
     await expect(page.getByRole("link", { name: c.nostrBackupGuide })).toHaveAttribute("rel", "noopener noreferrer");
-    expect(await page.locator('input:not([type="radio"])').count()).toBe(1); // existing recovery code only
+    // Only recovery accepts text; the footer also exposes the public feedback recipient for native copying.
+    expect(await page.locator('input:not([type="radio"]):not([readonly])').count()).toBe(1);
+    await expect(page.locator('[data-feedback] input')).toHaveAttribute("readonly", "");
     expect(requests).toEqual([]);
     expect(await page.evaluate(() => [...Object.keys(localStorage), ...Object.keys(sessionStorage)].some((k) => /nostr|nsec/i.test(k)))).toBe(false);
     await page.setViewportSize({ width: 360, height: 800 });

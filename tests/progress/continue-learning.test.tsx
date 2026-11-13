@@ -28,7 +28,7 @@ describe("ContinueLearning estimates", () => {
   });
   test("offers natural Kiswahili copy", () => {
     const html = render({ ...emptyProgress(), lessons: { [key]: { reflectedAt: at } } }, "sw");
-    expect(html).toContain("Unaendelea vizuri! Endelea kujifunza.");
+    expect(html).toContain("Unaendelea vizuri! Endelea hivyo.");
     expect(html).toContain("Makadirio ya somo zima: dakika 12.");
     expect(html).toContain("Endelea kujifunza</a>");
   });

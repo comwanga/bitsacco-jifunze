@@ -151,7 +151,7 @@ const sw = {
   resumeContinue: "Endelea",
   resumeReview: "Rudia",
   continueTitle: "Endelea kujifunza",
-  continueEncouragement: "Unaendelea vizuri! Endelea kujifunza.",
+  continueEncouragement: "Unaendelea vizuri! Endelea hivyo.",
   continueEstimate: "Makadirio ya somo zima: dakika {minutes}.",
   labsTitle: "Maabara ya Lightning",
   labsBody:

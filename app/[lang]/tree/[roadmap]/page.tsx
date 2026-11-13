@@ -13,7 +13,8 @@ type Params = { params: Promise<{ lang: string; roadmap: string }> };
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, roadmap } = await params;
   const tree = buildTree(lang as Lang, roadmap);
-  return pageMetadata(lang as Lang, `tree/${roadmap}/`, `${tree.title} · ${t(lang as Lang, "viewTree")}`, tree.description);
+  // The standard path URL shows this same Tree, so it is the canonical address.
+  return pageMetadata(lang as Lang, `${roadmap}/`, `${tree.title} · ${t(lang as Lang, "viewTree")}`, tree.description);
 }
 export default async function TreePage({ params }: Params) {
   const { lang: l, roadmap } = await params;

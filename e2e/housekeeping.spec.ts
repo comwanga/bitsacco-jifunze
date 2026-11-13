@@ -12,7 +12,8 @@ test("static metadata includes lessons and language alternatives", async ({ requ
   expect(xml).toContain("/en/lightning/conclusion/");
   expect(xml.match(/<url>/g)).toHaveLength(indexablePaths().length * LANGS.length);
   expect(xml).not.toContain("/offline/");
-  expect(xml).toContain("/en/tree/lightning/");
+  expect(xml).not.toContain("/tree/"); // the standard path URL is canonical
+  expect(xml).toContain("/en/list/lightning/");
   expect(xml).toContain("/sw/simulations/channel-balances/");
   expect(xml).toContain('hreflang="sw"');
   expect(xml).toContain('hreflang="en"');

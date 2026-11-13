@@ -86,7 +86,8 @@ test("animation keeps layout stable and samples frames on a throttled phone", as
   const cdp = await context.newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/en/");
+  // The scene starts at parse time. On a throttled CPU the load event can arrive after the 3.4s sunrise, so sample from commit.
+  await page.goto("/en/", { waitUntil: "commit" });
   await expectPlaying(page);
   const metrics = await page.evaluate(async () => {
     let cls = 0;
@@ -131,7 +132,7 @@ for (const lang of ["en", "sw"] as const) {
     await expect(card).toContainText(lang === "en" ? "Sats, prices and volatility: saving in Bitcoin vs shillings" : "Sats, bei na kupanda na kushuka: kuweka akiba kwa Bitcoin na kwa shilingi");
     const duration = /^minutes: (\d+)$/m.exec(fs.readFileSync(`content/savers/${lang}/sats-and-volatility.mdx`, "utf8"))![1];
     await expect(card).toContainText(lang === "en" ? `Full lesson estimate: ${duration} minutes.` : `Makadirio ya somo zima: dakika ${duration}.`);
-    await expect(card).toContainText(lang === "en" ? "You're making progress! Keep going." : "Unaendelea vizuri! Endelea kujifunza.");
+    await expect(card).toContainText(lang === "en" ? "You're making progress! Keep going." : "Unaendelea vizuri! Endelea hivyo.");
     await expect(card.getByRole("link")).toHaveText(lang === "en" ? "Continue learning" : "Endelea kujifunza");
     await expect(card.getByRole("link")).toHaveAttribute("href", `/${lang}/savers/sats-and-volatility/`);
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem("jifunze:progress:v1")!)) ).toEqual(progress);

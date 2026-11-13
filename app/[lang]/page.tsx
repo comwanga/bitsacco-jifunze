@@ -7,6 +7,7 @@ import { PathCard } from "@/components/home/PathCard";
 import { BaobabScene } from "@/components/intro/BaobabScene";
 import { flatLessons, getGlossary, getLesson, getLibrary, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
+import { IntroReplay } from "@/components/intro/IntroReplay";
 import { introScript } from "@/lib/intro/shouldPlay";
 import { pathOrder } from "@/lib/content/navigation";
 
@@ -27,12 +28,13 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const order = paths.map(({ r }) => pathOrder(r));
   const titles = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.title])));
   const pathTitles = Object.fromEntries(paths.map(({ r }) => [r.id, r.title[lang]]));
+  const minutes = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.minutes])));
 
   return (
     <>
       {/* One dark backdrop under the three earth sections, so their fractional-pixel edges never show the page through. */}
       <div className="bg-earth">
-        <section className="bg-earth">
+        <IntroReplay>
           <script dangerouslySetInnerHTML={{ __html: introScript() }} />
           <div className="h-[clamp(300px,46svh,560px)] bg-night md:h-[clamp(400px,62svh,640px)]">
             <BaobabScene lang={lang} />
@@ -53,9 +55,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 {siteCopy[lang].heroBrowse}
               </Link>
             </div>
-            <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} />
+            <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} />
           </div>
-        </section>
+        </IntroReplay>
 
         <section id="njia" className="bg-earth pb-14 text-[#f3e9dc]" aria-labelledby="njia-title">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">

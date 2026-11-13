@@ -8,6 +8,7 @@ export function uxPageKind(file: string, lab: boolean): UxPageKind | null {
   if (route === "index.html") return "home";
   if (route === "learn/index.html") return "catalogue";
   if (route.startsWith("tree/")) return "tree";
+  if (route.startsWith("list/")) return "roadmap";
   if (route.startsWith("simulations/")) return "simulation";
   if (/^(savers|builders|lightning)\/index.html$/.test(route)) return "roadmap";
   if (/^(savers|builders|lightning)\/.+\/index.html$/.test(route)) return lab ? "lab" : "lesson";

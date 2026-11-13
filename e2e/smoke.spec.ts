@@ -26,7 +26,7 @@ test("pages never scroll sideways on a phone", async ({ page }, info) => {
 test("with reduced motion the intro never plays", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/sw/");
-  await expect(page.locator("html")).not.toHaveClass(/intro-play/);
+  await expect(page.locator("[data-home-intro]")).not.toHaveClass(/intro-play/);
   await expect(page.getByRole("group", { name: /Mbuyu/ })).toBeVisible();
 });
 

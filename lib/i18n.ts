@@ -151,6 +151,8 @@ const sw = {
   resumeContinue: "Endelea",
   resumeReview: "Rudia",
   continueTitle: "Endelea kujifunza",
+  continueEncouragement: "Unaendelea vizuri! Endelea hivyo.",
+  continueEstimate: "Makadirio ya somo zima: dakika {minutes}.",
   labsTitle: "Maabara ya Lightning",
   labsBody:
     "Njia ya Lightning ina maabara yake. Nodi za majaribio zinaendeshwa kwenye kompyuta yako kupitia Docker, na unaandika amri na Python ndani ya somo lenyewe. Unahitaji kompyuta ndogo (laptop).",
@@ -320,6 +322,8 @@ const en: Record<DictKey, string> = {
   resumeContinue: "Continue",
   resumeReview: "Review",
   continueTitle: "Continue learning",
+  continueEncouragement: "You're making progress! Keep going.",
+  continueEstimate: "Full lesson estimate: {minutes} minutes.",
   labsTitle: "The Lightning lab",
   labsBody:
     "The Lightning path comes with a lab. Test nodes run on your own laptop through Docker, and you write commands and Python inside the lesson itself. You need a laptop.",

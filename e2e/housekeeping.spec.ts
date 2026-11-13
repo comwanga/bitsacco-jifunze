@@ -12,7 +12,8 @@ test("static metadata includes lessons and language alternatives", async ({ requ
   expect(xml).toContain("/en/lightning/conclusion/");
   expect(xml.match(/<url>/g)).toHaveLength(indexablePaths().length * LANGS.length);
   expect(xml).not.toContain("/offline/");
-  expect(xml).toContain("/en/tree/lightning/");
+  expect(xml).not.toContain("/tree/"); // the standard path URL is canonical
+  expect(xml).toContain("/en/list/lightning/");
   expect(xml).toContain("/sw/simulations/channel-balances/");
   expect(xml).toContain('hreflang="sw"');
   expect(xml).toContain('hreflang="en"');
@@ -27,7 +28,7 @@ test("a lesson opened through in-app navigation reloads offline", async ({ page,
   test.skip(info.project.name !== "desktop", "one browser is enough for the service worker");
   await page.goto("/en/savers/");
   await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
-  await page.locator('main a[href="/en/savers/wallets-keys/"]').click();
+  await page.locator('[data-tree-lesson="wallets-keys"] h3 a').click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Wallets");
   await page.waitForFunction(async () => Boolean(await (await caches.open("pages-v1")).match("/en/savers/wallets-keys/")));
   await context.setOffline(true);

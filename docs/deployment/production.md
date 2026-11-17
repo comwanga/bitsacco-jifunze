@@ -10,10 +10,10 @@ Verified 13 November 2026 (Africa/Nairobi). Deployment and CI timestamps use UTC
 | Railway project | `bitsacco-jifunze` / `9a7612e6-649f-44ca-91db-45977f0a8c41` |
 | Environment | `production` / `efc4e6ac-67f5-4e98-bffa-89095e2ef0d0` |
 | Service | `public-web` / `f2834873-d0f4-4248-aa52-ba5db5625a53` |
-| Deployed commit | `078807ca96914cca67379ff46e9b1aef88ea1d5a`, merge of [PR #26](https://github.com/comwanga/bitsacco-jifunze/pull/26) |
-| Deployment | `6fc46ae1-dd08-4e33-8663-278fcf44de0e`, SUCCESS |
-| Image | `sha256:4b47d6de74bf8a1240c5bd71f10a530fafeffb8f622774a2f3d2b5a5e867866d` |
-| Previous deployment | `04b97643-9ff7-45dd-ab39-433c68a2437b` / `3ec6b0d`; rollback-eligible before and after this release |
+| Deployed commit | `b02ead0392ea6ede559daf569d66d22471f523fb`, merge of [PR #28](https://github.com/comwanga/bitsacco-jifunze/pull/28) |
+| Deployment | `57eb7df9-1a4f-477c-99a3-38601b4801bd`, SUCCESS |
+| Image | `sha256:9db25b6739c6c5150c12503abb0ed767fd17e622273f94834402163bdc16af02` |
+| Previous deployment | `6fc46ae1-dd08-4e33-8663-278fcf44de0e` / `078807c` (image `sha256:4b47d6de74bf8a1240c5bd71f10a530fafeffb8f622774a2f3d2b5a5e867866d`); rollback-eligible before and after this release |
 | Runtime | Root Dockerfile; Next.js static export; non-root NGINX |
 | Capacity | One SFO replica, 0.25 vCPU, 96 MiB |
 | Port / startup health | `8080` / `/en/` |
@@ -38,7 +38,7 @@ The existing entrypoint rejects API/proxy-trust settings, an incorrect productio
 
 ## Deployment and rollback
 
-1. Confirm approval for the intended release and a successful CI run on its exact SHA. The current release passed [CI run 43315504797](https://github.com/comwanga/bitsacco-jifunze/actions/runs/43315504797) (`check`, `account`, `lab`).
+1. Confirm approval for the intended release and a successful CI run on its exact SHA. The current release passed [CI run 43371934861](https://github.com/comwanga/bitsacco-jifunze/actions/runs/43371934861) (`check`, `account`, `lab`).
 2. Capture the production service/configuration, public variables, limits, domains, active deployment and rollback eligibility. Capture the [staging baseline](railway-staging.md) separately. Do not log raw secret values.
 3. Keep automatic deployment off. Use `serviceInstanceDeployV2` with the production environment/service IDs above and the full reviewed `commitSha`. A source branch label or stored source-configuration SHA is not proof of the fetched commit; the existing configuration can retain an older pin. Do not substitute a checkout or update unrelated settings.
 4. Confirm the deployment's actual `meta.commitHash`, image digest, successful NGINX startup and health. Retain the existing origin, static mode, domain and capacity.
@@ -51,11 +51,13 @@ Ordinary source deployments do not require DNS changes. Preserve the apex ALIAS/
 
 ## Live acceptance
 
-The owner authorized this production deployment on 13 November 2026. Live Chromium checks on the official HTTPS origin passed **36 cases**, with **two declared mobile skips** for shared static-metadata/service-worker cases already covered on desktop. Coverage includes English/Kiswahili feedback as a single mailto link, keyboard/no-JavaScript use, responsive layout and axe scans, quizzes, stale-tab progress, export/import and quiz import order, offline reloads, retired account routes and deliberate-only local-lab contact.
+The owner authorized this production deployment on 13 November 2026. It adds the replaying welcome scene, full-lesson estimates on the Continue Learning card and Tree as the default path view. Live Chromium checks on the official HTTPS origin passed **65 cases**, with **five declared skips**: three mobile static-metadata/service-worker cases already covered on desktop, and two phone-only cases skipped on desktop. Coverage includes welcome-scene replay on reload, client returns, new tabs and sessions, reduced motion, the Continue Learning estimate in both languages, Tree as the default with List preserved (also without JavaScript), English/Kiswahili feedback as a single mailto link, responsive layout, quizzes, stale-tab progress, export/import and quiz import order, offline reloads and retired account routes. Accessibility scans in this live run covered the Continue Learning card; the full axe suite ran in the exact-commit CI build.
 
-All 130 sitemap pages returned 200 with production canonical URLs, indexable metadata, security headers, the strict page CSP and no session cookies or account/copy controls. The 20 HTTP acceptance checks also verified robots/sitemap behavior, HTTP-to-HTTPS redirection, API rejection/no-store, all ten retired account URLs, and the English book's MIME, 9,112,090-byte length and source-manifest SHA-256. Performance budgets belong to the successful exact-commit CI build; no live production performance score is inferred from functional browser checks. Phone coverage is device emulation, not physical-device or screen-reader certification.
+The first live run had two failures, both the same replay case on desktop and mobile: the test clicked the brand link before the preceding page change had completed. The test now waits for that navigation, and the rerun above passed without changing the deployed site.
 
-The public variables, limits, domain, deployment controls and staging services were preserved. Raw operator evidence remains locally under ignored `.superpowers/production-release-2026-11-13/`; a fresh clone does not require those files to build the site.
+All 130 sitemap pages returned 200 with production canonical URLs (the `/tree/` aliases point to the standard path URL and are not listed), indexable metadata, security headers, the strict page CSP and no session cookies or account/copy controls. The 20 HTTP acceptance checks also verified robots/sitemap behavior, HTTP-to-HTTPS redirection, API rejection/no-store, all ten retired account URLs, and the English book's MIME, 9,112,090-byte length and source-manifest SHA-256. Performance budgets belong to the successful exact-commit CI build; no live production performance score is inferred from functional browser checks. Phone coverage is device emulation, not physical-device or screen-reader certification.
+
+The public variables, limits, domain, deployment controls and staging services were preserved. Raw operator evidence remains locally under ignored `.superpowers/production-release-2026-11-13-pr28/`; a fresh clone does not require those files to build the site.
 
 ## Operations
 

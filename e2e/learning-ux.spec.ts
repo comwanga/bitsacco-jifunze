@@ -39,6 +39,8 @@ test("homepage replays on reload, client returns, another tab and a new session 
   // A previous visit's timer must not settle this newer visit early.
   await expect(page.locator("[data-home-intro]")).not.toHaveClass(/intro-play/, { timeout: 7000 });
   await page.getByRole("link", { name: "Browse all lessons", exact: true }).click();
+  // Wait for the page change: on a real network the brand click could land while still on the homepage.
+  await expect(page).toHaveURL(/\/en\/learn\/$/);
   await page.locator("header [data-brand]").click();
   await expectPlaying(page);
   const tab = await context.newPage();

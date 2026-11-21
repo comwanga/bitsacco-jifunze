@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     title: { default: t(l, "siteName"), template: `%s | ${t(l, "siteName")}` },
     description: t(l, "heroLead"),
     manifest: "/manifest.webmanifest",
-    icons: { icon: "/logo.svg", apple: "/icons/apple-touch-icon.png" },
+    icons: { icon: "/logo.svg", apple: "/icons/jifunze-apple-touch-180.png" },
   };
 }
 

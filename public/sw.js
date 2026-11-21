@@ -24,7 +24,7 @@ const PRECACHE = [
   "/sw/offline/",
   "/en/offline/",
   "/manifest.webmanifest",
-  "/icons/icon-192.png",
+  "/icons/jifunze-192.png",
   "/logo.svg",
 ];
 

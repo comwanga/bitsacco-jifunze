@@ -4,13 +4,23 @@ import { expect, test } from "vitest";
 
 const src = fs.readFileSync(path.join(import.meta.dirname, "../../public/sw.js"), "utf8");
 const fakeSelf = { addEventListener: () => {}, location: { origin: "http://x" } };
-const sw = new Function("self", "caches", "fetch", `${src}; return { pageOfData, langOf, staleCaches, cacheableStatic, staticAssetsOf };`)(fakeSelf, {}, () => {}) as {
+const sw = new Function("self", "caches", "fetch", `${src}; return { pageOfData, langOf, staleCaches, cacheableStatic, staticAssetsOf, PRECACHE };`)(fakeSelf, {}, () => {}) as {
   pageOfData(p: string): string | null;
   langOf(p: string): string;
   staleCaches(keys: string[]): string[];
   cacheableStatic(p: string): boolean;
   staticAssetsOf(html: string): string[];
+  PRECACHE: string[];
 };
+
+test("every precached static file exists, so install's addAll cannot fail on a renamed asset", () => {
+  const files = sw.PRECACHE.filter((p) => !p.endsWith("/"));
+  expect(files).toContain("/manifest.webmanifest");
+  for (const p of files) {
+    expect(fs.existsSync(path.join(import.meta.dirname, "../../public", p)), p).toBe(true);
+    expect(sw.cacheableStatic(p), p).toBe(true);
+  }
+});
 
 test("offline precaching uses real asset tags and skips legacy-only scripts and serialized paths", () => {
   const html = '<script src="/_next/static/modern.js"></script><script src="/_next/static/polyfill.js" noModule=""></script>' +

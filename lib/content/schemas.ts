@@ -121,7 +121,8 @@ export const WorldGroupSchema = z.object({
   line: LocalizedSchema,
   lat: z.number().min(-90).max(90),
   lon: z.number().min(-180).max(180),
-  source: z.string().url(),
+  // Same rule as lesson resources: sources must be https links.
+  source: z.string().regex(/^https:\/\/[^\s]+$/, "sources must be https links"),
 });
 export const WorldGroupsSchema = z
   .array(WorldGroupSchema)

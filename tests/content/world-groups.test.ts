@@ -17,3 +17,9 @@ test("duplicate ids are rejected", () => {
   const g = getWorldGroups();
   expect(WorldGroupsSchema.safeParse([g[0], g[0], ...g.slice(2)]).success).toBe(false);
 });
+
+test("sources must be https links", () => {
+  const g = getWorldGroups();
+  for (const bad of ["http://example.org/paper.pdf", "javascript:alert(1)"])
+    expect(WorldGroupsSchema.safeParse([{ ...g[0], source: bad }, ...g.slice(1)]).success, bad).toBe(false);
+});

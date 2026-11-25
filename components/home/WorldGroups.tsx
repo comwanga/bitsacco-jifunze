@@ -16,7 +16,7 @@ export function WorldGroups({ lang, groups, map }: { lang: Lang; groups: WorldGr
       <ul data-world-list className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map((g) => (
           <li key={g.id}>
-            <details className="group rounded-xl border border-[var(--line)] bg-[var(--card)] px-4 py-3">
+            <details className="rounded-xl border border-[var(--line)] bg-[var(--card)] px-4 py-3">
               <summary className="cursor-pointer font-semibold">
                 <span>{g.name}</span>
                 <span className="font-normal text-[var(--muted)]"> · {g.place[lang]}</span>

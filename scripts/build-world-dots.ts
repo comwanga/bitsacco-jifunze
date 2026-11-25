@@ -1,7 +1,8 @@
 // Builds public/images/world-dots.svg, the dot-pattern world map on the homepage. Run by hand, not in `npm run build`.
 //
 // Data: Natural Earth 1:110m land (public domain), downloaded once outside the repo and never committed.
-//   Source: https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson
+//   Version: Natural Earth v4.1.0 GeoJSON, natural-earth-vector commit 693f114 (2020-12-13, "v4.1.0 geojsons").
+//   Source (pinned): https://raw.githubusercontent.com/nvkelso/natural-earth-vector/693f11422f4e08d2da4566b854dda53eb7c39fb3/geojson/ne_110m_land.geojson
 //   Retrieved 2026-11-25, 138160 bytes, SHA-256 9e0729ee253ca7d7a5c4ae9395fb1902264c5377c52e224d13dd85010e2835d9
 // Usage: node scripts/build-world-dots.ts <path/to/ne_110m_land.geojson> public/images/world-dots.svg
 //

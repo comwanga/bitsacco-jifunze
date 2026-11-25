@@ -1,6 +1,6 @@
 # Homepage redesign: savings circle, starting points, questions and world map
 
-Status: owner decisions recorded 2026-11-25; awaiting approval of the full design. Builds on Batch 1 (`2026-11-25-homepage-repositioning-design.md`), which is implemented on `feat/community-finance-homepage`.
+Status: approved by the owner on 2026-11-25 and implemented; this document reflects the build as signed off, including the owner's changes during implementation (see Owner decisions). Builds on Batch 1 (`2026-11-25-homepage-repositioning-design.md`), which is implemented on `feat/community-finance-homepage`.
 
 ## Intent
 
@@ -25,7 +25,7 @@ The homepage should feel alive and polished, in the spirit of myfirstbitcoin.org
 ## Anti-goals
 
 - Homepage gzip JS above 144.9 KB (`UX_LIMITS.home`); the redesign should reduce it (baobab, intro script and lab strings are removed).
-- Any looping animation that runs longer than 5 seconds without a pause control (WCAG 2.2.2).
+- Any looping animation that runs longer than 5 seconds without a pause control (WCAG 2.2.2), with one accepted exception: the world map never pauses (owner decision 0).
 - Any number on the page not computed from repository content.
 - Copying My First Bitcoin's identity (purple palette, exact slant geometry, wording).
 - Map data or images loaded from a third-party service at runtime.
@@ -62,7 +62,7 @@ The homepage should feel alive and polished, in the spirit of myfirstbitcoin.org
    - The savings circle (see below), beside the text from `md`, below it on phones.
    - Actions: primary `Where are you starting?` linking to `#anza`; secondary `heroBrowse` to `/{lang}/learn/`.
    - The Batch 1 counts line (`[data-stats]`).
-2. **Where are you starting?** `<section id="anza">` with the Batch 1 `[data-start]` nav (same four links and order) and, for returning learners, the Batch 1 continue card (`[data-continue]`) above the tiles.
+2. **Where are you starting?** `<section id="anza">` with the Batch 1 `[data-start]` nav (same four links and order) For returning learners the Batch 1 continue card (`[data-continue]`) sits in the hero under the lead text (moved there so Continue is on the first screen on phones; compact on small screens).
 3. **01 Community Finance & Bitcoin**: the Batch 1 lead `PathCard` (`variant="lead"`, `number={1}`, outcome line). Add the three optional specializations as chips linking to `/{lang}/savers/#tree-section-<section id>` (anchors rendered by `PathTree` on the default tree view).
 4. **Three questions before you join** (slanted cards, colour progression night → teal → sun):
    - `01 Who holds the money?` → `/{lang}/savers/custody-and-fedimint/`
@@ -75,7 +75,7 @@ The homepage should feel alive and polished, in the spirit of myfirstbitcoin.org
 ### The savings circle
 
 - One inline `<svg>` (`viewBox` square) with an outer track, four arc segments, a centre disc labelled `Your savings` / `Akiba yako`, and an orange dot that travels the track. The four steps are also an ordered list (`<ol data-circle-steps>`) next to or under the SVG, so the content is text, not only graphics; the SVG is `aria-hidden`.
-- **Motion (owner decision 2):** the dot makes one lap and each step highlights in turn, finishing in **4.8 s**, then rests with all steps shown and step 4 highlighted. Running under 5 seconds with no loop meets WCAG 2.2.2 without a pause control. Under `prefers-reduced-motion: reduce` there is no animation and all steps show at once.
+- **Motion (owner decision 2, revised):** the dot loops (4.8 s per lap) and each step lights for a quarter of the lap. Pointing at a step pauses the circle with that step and its arc lit; moving away resumes; after the jump to `#anza` it stays stopped. A "Pause the circle" switch stops it for keyboard and touch users. All motion and the switch sit inside `@supports selector(:has(*))`, so browsers that cannot pause get a still circle and no switch. Under `prefers-reduced-motion: reduce` there is no animation and no switch.
 - CSS lives in a component stylesheet imported by the server component; no client component.
 
 ### Removed
@@ -140,7 +140,8 @@ All new keys go in `lib/site-copy.ts`.
 
 - `npm run check`, `npm run build`, `npm run check:ux-budget` (home ≤ 144.9 KB and expected to fall), full `npm run e2e`.
 - Rewrite `e2e/home.spec.ts` for the new layout. New tests: hero heading and circle steps; reduced motion has no running animation; start tiles in `#anza` before the path card; exactly one `[data-path-card]` on the homepage and no Builders/Lightning card (Builders stays reachable through the catalogue `/learn/`; Lightning through the header and footer); three question links; six world entries, map image returns 200 and is in the service-worker cache after install; 320px no horizontal scroll in both languages; axe on `/sw/` and `/en/` in light and dark.
-- Phone first-screen rule: first start tile within the first screen on Pixel 5 (owner decision 1).
+- Phone first-screen rule: first start tile within the first screen on Pixel 5 in both languages; for returning learners the Continue link, also on a 320 × 568 phone (owner decision 1).
+- Accepted by the owner (2026-11-26): map labels are small at 320 px (the list carries the content); the earlier desktop "main actions on the first screen" test is superseded by the phone rule and was not replaced (desktop verified: the hero action sits well within the first screen).
 
 ## Owner decisions (2026-11-25)
 

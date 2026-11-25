@@ -332,3 +332,29 @@ for (const lang of ["en", "sw"] as const)
         : "Majina hayamaanishi sheria au hali ya kisheria iliyo sawa.",
     );
   });
+
+for (const lang of ["sw", "en"] as const)
+  test(`${lang}: on a small phone a returning learner sees Continue on the first screen without a large layout shift`, async ({ page }, info) => {
+    test.skip(info.project.name !== "mobile", "phone layout only");
+    await page.setViewportSize({ width: 320, height: 568 });
+    // A slow phone: the card hydrates after the first paint, which is when a layout shift shows up.
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+    await page.addInitScript(() => {
+      localStorage.setItem("jifunze:progress:v1", JSON.stringify({ app: "bitsacco-jifunze", version: 1, lessons: { "savers/money-and-bitcoin": { completedAt: "2026-11-01T10:00:00.000Z" } } }));
+      const w = window as unknown as { __cls: number };
+      w.__cls = 0;
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries() as unknown as { value: number; hadRecentInput: boolean }[]) if (!e.hadRecentInput) w.__cls += e.value;
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    await page.goto(`/${lang}/`);
+    const cont = page.locator("[data-continue] a").first();
+    await expect(cont).toBeVisible();
+    const box = (await cont.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(568);
+    await page.waitForTimeout(1000);
+    const cls = await page.evaluate(() => (window as unknown as { __cls: number }).__cls);
+    console.log(`${lang} small-phone CLS ${cls.toFixed(3)}, Continue bottom ${Math.round(box.y + box.height)}`);
+    expect(cls).toBeLessThan(0.1);
+  });

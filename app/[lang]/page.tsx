@@ -11,6 +11,7 @@ import { flatLessons, getLesson, getWorldGroups, listRoadmaps } from "@/lib/cont
 import { t, type Lang } from "@/lib/i18n";
 import { pathOrder } from "@/lib/content/navigation";
 import { siteStats } from "@/lib/content/site-stats";
+import { continueSlotScript } from "@/lib/home/continue-slot";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
@@ -55,7 +56,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     <>
       {/* One dark backdrop under the three earth sections, so their fractional-pixel edges never show the page through. */}
       <div className="bg-earth">
-        <section className="hero-band bg-[linear-gradient(160deg,var(--color-night)_0%,#0d3b4a_55%,var(--color-brand)_140%)] pb-8 text-white [clip-path:polygon(0_0,100%_0,100%_calc(100%-1.5rem),0_100%)] sm:pb-16">
+        <section className="bg-[linear-gradient(160deg,var(--color-night)_0%,#0d3b4a_55%,var(--color-brand)_140%)] pb-8 text-white [clip-path:polygon(0_0,100%_0,100%_calc(100%-1.5rem),0_100%)] sm:pb-16">
           <div className="mx-auto grid max-w-6xl gap-4 px-4 pt-5 sm:px-6 sm:pt-12 md:grid-cols-[1.15fr_1fr] md:items-center md:gap-12">
             <div>
               <h1 className="text-[2.2rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">
@@ -64,7 +65,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
               </h1>
               <p className="mt-2 text-base font-semibold text-dawn sm:text-2xl">{c.heroSubtitle}</p>
               <p className="mt-2 max-w-xl text-[0.9375rem] leading-snug text-[#d6e2e6] sm:mt-3 sm:text-lg sm:leading-normal">{c.heroLead}</p>
-              <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} localNote={c.progressLocal} manageLabel={c.progressManage} />
+              {/* Reserve the compact card's height on small screens before the first paint (see lib/home/continue-slot.ts). */}
+              <div data-continue-slot suppressHydrationWarning className="max-sm:data-[reserved]:min-h-[9rem]">
+                <script dangerouslySetInnerHTML={{ __html: continueSlotScript() }} />
+                <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} localNote={c.progressLocal} manageLabel={c.progressManage} />
+              </div>
             </div>
             <div>
               <SavingsCircle lang={lang} />

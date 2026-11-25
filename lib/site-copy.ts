@@ -42,6 +42,10 @@ const en = {
   questionLeave: "Can I leave with my share?",
   questionCost: "What does it really cost?",
   questionRead: "Read the lesson",
+  worldTitle: "Savings groups around the world",
+  worldLead: "Same idea, many names. The lessons apply wherever people save together.",
+  worldCaveat: "Names do not mean identical rules or legal status.",
+  worldSource: "Source",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -86,6 +90,10 @@ const sw: SiteCopy = {
   questionLeave: "Naweza kuondoka na sehemu yangu?",
   questionCost: "Gharama halisi ni kiasi gani?",
   questionRead: "Soma somo",
+  worldTitle: "Vikundi vya akiba duniani",
+  worldLead: "Wazo moja, majina mengi. Masomo haya yanafaa popote watu wanapoweka akiba pamoja.",
+  worldCaveat: "Majina hayamaanishi sheria au hali ya kisheria iliyo sawa.",
+  worldSource: "Chanzo",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

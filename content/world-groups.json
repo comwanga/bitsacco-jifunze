@@ -1,0 +1,92 @@
+[
+  {
+    "id": "chama",
+    "name": "chama",
+    "place": {
+      "sw": "Kenya",
+      "en": "Kenya"
+    },
+    "line": {
+      "sw": "Jina la Kenya la kikundi cha akiba. Vingine huzungusha malipo; vingine hujenga mfuko wa pamoja.",
+      "en": "A Kenyan name for a savings group. Some rotate payouts; others build a shared fund."
+    },
+    "lat": -1.29,
+    "lon": 36.82,
+    "source": "https://www.centralbank.go.ke/uploads/financial_inclusion/1275230559_2019%20FinAcces%20Report%20(web).pdf"
+  },
+  {
+    "id": "upatu",
+    "name": "upatu",
+    "place": {
+      "sw": "Tanzania",
+      "en": "Tanzania"
+    },
+    "line": {
+      "sw": "Jina linalotumika Tanzania kwa kikundi cha akiba na mikopo cha mzunguko.",
+      "en": "A name used in Tanzania for a rotating savings and credit group."
+    },
+    "lat": -6.79,
+    "lon": 39.21,
+    "source": "https://www.fao.org/4/y4094e/y4094e04.htm"
+  },
+  {
+    "id": "susu",
+    "name": "susu",
+    "place": {
+      "sw": "Ghana",
+      "en": "Ghana"
+    },
+    "line": {
+      "sw": "Jina linalotumika Ghana na kwingineko Afrika Magharibi kwa kikundi cha akiba na mikopo cha mzunguko.",
+      "en": "A name used in Ghana and elsewhere in West Africa for a rotating savings and credit group."
+    },
+    "lat": 5.6,
+    "lon": -0.19,
+    "source": "https://www.fao.org/4/y4094e/y4094e04.htm"
+  },
+  {
+    "id": "arisan",
+    "name": "arisan",
+    "place": {
+      "sw": "Indonesia",
+      "en": "Indonesia"
+    },
+    "line": {
+      "sw": "Jina linalotumika Indonesia kwa kikundi cha akiba na mikopo cha mzunguko.",
+      "en": "A name used in Indonesia for a rotating savings and credit group."
+    },
+    "lat": -6.21,
+    "lon": 106.85,
+    "source": "https://www.fao.org/4/y4094e/y4094e04.htm"
+  },
+  {
+    "id": "pandero",
+    "name": "pandero",
+    "place": {
+      "sw": "Peru",
+      "en": "Peru"
+    },
+    "line": {
+      "sw": "Jina linalotumika Peru kwa kikundi cha akiba na mikopo cha mzunguko.",
+      "en": "A name used in Peru for a rotating savings and credit group."
+    },
+    "lat": -12.05,
+    "lon": -77.04,
+    "source": "https://documents1.worldbank.org/curated/en/453121468331738740/pdf/WPS6025.pdf"
+  },
+  {
+    "id": "stokvel",
+    "name": "stokvel",
+    "place": {
+      "sw": "Afrika Kusini",
+      "en": "South Africa"
+    },
+    "line": {
+      "sw": "Jina la Afrika Kusini la vilabu vya akiba vinavyomilikiwa na wanachama, ambavyo vinaweza kulipa kwa mzunguko au kujenga mfuko wa pamoja.",
+      "en": "A South African name for member-owned savings clubs, which may pay out in rotation or build a shared fund."
+    },
+    "lat": -26.2,
+    "lon": 28.05,
+    "source": "https://www.cliffedekkerhofmeyr.com/practice-areas/guides/downloads/Stokvels-and-the-National-Credit-Regulator.pdf"
+  }
+]

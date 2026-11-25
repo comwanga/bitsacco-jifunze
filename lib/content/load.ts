@@ -11,6 +11,8 @@ import {
   QuizFileSchema,
   ROADMAP_IDS,
   RoadmapSchema,
+  WorldGroupsSchema,
+  type WorldGroup,
   type GlossaryTerm,
   type LessonFrontmatter,
   type LibraryItem,
@@ -93,6 +95,10 @@ export function getExercise(id: string, root: string = CONTENT_ROOT, roadmap: Ro
 
 export function getGlossary(root: string = CONTENT_ROOT): GlossaryTerm[] {
   return GlossarySchema.parse(readJson(path.join(root, "glossary.json")));
+}
+
+export function getWorldGroups(root: string = CONTENT_ROOT): WorldGroup[] {
+  return WorldGroupsSchema.parse(readJson(path.join(root, "world-groups.json")));
 }
 
 export function getLibrary(root: string = CONTENT_ROOT): LibraryItem[] {

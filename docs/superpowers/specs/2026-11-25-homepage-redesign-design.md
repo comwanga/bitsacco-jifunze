@@ -96,11 +96,13 @@ The homepage should feel alive and polished, in the spirit of myfirstbitcoin.org
 | id | name | place (en / sw) | marker |
 |---|---|---|---|
 | chama | chama | Kenya / Kenya | −1.29, 36.82 |
-| tanda | tanda | Mexico / Meksiko | 19.43, −99.13 |
+| upatu | upatu | Tanzania / Tanzania | −6.79, 39.21 |
 | susu | susu | Ghana / Ghana | 5.60, −0.19 |
 | arisan | arisan | Indonesia / Indonesia | −6.21, 106.85 |
 | pandero | pandero | Peru / Peru | −12.05, −77.04 |
 | stokvel | stokvel | South Africa / Afrika Kusini | −26.20, 28.05 |
+
+  Revised during implementation: `tanda` (Mexico) replaced by `upatu` (Tanzania) because no readable source could be verified for tanda; FAO lists upatu (Tanzania) as a ROSCA. Each entry's `source` is the document that supports it (CBK FinAccess 2019, FAO group savings resource book, World Bank WPS6025, Cliffe Dekker Hofmeyr stokvel guide).
 
   `line`: one cautious sentence each, describing it only as a local name for group savings (rotating and/or accumulating), sourced from the references already cited by the `savings-groups` lesson (World Bank WPS6025, FAO, CARE). Under the list, the caveat from that lesson: `Names do not mean identical rules or legal status.` / `Majina hayamaanishi sheria au hali ya kisheria iliyo sawa.`
 - **Offline:** add `/images/world-dots.svg` to `PRECACHE` and `cacheableStatic` in `public/sw.js`.

@@ -113,6 +113,22 @@ export const GlossaryTermSchema = z.object({
 export const GlossarySchema = z.array(GlossaryTermSchema);
 export type GlossaryTerm = z.infer<typeof GlossaryTermSchema>;
 
+// Savings-group names shown on the homepage world map. Exactly six, unique ids, real coordinates.
+export const WorldGroupSchema = z.object({
+  id: slug,
+  name: z.string().min(1),
+  place: LocalizedSchema,
+  line: LocalizedSchema,
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+  source: z.string().url(),
+});
+export const WorldGroupsSchema = z
+  .array(WorldGroupSchema)
+  .length(6)
+  .refine((groups) => new Set(groups.map((g) => g.id)).size === groups.length, { message: "world group ids must be unique" });
+export type WorldGroup = z.infer<typeof WorldGroupSchema>;
+
 export const LibraryItemSchema = z.object({
   id: slug,
   title: LocalizedSchema,

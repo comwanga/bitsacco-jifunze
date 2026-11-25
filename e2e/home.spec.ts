@@ -136,3 +136,13 @@ for (const lang of ["en", "sw"] as const)
     expect(hrefs).toEqual(["custody-and-fedimint", "cooperative-foundations", "payments-liquidity"].map((s) => `/${lang}/savers/${s}/`));
     if (lang === "en") await expect(cards.first()).toContainText("Who holds the money?");
   });
+
+for (const lang of ["en", "sw"] as const)
+  test(`${lang}: six savings-group names open to one line each`, async ({ page }) => {
+    await page.goto(`/${lang}/`);
+    const items = page.locator("[data-world-list] details");
+    await expect(items).toHaveCount(6);
+    await items.first().locator("summary").click();
+    await expect(items.first()).toHaveAttribute("open", "");
+    await expect(page.locator("[data-world]")).toContainText(lang === "en" ? "Names do not mean identical rules or legal status." : "Majina hayamaanishi sheria au hali ya kisheria iliyo sawa.");
+  });

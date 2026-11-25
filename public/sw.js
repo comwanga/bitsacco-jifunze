@@ -26,6 +26,7 @@ const PRECACHE = [
   "/manifest.webmanifest",
   "/icons/jifunze-192.png",
   "/logo.svg",
+  "/images/world-dots.svg",
 ];
 
 // The offline pages must hydrate without a connection, so cache the scripts and styles they use.
@@ -86,7 +87,7 @@ function privateNavigation(pathname) {
 
 function cacheableStatic(pathname) {
   return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/") ||
-    pathname === "/logo.svg" || pathname === "/manifest.webmanifest";
+    pathname === "/logo.svg" || pathname === "/images/world-dots.svg" || pathname === "/manifest.webmanifest";
 }
 
 async function cacheFirst(request) {

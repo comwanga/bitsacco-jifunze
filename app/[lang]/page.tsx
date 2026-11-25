@@ -6,6 +6,7 @@ import { PathCard } from "@/components/home/PathCard";
 import { SavingsCircle } from "@/components/home/SavingsCircle";
 import { JoinQuestions } from "@/components/home/JoinQuestions";
 import { WorldGroups } from "@/components/home/WorldGroups";
+import { WorldMap } from "@/components/home/WorldMap";
 import { flatLessons, getLesson, getWorldGroups, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
 import { pathOrder } from "@/lib/content/navigation";
@@ -40,6 +41,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const titleLast = words.pop();
   const titleHead = words.join(" ");
   const lead = paths.find(({ r }) => r.id === "savers")!;
+  const worldGroups = getWorldGroups();
   const specializations = lead.r.sections.filter((s) => s.optional).map((s) => ({ id: s.id, title: s.title[lang] }));
   const starts = [
     { href: `/${lang}/savers/saving-together/`, label: c.startJoin },
@@ -113,7 +115,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </div>
       <div className="bg-[var(--surface-warm)] pb-16">
         <JoinQuestions lang={lang} />
-        <WorldGroups lang={lang} groups={getWorldGroups()} />
+        <WorldGroups lang={lang} groups={worldGroups} map={<WorldMap groups={worldGroups} />} />
       </div>
     </>
   );

@@ -73,7 +73,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
               </Link>
             </div>
             <p data-stats className="mt-5 text-sm text-[#d9cbbb]">{statItems.join(" · ")}</p>
-            <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} />
+            <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} localNote={c.progressLocal} manageLabel={c.progressManage} />
           </div>
         </IntroReplay>
 

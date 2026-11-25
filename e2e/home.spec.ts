@@ -23,7 +23,9 @@ test("after a finished lesson the continue card links to the next one", async ({
   );
   await page.reload();
   const card = page.locator("[data-continue]");
-  await expect(card.getByRole("link")).toHaveAttribute("href", "/sw/savers/sats-and-volatility/");
+  await expect(card.getByRole("link", { name: /Endelea/ })).toHaveAttribute("href", "/sw/savers/sats-and-volatility/");
+  await expect(card).toContainText("Imehifadhiwa kwenye kivinjari hiki pekee.");
+  await expect(card.getByRole("link", { name: "Dhibiti maendeleo" })).toHaveAttribute("href", "/sw/progress/");
   await expect(page.locator('[data-path-card="savers"] [data-resume]')).toHaveText(/Endelea/);
 });
 

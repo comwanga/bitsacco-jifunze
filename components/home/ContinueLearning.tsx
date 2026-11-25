@@ -12,12 +12,17 @@ export function ContinueLearning({
   titles,
   pathTitles,
   minutes,
+  localNote,
+  manageLabel,
 }: {
   lang: Lang;
   paths: PathOrder[];
   titles: Record<string, string>;
   pathTitles: Record<string, string>;
   minutes: Record<string, number>;
+  /** "Saved only in this browser." Passed from the server so the bundled dictionary does not grow. */
+  localNote: string;
+  manageLabel: string;
 }) {
   const { progress } = useProgress();
   const up = continueLearning(progress, paths);
@@ -37,6 +42,12 @@ export function ContinueLearning({
       <Link href={`/${lang}/${up.roadmap}/${up.slug}/`} className="mt-3 inline-block rounded-full bg-sun-deep px-5 py-2.5 font-semibold text-white">
         {t(lang, "continueTitle")}
       </Link>
+      <p className="mt-3 text-sm text-[#e3d5c5]">
+        {localNote}{" "}
+        <Link href={`/${lang}/progress/`} className="font-semibold text-dawn underline underline-offset-4">
+          {manageLabel}
+        </Link>
+      </p>
     </div>
   );
 }

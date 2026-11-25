@@ -35,6 +35,8 @@ const en = {
   startMove: "I want to move my group to Bitcoin",
   leadOutcome: "After this path you can check a chama or SACCO before you join, compare ways to save, and plan group savings with Bitcoin.",
   buildTitle: "Build the tools communities need",
+  progressLocal: "Saved only in this browser.",
+  progressManage: "Manage progress",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -72,6 +74,8 @@ const sw: SiteCopy = {
   startMove: "Nataka kuhamishia kikundi changu kwenye Bitcoin",
   leadOutcome: "Baada ya njia hii utaweza kukagua chama au SACCO kabla ya kujiunga, kulinganisha njia za kuweka akiba, na kupanga akiba ya kikundi kwa Bitcoin.",
   buildTitle: "Jenga zana zinazohitajika na jamii",
+  progressLocal: "Imehifadhiwa kwenye kivinjari hiki pekee.",
+  progressManage: "Dhibiti maendeleo",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

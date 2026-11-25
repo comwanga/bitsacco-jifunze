@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("/ sends Kiswahili readers to the Kiswahili home", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/sw\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Karibu Jifunze");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Kagua kabla ya kuweka akiba");
 });
 
 test("the language switch keeps you on the same lesson", async ({ page }) => {

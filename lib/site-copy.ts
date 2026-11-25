@@ -39,6 +39,7 @@ const en = {
   progressManage: "Manage progress",
   glossaryTermsLabel: "Savings-group words in the glossary",
   glossarySearchAll: "Search all {n} terms",
+  notFoundNext: "Where to go next",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -80,6 +81,7 @@ const sw: SiteCopy = {
   progressManage: "Dhibiti maendeleo",
   glossaryTermsLabel: "Maneno ya vikundi vya akiba kwenye kamusi",
   glossarySearchAll: "Tafuta maneno yote {n}",
+  notFoundNext: "Unaweza kwenda wapi sasa",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

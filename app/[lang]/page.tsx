@@ -62,17 +62,17 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 {titleHead}{" "}
                 <span className="bg-[linear-gradient(transparent_78%,var(--color-sun)_78%,var(--color-sun)_90%,transparent_90%)]">{titleLast}</span>
               </h1>
-              <p className="mt-2 text-lg font-semibold text-dawn sm:text-2xl">{c.heroSubtitle}</p>
-              <p className="mt-3 max-w-xl text-base text-[#d6e2e6] sm:text-lg">{c.heroLead}</p>
+              <p className="mt-2 text-base font-semibold text-dawn sm:text-2xl">{c.heroSubtitle}</p>
+              <p className="mt-2 max-w-xl text-[0.9375rem] leading-snug text-[#d6e2e6] sm:mt-3 sm:text-lg sm:leading-normal">{c.heroLead}</p>
               <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} localNote={c.progressLocal} manageLabel={c.progressManage} />
             </div>
             <div>
               <SavingsCircle lang={lang} />
-              <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <a href="#anza" className="inline-flex rounded-full bg-sun-deep px-5 py-2.5 font-bold text-white hover:bg-[#b83c00]">
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-3 sm:gap-x-6">
+                <a href="#anza" className="inline-flex rounded-full bg-sun-deep px-4 py-2.5 text-sm font-bold text-white hover:bg-[#b83c00] sm:px-5 sm:text-base">
                   {c.heroStartCta} <span aria-hidden="true">&nbsp;↓</span>
                 </a>
-                <Link prefetch={false} href={`/${lang}/learn/`} className="font-semibold text-dawn underline-offset-4 hover:underline">
+                <Link prefetch={false} href={`/${lang}/learn/`} className="text-sm font-semibold text-dawn underline-offset-4 hover:underline sm:text-base">
                   {c.heroBrowse}
                 </Link>
               </div>

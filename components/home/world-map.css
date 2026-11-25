@@ -3,6 +3,13 @@
    Owner decision: the map never pauses, not even with the circle's switch (accepted WCAG 2.2.2 gap).
    Reduced motion (an operating-system setting) still keeps it still. */
 
+/* Skip rendering (and the per-frame animation work) while the map is off-screen; the map never pauses,
+   so this is what keeps low-end phones from repainting it continuously. */
+.world-map {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
 .world-map .map-arc {
   fill: none;
   stroke: #ff5800;

@@ -26,8 +26,9 @@ const PRECACHE = [
   "/manifest.webmanifest",
   "/icons/jifunze-192.png",
   "/logo.svg",
-  "/images/world-dots.svg",
 ];
+// Static files fetched through cacheableStatic() are answered from STATIC, so they are precached there.
+const STATIC_PRECACHE = ["/images/world-dots.svg"];
 
 // The offline pages must hydrate without a connection, so cache the scripts and styles they use.
 function staticAssetsOf(html) {
@@ -53,6 +54,7 @@ self.addEventListener("install", (event) => {
     (async () => {
       const pages = await caches.open(PAGES);
       await pages.addAll(PRECACHE);
+      await (await caches.open(STATIC)).addAll(STATIC_PRECACHE);
       await precacheAssetsOf(pages, ["/sw/offline/", "/en/offline/"]);
       await self.skipWaiting();
     })(),

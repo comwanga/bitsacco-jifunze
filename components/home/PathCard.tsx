@@ -23,25 +23,25 @@ export function PathCard({
   lessons,
   lang,
   number,
-  variant,
   outcome,
+  specializations = [],
 }: {
   roadmap: Roadmap;
   lessons: PathLesson[];
   lang: Lang;
   /** Position in the path sequence, shown as 01, 02, ... */
   number: number;
-  /** The lead path spans the row and lists its first lessons; compact paths do not. */
-  variant: "lead" | "compact";
   /** What the learner can do after the path, shown under the description. */
   outcome?: string;
+  /** Optional sections of the path, linked to their place on the path page. */
+  specializations?: { id: string; title: string }[];
 }) {
   const slugs = lessons.map((l) => l.slug);
   const minutes = lessons.reduce((m, l) => m + l.minutes, 0);
   const { optionalSections } = pathOrder(roadmap);
   const introductory = slugs.filter((s) => !optionalSections?.some((group) => group.includes(s)));
   return (
-    <article data-path-card={roadmap.id} data-variant={variant} className="relative flex flex-col pl-6">
+    <article data-path-card={roadmap.id} className="relative flex flex-col pl-6">
       <span
         aria-hidden="true"
         className="absolute top-1 bottom-0 left-0 w-[3px] rounded-full bg-gradient-to-b from-dawn via-ember/70 to-transparent"
@@ -52,7 +52,7 @@ export function PathCard({
         </span>
         {t(lang, BRANCH[roadmap.id])}
       </p>
-      <h3 id={`path-${roadmap.id}`} className={`mt-1 font-bold text-white ${variant === "lead" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"}`}>
+      <h3 id={`path-${roadmap.id}`} className="mt-1 text-3xl font-bold text-white sm:text-4xl">
         {roadmap.title[lang]}
       </h3>
       <p className="mt-2 max-w-prose text-[#d9cbbb]">{roadmap.description[lang]}</p>
@@ -60,17 +60,35 @@ export function PathCard({
       <p className="mt-2 text-sm text-[#b9a896]">
         {slugs.length} {t(lang, "lessons")}, {minutes} {t(lang, "minutes")}, {levelRange(lang, lessons)}
       </p>
-      {variant === "lead" && (
-        <ol className="mt-4 space-y-1.5 text-[15px] text-[#e9ddcf]">
-          {lessons.slice(0, 3).map((l, i) => (
-            <li key={l.slug} className="flex gap-3">
-              <span className="w-5 shrink-0 text-right text-[#9c8a78] tabular-nums">{i + 1}</span>
-              <Link prefetch={false} href={`/${lang}/${roadmap.id}/${l.slug}/`} className="hover:text-white hover:underline">
-                {l.title}
-              </Link>
-            </li>
-          ))}
-        </ol>
+      <ol className="mt-4 space-y-1.5 text-[15px] text-[#e9ddcf]">
+        {lessons.slice(0, 3).map((l, i) => (
+          <li key={l.slug} className="flex gap-3">
+            <span className="w-5 shrink-0 text-right text-[#9c8a78] tabular-nums">{i + 1}</span>
+            <Link prefetch={false} href={`/${lang}/${roadmap.id}/${l.slug}/`} className="hover:text-white hover:underline">
+              {l.title}
+            </Link>
+          </li>
+        ))}
+      </ol>
+      {specializations.length > 0 && (
+        <div className="mt-5">
+          <p id={`specializations-${roadmap.id}`} className="text-sm font-semibold text-dawn">
+            {t(lang, "chooseSpecialization")}
+          </p>
+          <ul data-specializations aria-labelledby={`specializations-${roadmap.id}`} className="mt-2 flex flex-wrap gap-2">
+            {specializations.map((s) => (
+              <li key={s.id}>
+                <Link
+                  prefetch={false}
+                  href={`/${lang}/${roadmap.id}/#tree-section-${s.id}`}
+                  className="inline-flex rounded-full border border-white/20 px-3.5 py-1.5 text-sm font-semibold text-white hover:border-dawn"
+                >
+                  {s.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       {optionalSections?.length ? <p className="mt-4 text-sm text-[#d9cbbb]">{t(lang, "introductionProgress")}</p> : null}
       <RoadmapProgress roadmap={roadmap.id} slugs={introductory} lang={lang} />

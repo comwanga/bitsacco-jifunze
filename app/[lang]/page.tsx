@@ -2,16 +2,12 @@ import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { siteCopy } from "@/lib/site-copy";
 import { ContinueLearning } from "@/components/home/ContinueLearning";
-import { HowItWorks } from "@/components/home/HowItWorks";
 import { PathCard } from "@/components/home/PathCard";
 import { SavingsCircle } from "@/components/home/SavingsCircle";
-import { flatLessons, getGlossary, getLesson, getLibrary, listRoadmaps } from "@/lib/content/load";
+import { flatLessons, getLesson, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
 import { pathOrder } from "@/lib/content/navigation";
 import { siteStats } from "@/lib/content/site-stats";
-
-// Community-finance words linked from the homepage, in this order.
-const FEATURED_TERMS = ["chama", "rosca", "quorum", "self-custody"] as const;
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
@@ -42,19 +38,13 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const titleLast = words.pop();
   const titleHead = words.join(" ");
   const lead = paths.find(({ r }) => r.id === "savers")!;
-  const tools = paths.filter(({ r }) => r.id !== "savers");
+  const specializations = lead.r.sections.filter((s) => s.optional).map((s) => ({ id: s.id, title: s.title[lang] }));
   const starts = [
     { href: `/${lang}/savers/saving-together/`, label: c.startJoin },
     { href: `/${lang}/savers/#specializations`, label: c.startMember },
     { href: `/${lang}/savers/money-and-bitcoin/`, label: c.startSolo },
     { href: `/${lang}/savers/group-payments/`, label: c.startMove },
   ];
-  const glossary = getGlossary();
-  const featuredTerms = FEATURED_TERMS.map((id) => {
-    const row = glossary.find((g) => g.id === id);
-    if (!row) throw new Error(`Homepage glossary term "${id}" is missing from content/glossary.json`);
-    return { id, label: row[lang] };
-  });
   const minutes = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.minutes])));
 
   return (
@@ -115,39 +105,10 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             <h2 id="njia-title" className="sr-only">
               {t(lang, "pathsTitle")}
             </h2>
-            <PathCard roadmap={lead.r} lessons={lead.lessons} lang={lang} number={1} variant="lead" outcome={c.leadOutcome} />
-            <h2 id="build-title" className="mt-14 text-xl font-bold text-white sm:text-2xl">
-              {c.buildTitle}
-            </h2>
-            <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-10">
-              {tools.map(({ r, lessons }, i) => (
-                <PathCard key={r.id} roadmap={r} lessons={lessons} lang={lang} number={i + 2} variant="compact" />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-earth pb-12 text-[#f3e9dc]" aria-labelledby="labs-title">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/[0.04] p-6 md:flex-row md:items-center md:justify-between md:gap-10 md:p-8">
-              <div>
-                <h2 id="labs-title" className="text-xl font-bold text-white sm:text-2xl">
-                  {t(lang, "labsTitle")}
-                </h2>
-                <p className="mt-2 max-w-2xl text-[#d9cbbb]">{t(lang, "labsBody")}</p>
-              </div>
-              <Link
-                href={`/${lang}/lightning/`}
-                className="inline-flex shrink-0 self-start rounded-full border border-dawn/60 px-5 py-2.5 font-semibold text-dawn hover:bg-dawn hover:text-earth md:self-center"
-              >
-                {t(lang, "labsCta")}
-              </Link>
-            </div>
+            <PathCard roadmap={lead.r} lessons={lead.lessons} lang={lang} number={1} outcome={c.leadOutcome} specializations={specializations} />
           </div>
         </section>
       </div>
-
-      <HowItWorks lang={lang} libraryCount={getLibrary().length} glossaryCount={glossary.length} featuredTerms={featuredTerms} />
     </>
   );
 }

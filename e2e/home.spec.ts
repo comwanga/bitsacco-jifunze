@@ -22,26 +22,6 @@ test("after a finished lesson the continue card links to the next one", async ({
   await expect(page.locator('[data-path-card="savers"] [data-resume]')).toHaveText(/Endelea/);
 });
 
-test("how it works is a four-step journey", async ({ page }) => {
-  await page.goto("/sw/");
-  const steps = page.locator("[data-loop] > li");
-  await expect(steps).toHaveCount(4);
-  await expect(steps.locator("h3")).toHaveText(["Jifunze", "Jaribu", "Tumia", "Shiriki"]);
-});
-
-test("library and glossary are cards with a clear action", async ({ page }) => {
-  await page.goto("/en/");
-  const library = page.locator('[data-resource="library"]');
-  const glossary = page.locator('[data-resource="glossary"]');
-  await expect(library).toHaveAttribute("href", "/en/library/");
-  await expect(glossary).toHaveAttribute("href", "/en/glossary/");
-  await expect(library.getByRole("heading", { name: "Library" })).toBeVisible();
-  await expect(glossary).toContainText("57 terms");
-  await expect(library).toContainText("Open the library");
-  await glossary.focus();
-  await expect(glossary).toBeFocused();
-});
-
 test("the footer groups real destinations and keeps the disclaimer and licence", async ({ page }) => {
   await page.goto("/sw/");
   const footer = page.locator("footer");
@@ -63,17 +43,6 @@ test("the hero shows computed content counts", async ({ page }) => {
   await expect(page.locator("[data-stats]")).toContainText("masomo 49");
 });
 
-test("community finance leads, builders follow as numbered tools paths", async ({ page }) => {
-  await page.goto("/en/");
-  const cards = page.locator("[data-path-card]");
-  await expect(cards).toHaveCount(3);
-  await expect(cards.nth(0)).toHaveAttribute("data-path-card", "savers");
-  await expect(cards.nth(0)).toHaveAttribute("data-variant", "lead");
-  await expect(cards.locator("[data-path-number]")).toHaveText(["01", "02", "03"]);
-  await expect(cards.nth(0)).toContainText("After this path you can check a chama or SACCO before you join");
-  await expect(page.getByRole("heading", { name: "Build the tools communities need" })).toBeVisible();
-});
-
 for (const lang of ["en", "sw"] as const)
   test(`${lang}: four starting points link to existing lessons`, async ({ page }) => {
     await page.goto(`/${lang}/`);
@@ -90,17 +59,6 @@ test("no horizontal scroll at 320px in Kiswahili", async ({ page }) => {
   await page.goto("/sw/");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
-
-for (const lang of ["en", "sw"] as const)
-  test(`${lang}: glossary term links land on real rows`, async ({ page }) => {
-    await page.goto(`/${lang}/`);
-    const links = page.locator("[data-glossary-terms] a");
-    await expect(links).toHaveCount(5);
-    const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")));
-    expect(hrefs).toEqual(["chama", "rosca", "quorum", "self-custody"].map((id) => `/${lang}/glossary/#${id}`).concat(`/${lang}/glossary/`));
-    await links.nth(2).click();
-    await expect(page.locator("#quorum")).toBeInViewport();
-  });
 
 test("the hero shows the savings circle steps in order", async ({ page }) => {
   await page.goto("/en/");
@@ -147,4 +105,24 @@ test("the hero action jumps to the starting tiles", async ({ page }) => {
   await page.getByRole("link", { name: "Where are you starting?" }).click();
   await expect(page).toHaveURL(/#anza$/);
   await expect(page.locator("#anza [data-start] a")).toHaveCount(4);
+});
+
+test("the homepage has one path card with its three specializations", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.locator("[data-path-card]")).toHaveCount(1);
+  await expect(page.locator("[data-path-card]")).toHaveAttribute("data-path-card", "savers");
+  const chips = page.locator("[data-specializations] a");
+  await expect(chips).toHaveCount(3);
+  const hrefs = await chips.evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+  expect(hrefs).toEqual(["individual-savings", "community-savings", "cooperative-finance"].map((id) => `/en/savers/#tree-section-${id}`));
+  await chips.nth(1).click();
+  await expect(page.locator("#tree-section-community-savings")).toBeInViewport();
+});
+
+test("builders, lightning, the lab panel and resource cards are not on the homepage", async ({ page }) => {
+  await page.goto("/en/");
+  const main = page.locator("main");
+  await expect(main.locator('a[href="/en/builders/"], a[href="/en/lightning/"]')).toHaveCount(0);
+  await expect(main.locator("#labs-title, [data-loop], [data-resource], [data-glossary-terms]")).toHaveCount(0);
+  expect(await page.locator('header a[href="/en/lightning/"]').count()).toBeGreaterThan(0); // header unchanged (owner decision 3)
 });

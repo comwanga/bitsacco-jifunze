@@ -53,7 +53,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     <>
       {/* One dark backdrop under the three earth sections, so their fractional-pixel edges never show the page through. */}
       <div className="bg-earth">
-        <section className="hero-band bg-[linear-gradient(160deg,var(--color-night)_0%,#0d3b4a_55%,var(--color-brand)_140%)] pb-9 text-white [clip-path:polygon(0_0,100%_0,100%_calc(100%-1.5rem),0_100%)] sm:pb-16">
+        <section className="hero-band bg-[linear-gradient(160deg,var(--color-night)_0%,#0d3b4a_55%,var(--color-brand)_140%)] pb-8 text-white [clip-path:polygon(0_0,100%_0,100%_calc(100%-1.5rem),0_100%)] sm:pb-16">
           <div className="mx-auto grid max-w-6xl gap-4 px-4 pt-5 sm:px-6 sm:pt-12 md:grid-cols-[1.15fr_1fr] md:items-center md:gap-12">
             <div>
               <h1 className="text-[2.2rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">
@@ -66,7 +66,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             </div>
             <div>
               <SavingsCircle lang={lang} />
-              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <a href="#anza" className="inline-flex rounded-full bg-sun-deep px-5 py-2.5 font-bold text-white hover:bg-[#b83c00]">
                   {c.heroStartCta} <span aria-hidden="true">&nbsp;↓</span>
                 </a>
@@ -74,7 +74,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                   {c.heroBrowse}
                 </Link>
               </div>
-              <p data-stats className="mt-3 text-xs text-[#b9cdd3] sm:text-sm">{statItems.join(" · ")}</p>
+              <p data-stats className="mt-2 text-xs text-[#b9cdd3] sm:text-sm">{statItems.join(" · ")}</p>
             </div>
           </div>
         </section>

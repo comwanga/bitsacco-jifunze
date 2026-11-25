@@ -20,14 +20,15 @@ function segment(i: number): string {
 
 /**
  * The savings cycle: Learn → Check the group → Save together → Teach your chama.
- * CSS-only motion (savings-circle.css): one lap in 4.8 s, each step lit in turn, then rest on step 4.
+ * CSS-only motion (savings-circle.css): loops, pauses on a pointed-at step, stops after the jump to #anza,
+ * and has a "Pause animation" switch for keyboard and touch users.
  * The steps are a real list, so the content does not depend on the drawing or on JavaScript.
  */
 export function SavingsCircle({ lang }: { lang: Lang }) {
   const c = siteCopy[lang];
   const steps = [c.circleLearn, c.circleCheck, c.circleSave, c.circleTeach];
   return (
-    <div data-circle className="savings-circle grid grid-cols-[7.5rem_1fr] items-center gap-4 sm:grid-cols-[11rem_1fr] sm:gap-6">
+    <div data-circle className="savings-circle grid grid-cols-[7.5rem_1fr] items-center gap-x-4 gap-y-3 sm:grid-cols-[11rem_1fr] sm:gap-6">
       <svg viewBox="0 0 200 200" aria-hidden="true" className="h-auto w-full">
         <circle cx={C} cy={C} r={R} fill="none" stroke="rgb(255 255 255 / 0.12)" strokeWidth="14" />
         {[0, 1, 2, 3].map((i) => (
@@ -48,6 +49,10 @@ export function SavingsCircle({ lang }: { lang: Lang }) {
           </li>
         ))}
       </ol>
+      <label className="circle-pause-control col-span-2 inline-flex w-fit cursor-pointer items-center gap-2 text-sm text-[#d6e2e6]">
+        <input type="checkbox" className="circle-pause h-4 w-4 accent-[#ff5800]" />
+        {c.circlePause}
+      </label>
     </div>
   );
 }

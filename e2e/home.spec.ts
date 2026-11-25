@@ -68,14 +68,43 @@ test("the hero shows the savings circle steps in order", async ({ page }) => {
   await expect(page.locator("[data-circle-steps] li").first()).toHaveText("Jifunze jinsi inavyofanya kazi");
 });
 
-test("the circle runs once and rests on step 4", async ({ page }) => {
+const circleStates = (page: import("@playwright/test").Page) =>
+  page.locator("[data-circle]").evaluate((el) => el.getAnimations({ subtree: true }).map((a) => ({ state: a.playState, iterations: a.effect?.getTiming().iterations })));
+
+test("the circle loops until the visitor interacts", async ({ page }) => {
   await page.goto("/en/");
-  await page.waitForTimeout(5500);
-  const state = await page.locator("[data-circle]").evaluate((el) =>
-    el.getAnimations({ subtree: true }).map((a) => ({ state: a.playState, iterations: a.effect?.getTiming().iterations })));
-  expect(state.length).toBeGreaterThan(0);
-  expect(state.every((s) => s.state === "finished" && s.iterations !== Infinity)).toBe(true);
-  await expect(page.locator('[data-circle-steps] li[data-step="4"]')).toHaveCSS("background-color", "rgb(201, 68, 0)");
+  await page.waitForTimeout(1000);
+  const states = await circleStates(page);
+  expect(states.length).toBeGreaterThan(0);
+  expect(states.every((s) => s.state === "running" && s.iterations === Infinity)).toBe(true);
+});
+
+test("pointing at a step pauses the circle on it, and moving away resumes", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "hover needs a pointer");
+  await page.goto("/en/");
+  await page.locator('[data-circle-steps] li[data-step="2"]').hover();
+  expect((await circleStates(page)).every((s) => s.state === "paused")).toBe(true);
+  await expect(page.locator('[data-circle-steps] li[data-step="2"]')).toHaveCSS("background-color", "rgb(201, 68, 0)");
+  await expect(page.locator('[data-circle-steps] li[data-step="1"]')).not.toHaveCSS("background-color", "rgb(201, 68, 0)");
+  await page.mouse.move(5, 5);
+  expect((await circleStates(page)).every((s) => s.state === "running")).toBe(true);
+});
+
+test("after choosing where to start, the circle stays stopped", async ({ page }) => {
+  await page.goto("/en/");
+  await page.getByRole("link", { name: "Where are you starting?" }).click();
+  await expect(page).toHaveURL(/#anza$/);
+  await page.mouse.move(5, 5);
+  expect((await circleStates(page)).every((s) => s.state === "paused")).toBe(true);
+});
+
+test("the pause switch stops the circle without a mouse", async ({ page }) => {
+  await page.goto("/en/");
+  const pause = page.getByRole("checkbox", { name: "Pause animation" });
+  await pause.focus();
+  await page.keyboard.press("Space");
+  await expect(pause).toBeChecked();
+  expect((await circleStates(page)).every((s) => s.state === "paused")).toBe(true);
 });
 
 test("reduced motion shows every step without animation", async ({ page }) => {

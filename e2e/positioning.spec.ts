@@ -8,7 +8,7 @@ test("the old Savers path name is gone from the built site", () => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, e.name);
       if (e.isDirectory()) walk(p);
-      else if (p.endsWith(".html") && /Bitcoin for Savers|Bitcoin kwa Wawekaji/.test(fs.readFileSync(p, "utf8"))) hits.push(p);
+      else if (p.endsWith(".html") && /Bitcoin for Savers|Bitcoin kwa Wawekaji|Savers path|njia ya Wawekaji/.test(fs.readFileSync(p, "utf8"))) hits.push(p);
     }
   };
   walk(path.join(process.cwd(), "out"));

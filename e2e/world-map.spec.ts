@@ -31,3 +31,29 @@ test("the map is available offline after the first visit", async ({ page, contex
   expect(ok).toBe(true);
   await context.setOffline(false);
 });
+
+const mapStates = (page: import("@playwright/test").Page) =>
+  page.locator("[data-world-map]").evaluate((el) => el.getAnimations({ subtree: true }).map((a) => ({ state: a.playState, iterations: a.effect?.getTiming().iterations })));
+
+test("markers pulse and payment lines flow between the groups", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.locator("[data-world-map] svg [data-arc]")).toHaveCount(8);
+  await expect(page.locator("[data-world-map] svg [data-pulse]")).toHaveCount(6);
+  const states = await mapStates(page);
+  expect(states.length).toBe(14);
+  expect(states.every((s) => s.state === "running" && s.iterations === Infinity)).toBe(true);
+});
+
+test("the map has no control and keeps moving when the circle is paused", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.locator("[data-world-map] input, [data-world-map] button")).toHaveCount(0);
+  await page.getByRole("checkbox", { name: "Pause the circle" }).check();
+  expect((await mapStates(page)).every((s) => s.state === "running")).toBe(true);
+});
+
+test("reduced motion keeps the map still", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/en/");
+  expect((await mapStates(page)).length).toBe(0);
+  await expect(page.locator("[data-world-map] svg [data-arc]")).toHaveCount(8);
+});

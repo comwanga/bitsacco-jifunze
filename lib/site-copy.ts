@@ -36,7 +36,7 @@ const en = {
   circleCheck: "Check the group",
   circleSave: "Save together",
   circleTeach: "Teach your chama",
-  circlePause: "Pause animation",
+  circlePause: "Pause the circle",
   heroStartCta: "Where are you starting?",
   questionsTitle: "Three questions before you join",
   questionHolds: "Who holds the money?",

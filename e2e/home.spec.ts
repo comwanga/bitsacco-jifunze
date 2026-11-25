@@ -100,7 +100,7 @@ test("after choosing where to start, the circle stays stopped", async ({ page })
 
 test("the pause switch stops the circle without a mouse", async ({ page }) => {
   await page.goto("/en/");
-  const pause = page.getByRole("checkbox", { name: "Pause animation" });
+  const pause = page.getByRole("checkbox", { name: "Pause the circle" });
   await pause.focus();
   await page.keyboard.press("Space");
   await expect(pause).toBeChecked();

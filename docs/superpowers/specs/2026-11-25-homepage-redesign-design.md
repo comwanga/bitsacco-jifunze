@@ -144,8 +144,10 @@ All new keys go in `lib/site-copy.ts`.
 
 ## Owner decisions (2026-11-25)
 
+0. **World map motion (owner request during implementation):** markers pulse in turn like beacons and eight Lightning-style payment routes flow between the groups (CSS only). The map has no pause control and does not stop with the circle's switch (owner decision; accepted gap against WCAG 2.2.2, Level A). Reduced motion (operating-system setting) keeps the map still.
+
 1. **Phone first-screen rule:** moves from the first path card to the start tiles. The first `[data-start]` tile must be within the first screen on Pixel 5 (mobile project). The old "first path heading within 1.2 screens" test is replaced, not relaxed silently.
-2. **Circle motion (revised by the owner during implementation):** the circle loops continuously (4.8 s per lap, each step lit for a quarter). Pointing at a step pauses it with that step and its arc lit; moving away resumes. After the visitor clicks "Where are you starting?" (`#anza` is the target) it stays stopped. A visible "Pause animation" / "Simamisha mzunguko" switch lets keyboard and touch users stop it (WCAG 2.2.2). `prefers-reduced-motion: reduce`: no animation, no switch.
+2. **Circle motion (revised by the owner during implementation):** the circle loops continuously (4.8 s per lap, each step lit for a quarter). Pointing at a step pauses it with that step and its arc lit; moving away resumes. After the visitor clicks "Where are you starting?" (`#anza` is the target) it stays stopped. A visible "Pause the circle" / "Simamisha mzunguko" switch lets keyboard and touch users stop it (WCAG 2.2.2). `prefers-reduced-motion: reduce`: no animation, no switch.
 3. **Header "Lightning lab":** unchanged in this redesign. Header and footer stay as they are; only the homepage drops Builders and Lightning.
 
 ## Left to the builder

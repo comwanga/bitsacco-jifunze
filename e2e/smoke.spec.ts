@@ -23,13 +23,6 @@ test("pages never scroll sideways on a phone", async ({ page }, info) => {
   }
 });
 
-test("with reduced motion the intro never plays", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/sw/");
-  await expect(page.locator("[data-home-intro]")).not.toHaveClass(/intro-play/);
-  await expect(page.getByRole("group", { name: /Mbuyu/ })).toBeVisible();
-});
-
 test("a lesson opened once stays readable offline", async ({ page, context }, info) => {
   test.skip(info.project.name !== "desktop", "one browser is enough for the service worker");
   await page.goto("/sw/savers/wallets-keys/");

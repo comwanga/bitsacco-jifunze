@@ -1,12 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-test("three paths: three cards and three baobab branches", async ({ page }) => {
-  await page.goto("/sw/");
-  await expect(page.locator("[data-path-card]")).toHaveCount(3);
-  await expect(page.locator(".mbuyu a")).toHaveCount(3);
-  await expect(page.locator('.mbuyu a[href="/sw/lightning/"]')).toHaveCount(1);
-});
-
 test("a new learner sees Start on every path and no continue card", async ({ page }) => {
   await page.goto("/sw/");
   await expect(page.locator("[data-continue]")).toHaveCount(0);
@@ -27,23 +20,6 @@ test("after a finished lesson the continue card links to the next one", async ({
   await expect(card).toContainText("Imehifadhiwa kwenye kivinjari hiki pekee.");
   await expect(card.getByRole("link", { name: "Dhibiti maendeleo" })).toHaveAttribute("href", "/sw/progress/");
   await expect(page.locator('[data-path-card="savers"] [data-resume]')).toHaveText(/Endelea/);
-});
-
-test("on a phone the first path is close to the top", async ({ page }, info) => {
-  test.skip(info.project.name !== "mobile", "phone layout only");
-  await page.goto("/sw/");
-  const box = await page.locator("[data-path-card] h3").first().boundingBox();
-  const vh = page.viewportSize()!.height;
-  expect(box!.y).toBeLessThan(vh * 1.2);
-});
-
-test("the main actions are on the first screen", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/en/");
-  const vh = page.viewportSize()!.height;
-  const start = (await page.getByRole("link", { name: "Start learning" }).boundingBox())!;
-  expect(start.y + start.height).toBeLessThanOrEqual(vh);
-  await expect(page.getByRole("link", { name: "Browse all lessons" })).toHaveAttribute("href", "/en/learn/");
 });
 
 test("how it works is a four-step journey", async ({ page }) => {
@@ -125,3 +101,50 @@ for (const lang of ["en", "sw"] as const)
     await links.nth(2).click();
     await expect(page.locator("#quorum")).toBeInViewport();
   });
+
+test("the hero shows the savings circle steps in order", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Check before you save");
+  await expect(page.locator("[data-circle-steps] li")).toHaveText(["Learn how it works", "Check the group", "Save together", "Teach your chama"]);
+  await page.goto("/sw/");
+  await expect(page.locator("[data-circle-steps] li").first()).toHaveText("Jifunze jinsi inavyofanya kazi");
+});
+
+test("the circle runs once and rests on step 4", async ({ page }) => {
+  await page.goto("/en/");
+  await page.waitForTimeout(5500);
+  const state = await page.locator("[data-circle]").evaluate((el) =>
+    el.getAnimations({ subtree: true }).map((a) => ({ state: a.playState, iterations: a.effect?.getTiming().iterations })));
+  expect(state.length).toBeGreaterThan(0);
+  expect(state.every((s) => s.state === "finished" && s.iterations !== Infinity)).toBe(true);
+  await expect(page.locator('[data-circle-steps] li[data-step="4"]')).toHaveCSS("background-color", "rgb(201, 68, 0)");
+});
+
+test("reduced motion shows every step without animation", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/en/");
+  expect(await page.locator("[data-circle]").evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0);
+  await expect(page.locator("[data-circle-steps] li")).toHaveCount(4);
+});
+
+for (const withProgress of [false, true])
+  test(`on a phone the main way in is on the first screen (${withProgress ? "returning" : "new"} learner)`, async ({ page }, info) => {
+    test.skip(info.project.name !== "mobile", "phone layout only");
+    if (withProgress)
+      await page.addInitScript(() =>
+        localStorage.setItem("jifunze:progress:v1", JSON.stringify({ app: "bitsacco-jifunze", version: 1, lessons: { "savers/money-and-bitcoin": { completedAt: "2026-11-01T10:00:00.000Z" } } })),
+      );
+    await page.goto("/sw/");
+    // New learners: the first starting tile. Returning learners: the Continue link, which sits above the tiles.
+    const target = withProgress ? page.locator("[data-continue] a").first() : page.locator("[data-start] a").first();
+    const box = (await target.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  });
+
+test("the hero action jumps to the starting tiles", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/en/");
+  await page.getByRole("link", { name: "Where are you starting?" }).click();
+  await expect(page).toHaveURL(/#anza$/);
+  await expect(page.locator("#anza [data-start] a")).toHaveCount(4);
+});

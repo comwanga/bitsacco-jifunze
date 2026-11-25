@@ -40,6 +40,12 @@ const en = {
   glossaryTermsLabel: "Savings-group words in the glossary",
   glossarySearchAll: "Search all {n} terms",
   notFoundNext: "Where to go next",
+  circleCentre: "Your savings",
+  circleLearn: "Learn how it works",
+  circleCheck: "Check the group",
+  circleSave: "Save together",
+  circleTeach: "Teach your chama",
+  heroStartCta: "Where are you starting?",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -82,6 +88,12 @@ const sw: SiteCopy = {
   glossaryTermsLabel: "Maneno ya vikundi vya akiba kwenye kamusi",
   glossarySearchAll: "Tafuta maneno yote {n}",
   notFoundNext: "Unaweza kwenda wapi sasa",
+  circleCentre: "Akiba yako",
+  circleLearn: "Jifunze jinsi inavyofanya kazi",
+  circleCheck: "Kagua kikundi",
+  circleSave: "Wekeni akiba pamoja",
+  circleTeach: "Fundisha chama chako",
+  heroStartCta: "Unaanzia wapi?",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

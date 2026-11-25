@@ -1,0 +1,61 @@
+/* The savings circle runs once: one lap in 4.8 s, each step lit for 1.2 s, then it rests on step 4.
+   It never loops, so it needs no pause control (WCAG 2.2.2). Reduced motion: no animation at all. */
+
+.savings-circle .circle-seg {
+  stroke: rgb(255 255 255 / 0.28);
+}
+.savings-circle .circle-step {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+}
+
+.savings-circle .circle-orbit {
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+  animation: savings-orbit 4.8s linear 1 forwards;
+}
+
+.savings-circle .circle-seg-1,
+.savings-circle .circle-step-1 {
+  animation: savings-lit 1.2s steps(1, end) 0s 1;
+}
+.savings-circle .circle-seg-2,
+.savings-circle .circle-step-2 {
+  animation: savings-lit 1.2s steps(1, end) 1.2s 1;
+}
+.savings-circle .circle-seg-3,
+.savings-circle .circle-step-3 {
+  animation: savings-lit 1.2s steps(1, end) 2.4s 1;
+}
+/* Step 4 keeps its highlight when the run ends. */
+.savings-circle .circle-seg-4,
+.savings-circle .circle-step-4 {
+  animation: savings-lit 1.2s steps(1, end) 3.6s 1 forwards;
+}
+
+@keyframes savings-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* One keyframe styles both the arc (stroke) and the list item (background); each ignores the other's property. */
+@keyframes savings-lit {
+  from,
+  to {
+    stroke: #ff5800;
+    background-color: #c94400;
+    color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .savings-circle .circle-orbit,
+  .savings-circle .circle-seg,
+  .savings-circle .circle-step {
+    animation: none;
+  }
+}

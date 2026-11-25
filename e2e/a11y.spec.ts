@@ -6,7 +6,7 @@ const PAGES = ["/sw/", "/en/", "/sw/savers/", "/en/savers/", "/sw/savers/wallets
 for (const path of PAGES) {
   test(`no serious accessibility problems on ${path}`, async ({ page }, info) => {
     test.skip(info.project.name !== "desktop", "markup is the same on both projects");
-    await page.emulateMedia({ reducedMotion: "reduce" }); // check the settled page, not a frame of the intro
+    await page.emulateMedia({ reducedMotion: "reduce" }); // check the settled page, not a frame of the savings-circle animation
     await page.goto(path);
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
     const bad = results.violations

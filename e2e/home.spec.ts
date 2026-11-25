@@ -54,11 +54,12 @@ for (const lang of ["en", "sw"] as const)
     await expect(page.locator("#specializations")).toBeVisible();
   });
 
-test("no horizontal scroll at 320px in Kiswahili", async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 640 });
-  await page.goto("/sw/");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
-});
+for (const lang of ["sw", "en"] as const)
+  test(`no horizontal scroll at 320px (${lang})`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(`/${lang}/`);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  });
 
 test("the hero shows the savings circle steps in order", async ({ page }) => {
   await page.goto("/en/");

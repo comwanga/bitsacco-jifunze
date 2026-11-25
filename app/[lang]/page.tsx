@@ -10,6 +10,7 @@ import { t, type Lang } from "@/lib/i18n";
 import { IntroReplay } from "@/components/intro/IntroReplay";
 import { introScript } from "@/lib/intro/shouldPlay";
 import { pathOrder } from "@/lib/content/navigation";
+import { siteStats } from "@/lib/content/site-stats";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
@@ -28,6 +29,14 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const order = paths.map(({ r }) => pathOrder(r));
   const titles = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.title])));
   const pathTitles = Object.fromEntries(paths.map(({ r }) => [r.id, r.title[lang]]));
+  const c = siteCopy[lang];
+  const stats = siteStats(lang);
+  const statItems = [
+    c.statsLessons.replace("{n}", String(stats.lessons)),
+    c.statsLanguages.replace("{n}", String(stats.languages)),
+    c.statsHours.replace("{n}", String(stats.hours)),
+    c.statsTerms.replace("{n}", String(stats.glossaryTerms)),
+  ];
   const minutes = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.minutes])));
 
   return (
@@ -55,6 +64,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 {siteCopy[lang].heroBrowse}
               </Link>
             </div>
+            <p data-stats className="mt-5 text-sm text-[#d9cbbb]">{statItems.join(" · ")}</p>
             <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} />
           </div>
         </IntroReplay>

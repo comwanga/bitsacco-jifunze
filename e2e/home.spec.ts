@@ -77,3 +77,10 @@ test("the footer groups real destinations and keeps the disclaimer and licence",
   await expect(footer).toContainText("CC BY-SA 4.0");
   await expect(footer.getByRole("heading", { level: 2 })).toHaveText(["Kujifunza", "Rasilimali", "Mradi"]);
 });
+
+test("the hero shows computed content counts", async ({ page }) => {
+  await page.goto("/en/");
+  await expect(page.locator("[data-stats]")).toHaveText(/49 lessons.*2 languages.*about 34 hours of reading.*57 glossary terms/s);
+  await page.goto("/sw/");
+  await expect(page.locator("[data-stats]")).toContainText("masomo 49");
+});

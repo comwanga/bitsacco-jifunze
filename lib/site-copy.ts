@@ -24,6 +24,10 @@ const en = {
   pathOutcomesTitle: "What you'll learn",
   pathFormatTitle: "How it works",
   pathAudienceTitle: "Who it's for",
+  statsLessons: "{n} lessons",
+  statsLanguages: "{n} languages",
+  statsHours: "about {n} hours of reading",
+  statsTerms: "{n} glossary terms",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -50,6 +54,10 @@ const sw: SiteCopy = {
   pathOutcomesTitle: "Utakachojifunza",
   pathFormatTitle: "Jinsi inavyofanya kazi",
   pathAudienceTitle: "Ni kwa ajili ya nani",
+  statsLessons: "masomo {n}",
+  statsLanguages: "lugha {n}",
+  statsHours: "takriban saa {n} za kusoma",
+  statsTerms: "maneno {n} ya kamusi",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

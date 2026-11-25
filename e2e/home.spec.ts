@@ -114,3 +114,14 @@ test("no horizontal scroll at 320px in Kiswahili", async ({ page }) => {
   await page.goto("/sw/");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
+
+for (const lang of ["en", "sw"] as const)
+  test(`${lang}: glossary term links land on real rows`, async ({ page }) => {
+    await page.goto(`/${lang}/`);
+    const links = page.locator("[data-glossary-terms] a");
+    await expect(links).toHaveCount(5);
+    const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+    expect(hrefs).toEqual(["chama", "rosca", "quorum", "self-custody"].map((id) => `/${lang}/glossary/#${id}`).concat(`/${lang}/glossary/`));
+    await links.nth(2).click();
+    await expect(page.locator("#quorum")).toBeInViewport();
+  });

@@ -37,6 +37,8 @@ const en = {
   buildTitle: "Build the tools communities need",
   progressLocal: "Saved only in this browser.",
   progressManage: "Manage progress",
+  glossaryTermsLabel: "Savings-group words in the glossary",
+  glossarySearchAll: "Search all {n} terms",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -76,6 +78,8 @@ const sw: SiteCopy = {
   buildTitle: "Jenga zana zinazohitajika na jamii",
   progressLocal: "Imehifadhiwa kwenye kivinjari hiki pekee.",
   progressManage: "Dhibiti maendeleo",
+  glossaryTermsLabel: "Maneno ya vikundi vya akiba kwenye kamusi",
+  glossarySearchAll: "Tafuta maneno yote {n}",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

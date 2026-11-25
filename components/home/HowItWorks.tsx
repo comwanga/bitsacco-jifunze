@@ -15,7 +15,18 @@ const STEPS: { title: DictKey; body: DictKey; Icon: typeof LearnIcon }[] = [
  * The lower home page: a soft horizon out of the dark earth, the four-step learning journey,
  * then the library and glossary as destinations.
  */
-export function HowItWorks({ lang, libraryCount, glossaryCount }: { lang: Lang; libraryCount: number; glossaryCount: number }) {
+export function HowItWorks({
+  lang,
+  libraryCount,
+  glossaryCount,
+  featuredTerms,
+}: {
+  lang: Lang;
+  libraryCount: number;
+  glossaryCount: number;
+  /** Community-finance glossary rows linked by id, after the resource cards. */
+  featuredTerms: { id: string; label: string }[];
+}) {
   const c = siteCopy[lang];
   const resources = [
     { id: "library", href: `/${lang}/library/`, title: t(lang, "navLibrary"), body: t(lang, "libraryCta"), count: `${libraryCount} ${c.libraryCount}`, action: c.libraryAction, Icon: LibraryIcon },
@@ -74,6 +85,26 @@ export function HowItWorks({ lang, libraryCount, glossaryCount }: { lang: Lang; 
             </Link>
           ))}
         </div>
+        <nav data-glossary-terms aria-label={c.glossaryTermsLabel} className="mt-6">
+          <ul className="flex flex-wrap gap-3">
+            {featuredTerms.map(({ id, label }) => (
+              <li key={id}>
+                <Link
+                  prefetch={false}
+                  href={`/${lang}/glossary/#${id}`}
+                  className="inline-flex rounded-full border border-[var(--line)] px-4 py-2 font-semibold text-teal-700 hover:border-teal-600/60 dark:text-teal-300"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link prefetch={false} href={`/${lang}/glossary/`} className="inline-flex px-2 py-2 font-semibold text-teal-700 underline underline-offset-4 dark:text-teal-300">
+                {c.glossarySearchAll.replace("{n}", String(glossaryCount))}
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </section>
     </div>
   );

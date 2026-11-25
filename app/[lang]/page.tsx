@@ -12,6 +12,9 @@ import { introScript } from "@/lib/intro/shouldPlay";
 import { pathOrder } from "@/lib/content/navigation";
 import { siteStats } from "@/lib/content/site-stats";
 
+// Community-finance words linked from the homepage, in this order.
+const FEATURED_TERMS = ["chama", "rosca", "quorum", "self-custody"] as const;
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
   return pageMetadata(lang, "", t(lang, "siteName"), siteCopy[lang].heroLead);
@@ -45,6 +48,12 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     { href: `/${lang}/savers/money-and-bitcoin/`, label: c.startSolo },
     { href: `/${lang}/savers/group-payments/`, label: c.startMove },
   ];
+  const glossary = getGlossary();
+  const featuredTerms = FEATURED_TERMS.map((id) => {
+    const row = glossary.find((g) => g.id === id);
+    if (!row) throw new Error(`Homepage glossary term "${id}" is missing from content/glossary.json`);
+    return { id, label: row[lang] };
+  });
   const minutes = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.minutes])));
 
   return (
@@ -132,7 +141,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </section>
       </div>
 
-      <HowItWorks lang={lang} libraryCount={getLibrary().length} glossaryCount={getGlossary().length} />
+      <HowItWorks lang={lang} libraryCount={getLibrary().length} glossaryCount={glossary.length} featuredTerms={featuredTerms} />
     </>
   );
 }

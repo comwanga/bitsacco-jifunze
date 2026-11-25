@@ -30,3 +30,11 @@ test("tree section headings are named by their title alone", async ({ page }) =>
   await expect(page.getByRole("heading", { level: 2, name: "Misingi", exact: true })).toBeVisible();
   await expect(page.locator('[data-section-progress="misingi"]')).toHaveText("0 / 2 umemaliza");
 });
+
+for (const view of ["", "list/"] as const)
+  test(`path intro shows three parts (${view || "tree"})`, async ({ page }) => {
+    await page.goto(view ? `/en/${view}savers/` : "/en/savers/");
+    const intro = page.locator("[data-path-intro]");
+    await expect(intro.getByRole("heading", { level: 2 })).toHaveText(["What you'll learn", "How it works", "Who it's for"]);
+    await expect(intro.locator("li")).toHaveCount(4);
+  });

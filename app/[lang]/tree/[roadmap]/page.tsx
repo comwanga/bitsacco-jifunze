@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { PathHeader } from "@/components/roadmap/PathHeader";
 import { PathTree } from "@/components/roadmap/PathTree";
 import { buildTree } from "@/lib/content/tree";
-import { listRoadmaps } from "@/lib/content/load";
+import { getRoadmap, listRoadmaps } from "@/lib/content/load";
+import type { RoadmapId } from "@/lib/content/schemas";
+import { PathIntro } from "@/components/roadmap/PathIntro";
+import { pathIntro } from "@/lib/content/path-intro";
 import { t, type Lang } from "@/lib/i18n";
 import { FeedbackLink } from "@/components/FeedbackLink";
 
@@ -21,8 +24,10 @@ export default async function TreePage({ params }: Params) {
   const lang = l as Lang;
   const tree = buildTree(lang, roadmap);
   const lessons = tree.sections.flatMap((s) => s.lessons);
+  const intro = pathIntro(getRoadmap(roadmap as RoadmapId), lang);
   return <>
     <PathHeader path={tree} lang={lang} slugs={lessons.map((l) => l.slug)} optionalSections={tree.sections.filter((s) => s.optional).map((s) => s.lessons.map((l) => l.slug))} minutes={lessons.reduce((sum, l) => sum + l.minutes, 0)} view="tree" />
+    {intro && <PathIntro intro={intro} lang={lang} />}
     <PathTree tree={tree} lang={lang} />
     <div className="mx-auto max-w-5xl px-4 pb-10">
       <FeedbackLink lang={lang} context={{ pathTitle: tree.title, pathname: `/${lang}/${roadmap}/` }} className="text-teal-700 dark:text-teal-400" />

@@ -21,6 +21,9 @@ const en = {
   footerProject: "Project",
   footerLab: "Lightning lab",
   footerPractice: "Practice simulations",
+  pathOutcomesTitle: "What you'll learn",
+  pathFormatTitle: "How it works",
+  pathAudienceTitle: "Who it's for",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -44,6 +47,9 @@ const sw: SiteCopy = {
   footerProject: "Mradi",
   footerLab: "Maabara ya Lightning",
   footerPractice: "Mazoezi ya Bitcoin",
+  pathOutcomesTitle: "Utakachojifunza",
+  pathFormatTitle: "Jinsi inavyofanya kazi",
+  pathAudienceTitle: "Ni kwa ajili ya nani",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

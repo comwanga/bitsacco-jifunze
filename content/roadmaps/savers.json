@@ -12,6 +12,32 @@
     "sw": "Anza na pesa, akiba, pochi na usalama. Kisha chagua akiba binafsi, vikundi vya akiba vya jamii au fedha za ushirika, na ujifunze kupima hatari, sheria na kumbukumbu kabla ya kuweka pesa. Huhitaji kujua programu.",
     "en": "Start with money, savings, wallets and safety. Then choose personal savings, community savings groups or cooperative finance, and learn to judge risks, rules and records before you put money in. No programming needed."
   },
+  "outcomes": [
+    {
+      "sw": "Jinsi vikundi vya mzunguko, vikundi vya kulimbikiza na SACCO vinavyoshughulikia pesa, na wapi kila kimoja kinaweza kushindwa",
+      "en": "How rotating groups, accumulating groups and SACCOs handle money, and where each one can fail"
+    },
+    {
+      "sw": "Maswali ya kuuliza kuhusu sheria, kumbukumbu na uongozi kabla ya kujiunga",
+      "en": "Questions to ask about rules, records and leadership before you join"
+    },
+    {
+      "sw": "Jinsi ya kulinganisha njia za kuweka akiba kwa gharama, upatikanaji na nani anadhibiti pesa",
+      "en": "How to compare savings options by cost, access and who controls the money"
+    },
+    {
+      "sw": "Jinsi ya kushikilia Bitcoin mwenyewe kwa usalama, na jinsi kikundi kinavyoweza kuitumia kwa sheria zilizo wazi",
+      "en": "How to hold Bitcoin safely yourself, and how a group can use it with clear rules"
+    }
+  ],
+  "format": {
+    "sw": "Masomo manane mafupi ya utangulizi, kisha uchague fedha binafsi, za kikundi au za ushirika. Kila somo lina mfano wa kubuni, zoezi, maswali ya majadiliano na jaribio fupi. Hakuna pesa halisi inayotumika.",
+    "en": "Eight short introductory lessons, then a choice of personal, community or cooperative finance. Every lesson has a fictional case, a worked activity, discussion questions and a short quiz. No real money is used."
+  },
+  "audience": {
+    "sw": "Yeyote anayekaribia kujiunga au aliye tayari kwenye chama, SACCO au kikundi cha akiba, yeyote anayeweka akiba peke yake, na wanaoongoza au kufundisha kikundi. Huhitaji ujuzi wa kiufundi.",
+    "en": "Anyone about to join or already in a chama, SACCO or savings group, anyone saving on their own, and people who lead or teach a group. No technical background needed."
+  },
   "sections": [
     {
       "id": "misingi",

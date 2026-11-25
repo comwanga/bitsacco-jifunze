@@ -8,11 +8,16 @@ export const ROADMAP_IDS = ["savers", "builders", "lightning"] as const;
 export const RoadmapIdSchema = z.enum(ROADMAP_IDS);
 export type RoadmapId = z.infer<typeof RoadmapIdSchema>;
 
-export const RoadmapSchema = z.object({
+export const RoadmapSchema = z
+  .object({
   id: RoadmapIdSchema,
   title: LocalizedSchema,
   tagline: LocalizedSchema,
   description: LocalizedSchema,
+  // Path intro: what you'll learn, how it works, who it's for. All three or none.
+  outcomes: z.array(LocalizedSchema).min(3).max(5).optional(),
+  format: LocalizedSchema.optional(),
+  audience: LocalizedSchema.optional(),
   sections: z
     .array(
       z.object({
@@ -24,7 +29,10 @@ export const RoadmapSchema = z.object({
       }),
     )
     .min(1),
-});
+  })
+  .refine((r) => [r.outcomes, r.format, r.audience].every((f) => f === undefined) || [r.outcomes, r.format, r.audience].every((f) => f !== undefined), {
+    message: "outcomes, format and audience must be given together",
+  });
 export type Roadmap = z.infer<typeof RoadmapSchema>;
 
 export const ResourceSchema = z.object({

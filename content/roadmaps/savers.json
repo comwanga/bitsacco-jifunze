@@ -1,16 +1,16 @@
 {
   "id": "savers",
   "title": {
-    "sw": "Bitcoin kwa Wawekaji",
-    "en": "Bitcoin for Savers"
+    "sw": "Fedha za Jamii na Bitcoin",
+    "en": "Community Finance & Bitcoin"
   },
   "tagline": {
-    "sw": "Masomo manane ya utangulizi, kisha maeneo ya hiari ya fedha binafsi, vikundi na ushirika.",
-    "en": "Eight introductory lessons, then optional personal, community and cooperative finance modules."
+    "sw": "Elewa chama, SACCO na akiba binafsi, kisha uone jinsi Bitcoin inavyoviimarisha.",
+    "en": "Understand chamas, SACCOs and personal savings, then see how Bitcoin strengthens them."
   },
   "description": {
-    "sw": "Anza na pesa, sats, pochi, malipo na usalama. Endelea na ustahimilivu wa kifedha, akiba ya jamii au fedha za ushirika bila kuhitaji programu.",
-    "en": "Start with money, sats, wallets, payments and safety. Continue into financial resilience, community savings or cooperative finance, without needing programming."
+    "sw": "Anza na pesa, akiba, pochi na usalama. Kisha chagua akiba binafsi, vikundi vya akiba vya jamii au fedha za ushirika, na ujifunze kupima hatari, sheria na kumbukumbu kabla ya kuweka pesa. Huhitaji kujua programu.",
+    "en": "Start with money, savings, wallets and safety. Then choose personal savings, community savings groups or cooperative finance, and learn to judge risks, rules and records before you put money in. No programming needed."
   },
   "sections": [
     {

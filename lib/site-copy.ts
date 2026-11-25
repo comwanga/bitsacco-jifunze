@@ -4,6 +4,10 @@ import type { Lang } from "./i18n.ts";
 // whose dictionary is bundled into every page's JavaScript, the same way lib/simulations/copy.ts is.
 const en = {
   brandBy: "by Bitsacco",
+  heroTitle: "Check before you save",
+  heroSubtitle: "Chamas, SACCOs, personal savings and Bitcoin",
+  heroLead:
+    "Learn how savings groups and money tools really work, what the real risks are, and how Bitcoin can make them stronger. Free, in Kiswahili or English, no sign-up.",
   heroBrowse: "Browse all lessons",
   resourcesTitle: "Learning resources",
   glossaryCard: "Understand Bitcoin words in Kiswahili and English.",
@@ -23,6 +27,10 @@ export type SiteCopy = Record<keyof typeof en, string>;
 
 const sw: SiteCopy = {
   brandBy: "na Bitsacco",
+  heroTitle: "Kagua kabla ya kuweka akiba",
+  heroSubtitle: "Chama, SACCO, akiba binafsi na Bitcoin",
+  heroLead:
+    "Elewa jinsi vikundi vya akiba na zana za fedha zinavyofanya kazi, hatari zake halisi, na jinsi Bitcoin inavyoweza kuviimarisha. Bure, kwa Kiswahili au Kiingereza, bila kujisajili.",
   heroBrowse: "Tazama masomo yote",
   resourcesTitle: "Rasilimali za kujifunza",
   glossaryCard: "Elewa maneno ya Bitcoin kwa Kiswahili na Kiingereza.",

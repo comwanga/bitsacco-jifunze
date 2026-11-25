@@ -13,7 +13,7 @@ import { pathOrder } from "@/lib/content/navigation";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
-  return pageMetadata(lang, "", t(lang, "siteName"), t(lang, "heroLead"));
+  return pageMetadata(lang, "", t(lang, "siteName"), siteCopy[lang].heroLead);
 }
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
@@ -41,9 +41,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           </div>
           {/* The copy rises into the dark ground of the scene, so the first actions sit on the first screen. */}
           <div className="hero-copy mx-auto -mt-14 max-w-6xl px-4 pb-14 text-[#fbf1e1] sm:px-6 md:-mt-28">
-            <h1 className="text-[2.6rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">{t(lang, "heroTitle")}</h1>
-            <p className="mt-2 text-xl font-semibold text-dawn sm:text-2xl">{t(lang, "heroSubtitle")}</p>
-            <p className="mt-4 max-w-xl text-lg text-[#e3d5c5]">{t(lang, "heroLead")}</p>
+            <h1 className="text-[2.6rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">{siteCopy[lang].heroTitle}</h1>
+            <p className="mt-2 text-xl font-semibold text-dawn sm:text-2xl">{siteCopy[lang].heroSubtitle}</p>
+            <p className="mt-4 max-w-xl text-lg text-[#e3d5c5]">{siteCopy[lang].heroLead}</p>
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
               <a
                 href="#njia"

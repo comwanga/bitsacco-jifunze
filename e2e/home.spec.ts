@@ -84,3 +84,31 @@ test("the hero shows computed content counts", async ({ page }) => {
   await page.goto("/sw/");
   await expect(page.locator("[data-stats]")).toContainText("masomo 49");
 });
+
+test("community finance leads, builders follow as numbered tools paths", async ({ page }) => {
+  await page.goto("/en/");
+  const cards = page.locator("[data-path-card]");
+  await expect(cards).toHaveCount(3);
+  await expect(cards.nth(0)).toHaveAttribute("data-path-card", "savers");
+  await expect(cards.nth(0)).toHaveAttribute("data-variant", "lead");
+  await expect(cards.locator("[data-path-number]")).toHaveText(["01", "02", "03"]);
+  await expect(cards.nth(0)).toContainText("After this path you can check a chama or SACCO before you join");
+  await expect(page.getByRole("heading", { name: "Build the tools communities need" })).toBeVisible();
+});
+
+for (const lang of ["en", "sw"] as const)
+  test(`${lang}: four starting points link to existing lessons`, async ({ page }) => {
+    await page.goto(`/${lang}/`);
+    const links = page.locator("[data-start] a");
+    await expect(links).toHaveCount(4);
+    const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+    expect(hrefs).toEqual([`/${lang}/savers/saving-together/`, `/${lang}/savers/#specializations`, `/${lang}/savers/money-and-bitcoin/`, `/${lang}/savers/group-payments/`]);
+    await links.nth(1).click();
+    await expect(page.locator("#specializations")).toBeVisible();
+  });
+
+test("no horizontal scroll at 320px in Kiswahili", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/sw/");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});

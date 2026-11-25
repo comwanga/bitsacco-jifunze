@@ -28,6 +28,13 @@ const en = {
   statsLanguages: "{n} languages",
   statsHours: "about {n} hours of reading",
   statsTerms: "{n} glossary terms",
+  startTitle: "Where are you starting?",
+  startJoin: "I'm about to join a savings group",
+  startMember: "I'm already in a chama or SACCO",
+  startSolo: "I want to save on my own",
+  startMove: "I want to move my group to Bitcoin",
+  leadOutcome: "After this path you can check a chama or SACCO before you join, compare ways to save, and plan group savings with Bitcoin.",
+  buildTitle: "Build the tools communities need",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -58,6 +65,13 @@ const sw: SiteCopy = {
   statsLanguages: "lugha {n}",
   statsHours: "takriban saa {n} za kusoma",
   statsTerms: "maneno {n} ya kamusi",
+  startTitle: "Unaanzia wapi?",
+  startJoin: "Ninakaribia kujiunga na kikundi cha akiba",
+  startMember: "Tayari niko kwenye chama au SACCO",
+  startSolo: "Nataka kuweka akiba peke yangu",
+  startMove: "Nataka kuhamishia kikundi changu kwenye Bitcoin",
+  leadOutcome: "Baada ya njia hii utaweza kukagua chama au SACCO kabla ya kujiunga, kulinganisha njia za kuweka akiba, na kupanga akiba ya kikundi kwa Bitcoin.",
+  buildTitle: "Jenga zana zinazohitajika na jamii",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

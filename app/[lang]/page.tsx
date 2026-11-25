@@ -37,6 +37,14 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     c.statsHours.replace("{n}", String(stats.hours)),
     c.statsTerms.replace("{n}", String(stats.glossaryTerms)),
   ];
+  const lead = paths.find(({ r }) => r.id === "savers")!;
+  const tools = paths.filter(({ r }) => r.id !== "savers");
+  const starts = [
+    { href: `/${lang}/savers/saving-together/`, label: c.startJoin },
+    { href: `/${lang}/savers/#specializations`, label: c.startMember },
+    { href: `/${lang}/savers/money-and-bitcoin/`, label: c.startSolo },
+    { href: `/${lang}/savers/group-payments/`, label: c.startMove },
+  ];
   const minutes = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.minutes])));
 
   return (
@@ -74,9 +82,31 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             <h2 id="njia-title" className="sr-only">
               {t(lang, "pathsTitle")}
             </h2>
-            <div className="grid gap-12 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
-              {paths.map(({ r, lessons }) => (
-                <PathCard key={r.id} roadmap={r} lessons={lessons} lang={lang} />
+            <PathCard roadmap={lead.r} lessons={lead.lessons} lang={lang} number={1} variant="lead" outcome={c.leadOutcome} />
+            <nav data-start aria-labelledby="start-title" className="mt-14">
+              <h2 id="start-title" className="text-xl font-bold text-white sm:text-2xl">
+                {c.startTitle}
+              </h2>
+              <ul className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+                {starts.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      prefetch={false}
+                      href={href}
+                      className="flex h-full items-center rounded-xl border border-white/15 bg-white/[0.04] px-3 py-3 text-sm font-semibold text-white hover:border-dawn hover:bg-white/[0.08] sm:px-4 sm:text-base"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <h2 id="build-title" className="mt-14 text-xl font-bold text-white sm:text-2xl">
+              {c.buildTitle}
+            </h2>
+            <div className="mt-8 grid gap-12 md:grid-cols-2 md:gap-10">
+              {tools.map(({ r, lessons }, i) => (
+                <PathCard key={r.id} roadmap={r} lessons={lessons} lang={lang} number={i + 2} variant="compact" />
               ))}
             </div>
           </div>

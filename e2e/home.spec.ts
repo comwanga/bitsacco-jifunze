@@ -126,3 +126,13 @@ test("builders, lightning, the lab panel and resource cards are not on the homep
   await expect(main.locator("#labs-title, [data-loop], [data-resource], [data-glossary-terms]")).toHaveCount(0);
   expect(await page.locator('header a[href="/en/lightning/"]').count()).toBeGreaterThan(0); // header unchanged (owner decision 3)
 });
+
+for (const lang of ["en", "sw"] as const)
+  test(`${lang}: three questions link to the lessons that answer them`, async ({ page }) => {
+    await page.goto(`/${lang}/`);
+    const cards = page.locator("[data-questions] a");
+    await expect(cards).toHaveCount(3);
+    const hrefs = await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+    expect(hrefs).toEqual(["custody-and-fedimint", "cooperative-foundations", "payments-liquidity"].map((s) => `/${lang}/savers/${s}/`));
+    if (lang === "en") await expect(cards.first()).toContainText("Who holds the money?");
+  });

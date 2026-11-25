@@ -4,6 +4,7 @@ import { siteCopy } from "@/lib/site-copy";
 import { ContinueLearning } from "@/components/home/ContinueLearning";
 import { PathCard } from "@/components/home/PathCard";
 import { SavingsCircle } from "@/components/home/SavingsCircle";
+import { JoinQuestions } from "@/components/home/JoinQuestions";
 import { flatLessons, getLesson, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
 import { pathOrder } from "@/lib/content/navigation";
@@ -108,6 +109,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             <PathCard roadmap={lead.r} lessons={lead.lessons} lang={lang} number={1} outcome={c.leadOutcome} specializations={specializations} />
           </div>
         </section>
+      </div>
+      <div className="bg-[var(--surface-warm)] pb-16">
+        <JoinQuestions lang={lang} />
       </div>
     </>
   );

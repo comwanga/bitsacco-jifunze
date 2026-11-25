@@ -37,6 +37,11 @@ const en = {
   circleSave: "Save together",
   circleTeach: "Teach your chama",
   heroStartCta: "Where are you starting?",
+  questionsTitle: "Three questions before you join",
+  questionHolds: "Who holds the money?",
+  questionLeave: "Can I leave with my share?",
+  questionCost: "What does it really cost?",
+  questionRead: "Read the lesson",
 };
 
 export type SiteCopy = Record<keyof typeof en, string>;
@@ -76,6 +81,11 @@ const sw: SiteCopy = {
   circleSave: "Wekeni akiba pamoja",
   circleTeach: "Fundisha chama chako",
   heroStartCta: "Unaanzia wapi?",
+  questionsTitle: "Maswali matatu kabla ya kujiunga",
+  questionHolds: "Nani anashika pesa?",
+  questionLeave: "Naweza kuondoka na sehemu yangu?",
+  questionCost: "Gharama halisi ni kiasi gani?",
+  questionRead: "Soma somo",
 };
 
 export const siteCopy: Record<Lang, SiteCopy> = { en, sw };

@@ -13,10 +13,10 @@ export default function NotFound() {
         Page not found
       </p>
       <p className="mt-6 flex gap-6">
-        <Link className="font-semibold text-teal-700 underline" href="/sw/">
+        <Link className="font-semibold text-teal-700 underline dark:text-teal-400" href="/sw/">
           Rudi mwanzo
         </Link>
-        <Link className="font-semibold text-teal-700 underline" href="/en/" lang="en">
+        <Link className="font-semibold text-teal-700 underline dark:text-teal-400" href="/en/" lang="en">
           Go home
         </Link>
       </p>

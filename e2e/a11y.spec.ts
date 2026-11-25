@@ -29,3 +29,15 @@ test("completed lesson status has accessible contrast in both languages", async 
     expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
   }
 });
+
+for (const colorScheme of ["light", "dark"] as const)
+  test(`the 404 page has no serious accessibility problems (${colorScheme})`, async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop", "markup is the same on both projects");
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+    await page.goto("/en/no-such-page/");
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    const bad = results.violations
+      .filter((v) => v.impact === "serious" || v.impact === "critical")
+      .map((v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(" ")).slice(0, 5).join(" | ")}`);
+    expect(bad, bad.join("\n")).toEqual([]);
+  });

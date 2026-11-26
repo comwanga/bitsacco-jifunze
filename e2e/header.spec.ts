@@ -11,7 +11,7 @@ test.describe("desktop header", () => {
     const header = await box(page, "header[data-site-header]");
     expect(header.height).toBeLessThanOrEqual(72);
     const nav = page.getByRole("navigation", { name: "Menu" });
-    await expect(nav.getByRole("link")).toHaveText(["Paths", "Labs", "Library", "Glossary", "Progress"]);
+    await expect(nav.getByRole("link")).toHaveText(["Paths", "Labs", "Library", "Blog", "Glossary", "Progress"]);
     const centre = (b: { y: number; height: number }) => b.y + b.height / 2;
     for (const sel of ["header [data-brand]", 'header a[hreflang="sw"]']) {
       expect(Math.abs(centre(await box(page, sel)) - centre(header))).toBeLessThan(8);

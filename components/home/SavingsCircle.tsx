@@ -28,7 +28,7 @@ export function SavingsCircle({ lang }: { lang: Lang }) {
   const c = siteCopy[lang];
   const steps = [c.circleLearn, c.circleCheck, c.circleSave, c.circleTeach];
   return (
-    <div data-circle className="savings-circle grid grid-cols-[7.5rem_1fr] items-center gap-x-4 gap-y-3 sm:grid-cols-[11rem_1fr] sm:gap-6">
+    <div data-circle className="savings-circle grid grid-cols-[5.5rem_1fr] items-center gap-x-3 gap-y-3 sm:grid-cols-[11rem_1fr] sm:gap-6">
       <svg viewBox="0 0 200 200" aria-hidden="true" className="h-auto w-full">
         <circle cx={C} cy={C} r={R} fill="none" stroke="rgb(255 255 255 / 0.12)" strokeWidth="14" />
         {[0, 1, 2, 3].map((i) => (
@@ -44,7 +44,7 @@ export function SavingsCircle({ lang }: { lang: Lang }) {
       </svg>
       <ol data-circle-steps className="list-inside list-decimal space-y-1 text-[0.8125rem] font-semibold marker:opacity-80 sm:space-y-1.5 sm:text-base">
         {steps.map((label, i) => (
-          <li key={label} data-step={i + 1} className={`circle-step circle-step-${i + 1} rounded-lg px-2.5 py-1 sm:px-3 sm:py-1.5`}>
+          <li key={label} data-step={i + 1} className={`circle-step circle-step-${i + 1} rounded-lg px-2 py-0.5 sm:px-3 sm:py-1.5`}>
             {label}
           </li>
         ))}

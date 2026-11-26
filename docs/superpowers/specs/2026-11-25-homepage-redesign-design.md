@@ -61,7 +61,7 @@ The homepage should feel alive and polished, in the spirit of myfirstbitcoin.org
    - Subtitle and lead from Batch 1 `siteCopy` (`heroSubtitle`, `heroLead`).
    - The savings circle (see below), beside the text from `md`, below it on phones.
    - Actions: primary `Where are you starting?` linking to `#anza`; secondary `heroBrowse` to `/{lang}/learn/`.
-   - The Batch 1 counts line (`[data-stats]`).
+   - The Batch 1 counts line (`[data-stats]`) was moved below the starting tiles during CI verification: with wide fonts (Linux CI, DejaVu) the hero pushed the first tile off a Pixel 5 screen.
 2. **Where are you starting?** `<section id="anza">` with the Batch 1 `[data-start]` nav (same four links and order) For returning learners the Batch 1 continue card (`[data-continue]`) sits in the hero under the lead text (moved there so Continue is on the first screen on phones; compact on small screens).
 3. **01 Community Finance & Bitcoin**: the Batch 1 lead `PathCard` (`variant="lead"`, `number={1}`, outcome line). Add the three optional specializations as chips linking to `/{lang}/savers/#tree-section-<section id>` (anchors rendered by `PathTree` on the default tree view).
 4. **Three questions before you join** (slanted cards, colour progression night → teal → sun):

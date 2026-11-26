@@ -76,7 +76,7 @@ test("the footer groups real destinations and keeps the disclaimer and licence",
   ]);
 });
 
-test("the hero shows computed content counts", async ({ page }) => {
+test("the homepage shows computed content counts", async ({ page }) => {
   await page.goto("/en/");
   await expect(page.locator("[data-stats]")).toHaveText(
     /49 lessons.*2 languages.*about 34 hours of reading.*57 glossary terms/s,

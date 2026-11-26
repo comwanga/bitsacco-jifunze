@@ -81,7 +81,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                   {c.heroBrowse}
                 </Link>
               </div>
-              <p data-stats className="mt-2 text-xs text-[#b9cdd3] sm:text-sm">{statItems.join(" · ")}</p>
             </div>
           </div>
         </section>
@@ -106,6 +105,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 ))}
               </ul>
             </nav>
+            <p data-stats className="mt-4 text-xs text-[#b9a896] sm:text-sm">{statItems.join(" · ")}</p>
           </div>
         </section>
 

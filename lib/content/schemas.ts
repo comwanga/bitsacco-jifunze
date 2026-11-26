@@ -148,3 +148,30 @@ export const LibraryItemSchema = z.object({
 });
 export const LibrarySchema = z.array(LibraryItemSchema);
 export type LibraryItem = z.infer<typeof LibraryItemSchema>;
+
+// Blog (Makala): shared metadata in content/blog/posts.json, text in one MDX file per written language.
+export const BLOG_CATEGORY_IDS = ["explainers", "guides", "developments", "case-studies", "myths", "community", "terms", "pathways"] as const;
+export const BlogCategorySchema = z.object({ id: z.enum(BLOG_CATEGORY_IDS), title: LocalizedSchema });
+export type BlogCategory = z.infer<typeof BlogCategorySchema>;
+export const BlogCategoriesSchema = z.array(BlogCategorySchema);
+
+export const BlogEntrySchema = z.object({
+  slug,
+  category: z.enum(BLOG_CATEGORY_IDS),
+  author: z.string().min(1),
+  publishedAt: isoDate,
+  updatedAt: isoDate.optional(),
+  featured: z.boolean().optional(),
+  image: z.string().regex(/^\/images\/blog\/[a-z0-9][a-z0-9-]*\.(webp|jpg|png|svg)$/, "images live in /images/blog/ as .webp, .jpg, .png or .svg").optional(),
+  relatedLessons: z.array(z.string().regex(/^(savers|builders|lightning)\/[a-z0-9-]+$/, "related lessons are written roadmap/slug")).min(1).max(4),
+});
+export type BlogEntry = z.infer<typeof BlogEntrySchema>;
+export const BlogRegistrySchema = z.array(BlogEntrySchema);
+
+export const BlogFrontmatterSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  imageAlt: z.string().min(1).optional(),
+  terms: z.array(z.string()).optional(),
+});
+export type BlogFrontmatter = z.infer<typeof BlogFrontmatterSchema>;

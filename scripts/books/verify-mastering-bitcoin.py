@@ -13,13 +13,25 @@ sys.path.insert(0, str(Path('.superpowers/pdf-tools').resolve()))
 import fitz
 from pypdf import PdfReader
 
-work = Path('.superpowers/pdf-generation')
-pdf = work / 'mastering-bitcoin-en-3rd-edition.pdf'
+# Usage: verify-mastering-bitcoin.py [en|sw]. "sw" checks generate-kujifunza-bitcoin.mjs output.
+edition = sys.argv[1] if len(sys.argv) > 1 else 'en'
+if edition == 'en':
+    work = Path('.superpowers/pdf-generation')
+    pdf = work / 'mastering-bitcoin-en-3rd-edition.pdf'
+    expected_metadata = dict(author='Andreas M. Antonopoulos; David A. Harding',
+                             subject='Third edition; generated from official open-source revision 275c4eb8eab8800c6adc39f8def8e8f8fa356a57; CC BY-SA 4.0',
+                             keywords='Bitcoin, third edition, CC BY-SA 4.0, generated open-source edition')
+elif edition == 'sw':
+    work = Path('.superpowers/pdf-generation-sw')
+    pdf = work / 'kujifunza-bitcoin-sw-3rd-edition.pdf'
+    generator = json.loads((work / 'generator.json').read_text(encoding='utf8'))
+    expected_metadata = dict(author='Andreas M. Antonopoulos; David A. Harding; Kiswahili translation: comwanga',
+                             subject=f"Third edition, Kiswahili translation; generated from translation revision {generator['revision']} and upstream revision {generator['upstreamRevision']}; CC BY-SA 4.0",
+                             keywords='Bitcoin, Kiswahili, third edition, CC BY-SA 4.0, generated open-source edition')
+else:
+    sys.exit(f'Unknown edition: {edition}')
 doc = fitz.open(pdf)
 metadata = doc.metadata
-expected_metadata = dict(author='Andreas M. Antonopoulos; David A. Harding',
-                         subject='Third edition; generated from official open-source revision 275c4eb8eab8800c6adc39f8def8e8f8fa356a57; CC BY-SA 4.0',
-                         keywords='Bitcoin, third edition, CC BY-SA 4.0, generated open-source edition')
 if any(metadata.get(key) != value for key,value in expected_metadata.items()):
     metadata.update(expected_metadata)
     doc.set_metadata(metadata)

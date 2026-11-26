@@ -10,6 +10,7 @@ Start with the [project README](../README.md) for the learning paths, feedback a
 - [Feedback](development/feedback.md): the plain email link and its public build-time recipient.
 - [Retained API maintenance](development/retained-api.md): unused API checks and security/logging constraints; no learner account interface.
 - [English book provenance and reproduction](deployment/mastering-bitcoin-generated.md): source revision, license, artifact verification and generation. The [source manifest](../public/books/mastering-bitcoin-en-3rd-edition.source.json) identifies the published PDF.
+- [Kiswahili book provenance and reproduction](deployment/kujifunza-bitcoin-generated.md): translation and upstream revisions, licence, artifact verification and generation. Its [source manifest](../public/books/kujifunza-bitcoin-sw-3rd-edition.source.json) identifies the published PDF.
 - [Attributions](../ATTRIBUTIONS.md), [code license](../LICENSE), [curriculum license](../content/LICENSE), [font notices](../scripts/books/font-notices.txt) and [MathJax notice](../scripts/books/mathjax-LICENSE.txt).
 
 ## Performance

@@ -3,24 +3,26 @@ import path from "node:path";
 import { expect, test } from "vitest";
 import { flatLessons, getLesson, getLibrary, listRoadmaps } from "../../lib/content/load.ts";
 
-test("all companion-book references lead to the pending Kiswahili notice, never an unpublished download", () => {
-  const pending = getLibrary().find(item => item.id === "kujifunza-bitcoin")!;
-  expect(pending.format).toBe("pending-pdf");
-  expect(pending.url).toBeUndefined();
+test("all companion-book references open the Kiswahili book page, which serves the verified local PDF", () => {
+  const book = getLibrary().find(item => item.id === "kujifunza-bitcoin")!;
+  const meta = JSON.parse(fs.readFileSync("public/books/kujifunza-bitcoin-sw-3rd-edition.source.json", "utf8"));
+  expect(book.format).toBe("pdf");
+  expect(book.url).toBe(`/books/${meta.filename}`);
+  expect(book.sizeBytes).toBe(meta.bytes);
   let references = 0;
   for (const roadmap of listRoadmaps()) for (const slug of flatLessons(roadmap)) for (const lang of ["en", "sw"] as const) {
     const { frontmatter } = getLesson(roadmap.id, slug, lang);
     for (const resource of frontmatter.resources) {
-      expect(resource.url).not.toContain("kujifunza-bitcoin-sw.pdf");
+      expect(resource.url).not.toContain("kujifunza-bitcoin-sw.pdf"); // Bitsacco's unpublished copy
       if (!resource.title.startsWith("Kujifunza Bitcoin")) continue;
       references++;
       expect(resource.language).toBe("sw");
-      expect(resource.url).toBe("/sw/library/#kujifunza-bitcoin");
-      expect(resource.note).toContain(lang === "en" ? "awaits official publication" : "inasubiri kuchapishwa rasmi");
-      expect(resource.note).toContain(lang === "en" ? "not a PDF download" : "si upakuaji wa PDF");
+      expect(resource.url).toBe("/sw/library/kujifunza-bitcoin/");
+      expect(resource.note).toContain(lang === "en" ? "read or download it" : "kukisoma au kukipakua");
+      expect(resource.note).not.toMatch(/awaits official publication|inasubiri kuchapishwa rasmi/);
     }
   }
-  // Preserve every audited chapter reference while the translation awaits publication.
+  // Every audited chapter reference is kept.
   expect(references).toBe(30);
 });
 

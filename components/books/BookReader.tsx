@@ -23,8 +23,10 @@ const copy = {
 };
 const subscribe = () => () => {};
 
-export function BookReader({ lang, url, bytes, sha256, filename }: { lang: Lang; url: string; bytes: number; sha256: string; filename: string }) {
+/** `title` names the book for the reader region and frame; it defaults to the English edition's title. */
+export function BookReader({ lang, url, bytes, sha256, filename, title }: { lang: Lang; url: string; bytes: number; sha256: string; filename: string; title?: string }) {
   const c = copy[lang];
+  const label = title ?? c.title;
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const [phase, setPhase] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export function BookReader({ lang, url, bytes, sha256, filename }: { lang: Lang;
   }
   function cancel() { active.current?.abort(); active.current = null; setPhase("idle"); }
   const action = "inline-block rounded-full border-2 border-teal-700 px-5 py-2.5 font-semibold text-teal-800 dark:text-teal-200";
-  return <section data-pdf-reader aria-label={c.title} className="mt-8">
+  return <section data-pdf-reader aria-label={label} className="mt-8">
     <p className="max-w-prose text-[var(--muted)]">{c.offline}</p>
     <div className="my-4 flex flex-wrap gap-3">
       {(phase === "idle" || phase === "error") && <button type="button" disabled={!ready} onClick={() => void load()} className={action}>{phase === "error" ? c.retry : c.read}</button>}
@@ -76,6 +78,6 @@ export function BookReader({ lang, url, bytes, sha256, filename }: { lang: Lang;
     {phase === "loading" && <p role="status" className="my-4">{c.loading}</p>}
     {phase === "error" && <p role="alert" className="my-4 rounded-xl bg-dawn/20 p-4">{c.error}</p>}
     <p className="my-4 max-w-prose text-sm text-[var(--muted)]">{c.help}</p>
-    {blobUrl && <iframe ref={frame} src={blobUrl} title={c.title} className="h-[75svh] min-h-96 w-full rounded-xl border border-[var(--line)]" />}
+    {blobUrl && <iframe ref={frame} src={blobUrl} title={label} className="h-[75svh] min-h-96 w-full rounded-xl border border-[var(--line)]" />}
   </section>;
 }

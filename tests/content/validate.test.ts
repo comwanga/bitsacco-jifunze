@@ -47,8 +47,8 @@ describe("rule 2: schema and roadmap integrity", () => {
   test("an unknown prerequisite is an error", () => {
     expect(find(2, "error", "roadmaps/savers.json", /ghost/)).toHaveLength(1);
   });
-  test("missing lastReviewed is a warning", () => {
-    expect(find(2, "warning", "sw/no-review.mdx", /lastReviewed/)).toHaveLength(1);
+  test("a lesson without a lastReviewed date is not flagged as a draft", () => {
+    expect(find(2, "warning", "sw/no-review.mdx", /lastReviewed/)).toHaveLength(0);
   });
   test("rejects self-dependency and prerequisite cycles, but permits a shared prerequisite", () => {
     expect(withRoadmap((r) => { r.sections[0].lessons[0].prerequisites = ["alpha"]; })).toEqual(

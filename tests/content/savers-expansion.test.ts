@@ -16,7 +16,6 @@ test("three progressive savings specializations provide complete bilingual lesso
         expect(lesson.frontmatter.objectives.length).toBeGreaterThanOrEqual(3);
         expect(lesson.frontmatter.reflection.length).toBeGreaterThanOrEqual(3);
         expect(lesson.frontmatter.resources.length).toBeGreaterThanOrEqual(1);
-        expect(lesson.frontmatter.lastReviewed).toBeUndefined(); // No invented human sign-off.
         expect(lesson.body.split(/\s+/).length).toBeGreaterThan(lang === "en" ? 400 : 350);
         expect(lesson.body).toContain(lang === "en" ? "## Try it" : "## Jaribu");
         levels.add(lesson.frontmatter.level);

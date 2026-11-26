@@ -5,16 +5,17 @@ import { useState } from "react";
 import { filterCatalog, type CatalogEntry, type LessonType } from "@/lib/content/catalog-filter";
 import { t, type Lang } from "@/lib/i18n";
 
-export function CatalogList({ lang, entries }: { lang: Lang; entries: CatalogEntry[] }) {
+/** `defaultPath` is the path shown first; "All paths" stays one choice away. */
+export function CatalogList({ lang, entries, defaultPath }: { lang: Lang; entries: CatalogEntry[]; defaultPath: string }) {
   const [text, setText] = useState("");
-  const [roadmap, setRoadmap] = useState("");
+  const [roadmap, setRoadmap] = useState(defaultPath);
   const [level, setLevel] = useState("");
   const [type, setType] = useState<LessonType | "">("");
   const shown = filterCatalog(entries, { text, roadmap, level, type: type || undefined });
   const paths = [...new Map(entries.map((e) => [e.roadmap, e.roadmapTitle])).entries()];
   const control = "mt-1 w-full rounded-xl border-2 border-[var(--line)] bg-[var(--bg)] px-3 py-3 text-base";
   function clear() {
-    setText(""); setRoadmap(""); setLevel(""); setType("");
+    setText(""); setRoadmap(defaultPath); setLevel(""); setType("");
   }
   return (
     <>
@@ -48,11 +49,21 @@ export function CatalogList({ lang, entries }: { lang: Lang; entries: CatalogEnt
       <p className="mt-5 text-sm text-[var(--muted)]" role="status" aria-live="polite" aria-atomic="true">
         {t(lang, "catalogResults")}: {shown.length} / {entries.length}
       </p>
-      {(text || roadmap || level || type) && (
+      {(text || roadmap !== defaultPath || level || type) && (
         <button type="button" onClick={clear} className="mt-3 rounded-full border border-teal-600 px-4 py-2 font-semibold text-teal-700 dark:text-teal-400">
           {t(lang, "catalogClear")}
         </button>
       )}
+      {/* Plain links, so the other paths stay reachable without JavaScript. */}
+      <p data-other-paths className="mt-3 text-sm text-[var(--muted)]">
+        {t(lang, "catalogOtherPaths")}:{" "}
+        {paths.filter(([id]) => id !== defaultPath).map(([id, title], i) => (
+          <span key={id}>
+            {i > 0 && " · "}
+            <Link prefetch={false} href={`/${lang}/${id}/`} className="underline underline-offset-2 hover:text-[var(--fg)]">{title}</Link>
+          </span>
+        ))}
+      </p>
       {shown.length === 0 && <p className="mt-6">{t(lang, "catalogEmpty")}</p>}
       <ul className="mt-6 divide-y divide-[var(--line)]">
         {shown.map((e) => (

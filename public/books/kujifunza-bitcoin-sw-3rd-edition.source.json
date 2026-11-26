@@ -1,0 +1,36 @@
+{
+  "filename": "kujifunza-bitcoin-sw-3rd-edition.pdf",
+  "title": "Kujifunza Bitcoin: Kuprogramu Blockchain Huria (Toleo la 3)",
+  "language": "sw",
+  "authors": [
+    "Andreas M. Antonopoulos",
+    "David A. Harding"
+  ],
+  "translator": "comwanga",
+  "translationSource": "https://github.com/comwanga/bitcoinbook-swahili",
+  "translationRevision": "5da7e1705b29c153ef2d7ed040df8a8b6a6eed53",
+  "upstream": "https://github.com/bitcoinbook/bitcoinbook",
+  "revision": "275c4eb8eab8800c6adc39f8def8e8f8fa356a57",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "licenseGrant": "https://github.com/bitcoinbook/bitcoinbook/commit/94c9ba64b454eb79ca77904a48251bd4efab73cf",
+  "bytes": 10154755,
+  "pages": 422,
+  "sha256": "3b99ac777bc8e59c15d9d163ef3a589228459be2d8bc2b6f74aa4b2b873f5ce4",
+  "generator": {
+    "image": "asciidoctor/docker-asciidoctor@sha256:b0c0ebff6e2d6f5cd66a075310ca7f076921d8acb293d8f4ae8fcae0d7fea30c",
+    "chromium": "156.0.8078.4",
+    "mathjax": "3.2.2",
+    "indexEntries": 1643
+  },
+  "description": "PDF generated from the open-source Kiswahili translation, not a publisher PDF. Typesetting, open fonts, linked index, bookmarks, Kiswahili cover and title page and provenance notices added; translated text unchanged.",
+  "notices": [
+    "Translation licence (CC BY-SA 4.0) and upstream licence retained in PDF",
+    "Satoshi Nakamoto whitepaper: MIT",
+    "Whitepaper errata: CC0",
+    "Bitcoin Design Guide images: CC BY 4.0",
+    "DejaVu / Bitstream Vera / DejaVu Math font notices embedded",
+    "MathJax equation glyphs: Apache 2.0 notice embedded",
+    "Cover: comwanga, CC BY-SA 4.0 (publisher logo removed); SHA-256 59ad299f25910e2653dcde73b9d1dda969e16d4404d27dc1dbe497fdd80cdb62"
+  ]
+}

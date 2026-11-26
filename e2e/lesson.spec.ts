@@ -54,3 +54,10 @@ test("on a phone, opening one lesson menu closes the other", async ({ page }, in
   await expect(toc).toHaveAttribute("open", "");
   await expect(course).not.toHaveAttribute("open", "");
 });
+
+for (const [lang, draft] of [["sw", "Rasimu"], ["en", "Draft"]] as const)
+  test(`${lang}: lessons open without a draft or pending-review notice`, async ({ page }) => {
+    await page.goto(`/${lang}/savers/money-and-bitcoin/`);
+    await expect(page.locator("article h1")).toBeVisible();
+    await expect(page.locator("article")).not.toContainText(draft);
+  });

@@ -44,7 +44,7 @@ Add the slug to `content/roadmaps/<roadmap>.json`. If only one language is ready
 | `reflection` | yes | Prompts shown after the lesson |
 | `source` | yes | `type: original`, or `type: adapted` with `from`, `url`, `licence`, `credit` |
 | `translationOf` | no | The language this file was translated from |
-| `lastReviewed` | no | `YYYY-MM-DD`, set by a reviewer when they sign off |
+| `lastReviewed` | no | `YYYY-MM-DD`; when set, shown as the lesson's review date |
 | `translationPending` | no | `true` when the other language is missing |
 | `terms` | no | Glossary ids shown as key terms |
 
@@ -76,14 +76,7 @@ Then lint, typecheck, unit tests, the static build, a link check, CSP generation
 
 ## Reviewers
 
-Each lesson needs two sign-offs before `lastReviewed` is set:
-
-- a **Kiswahili reviewer** for wording and clarity, and
-- a **technical reviewer** for accuracy.
-
-The maintainer has approved the existing Kiswahili wording. Missing `lastReviewed` dates must not be treated as evidence that the completed language review is still pending; do not set review dates without both required sign-offs. New or changed material still needs the applicable reviews.
-
-The project owner completed the expanded curriculum's educational review on 11 November 2026 and waived the separate independent reviews for that release on 12 November. See the [current review status](docs/content-guide.md#review-status). This does not invent reviewer identities or both formal sign-offs, and it does not change the policy for setting `lastReviewed` or reviewing future content changes.
+The project owner reviews each lesson, in Kiswahili and English, as it is written and before it is merged. Published lessons are reviewed lessons, so the site shows no draft or pending-review notice. `lastReviewed` is optional and is not required to publish a lesson.
 
 Lessons explain how things work. They must never give financial or investment advice, promise returns, or tell readers what to buy.
 

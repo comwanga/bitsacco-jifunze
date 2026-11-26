@@ -18,3 +18,8 @@ test("the hero leads with community finance in each language", () => {
   expect(siteCopy.sw.heroSubtitle).toBe("Chama, SACCO, akiba binafsi na Bitcoin");
   expect(siteCopy.en.heroLead).toMatch(/^Learn how savings groups and money tools really work/);
 });
+
+test("the hero tells new learners that progress stays on their device", () => {
+  expect(siteCopy.en.heroLead).toMatch(/No sign-up: your progress is saved on this device\.$/);
+  expect(siteCopy.sw.heroLead).toMatch(/Bila kujisajili: maendeleo yako yanahifadhiwa kwenye kifaa hiki\.$/);
+});

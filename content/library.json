@@ -41,12 +41,14 @@
     "title": { "sw": "Kujifunza Bitcoin: Kuprogramu Blockchain Huria", "en": "Kujifunza Bitcoin (Mastering Bitcoin in Kiswahili)" },
     "author": "Andreas M. Antonopoulos & David A. Harding",
     "language": "sw",
-    "format": "pending-pdf",
+    "format": "pdf",
+    "url": "/books/kujifunza-bitcoin-sw-3rd-edition.pdf",
     "licence": "CC BY-SA 4.0",
     "credit": "comwanga",
     "note": {
-      "sw": "Toleo la Kiswahili la Mastering Bitcoin (toleo la 3). Kitabu kirefu kinachoambatana na masomo yote.",
-      "en": "The Kiswahili edition of Mastering Bitcoin (3rd edition). The long-form companion to every lesson."
-    }
+      "sw": "Toleo la Kiswahili la Mastering Bitcoin (toleo la 3). Kitabu kirefu kinachoambatana na masomo yote. PDF imetengenezwa kutoka maandishi ya chanzo huria ya tafsiri.",
+      "en": "The Kiswahili edition of Mastering Bitcoin (3rd edition). The long-form companion to every lesson. PDF generated from the open-source text of the translation."
+    },
+    "sizeBytes": 10154755
   }
 ]

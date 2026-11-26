@@ -17,7 +17,7 @@ Two optional technical paths serve builders:
 
 All 49 lessons are available in Kiswahili and English, with learning trees, quizzes, a glossary and fictional practice simulations. Every lesson includes required open-ended discussion: explain reasoning, test an assumption and formulate a question of your own. Learners self-confirm the activity before new lesson completion; answers stay with learners and existing completions remain valid. The owner's educational review and release decisions are linked under Contributing below.
 
-The educational library includes the whitepaper in both languages and in-app readers and downloads for *Mastering Bitcoin*, third edition, in English and in Kiswahili (*Kujifunza Bitcoin*, translated by comwanga). See the [curriculum, primary sources and review guide](docs/content-guide.md).
+The educational library includes the whitepaper in both languages and in-app readers and downloads for *Mastering Bitcoin*, third edition, in English and in Kiswahili (*Kujifunza Bitcoin*, translated by comwanga). The **Makala / Blog** section has short posts that explain what is happening in community finance and Bitcoin and lead into the lessons; anyone can propose one by pull request ([how to write a post](CONTRIBUTING.md#writing-a-blog-post)). See the [curriculum, primary sources and review guide](docs/content-guide.md).
 
 There is no sign-up: learning progress is saved on the learner's device and can be exported and imported to move it to another one. Previously opened lessons support offline reading; interactive simulations work offline after their modules have been loaded. The books are downloaded only on request and are not included in the offline lesson cache.
 

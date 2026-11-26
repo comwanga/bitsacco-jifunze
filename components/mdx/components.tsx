@@ -5,6 +5,7 @@ import type { Lang } from "../../lib/i18n.ts";
 import type { LessonKey } from "../../lib/progress/model.ts";
 import type { ExerciseProps } from "../lab/ExerciseRunner.tsx";
 import { LazyExerciseRunner } from "../lab/LabIslands.tsx";
+import { Marker, makeDiagram } from "../blog/Diagram.tsx";
 
 const CALLOUT_STYLE = {
   tip: "border-teal-600 bg-teal-50 text-teal-900 dark:bg-teal-900/30 dark:text-teal-50",
@@ -75,4 +76,10 @@ export function makeMdxComponents(lang: Lang, glossary: GlossaryTerm[], ctx?: Le
   }
 
   return { Term, Callout, Exercise, table: Table };
+}
+
+/** Blog posts: the lesson components without labs, plus labelled diagrams. */
+export function makeBlogMdxComponents(lang: Lang, glossary: GlossaryTerm[]) {
+  const { Term, Callout, table } = makeMdxComponents(lang, glossary);
+  return { Term, Callout, table, Diagram: makeDiagram(lang), Marker, Exercise: () => null };
 }

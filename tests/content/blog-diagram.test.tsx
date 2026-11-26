@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
-import { renderBlogBody } from "../../lib/content/mdx.ts";
+import { renderBlogBody } from "../../lib/content/blog-mdx.ts";
 
 const body = `Kabla.
 

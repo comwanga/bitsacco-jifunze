@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { t, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { blogText } from "@/lib/blog/copy";
 import type { BlogCard } from "@/lib/content/blog";
 import type { BlogCategory } from "@/lib/content/schemas";
 import { PostCard } from "./PostCard";
@@ -20,9 +21,9 @@ export function BlogList({ lang, cards, categories, leadSlug }: { lang: Lang; ca
   return (
     <>
       {present.length > 1 && (
-        <div role="group" aria-label={t(lang, "blogFilter")} className="flex flex-wrap gap-2">
+        <div role="group" aria-label={blogText(lang, "blogFilter")} className="flex flex-wrap gap-2">
           <button type="button" aria-pressed={category === null} onClick={() => setCategory(null)} className={chip(category === null)}>
-            {t(lang, "blogAll")}
+            {blogText(lang, "blogAll")}
           </button>
           {present.map((c) => (
             <button key={c.id} type="button" aria-pressed={category === c.id} onClick={() => setCategory(c.id)} className={chip(category === c.id)}>
@@ -34,7 +35,7 @@ export function BlogList({ lang, cards, categories, leadSlug }: { lang: Lang; ca
       {lead && (
         <section aria-labelledby="blog-featured" className="mt-8">
           <h2 id="blog-featured" className="sr-only">
-            {t(lang, "blogFeatured")}
+            {blogText(lang, "blogFeatured")}
           </h2>
           <PostCard card={lead} lang={lang} lead />
         </section>
@@ -42,7 +43,7 @@ export function BlogList({ lang, cards, categories, leadSlug }: { lang: Lang; ca
       {shown.length > 0 && (
         <section aria-labelledby="blog-recent" className="mt-10">
           <h2 id="blog-recent" className="text-xl font-bold">
-            {t(lang, "blogRecent")}
+            {blogText(lang, "blogRecent")}
           </h2>
           <div className="mt-4 grid gap-5 md:grid-cols-2">
             {shown.map((c) => (

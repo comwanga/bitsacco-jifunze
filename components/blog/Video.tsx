@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { t, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { blogText } from "@/lib/blog/copy";
 
 function subscribe(onChange: () => void) {
   window.addEventListener("online", onChange);
@@ -34,7 +35,7 @@ export function Video({ src, poster, captions, title, lang }: { src: string; pos
       </video>
       <figcaption className="mt-2 text-sm text-[var(--muted)]">{title}</figcaption>
       <p data-video-offline hidden={online && !failed} className="mt-2 rounded-xl bg-dawn/20 p-3 text-sm">
-        {t(lang, "blogVideoOffline")}
+        {blogText(lang, "blogVideoOffline")}
       </p>
     </figure>
   );

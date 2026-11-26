@@ -1,4 +1,5 @@
-import { t, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
+import { blogText } from "@/lib/blog/copy";
 
 /** A plain link to a longer video elsewhere: no embed, so nothing loads from the video site until the reader taps. */
 export function VideoLink({ href, poster, title, duration, lang }: { href: string; poster: string; title: string; duration: string; lang: Lang }) {
@@ -21,7 +22,7 @@ export function VideoLink({ href, poster, title, duration, lang }: { href: strin
         <span className="block font-bold text-[var(--fg)]">{title}</span>
         <span className="mt-1 block text-sm text-[var(--muted)]">{duration}</span>
         <span data-video-host className="mt-1 block text-sm text-teal-700 underline dark:text-teal-400">
-          {t(lang, "blogVideoOpens").replace("{host}", host)}
+          {blogText(lang, "blogVideoOpens").replace("{host}", host)}
         </span>
       </span>
     </a>

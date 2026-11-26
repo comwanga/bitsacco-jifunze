@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
-import { renderBlogBody } from "../../lib/content/mdx.ts";
+import { renderBlogBody } from "../../lib/content/blog-mdx.ts";
 
 test("a self-hosted video downloads nothing until play and carries captions in the post language", async () => {
   const html = renderToStaticMarkup(

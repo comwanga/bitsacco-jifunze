@@ -1,4 +1,5 @@
 import { t, type Lang } from "@/lib/i18n";
+import { blogText } from "@/lib/blog/copy";
 import type { BlogCard } from "@/lib/content/blog";
 
 /** One post in a listing. `lead` is the large featured card at the top of the index. */
@@ -19,7 +20,7 @@ export function PostCard({ card, lang, lead = false }: { card: BlogCard; lang: L
           <span>
             {card.minutes} {t(lang, "minutes")}
           </span>
-          {card.isFallback && <span className="rounded-full border border-[var(--line)] px-2 py-0.5">{t(lang, "blogOtherLang")}</span>}
+          {card.isFallback && <span className="rounded-full border border-[var(--line)] px-2 py-0.5">{blogText(lang, "blogOtherLang")}</span>}
         </p>
         <h3 lang={contentLang} className={`mt-3 font-extrabold tracking-tight ${lead ? "text-2xl sm:text-3xl" : "text-xl"}`}>
           <a href={href} className="underline decoration-teal-600/40 underline-offset-4 hover:text-teal-700 dark:hover:text-teal-400">

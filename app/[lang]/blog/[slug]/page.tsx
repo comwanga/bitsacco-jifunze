@@ -4,9 +4,10 @@ import { FeedbackLink } from "@/components/FeedbackLink";
 import { PostCard } from "@/components/blog/PostCard";
 import { blogCard, formatBlogDate, getBlogCategories, getBlogPost, listBlogPosts, relatedPosts } from "@/lib/content/blog";
 import { getGlossary, getLesson, getRoadmap } from "@/lib/content/load";
-import { renderBlogBody } from "@/lib/content/mdx";
+import { renderBlogBody } from "@/lib/content/blog-mdx";
 import type { RoadmapId } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
+import { blogText } from "@/lib/blog/copy";
 import { pageMetadata } from "@/lib/page-metadata";
 
 export const dynamicParams = false;
@@ -54,7 +55,7 @@ export default async function BlogPostPage({ params }: Params) {
     <div className="mx-auto max-w-[72ch] px-4 pt-8 pb-16">
       <p className="text-sm text-[var(--muted)]">
         <Link href={`/${lang}/blog/`} className="underline underline-offset-2 hover:text-[var(--fg)]">
-          {t(lang, "blogTitle")}
+          {blogText(lang, "blogTitle")}
         </Link>{" "}
         <span aria-hidden="true">/</span> {category}
       </p>
@@ -63,13 +64,13 @@ export default async function BlogPostPage({ params }: Params) {
         <p className="mt-3 text-lg text-[var(--muted)]">{fm.description}</p>
         <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[var(--muted)]" lang={lang}>
           <span>
-            {t(lang, "blogBy")} {entry.author}
+            {blogText(lang, "blogBy")} {entry.author}
           </span>
           <span aria-hidden="true">·</span>
           <time dateTime={entry.publishedAt}>{formatBlogDate(entry.publishedAt, lang)}</time>
           {entry.updatedAt && (
             <span>
-              ({t(lang, "blogUpdated")} <time dateTime={entry.updatedAt}>{formatBlogDate(entry.updatedAt, lang)}</time>)
+              ({blogText(lang, "blogUpdated")} <time dateTime={entry.updatedAt}>{formatBlogDate(entry.updatedAt, lang)}</time>)
             </span>
           )}
           <span aria-hidden="true">·</span>
@@ -79,7 +80,7 @@ export default async function BlogPostPage({ params }: Params) {
         </p>
         {post.isFallback && (
           <p className="mt-6 rounded-xl bg-dawn/20 p-4 text-[15px]" lang={lang} role="note">
-            {t(lang, "blogFallback")}
+            {blogText(lang, "blogFallback")}
           </p>
         )}
         {entry.image && (
@@ -91,7 +92,7 @@ export default async function BlogPostPage({ params }: Params) {
 
       <section aria-labelledby="blog-continue" className="mt-12" lang={lang}>
         <h2 id="blog-continue" className="text-2xl font-bold">
-          {t(lang, "blogContinue")}
+          {blogText(lang, "blogContinue")}
         </h2>
         <ul className="mt-4 grid gap-3">
           {lessons.map((lesson) => (
@@ -111,7 +112,7 @@ export default async function BlogPostPage({ params }: Params) {
       {related.length > 0 && (
         <section aria-labelledby="blog-related" className="mt-12" lang={lang}>
           <h2 id="blog-related" className="text-2xl font-bold">
-            {t(lang, "blogRelated")}
+            {blogText(lang, "blogRelated")}
           </h2>
           <div className="mt-4 grid gap-4">
             {related.map((card) => (
@@ -122,7 +123,7 @@ export default async function BlogPostPage({ params }: Params) {
       )}
 
       <div className="mt-10" lang={lang}>
-        <FeedbackLink lang={lang} context={{ pathTitle: t(lang, "blogTitle"), lessonTitle: fm.title, pathname: `/${lang}/blog/${slug}/` }} className="text-teal-700 dark:text-teal-400" />
+        <FeedbackLink lang={lang} context={{ pathTitle: blogText(lang, "blogTitle"), lessonTitle: fm.title, pathname: `/${lang}/blog/${slug}/` }} className="text-teal-700 dark:text-teal-400" />
       </div>
     </div>
   );

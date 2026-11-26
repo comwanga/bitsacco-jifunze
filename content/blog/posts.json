@@ -1,0 +1,10 @@
+[
+  {
+    "slug": "chama-loses-wallet-access",
+    "category": "guides",
+    "author": "Bitsacco Jifunze",
+    "publishedAt": "2026-11-26",
+    "featured": true,
+    "relatedLessons": ["savers/group-multisig", "savers/group-treasury", "savers/custody-recovery"]
+  }
+]

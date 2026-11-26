@@ -11,13 +11,17 @@ import {
   QuizFileSchema,
   ROADMAP_IDS,
   RoadmapSchema,
+  BLOG_CATEGORY_IDS,
+  BlogCategoriesSchema,
+  BlogEntrySchema,
+  BlogFrontmatterSchema,
   type GlossaryTerm,
   type Roadmap,
 } from "./schemas.ts";
 
 export type Issue = {
   level: "error" | "warning";
-  rule: 1 | 2 | 3 | 4 | 5 | 6;
+  rule: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   file: string;
   message: string;
 };
@@ -384,5 +388,106 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
   const checks = checkIdsIn(opts.checksDir ?? path.join(root, "..", "lab", "jifunze_lab", "checks"));
   for (const roadmap of roadmaps) validateExercises(root, roadmap, checks, issues);
 
+  validateBlog(root, lessonKeys, issues);
+
   return issues;
+}
+
+const BLOG_IMAGE_MAX = 400 * 1024;
+
+/** Rule 7: blog posts. Messages are written for post writers, naming the field and the fix. */
+function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): void {
+  const dir = path.join(root, "blog");
+  if (!fs.existsSync(dir)) return;
+  const err = (file: string, message: string) => issues.push({ level: "error", rule: 7, file: rel(root, file), message });
+  const registryFile = path.join(dir, "posts.json");
+  const categoriesFile = path.join(dir, "categories.json");
+  if (fs.existsSync(categoriesFile)) {
+    const parsed = BlogCategoriesSchema.safeParse(readJsonSafe(categoriesFile, issues, root, 7));
+    if (!parsed.success) err(categoriesFile, `categories.json: ${parsed.error.message}`);
+  }
+  const raw = fs.existsSync(registryFile) ? readJsonSafe(registryFile, issues, root, 7) : [];
+  if (!Array.isArray(raw)) { err(registryFile, "posts.json must be a list of posts"); return; }
+
+  const publicFile = (site: string) => path.join(root, "..", "public", site);
+  const checkImage = (file: string, site: string, what: string) => {
+    if (!/^\/images\/blog\/[a-z0-9][a-z0-9-]*\.(webp|jpg|png|svg)$/.test(site)) return err(file, `${what} "${site}" must be a .webp, .jpg, .png or .svg file in /images/blog/`);
+    if (!fs.existsSync(publicFile(site))) return err(file, `${what}: image file not found: add public${site}`);
+    if (fs.statSync(publicFile(site)).size > BLOG_IMAGE_MAX) err(file, `${what}: public${site} is larger than 400 KB; make it smaller to save learners' mobile data`);
+  };
+
+  const listed = new Set<string>();
+  for (const entry of raw as Record<string, unknown>[]) {
+    const slug = typeof entry?.slug === "string" ? entry.slug : "(no slug)";
+    if (listed.has(slug)) { err(registryFile, `duplicate slug "${slug}": each post needs its own slug`); continue; }
+    listed.add(slug);
+    if (typeof entry?.category === "string" && !(BLOG_CATEGORY_IDS as readonly string[]).includes(entry.category)) {
+      err(registryFile, `${slug}: unknown category "${entry.category}"; use one of ${BLOG_CATEGORY_IDS.join(", ")}`);
+    }
+    const parsed = BlogEntrySchema.safeParse(entry);
+    if (!parsed.success) {
+      for (const problem of parsed.error.issues) {
+        if (problem.path[0] === "category") continue; // reported above in plain words
+        err(registryFile, `${slug}: ${problem.path.join(".") || "entry"}: ${problem.message}`);
+      }
+      continue;
+    }
+    const post = parsed.data;
+    if (post.updatedAt && post.updatedAt < post.publishedAt) err(registryFile, `${slug}: updatedAt is before publishedAt`);
+    for (const lesson of post.relatedLessons) {
+      if (!lessonKeys.has(lesson)) err(registryFile, `${slug}: related lesson "${lesson}" does not exist; use roadmap/slug of a real lesson`);
+    }
+    if (post.image) checkImage(registryFile, post.image, `${slug}: image`);
+
+    const present = LANGS.filter((l) => fs.existsSync(path.join(dir, l, `${slug}.mdx`)));
+    if (present.length === 0) err(registryFile, `${slug}: no Kiswahili or English file; add blog/sw/${slug}.mdx or blog/en/${slug}.mdx`);
+    for (const lang of present) {
+      const file = path.join(dir, lang, `${slug}.mdx`);
+      let data: Record<string, unknown>, body: string;
+      try {
+        ({ data, content: body } = matter(fs.readFileSync(file, "utf8")));
+      } catch (e) {
+        err(file, `front matter could not be read: ${(e as Error).message}`);
+        continue;
+      }
+      const fm = BlogFrontmatterSchema.safeParse(data);
+      if (!fm.success) for (const problem of fm.error.issues) err(file, `${problem.path.join(".") || "front matter"}: ${problem.message}`);
+      if (post.image && !data.imageAlt) err(file, "imageAlt is required because the post has an image; describe the image in this language");
+      validateBlogBody(file, body, err, checkImage);
+    }
+  }
+
+  for (const lang of LANGS) {
+    const langDir = path.join(dir, lang);
+    if (!fs.existsSync(langDir)) continue;
+    for (const name of fs.readdirSync(langDir)) {
+      if (name.endsWith(".mdx") && !listed.has(name.slice(0, -4))) err(path.join(langDir, name), `"${name.slice(0, -4)}" is not listed in posts.json; add an entry for it`);
+    }
+  }
+}
+
+function validateBlogBody(
+  file: string,
+  body: string,
+  err: (file: string, message: string) => void,
+  checkImage: (file: string, site: string, what: string) => void,
+): void {
+  if (/<Exercise\b/.test(body)) err(file, "labs are not allowed in posts; link to the lesson that has the lab instead");
+  for (const m of body.matchAll(/<Diagram\b([^>]*)>([\s\S]*?)<\/Diagram>/g)) {
+    const attrs = m[1];
+    const src = /\bsrc="([^"]*)"/.exec(attrs)?.[1];
+    if (!/\balt="[^"]+"/.test(attrs)) err(file, "diagram needs alt text: add alt=\"…\" describing the image");
+    if (!src) err(file, "diagram needs src=\"/images/blog/…\"");
+    else checkImage(file, src, "diagram");
+    const markers = [...m[2].matchAll(/<Marker\b([^>]*)>([\s\S]*?)<\/Marker>/g)];
+    if (markers.length === 0) err(file, "diagram needs at least one <Marker>");
+    for (const [n, marker] of markers.entries()) {
+      for (const [axis, pattern] of [["x", /\bx=\{(-?[\d.]+)\}/], ["y", /\by=\{(-?[\d.]+)\}/]] as const) {
+        const value = Number(pattern.exec(marker[1])?.[1]);
+        if (!Number.isFinite(value) || value < 0 || value > 100) err(file, `marker ${n + 1}: marker position must be 0–100 (${axis}={…} is a percentage of the image)`);
+      }
+      if (!/\btitle="[^"]+"/.test(marker[1])) err(file, `marker ${n + 1} needs a title`);
+      if (!marker[2].trim()) err(file, `marker ${n + 1} needs explanation text`);
+    }
+  }
 }

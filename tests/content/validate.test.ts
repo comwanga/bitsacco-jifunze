@@ -111,3 +111,87 @@ describe("clean content", () => {
     expect(validateContent(CLEAN).filter((i) => i.level === "error")).toEqual([]);
   });
 });
+
+describe("rule 7: blog posts", () => {
+  type Edit = { posts?: (p: Record<string, unknown>[]) => void; files?: Record<string, string | null>; publicFiles?: Record<string, Buffer | string> };
+  /** A copy of the clean tree (content/ next to public/, as in the repo) with one thing changed. */
+  function blogErrors(edit: Edit): Issue[] {
+    const base = fs.mkdtempSync(path.join(os.tmpdir(), "jifunze-blog-"));
+    temporaryRoots.push(base);
+    const root = path.join(base, "content");
+    fs.cpSync(CLEAN, root, { recursive: true });
+    const postsFile = path.join(root, "blog/posts.json");
+    const posts = JSON.parse(fs.readFileSync(postsFile, "utf8"));
+    edit.posts?.(posts);
+    fs.writeFileSync(postsFile, JSON.stringify(posts));
+    for (const [rel, text] of Object.entries(edit.files ?? {})) {
+      const file = path.join(root, "blog", rel);
+      if (text === null) fs.rmSync(file);
+      else { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, text); }
+    }
+    for (const [rel, data] of Object.entries(edit.publicFiles ?? {})) {
+      const file = path.join(base, "public", rel);
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, data);
+    }
+    return validateContent(root, { checksDir: path.join(CLEAN, "../lab/jifunze_lab/checks") }).filter((i) => i.rule === 7 && i.level === "error");
+  }
+  const post = (body: string, extra = "") => `---\ntitle: "T"\ndescription: "D"\n${extra}---\n\n${body}\n`;
+  const one = (edit: Edit, msg: RegExp) => {
+    const errors = blogErrors(edit);
+    expect(errors.map((e) => e.message)).toEqual([expect.stringMatching(msg)]);
+  };
+
+  test("the clean fixture blog has no blog errors", () => {
+    expect(blogErrors({})).toEqual([]);
+  });
+  test("a registry entry with no language file", () => {
+    one({ posts: (p) => p.push({ slug: "ghost", category: "guides", author: "A", publishedAt: "2026-11-01", relatedLessons: ["savers/alpha"] }) }, /no Kiswahili or English file/);
+  });
+  test("a post file that is not in the registry", () => {
+    one({ files: { "en/stray.mdx": post("Text") } }, /not listed in posts\.json/);
+  });
+  test("a duplicate slug", () => {
+    one({ posts: (p) => p.push({ ...p[0] }) }, /duplicate slug/);
+  });
+  test("an unknown category", () => {
+    one({ posts: (p) => { p[0].category = "gossip"; } }, /unknown category/);
+  });
+  test("updatedAt before publishedAt", () => {
+    one({ posts: (p) => { p[0].updatedAt = "2026-10-01"; } }, /updatedAt is before publishedAt/);
+  });
+  test("a related lesson that does not exist", () => {
+    one({ posts: (p) => { p[0].relatedLessons = ["savers/nope"]; } }, /related lesson "savers\/nope" does not exist/);
+  });
+  test("an image file that is missing", () => {
+    one({ posts: (p) => { p[0].image = "/images/blog/missing.png"; }, files: { "en/english-only.mdx": post("Text", 'imageAlt: "A"\n') } }, /image file not found/);
+  });
+  test("an image without alt text in a language file", () => {
+    one({ posts: (p) => { p[0].image = "/images/blog/ok.png"; }, publicFiles: { "images/blog/ok.png": "png" } }, /imageAlt is required/);
+  });
+  test("an image over 400 KB", () => {
+    one({
+      posts: (p) => { p[0].image = "/images/blog/big.png"; },
+      files: { "en/english-only.mdx": post("Text", 'imageAlt: "A"\n') },
+      publicFiles: { "images/blog/big.png": Buffer.alloc(400 * 1024 + 1) },
+    }, /larger than 400 KB/);
+  });
+  test("a lab exercise in a post", () => {
+    one({ files: { "en/english-only.mdx": post('<Exercise id="x" />') } }, /labs are not allowed in posts/);
+  });
+  test("a diagram without alt text", () => {
+    one({
+      files: { "en/english-only.mdx": post('<Diagram src="/images/blog/ok.png">\n<Marker x={10} y={20} title="One">Text</Marker>\n</Diagram>') },
+      publicFiles: { "images/blog/ok.png": "png" },
+    }, /diagram needs alt text/);
+  });
+  test("a marker outside the image", () => {
+    one({
+      files: { "en/english-only.mdx": post('<Diagram src="/images/blog/ok.png" alt="A">\n<Marker x={120} y={20} title="One">Text</Marker>\n</Diagram>') },
+      publicFiles: { "images/blog/ok.png": "png" },
+    }, /marker position must be 0–100/);
+  });
+  test("the writer template folder is ignored", () => {
+    expect(blogErrors({ files: { "_template/post.mdx": post('<Exercise id="x" />') } })).toEqual([]);
+  });
+});

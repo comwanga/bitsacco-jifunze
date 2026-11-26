@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
 import { validateContent, type Issue } from "../../lib/content/validate.ts";
+import { mp4Header } from "../helpers/mp4.ts";
 
 const BROKEN = path.join(import.meta.dirname, "../fixtures/broken");
 const CLEAN = path.join(import.meta.dirname, "../fixtures/content");
@@ -190,6 +191,41 @@ describe("rule 7: blog posts", () => {
       files: { "en/english-only.mdx": post('<Diagram src="/images/blog/ok.png" alt="A">\n<Marker x={120} y={20} title="One">Text</Marker>\n</Diagram>') },
       publicFiles: { "images/blog/ok.png": "png" },
     }, /marker position must be 0–100/);
+  });
+  const clip = (attrs: string) => ({ files: { "en/english-only.mdx": post(`<Video ${attrs} />`) } });
+  const okMedia = {
+    "images/blog/poster.webp": "img",
+    "videos/blog/clip.mp4": mp4Header(30),
+    "videos/blog/clip.en.vtt": "WEBVTT\n\n00:00.000 --> 00:01.000\nHi\n",
+  };
+  const goodVideo = 'src="/videos/blog/clip.mp4" poster="/images/blog/poster.webp" captions="/videos/blog/clip.en.vtt" title="Clip"';
+  test("a correct video passes", () => {
+    expect(blogErrors({ ...clip(goodVideo), publicFiles: okMedia })).toEqual([]);
+  });
+  test("a video file that is missing", () => {
+    one({ ...clip(goodVideo.replace("clip.mp4", "gone.mp4")), publicFiles: okMedia }, /video file not found/);
+  });
+  test("a video that is not an MP4", () => {
+    one({ ...clip(goodVideo), publicFiles: { ...okMedia, "videos/blog/clip.mp4": "not a video" } }, /video must be an MP4/);
+  });
+  test("a video over 10 MB", () => {
+    const big = Buffer.concat([mp4Header(30), Buffer.alloc(10 * 1024 * 1024)]);
+    one({ ...clip(goodVideo), publicFiles: { ...okMedia, "videos/blog/clip.mp4": big } }, /larger than 10 MB/);
+  });
+  test("a video over 2 minutes", () => {
+    one({ ...clip(goodVideo), publicFiles: { ...okMedia, "videos/blog/clip.mp4": mp4Header(180) } }, /longer than 2 minutes/);
+  });
+  test("a video without a poster", () => {
+    one({ ...clip(goodVideo.replace(' poster="/images/blog/poster.webp"', "")), publicFiles: okMedia }, /video needs a poster image/);
+  });
+  test("captions that are not WebVTT", () => {
+    one({ ...clip(goodVideo), publicFiles: { ...okMedia, "videos/blog/clip.en.vtt": "1\n00:00:00,000 --> 00:00:01,000\nHi\n" } }, /captions must be a WebVTT file/);
+  });
+  test("a video link that is not https", () => {
+    one({
+      files: { "en/english-only.mdx": post('<VideoLink href="http://example.com/v" poster="/images/blog/poster.webp" title="T" duration="1:00" />') },
+      publicFiles: okMedia,
+    }, /https/);
   });
   test("the writer template folder is ignored", () => {
     expect(blogErrors({ files: { "_template/post.mdx": post('<Exercise id="x" />') } })).toEqual([]);

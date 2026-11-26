@@ -179,3 +179,18 @@ test("privateNavigation matches account and community paths only", () => {
   for (const p of ["/sw/account", "/sw/account/", "/en/community/a/"]) expect(api.privateNavigation(p), p).toBe(true);
   for (const p of ["/sw/accounts/", "/sw/learn/"]) expect(api.privateNavigation(p), p).toBe(false);
 });
+
+test("blog images enter the static cache so posts read offline keep their diagrams", () => {
+  expect(sw.cacheableStatic("/images/blog/chama-treasury-sw.svg")).toBe(true);
+  expect(sw.cacheableStatic("/images/blog-private/x.svg")).toBe(false);
+});
+
+test("blog videos and captions are never intercepted or cached", async () => {
+  const h = harness(async () => { throw Error("video must use the browser network directly"); });
+  for (const p of ["/videos/blog/clip.mp4", "/videos/blog/clip.sw.vtt"]) {
+    for (const mode of ["navigate", "cors", "same-origin", "no-cors"]) {
+      expect((await h.fire(h.nav(p, mode))).intercepted, `${p} ${mode}`).toBe(false);
+    }
+  }
+  expect(Object.keys(h.stores)).toEqual([]);
+});

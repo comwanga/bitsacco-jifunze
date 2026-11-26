@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { LANGS, type Lang } from "../i18n.ts";
+import { mp4DurationSeconds } from "./mp4.ts";
 import {
   ExerciseFileSchema,
   GlossarySchema,
@@ -394,6 +395,8 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
 }
 
 const BLOG_IMAGE_MAX = 400 * 1024;
+const VIDEO_MAX = 10 * 1024 * 1024;
+const VIDEO_MAX_SECONDS = 120;
 
 /** Rule 7: blog posts. Messages are written for post writers, naming the field and the fix. */
 function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): void {
@@ -453,7 +456,7 @@ function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): v
       const fm = BlogFrontmatterSchema.safeParse(data);
       if (!fm.success) for (const problem of fm.error.issues) err(file, `${problem.path.join(".") || "front matter"}: ${problem.message}`);
       if (post.image && !data.imageAlt) err(file, "imageAlt is required because the post has an image; describe the image in this language");
-      validateBlogBody(file, body, err, checkImage);
+      validateBlogBody(file, body, err, checkImage, publicFile);
     }
   }
 
@@ -471,7 +474,40 @@ function validateBlogBody(
   body: string,
   err: (file: string, message: string) => void,
   checkImage: (file: string, site: string, what: string) => void,
+  publicFile: (site: string) => string,
 ): void {
+  const attr = (attrs: string, name: string) => new RegExp(`(?:^|\\s)${name}="([^"]*)"`).exec(attrs)?.[1];
+  for (const m of body.matchAll(/<Video\s([^>]*?)\/?>/g)) {
+    const [src, poster, captions, title] = ["src", "poster", "captions", "title"].map((n) => attr(m[1], n));
+    if (!title) err(file, 'video needs a title="…"');
+    if (!poster) err(file, 'video needs a poster image: add poster="/images/blog/…"');
+    else checkImage(file, poster, "video poster");
+    if (!src || !/^\/videos\/blog\/[a-z0-9][a-z0-9-]*\.mp4$/.test(src)) err(file, "video src must be an .mp4 file in /videos/blog/");
+    else if (!fs.existsSync(publicFile(src))) err(file, `video file not found: add public${src}`);
+    else {
+      const duration = mp4DurationSeconds(publicFile(src));
+      if (duration === null) err(file, `video must be an MP4 (H.264/AAC): public${src} is not one`);
+      else {
+        if (fs.statSync(publicFile(src)).size > VIDEO_MAX) err(file, `video public${src} is larger than 10 MB; shorten or compress it`);
+        if (duration > VIDEO_MAX_SECONDS) err(file, `video public${src} is longer than 2 minutes; link to longer videos with <VideoLink> instead`);
+      }
+    }
+    if (!captions || !/^\/videos\/blog\/[a-z0-9][a-z0-9.-]*\.vtt$/.test(captions)) err(file, 'video needs captions: add captions="/videos/blog/….vtt"');
+    else if (!fs.existsSync(publicFile(captions))) err(file, `captions file not found: add public${captions}`);
+    else if (!fs.readFileSync(publicFile(captions), "utf8").replace(/^﻿/, "").startsWith("WEBVTT")) err(file, `captions must be a WebVTT file starting with WEBVTT: public${captions}`);
+  }
+  for (const m of body.matchAll(/<VideoLink\s([^>]*?)\/?>/g)) {
+    const [href, poster, title, duration] = ["href", "poster", "title", "duration"].map((n) => attr(m[1], n));
+    if (!title) err(file, 'video link needs a title="…"');
+    if (!duration) err(file, 'video link needs a duration="m:ss"');
+    if (!poster) err(file, 'video link needs a poster image: add poster="/images/blog/…"');
+    else checkImage(file, poster, "video link poster");
+    if (!href) err(file, "video link needs an https:// href");
+    else {
+      const problem = href.startsWith("/") ? `"${href}" must be an https:// address on the video site` : checkUrl(href);
+      if (problem) err(file, `video link ${problem}`);
+    }
+  }
   if (/<Exercise\b/.test(body)) err(file, "labs are not allowed in posts; link to the lesson that has the lab instead");
   for (const m of body.matchAll(/<Diagram\b([^>]*)>([\s\S]*?)<\/Diagram>/g)) {
     const attrs = m[1];

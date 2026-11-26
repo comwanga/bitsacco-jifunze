@@ -1,6 +1,6 @@
 # Staging operations
 
-Verified 13 November 2026 (Africa/Nairobi). Staging is separate from [production](production.md); it is not an account-release environment for learners.
+Service deployments and web domains verified 26 November 2026 (Africa/Nairobi); networking, capacity, allowlist and variable rows were last verified 13 November 2026. Staging is separate from [production](production.md); it is not an account-release environment for learners.
 
 ## Current state
 
@@ -8,7 +8,7 @@ Verified 13 November 2026 (Africa/Nairobi). Staging is separate from [production
 | --- | --- |
 | Project / environment | `bitsacco-jifunze` / `staging` (`1b138f86-2127-4c52-9142-868ecdf75460`) |
 | Public origin | <https://staging.bitsaccojifunze.xyz>; noindex/nofollow, robots disallow all |
-| Web | `27e66b05-93b9-4180-bb8e-263052e4e69c` / `80c7f5ad4599574eb37a5165f9866d90260ed812`, SUCCESS |
+| Web | `408c92b1-7bf9-419b-bf7e-f5d63b8f195d` / `36be54cce6dd2efb40e6652accb59152c45c4dc4` (merge of [PR #34](https://github.com/comwanga/bitsacco-jifunze/pull/34)), SUCCESS |
 | API | `54f04926-aa26-4f44-8e31-099ad715b4e8` / `b702a14`, SUCCESS; unused by the site |
 | PostgreSQL | `f8ac6eaf-5174-4157-9064-8304c295fe4e`, SUCCESS; unchanged |
 | Networking | Only web has HTTP domains; API/database private; zero public TCP proxies |
@@ -16,7 +16,7 @@ Verified 13 November 2026 (Africa/Nairobi). Staging is separate from [production
 | Account access | Tester allowlist enforced and empty; no learner can authenticate |
 | API forwarding | Web `STAGING_AUTH_ENABLED=1` remains set; the account-free site makes no account API request |
 
-The plain English/Kiswahili feedback link passed 12 live desktop/mobile Chromium checks on this exact web commit, including keyboard activation, no-JavaScript operation and the absence of copy controls/helper text. The earlier reviewed account-free build also passed progress/import-order, offline, navigation and retired-route acceptance. These results are tied to their commits, not a promise about a future build.
+This web commit passed 137 live desktop/mobile Chromium checks on the staging origin: home, world map, not-found, smoke, public release, accessibility, library, book reader, catalogue and lesson specs. The two failures were the English book test's production-canonical assertion, which staging's own canonical origin fails by design; the Kiswahili book test covers the same reader flow and passed. Direct checks confirmed HTTPS with an HTTP redirect, `noindex, nofollow` on every response, robots disallowing all, ordinary 404s for retired account paths in both languages, and both PDFs served as `application/pdf` with byte ranges and the exact bytes in their manifests. These results are tied to this commit, not a promise about a future build.
 
 ## Controlled web deployment
 
@@ -25,7 +25,7 @@ The plain English/Kiswahili feedback link passed 12 live desktop/mobile Chromium
 3. Verify HTTPS, noindex/robots, feedback, local progress and the relevant regression cases. Retired account paths must return the ordinary 404 in both languages.
 4. Recheck the private services, allowlist, configuration and production baseline. Do not change the API/database, billing, DNS or production as a side effect of web deployment.
 
-The previous web `ec9d7693-9d02-4267-85bf-c57ed0f99f3d` / `9923f6e` was rollback-eligible at the latest staging acceptance. Recheck eligibility before a later operation.
+The previous web `957decab-a0ae-4970-ba38-96296069ae53` / `5a1c9fe` was rollback-eligible before this deployment. Recheck eligibility before a later operation.
 
 ## Unused API and ingress boundary
 

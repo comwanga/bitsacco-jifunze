@@ -73,7 +73,7 @@ Technical explanations use primary references such as the [Bitcoin developer net
 
 The project owner completed educational review on 11 November 2026, covering Kiswahili wording, Bitcoin accuracy, financial explanations, community/cooperative savings and documentation. On 12 November the owner waived separate independent technical, financial/cooperative specialist and practical assistive-technology reviews for that curriculum release. These decisions do not establish an independent reviewer identity or specialist sign-off.
 
-The two-sign-off policy in [Contributing](../CONTRIBUTING.md#reviewers) still governs `lastReviewed`: do not invent review dates or mark lessons reviewed without the required documented sign-offs. Existing draft labels and pending terminology metadata remain honest descriptions of that metadata; they do not undo the owner's completed review. Future content changes need their applicable reviews.
+The owner reviews lessons as they are produced, so published lessons carry no draft label (see [Contributing](../CONTRIBUTING.md#reviewers)). `lastReviewed` is optional. Pending terminology metadata is unchanged.
 
 The current interface uses the owner-supplied feedback labels “Send Feedback” / “Tuma Maoni”. The discarded copy-address helper text is not part of the site and requires no approval.
 

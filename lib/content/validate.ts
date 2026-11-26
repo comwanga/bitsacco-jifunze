@@ -157,9 +157,6 @@ function validateLessonFile(
       issues.push({ level: "error", rule: 2, file: where, message: `${issue.path.join(".") || "front matter"}: ${issue.message}` });
     }
   }
-  if (!data.lastReviewed) {
-    issues.push({ level: "warning", rule: 2, file: where, message: "no lastReviewed date yet (draft until a reviewer signs off)" });
-  }
 
   // Rule 3: resource links are well formed.
   const resources = Array.isArray(data.resources) ? (data.resources as Record<string, unknown>[]) : [];

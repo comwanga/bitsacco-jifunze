@@ -31,7 +31,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const titles = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.title])));
   const pathTitles = Object.fromEntries(paths.map(({ r }) => [r.id, r.title[lang]]));
   const c = siteCopy[lang];
-  const stats = siteStats(lang);
+  const stats = siteStats(lang, "savers");
   const statItems = [
     c.statsLessons.replace("{n}", String(stats.lessons)),
     c.statsLanguages.replace("{n}", String(stats.languages)),

@@ -12,7 +12,7 @@ Bitsacco Jifunze is a Kiswahili-first, bilingual community-finance and Bitcoin e
 
 All 49 lessons are available in Kiswahili and English, with learning trees, quizzes, a glossary and fictional practice simulations. Every lesson includes required open-ended discussion: explain reasoning, test an assumption and formulate a question of your own. Learners self-confirm the activity before new lesson completion; answers stay with learners and existing completions remain valid. The owner's educational review and release decisions are linked under Contributing below.
 
-The educational library includes the whitepaper in both languages and an in-app English *Mastering Bitcoin*, third-edition PDF reader and download. The Kiswahili book awaits official publication. See the [curriculum, primary sources and review guide](docs/content-guide.md).
+The educational library includes the whitepaper in both languages and in-app readers and downloads for *Mastering Bitcoin*, third edition, in English and in Kiswahili (*Kujifunza Bitcoin*, translated by comwanga). See the [curriculum, primary sources and review guide](docs/content-guide.md).
 
 Learning progress stays in the browser and can be exported and imported. Previously opened lessons support offline reading; interactive simulations work offline after their modules have been loaded. The book is downloaded only on request and is not included in the offline lesson cache.
 
@@ -65,7 +65,7 @@ On Linux, Playwright may need `npx playwright install --with-deps chromium webki
 
 Educators can improve explanations and quizzes, translators can maintain bilingual lessons and terminology, and developers can fix issues or improve the platform and lab. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and submit changes to [comwanga/bitsacco-jifunze](https://github.com/comwanga/bitsacco-jifunze).
 
-The project owner completed educational review of the expansion on 11 November 2026 and waived separate independent reviews for that release on 12 November. The [current review guide](docs/content-guide.md#review-status) distinguishes these decisions from the two documented sign-offs required to set a lesson's `lastReviewed` date. New or changed material follows [Contributing](CONTRIBUTING.md#reviewers).
+The project owner reviews lessons as they are produced; see [Contributing](CONTRIBUTING.md#reviewers) and the [review status](docs/content-guide.md#review-status).
 
 ## Documentation and licences
 
@@ -73,5 +73,5 @@ The project owner completed educational review of the expansion on 11 November 2
 - [Production operations](docs/deployment/production.md): Railway, domain, deployment, rollback, monitoring and scaling.
 - [Staging safeguards](docs/deployment/railway-staging.md) and [Lightning lab](lab/README.md).
 - [Feedback](docs/development/feedback.md) and [curriculum/content review](docs/content-guide.md).
-- [Book provenance and reproduction](docs/deployment/mastering-bitcoin-generated.md).
+- Book provenance and reproduction: [English](docs/deployment/mastering-bitcoin-generated.md) and [Kiswahili](docs/deployment/kujifunza-bitcoin-generated.md).
 - Code: [MIT](LICENSE). Curriculum: [CC BY-SA 4.0](content/LICENSE). Adapted works and separate notices: [ATTRIBUTIONS.md](ATTRIBUTIONS.md).

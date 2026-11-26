@@ -65,4 +65,4 @@ Use Railway metrics and logs for the `production` / `public-web` instance. The `
 
 Investigate measured resource pressure before proposing capacity changes. CPU/RAM changes, extra replicas, plan changes and DNS changes need their own authorization. Existing limits do not constitute an egress spending cap; consult current provider pricing before a cost decision.
 
-The [content guide](../content-guide.md#review-status) records the owner's curriculum review and waived independent reviews without inventing formal sign-offs. The Kiswahili book remains pending publication. [PDF provenance](mastering-bitcoin-generated.md) documents the currently published English edition.
+The [content guide](../content-guide.md#review-status) records the owner's curriculum review and waived independent reviews without inventing formal sign-offs. [PDF provenance](mastering-bitcoin-generated.md) documents the English edition and [Kiswahili provenance](kujifunza-bitcoin-generated.md) the Kiswahili edition.

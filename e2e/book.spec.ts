@@ -87,3 +87,34 @@ test("loading can be cancelled and Kiswahili navigation uses the same reader", a
   await expect(page.locator("iframe")).toHaveCount(0);
   await expect(page.locator("[data-pdf-reader]").getByRole("alert")).toHaveCount(0);
 });
+
+test("the Kiswahili book page loads its own verified PDF on request and keeps it out of offline caches", async ({ page }) => {
+  const sw = JSON.parse(await fs.readFile("public/books/kujifunza-bitcoin-sw-3rd-edition.source.json", "utf8"));
+  const swPdf = `/books/${sw.filename}`;
+  const requests: string[] = [];
+  page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/books/")) requests.push(new URL(r.url()).pathname); });
+  await page.goto("/sw/library/kujifunza-bitcoin/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Kujifunza Bitcoin: Kuprogramu Blockchain Huria");
+  await expect(page.getByText(/tafsiri ya Kiswahili: comwanga/)).toBeVisible();
+  await expect(page.locator("[data-pdf-reader]")).toHaveAttribute("aria-label", "Kujifunza Bitcoin, toleo la 3 — PDF ya Kiswahili");
+  expect(requests).toEqual([]);
+  await page.getByRole("button", { name: "Soma PDF", exact: true }).click();
+  await expect(page.locator("iframe")).toHaveAttribute("src", /^blob:/, { timeout: 30_000 });
+  expect(requests).toEqual([swPdf]);
+  const downloadEvent = page.waitForEvent("download");
+  await page.getByRole("link", { name: "Pakua PDF nzima" }).click();
+  const download = await downloadEvent;
+  expect(download.suggestedFilename()).toBe(sw.filename);
+  const data = await fs.readFile((await download.path())!);
+  expect(data.length).toBe(sw.bytes);
+  expect(createHash("sha256").update(data).digest("hex")).toBe(sw.sha256);
+  expect(requests).toEqual([swPdf]); // the download reuses the verified copy
+  const cached = await page.evaluate(async () => {
+    const urls: string[] = [];
+    for (const key of await caches.keys()) for (const req of await (await caches.open(key)).keys()) urls.push(req.url);
+    return urls;
+  });
+  expect(cached.filter(url => new URL(url).pathname.startsWith("/books/"))).toEqual([]);
+  const axe = await new AxeBuilder({ page }).exclude("iframe").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(axe.violations).toEqual([]);
+});

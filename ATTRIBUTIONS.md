@@ -16,7 +16,7 @@ The lab in `lab/` runs regtest node images from [Polar](https://github.com/jamal
 
 ## Kujifunza Bitcoin and the whitepaper
 
-- **Kujifunza Bitcoin: Kuprogramu Blockchain Huria** is the Kiswahili edition of *Mastering Bitcoin* (3rd edition) by Andreas M. Antonopoulos and David A. Harding, translated by comwanga, licensed CC BY-SA 4.0. Official publication awaits [Bitsacco PR #107](https://github.com/bitsacco/bitsacco/pull/107). Library and lesson references retain the credits and explain pending availability; no Kiswahili book download is advertised.
+- **Kujifunza Bitcoin: Kuprogramu Blockchain Huria** is the Kiswahili edition of *Mastering Bitcoin* (3rd edition) by Andreas M. Antonopoulos and David A. Harding, translated by comwanga, licensed CC BY-SA 4.0 ([source](https://github.com/comwanga/bitcoinbook-swahili)). Jifunze publishes a PDF generated from the translation's open-source text, with an in-app reader and download; the [provenance record](docs/deployment/kujifunza-bitcoin-generated.md) and [source manifest](public/books/kujifunza-bitcoin-sw-3rd-edition.source.json) identify it. Its cover is comwanga's own work, licensed CC BY-SA 4.0, with no publisher logo.
 - **Bitcoin: A Peer-to-Peer Electronic Cash System** by Satoshi Nakamoto, in English and Kiswahili, is linked from bitsacco.com.
 
 ## Mastering Bitcoin — generated English PDF

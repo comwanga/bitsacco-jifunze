@@ -87,11 +87,6 @@ export default async function LessonPage({ params }: Params) {
           {t(lang, "translationNotice")}
         </p>
       )}
-      {!fm.lastReviewed && (
-        <p className="mt-4 text-sm text-[var(--muted)]" lang={lang}>
-          {t(lang, "draftNotice")}
-        </p>
-      )}
 
       <Objectives lang={lang} items={fm.objectives} />
       <KeyTerms lang={lang} terms={terms} />

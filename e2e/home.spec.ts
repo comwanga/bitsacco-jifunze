@@ -79,10 +79,11 @@ test("the footer groups real destinations and keeps the disclaimer and licence",
 test("the homepage shows computed content counts", async ({ page }) => {
   await page.goto("/en/");
   await expect(page.locator("[data-stats]")).toHaveText(
-    /49 lessons.*2 languages.*about 34 hours of reading.*57 glossary terms/s,
+    /24 community finance lessons.*2 languages.*about 7 hours of lessons.*57 glossary terms/s,
   );
   await page.goto("/sw/");
-  await expect(page.locator("[data-stats]")).toContainText("masomo 49");
+  await expect(page.locator("[data-stats]")).toContainText("masomo 24 ya fedha za jamii");
+  await expect(page.locator("[data-stats]")).toContainText("takriban saa 7 za masomo");
 });
 
 for (const lang of ["en", "sw"] as const)

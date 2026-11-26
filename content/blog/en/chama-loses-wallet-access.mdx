@@ -9,11 +9,11 @@ Imagine the treasurer of a fictional chama, Umoja, calls a meeting: her phone is
 "Losing access" covers very different problems. A lost device, an official who stops answering, a stolen key and every key gone at once are not the same failure, and they do not have the same fix. The picture below shows the parts of a group wallet that decide which problems you can recover from. Tap a number to read about each part.
 
 <Diagram src="/images/blog/chama-treasury-en.svg" alt="A chama treasury: members approve an expense; a group wallet needs two of three signatures from the treasurer, the secretary and a member; a wallet setup record; and three backups kept in separate places">
-  <Marker x={67} y={7} title="Approval happens outside the wallet">The wallet only checks signatures. It cannot check whether the meeting minutes are genuine or the expense was agreed. Member approval and records are a separate control that people keep.</Marker>
-  <Marker x={6} y={33} title="Each signer holds a different key">Three officials, three separate keys. No chairperson should collect every <Term id="seed-phrase" /> "for safety": that turns three keys back into one point of failure.</Marker>
-  <Marker x={67} y={31} title="Two of three can still pay">With a 2-of-3 <Term id="multisig" /> wallet, one missing key can be tolerated, but only if the other two keys and the wallet's setup are usable. Two dishonest signers together can still spend.</Marker>
-  <Marker x={95} y={65} title="Keep the setup record">Recovery needs a record of the threshold and the signers' public keys, as well as enough private recovery material. The record cannot sign alone, but it can reveal balances and history, so keep it private.</Marker>
-  <Marker x={29} y={63} title="Backups in separate places">Three copies in one bag, one office or one cloud account are one failure. A <Term id="backup" /> plan has to survive both loss and theft, not just multiply copies.</Marker>
+  <Marker x={92} y={4} title="Approval happens outside the wallet">The wallet only checks signatures. It cannot check whether the meeting minutes are genuine or the expense was agreed. Member approval and records are a separate control that people keep.</Marker>
+  <Marker x={4} y={42} title="Each signer holds a different key">Three officials, three separate keys. No chairperson should collect every <Term id="seed-phrase" /> "for safety": that turns three keys back into one point of failure.</Marker>
+  <Marker x={86} y={21} title="Two of three can still pay">With a 2-of-3 <Term id="multisig" /> wallet, one missing key can be tolerated, but only if the other two keys and the wallet's setup are usable. Two dishonest signers together can still spend.</Marker>
+  <Marker x={95} y={58} title="Keep the setup record">Recovery needs a record of the threshold and the signers' public keys, as well as enough private recovery material. The record cannot sign alone, but it can reveal balances and history, so keep it private.</Marker>
+  <Marker x={4} y={81} title="Backups in separate places">Three copies in one bag, one office or one cloud account are one failure. A <Term id="backup" /> plan has to survive both loss and theft, not just multiply copies.</Marker>
 </Diagram>
 
 ## What a group wallet can survive

@@ -397,6 +397,8 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
 const BLOG_IMAGE_MAX = 400 * 1024;
 const VIDEO_MAX = 10 * 1024 * 1024;
 const VIDEO_MAX_SECONDS = 120;
+// Scripts, event handlers, embedded HTML, javascript: URLs and remote href/src (xmlns declarations are not href/src).
+const UNSAFE_SVG = /<script\b|<foreignObject\b|\son[a-z]+\s*=|javascript:|\b(?:href|src)\s*=\s*["']\s*(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
 
 /** Rule 7: blog posts. Messages are written for post writers, naming the field and the fix. */
 function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): void {
@@ -418,6 +420,13 @@ function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): v
     if (!/^\/images\/blog\/[a-z0-9][a-z0-9-]*\.(webp|jpg|png|svg)$/.test(site)) return err(file, `${what} "${site}" must be a .webp, .jpg, .png or .svg file in /images/blog/`);
     if (!fs.existsSync(publicFile(site))) return err(file, `${what}: image file not found: add public${site}`);
     if (fs.statSync(publicFile(site)).size > BLOG_IMAGE_MAX) err(file, `${what}: public${site} is larger than 400 KB; make it smaller to save learners' mobile data`);
+    // An SVG opened directly is a document on this origin: anything executable or remote is refused.
+    if (site.endsWith(".svg")) {
+      const svg = fs.readFileSync(publicFile(site), "utf8");
+      if (UNSAFE_SVG.test(svg)) err(file, `${what}: SVG public${site} can run code or load outside content; remove scripts, event handlers, embedded HTML and outside links`);
+      const root = /<svg\b[^>]*>/i.exec(svg)?.[0] ?? "";
+      if (!/\swidth="[\d.]+"/.test(root) || !/\sheight="[\d.]+"/.test(root)) err(file, `${what}: SVG public${site} needs width and height on its <svg> element, or browsers show it at a 300×150 default size`);
+    }
   };
 
   const listed = new Set<string>();
@@ -437,7 +446,11 @@ function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): v
       continue;
     }
     const post = parsed.data;
-    if (post.updatedAt && post.updatedAt < post.publishedAt) err(registryFile, `${slug}: updatedAt is before publishedAt`);
+    // The format check alone lets 2026-11-31 through, which would print as 1 December.
+    const realDate = (d: string) => { const t = new Date(`${d}T00:00:00Z`); return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === d; };
+    const dates = (["publishedAt", "updatedAt"] as const).filter((k) => post[k] !== undefined);
+    for (const k of dates) if (!realDate(post[k]!)) err(registryFile, `${slug}: ${k} "${post[k]}" is not a real calendar date`);
+    if (dates.every((k) => realDate(post[k]!)) && post.updatedAt && post.updatedAt < post.publishedAt) err(registryFile, `${slug}: updatedAt is before publishedAt`);
     for (const lesson of post.relatedLessons) {
       if (!lessonKeys.has(lesson)) err(registryFile, `${slug}: related lesson "${lesson}" does not exist; use roadmap/slug of a real lesson`);
     }
@@ -510,6 +523,14 @@ function validateBlogBody(
     }
   }
   if (/<Exercise\b/.test(body)) err(file, "labs are not allowed in posts; link to the lesson that has the lab instead");
+  for (const m of stripCode(body).matchAll(/\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\)/g)) {
+    const problem = checkUrl(m[1]);
+    if (problem) err(file, `link ${problem}`);
+  }
+  for (const m of body.matchAll(/<Diagram\b([^>]*?)\/>/g)) {
+    if (!/\balt="[^"]+"/.test(m[1])) err(file, "diagram needs alt text: add alt=\"…\" describing the image");
+    err(file, "diagram needs at least one <Marker>: write <Diagram …> markers </Diagram>, or use a plain image");
+  }
   for (const m of body.matchAll(/<Diagram\b([^>]*)>([\s\S]*?)<\/Diagram>/g)) {
     const attrs = m[1];
     const src = /\bsrc="([^"]*)"/.exec(attrs)?.[1];

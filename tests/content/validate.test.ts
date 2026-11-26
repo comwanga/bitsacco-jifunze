@@ -227,6 +227,44 @@ describe("rule 7: blog posts", () => {
       publicFiles: okMedia,
     }, /https/);
   });
+  const svgPost = (svg: string) => ({
+    files: { "en/english-only.mdx": post('<Diagram src="/images/blog/d.svg" alt="A">\n<Marker x={10} y={20} title="One">Text</Marker>\n</Diagram>') },
+    publicFiles: { "images/blog/d.svg": svg },
+  });
+  test("a plain SVG diagram passes", () => {
+    expect(blogErrors(svgPost('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><title>t</title><rect width="10" height="10"/></svg>'))).toEqual([]);
+  });
+  for (const [name, svg] of [
+    ["a script element", '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><script>fetch("/api/")</script></svg>'],
+    ["an event handler", '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" onload="alert(1)"><rect/></svg>'],
+    ["embedded HTML", '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><foreignObject><div>x</div></foreignObject></svg>'],
+    ["a javascript: link", '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><a href="javascript:alert(1)"><rect/></a></svg>'],
+    ["an outside resource", '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><image href="https://example.com/x.png"/></svg>'],
+  ] as const) {
+    test(`an SVG with ${name} is rejected`, () => {
+      one(svgPost(svg), /SVG .*can run code or load outside content/);
+    });
+  }
+  test("an SVG without width and height (it would display at a 300×150 default size)", () => {
+    one(svgPost('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10"/></svg>'), /SVG .*needs width and height/);
+  });
+  test("the launch diagrams pass the SVG safety check", () => {
+    for (const lang of ["en", "sw"]) {
+      const svg = fs.readFileSync(path.join(CLEAN, `../../../public/images/blog/chama-treasury-${lang}.svg`), "utf8");
+      expect(blogErrors(svgPost(svg))).toEqual([]);
+    }
+  });
+  for (const date of ["2026-11-31", "2026-13-01", "2026-02-29"]) {
+    test(`an impossible publishedAt date (${date})`, () => {
+      one({ posts: (p) => { p[0].publishedAt = date; } }, /publishedAt "\d{4}-\d{2}-\d{2}" is not a real calendar date/);
+    });
+  }
+  test("a link in the post text that is not https", () => {
+    one({ files: { "en/english-only.mdx": post("Read [this](http://example.com/page) first.") } }, /must use https/);
+  });
+  test("a self-closing diagram without markers", () => {
+    one({ files: { "en/english-only.mdx": post('<Diagram src="/images/blog/ok.png" alt="A" />') }, publicFiles: { "images/blog/ok.png": "png" } }, /diagram needs at least one <Marker>/);
+  });
   test("an empty registry, because the static build needs at least one post page", () => {
     one({ posts: (p) => p.splice(0), files: { "en/both.mdx": null, "sw/both.mdx": null, "en/english-only.mdx": null, "sw/swahili-featured.mdx": null } }, /at least one post/);
   });

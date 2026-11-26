@@ -40,9 +40,10 @@ export function DiagramMarkers({ src, alt, markers, lang }: { src: string; alt: 
 
   return (
     <>
-      <div className="relative">
+      {/* The wrapper takes the image's size, so percentage markers stay on it; tall diagrams fit the screen height. */}
+      <div className="relative mx-auto w-fit max-w-full">
         {/* eslint-disable-next-line @next/next/no-img-element -- static export serves the file as-is */}
-        <img src={src} alt={alt} className="h-auto w-full rounded-xl border border-[var(--line)]" />
+        <img src={src} alt={alt} className="block h-auto max-h-[75vh] w-auto max-w-full rounded-xl border border-[var(--line)]" />
         {markers.map((m) =>
           ready ? (
             <button

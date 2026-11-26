@@ -7,6 +7,7 @@ import {
   GlossarySchema,
   LessonFrontmatterSchema,
   LibrarySchema,
+  WorldGroupsSchema,
   QuizFileSchema,
   ROADMAP_IDS,
   RoadmapSchema,
@@ -215,6 +216,13 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
       if (seen.has(g.id)) issues.push({ level: "error", rule: 2, file: rel(root, glossaryFile), message: `duplicate id "${g.id}"` });
       seen.add(g.id);
     }
+  }
+
+  const worldFile = path.join(root, "world-groups.json");
+  if (fs.existsSync(worldFile)) {
+    const raw = readJsonSafe(worldFile, issues, root, 2);
+    const world = WorldGroupsSchema.safeParse(raw);
+    if (raw !== undefined && !world.success) issues.push({ level: "error", rule: 2, file: rel(root, worldFile), message: world.error.message });
   }
 
   const libraryFile = path.join(root, "library.json");

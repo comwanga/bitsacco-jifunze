@@ -9,6 +9,19 @@
     "sw": "Endesha nodi halisi za Lightning kwenye regtest: tengeneza ankara, fungua chaneli, pitisha malipo, chunguza HTLC, kitunguu na ramani ya mtandao, kwa amri za kitabu na Python. Inahitaji kompyuta yenye Docker.",
     "en": "Run real Lightning nodes on regtest: create invoices, open channels, route payments, and dig into HTLCs, onions and the network graph, with the book's commands and Python. Needs a laptop with Docker."
   },
+  "outcomes": [
+    { "sw": "Jinsi njia za malipo, ankara na uelekezaji zinavyofanya kazi", "en": "How payment channels, invoices and routing work" },
+    { "sw": "Jinsi nodi zinavyotafuta njia na kupeleka malipo kwa usalama", "en": "How nodes find paths and forward payments safely" },
+    { "sw": "Jinsi ya kuendesha, kuhifadhi nakala na kulinda nodi", "en": "How to operate, back up and secure a node" }
+  ],
+  "format": {
+    "sw": "Masomo kumi na saba yaliyotoholewa kutoka Mastering the Lightning Network, pamoja na mazoezi unayoweza kuendesha kwenye maabara ya ndani. Hakuna pesa halisi inayotumika.",
+    "en": "Seventeen lessons adapted from Mastering the Lightning Network, with exercises you can run in a local lab. No real money is used."
+  },
+  "audience": {
+    "sw": "Wajenzi waliomaliza njia ya Wajenzi au wanaojua tayari miamala ya Bitcoin, wanaotaka kuendesha njia za malipo zinazotumiwa na jamii.",
+    "en": "Builders who finished the Builders path or already know Bitcoin transactions, and want to run the payment rails communities use."
+  },
   "sections": [
     {
       "id": "misingi",

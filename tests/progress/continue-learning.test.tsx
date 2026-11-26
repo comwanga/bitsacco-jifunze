@@ -11,7 +11,8 @@ const at = "2026-11-01T10:00:00Z";
 function render(progress: Progress, lang: "en" | "sw" = "en", minutes: Record<string, number> = { [key]: 12 }) {
   vi.mocked(useProgress).mockReturnValue({ progress } as ReturnType<typeof useProgress>);
   return renderToStaticMarkup(<ContinueLearning lang={lang} paths={[{ id: "builders", slugs: ["first"] }]}
-    titles={{ [key]: "First lesson" }} pathTitles={{ builders: "Builders" }} minutes={minutes} />);
+    titles={{ [key]: "First lesson" }} pathTitles={{ builders: "Builders" }} minutes={minutes}
+    localNote="Saved only in this browser." manageLabel="Manage progress" />);
 }
 
 describe("ContinueLearning estimates", () => {
@@ -23,6 +24,8 @@ describe("ContinueLearning estimates", () => {
       expect(html).toContain("First lesson");
       expect(html).toContain("Builders");
       expect(html).toContain('href="/en/builders/first"');
+      expect(html).toContain("Saved only in this browser.");
+      expect(html).toContain('href="/en/progress"');
       expect(html).not.toMatch(/remaining|%/);
     }
   });

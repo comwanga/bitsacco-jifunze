@@ -1,12 +1,12 @@
 # Bitsacco Jifunze
 
-Bitsacco Jifunze is a Kiswahili-first, bilingual Bitcoin education platform. Learn at **[bitsaccojifunze.xyz](https://bitsaccojifunze.xyz)** without an account.
+Bitsacco Jifunze is a Kiswahili-first, bilingual community-finance and Bitcoin education platform: understand chamas, SACCOs and personal savings before you put money in, and how Bitcoin can strengthen them. Learn at **[bitsaccojifunze.xyz](https://bitsaccojifunze.xyz)** without an account.
 
 ![Kiswahili homepage with the baobab and links to the three learning paths](docs/images/homepage-sw.png)
 
 ## Learning paths
 
-- **Bitcoin kwa Wawekaji / Bitcoin for Savers — 8 introductory lessons + 16 specialization lessons:** retain the accessible introduction, then choose individual savings/financial sovereignty, community savings or cooperative finance, progressing through foundations, intermediate practice and advanced cases.
+- **Fedha za Jamii na Bitcoin / Community Finance & Bitcoin — 8 introductory lessons + 16 specialization lessons:** retain the accessible introduction, then choose individual savings/financial sovereignty, community savings or cooperative finance, progressing through foundations, intermediate practice and advanced cases.
 - **Bitcoin kwa Wajenzi / Bitcoin for Builders — 8 lessons:** regtest, transactions, keys, Lightning, Fedimint and contributing to open-source projects.
 - **Lightning kwa Wajenzi / Lightning for Builders — 17 lessons:** adapted from *Mastering the Lightning Network*, with interactive exercises.
 

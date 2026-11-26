@@ -11,6 +11,8 @@ import type { RoadmapId } from "@/lib/content/schemas";
 import { t, type Lang } from "@/lib/i18n";
 import { pathOrder } from "@/lib/content/navigation";
 import { SpecializationChoices } from "@/components/roadmap/SpecializationChoices";
+import { PathIntro } from "@/components/roadmap/PathIntro";
+import { pathIntro } from "@/lib/content/path-intro";
 
 export const dynamicParams = false;
 
@@ -34,11 +36,13 @@ export default async function RoadmapPage({ params }: Params) {
   const lessons = new Map(slugs.map((s) => [s, getLesson(r.id, s, lang)]));
   const minutes = [...lessons.values()].reduce((m, x) => m + x.frontmatter.minutes, 0);
   const last = slugs[slugs.length - 1];
+  const intro = pathIntro(r, lang);
   const types = new Map(buildCatalog(lang).filter((e) => e.roadmap === r.id).map((e) => [e.slug, e.types]));
 
   return (
     <>
       <PathHeader path={{ id: r.id, title: r.title[lang], tagline: r.tagline[lang], description: r.description[lang] }} lang={lang} slugs={slugs} optionalSections={pathOrder(r).optionalSections} minutes={minutes} view="list" />
+      {intro && <PathIntro intro={intro} lang={lang} />}
 
       <div className="mx-auto max-w-3xl px-4 py-10">
         <SpecializationChoices sections={r.sections.map((s) => ({ ...s, title: s.title[lang], description: s.description?.[lang] }))} lang={lang} prefix="s" />

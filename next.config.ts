@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   // Bound static-export worker memory on small builders and the maintainer's workstation.
-  experimental: { cpus: 2 },
+  // globalNotFound: one bilingual 404 for unmatched URLs, needed because the app has two root layouts.
+  experimental: { cpus: 2, globalNotFound: true },
 };
 
 export default nextConfig;

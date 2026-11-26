@@ -8,11 +8,16 @@ export const ROADMAP_IDS = ["savers", "builders", "lightning"] as const;
 export const RoadmapIdSchema = z.enum(ROADMAP_IDS);
 export type RoadmapId = z.infer<typeof RoadmapIdSchema>;
 
-export const RoadmapSchema = z.object({
+export const RoadmapSchema = z
+  .object({
   id: RoadmapIdSchema,
   title: LocalizedSchema,
   tagline: LocalizedSchema,
   description: LocalizedSchema,
+  // Path intro: what you'll learn, how it works, who it's for. All three or none.
+  outcomes: z.array(LocalizedSchema).min(3).max(5).optional(),
+  format: LocalizedSchema.optional(),
+  audience: LocalizedSchema.optional(),
   sections: z
     .array(
       z.object({
@@ -24,7 +29,10 @@ export const RoadmapSchema = z.object({
       }),
     )
     .min(1),
-});
+  })
+  .refine((r) => [r.outcomes, r.format, r.audience].every((f) => f === undefined) || [r.outcomes, r.format, r.audience].every((f) => f !== undefined), {
+    message: "outcomes, format and audience must be given together",
+  });
 export type Roadmap = z.infer<typeof RoadmapSchema>;
 
 export const ResourceSchema = z.object({
@@ -104,6 +112,23 @@ export const GlossaryTermSchema = z.object({
 });
 export const GlossarySchema = z.array(GlossaryTermSchema);
 export type GlossaryTerm = z.infer<typeof GlossaryTermSchema>;
+
+// Savings-group names shown on the homepage world map. Exactly six, unique ids, real coordinates.
+export const WorldGroupSchema = z.object({
+  id: slug,
+  name: z.string().min(1),
+  place: LocalizedSchema,
+  line: LocalizedSchema,
+  lat: z.number().min(-90).max(90),
+  lon: z.number().min(-180).max(180),
+  // Same rule as lesson resources: sources must be https links.
+  source: z.string().regex(/^https:\/\/[^\s]+$/, "sources must be https links"),
+});
+export const WorldGroupsSchema = z
+  .array(WorldGroupSchema)
+  .length(6)
+  .refine((groups) => new Set(groups.map((g) => g.id)).size === groups.length, { message: "world group ids must be unique" });
+export type WorldGroup = z.infer<typeof WorldGroupSchema>;
 
 export const LibraryItemSchema = z.object({
   id: slug,

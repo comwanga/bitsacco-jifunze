@@ -18,7 +18,24 @@ function levelRange(lang: Lang, lessons: PathLesson[]): string {
 }
 
 /** One learning path on the home page: what it is, how long it takes, where it starts, and a resume button. */
-export function PathCard({ roadmap, lessons, lang }: { roadmap: Roadmap; lessons: PathLesson[]; lang: Lang }) {
+export function PathCard({
+  roadmap,
+  lessons,
+  lang,
+  number,
+  outcome,
+  specializations = [],
+}: {
+  roadmap: Roadmap;
+  lessons: PathLesson[];
+  lang: Lang;
+  /** Position in the path sequence, shown as 01, 02, ... */
+  number: number;
+  /** What the learner can do after the path, shown under the description. */
+  outcome?: string;
+  /** Optional sections of the path, linked to their place on the path page. */
+  specializations?: { id: string; title: string }[];
+}) {
   const slugs = lessons.map((l) => l.slug);
   const minutes = lessons.reduce((m, l) => m + l.minutes, 0);
   const { optionalSections } = pathOrder(roadmap);
@@ -29,9 +46,17 @@ export function PathCard({ roadmap, lessons, lang }: { roadmap: Roadmap; lessons
         aria-hidden="true"
         className="absolute top-1 bottom-0 left-0 w-[3px] rounded-full bg-gradient-to-b from-dawn via-ember/70 to-transparent"
       />
-      <p className="text-sm font-semibold text-dawn">{t(lang, BRANCH[roadmap.id])}</p>
-      <h3 id={`path-${roadmap.id}`} className="mt-1 text-2xl font-bold text-white sm:text-3xl">{roadmap.title[lang]}</h3>
+      <p className="flex items-baseline gap-3 text-sm font-semibold text-dawn">
+        <span data-path-number className="text-base font-extrabold tabular-nums">
+          {String(number).padStart(2, "0")}
+        </span>
+        {t(lang, BRANCH[roadmap.id])}
+      </p>
+      <h3 id={`path-${roadmap.id}`} className="mt-1 text-3xl font-bold text-white sm:text-4xl">
+        {roadmap.title[lang]}
+      </h3>
       <p className="mt-2 max-w-prose text-[#d9cbbb]">{roadmap.description[lang]}</p>
+      {outcome && <p className="mt-3 max-w-prose font-semibold text-white">{outcome}</p>}
       <p className="mt-2 text-sm text-[#b9a896]">
         {slugs.length} {t(lang, "lessons")}, {minutes} {t(lang, "minutes")}, {levelRange(lang, lessons)}
       </p>
@@ -45,6 +70,26 @@ export function PathCard({ roadmap, lessons, lang }: { roadmap: Roadmap; lessons
           </li>
         ))}
       </ol>
+      {specializations.length > 0 && (
+        <div className="mt-5">
+          <p id={`specializations-${roadmap.id}`} className="text-sm font-semibold text-dawn">
+            {t(lang, "chooseSpecialization")}
+          </p>
+          <ul data-specializations aria-labelledby={`specializations-${roadmap.id}`} className="mt-2 flex flex-wrap gap-2">
+            {specializations.map((s) => (
+              <li key={s.id}>
+                <Link
+                  prefetch={false}
+                  href={`/${lang}/${roadmap.id}/#tree-section-${s.id}`}
+                  className="inline-flex rounded-full border border-white/20 px-3.5 py-1.5 text-sm font-semibold text-white hover:border-dawn"
+                >
+                  {s.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {optionalSections?.length ? <p className="mt-4 text-sm text-[#d9cbbb]">{t(lang, "introductionProgress")}</p> : null}
       <RoadmapProgress roadmap={roadmap.id} slugs={introductory} lang={lang} />
       <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-6">

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("/ sends Kiswahili readers to the Kiswahili home", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/sw\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Karibu Jifunze");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Kagua kabla ya kuweka akiba");
 });
 
 test("the language switch keeps you on the same lesson", async ({ page }) => {
@@ -21,13 +21,6 @@ test("pages never scroll sideways on a phone", async ({ page }, info) => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, `${path} overflows by ${overflow}px`).toBeLessThanOrEqual(0);
   }
-});
-
-test("with reduced motion the intro never plays", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/sw/");
-  await expect(page.locator("[data-home-intro]")).not.toHaveClass(/intro-play/);
-  await expect(page.getByRole("group", { name: /Mbuyu/ })).toBeVisible();
 });
 
 test("a lesson opened once stays readable offline", async ({ page, context }, info) => {

@@ -9,6 +9,20 @@
     "sw": "Kutoka maabara yako ya regtest hadi miamala, funguo, Lightning na Fedimint, kisha jenga programu ndogo na uchangie programu huria. Unahitaji kujua kutumia terminal na lugha moja ya programu.",
     "en": "From your own regtest lab to transactions, keys, Lightning and Fedimint, then build a mini-app and contribute to open source. You should be comfortable with a terminal and one programming language."
   },
+  "outcomes": [
+    { "sw": "Endesha mtandao binafsi wa majaribio wa Bitcoin kwenye kompyuta yako", "en": "Run a private Bitcoin test network on your own computer" },
+    { "sw": "Soma miamala, funguo na descriptors", "en": "Read transactions, keys and descriptors" },
+    { "sw": "Elewa jinsi Lightning na Fedimint zinavyofanya kazi ndani", "en": "Understand how Lightning and Fedimint work underneath" },
+    { "sw": "Changia miradi ya chanzo huria na utengeneze zana ndogo kwa ajili ya jamii yako", "en": "Contribute to open-source projects and ship a small tool for your community" }
+  ],
+  "format": {
+    "sw": "Masomo manane ya vitendo kwa kutumia regtest, kwa hiyo hakuna pesa halisi. Kila somo linaishia na majadiliano na jaribio, na la mwisho ni mradi.",
+    "en": "Eight hands-on lessons on regtest, so no real money is involved. Each lesson ends with discussion and a quiz, and the last one is a project."
+  },
+  "audience": {
+    "sw": "Watu wanaoweza kutumia terminal wanaotaka kujenga zana kwa ajili ya vikundi vya akiba na jamii.",
+    "en": "People comfortable with a terminal who want to build tools for savings groups and communities."
+  },
   "sections": [
     {
       "id": "maabara",

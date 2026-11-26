@@ -10,3 +10,11 @@ test("the footer tagline repeats the four learning steps in each language", () =
   expect(siteCopy.sw.footerTagline).toBe("Jifunze Bitcoin. Jaribu. Tumia. Shiriki.");
   expect(siteCopy.en.footerTagline).toBe("Learn Bitcoin. Practise. Use it. Share.");
 });
+
+test("the hero leads with community finance in each language", () => {
+  expect(siteCopy.en.heroTitle).toBe("Check before you save");
+  expect(siteCopy.sw.heroTitle).toBe("Kagua kabla ya kuweka akiba");
+  expect(siteCopy.en.heroSubtitle).toBe("Chamas, SACCOs, personal savings and Bitcoin");
+  expect(siteCopy.sw.heroSubtitle).toBe("Chama, SACCO, akiba binafsi na Bitcoin");
+  expect(siteCopy.en.heroLead).toMatch(/^Learn how savings groups and money tools really work/);
+});

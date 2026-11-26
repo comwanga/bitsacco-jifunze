@@ -51,14 +51,14 @@ test("the header stays pinned with the brand visible, without changing height", 
   expect(brand.x).toBeGreaterThanOrEqual(12);
 });
 
-test("jumping to the paths leaves the first path heading below the header", async ({ page }) => {
+test("jumping to the starting tiles leaves their heading below the header", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/en/");
-  await page.getByRole("link", { name: "Start learning" }).click();
-  await expect(page).toHaveURL(/#njia$/);
+  await page.getByRole("link", { name: "Where are you starting?" }).click();
+  await expect(page).toHaveURL(/#anza$/);
   await page.waitForTimeout(300);
   const header = await box(page, "header[data-site-header]");
-  const heading = await box(page, "[data-path-card] h3");
+  const heading = await box(page, "#start-title");
   expect(heading.y).toBeGreaterThanOrEqual(header.y + header.height);
 });
 

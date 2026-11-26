@@ -2,18 +2,20 @@ import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { siteCopy } from "@/lib/site-copy";
 import { ContinueLearning } from "@/components/home/ContinueLearning";
-import { HowItWorks } from "@/components/home/HowItWorks";
 import { PathCard } from "@/components/home/PathCard";
-import { BaobabScene } from "@/components/intro/BaobabScene";
-import { flatLessons, getGlossary, getLesson, getLibrary, listRoadmaps } from "@/lib/content/load";
+import { SavingsCircle } from "@/components/home/SavingsCircle";
+import { JoinQuestions } from "@/components/home/JoinQuestions";
+import { WorldGroups } from "@/components/home/WorldGroups";
+import { WorldMap } from "@/components/home/WorldMap";
+import { flatLessons, getLesson, getWorldGroups, listRoadmaps } from "@/lib/content/load";
 import { t, type Lang } from "@/lib/i18n";
-import { IntroReplay } from "@/components/intro/IntroReplay";
-import { introScript } from "@/lib/intro/shouldPlay";
 import { pathOrder } from "@/lib/content/navigation";
+import { siteStats } from "@/lib/content/site-stats";
+import { continueSlotScript } from "@/lib/home/continue-slot";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const lang = (await params).lang as Lang;
-  return pageMetadata(lang, "", t(lang, "siteName"), t(lang, "heroLead"));
+  return pageMetadata(lang, "", t(lang, "siteName"), siteCopy[lang].heroLead);
 }
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
@@ -28,71 +30,98 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
   const order = paths.map(({ r }) => pathOrder(r));
   const titles = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.title])));
   const pathTitles = Object.fromEntries(paths.map(({ r }) => [r.id, r.title[lang]]));
+  const c = siteCopy[lang];
+  const stats = siteStats(lang);
+  const statItems = [
+    c.statsLessons.replace("{n}", String(stats.lessons)),
+    c.statsLanguages.replace("{n}", String(stats.languages)),
+    c.statsHours.replace("{n}", String(stats.hours)),
+    c.statsTerms.replace("{n}", String(stats.glossaryTerms)),
+  ];
+  const words = c.heroTitle.split(" ");
+  const titleLast = words.pop();
+  const titleHead = words.join(" ");
+  const lead = paths.find(({ r }) => r.id === "savers")!;
+  const worldGroups = getWorldGroups();
+  const specializations = lead.r.sections.filter((s) => s.optional).map((s) => ({ id: s.id, title: s.title[lang] }));
+  const starts = [
+    { href: `/${lang}/savers/saving-together/`, label: c.startJoin },
+    { href: `/${lang}/savers/#specializations`, label: c.startMember },
+    { href: `/${lang}/savers/money-and-bitcoin/`, label: c.startSolo },
+    { href: `/${lang}/savers/group-payments/`, label: c.startMove },
+  ];
   const minutes = Object.fromEntries(paths.flatMap(({ r, lessons }) => lessons.map((l) => [`${r.id}/${l.slug}`, l.minutes])));
 
   return (
     <>
       {/* One dark backdrop under the three earth sections, so their fractional-pixel edges never show the page through. */}
       <div className="bg-earth">
-        <IntroReplay>
-          <script dangerouslySetInnerHTML={{ __html: introScript() }} />
-          <div className="h-[clamp(300px,46svh,560px)] bg-night md:h-[clamp(400px,62svh,640px)]">
-            <BaobabScene lang={lang} />
-          </div>
-          {/* The copy rises into the dark ground of the scene, so the first actions sit on the first screen. */}
-          <div className="hero-copy mx-auto -mt-14 max-w-6xl px-4 pb-14 text-[#fbf1e1] sm:px-6 md:-mt-28">
-            <h1 className="text-[2.6rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">{t(lang, "heroTitle")}</h1>
-            <p className="mt-2 text-xl font-semibold text-dawn sm:text-2xl">{t(lang, "heroSubtitle")}</p>
-            <p className="mt-4 max-w-xl text-lg text-[#e3d5c5]">{t(lang, "heroLead")}</p>
-            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <a
-                href="#njia"
-                className="inline-flex rounded-full bg-sun-deep px-6 py-3 text-base font-bold text-white shadow-[0_4px_18px_rgba(255,88,0,.35)] hover:bg-[#b83c00]"
-              >
-                {t(lang, "startLearning")}
-              </a>
-              <Link prefetch={false} href={`/${lang}/learn/`} className="font-semibold text-dawn underline-offset-4 hover:underline">
-                {siteCopy[lang].heroBrowse}
-              </Link>
+        <section className="bg-[linear-gradient(160deg,var(--color-night)_0%,#0d3b4a_55%,var(--color-brand)_140%)] pb-8 text-white [clip-path:polygon(0_0,100%_0,100%_calc(100%-1.5rem),0_100%)] sm:pb-16">
+          <div className="mx-auto grid max-w-6xl gap-4 px-4 pt-5 sm:px-6 sm:pt-12 md:grid-cols-[1.15fr_1fr] md:items-center md:gap-12">
+            <div>
+              <h1 className="text-[2.2rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">
+                {titleHead}{" "}
+                <span className="bg-[linear-gradient(transparent_78%,var(--color-sun)_78%,var(--color-sun)_90%,transparent_90%)]">{titleLast}</span>
+              </h1>
+              <p className="mt-2 text-base font-semibold text-dawn sm:text-2xl">{c.heroSubtitle}</p>
+              <p className="mt-2 max-w-xl text-[0.9375rem] leading-snug text-[#d6e2e6] sm:mt-3 sm:text-lg sm:leading-normal">{c.heroLead}</p>
+              {/* Reserve the compact card's height on small screens before the first paint (see lib/home/continue-slot.ts). */}
+              <div data-continue-slot suppressHydrationWarning className="max-sm:data-[reserved]:min-h-[9rem]">
+                <script dangerouslySetInnerHTML={{ __html: continueSlotScript() }} />
+                <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} localNote={c.progressLocal} manageLabel={c.progressManage} />
+              </div>
             </div>
-            <ContinueLearning lang={lang} paths={order} titles={titles} pathTitles={pathTitles} minutes={minutes} />
+            <div>
+              <SavingsCircle lang={lang} />
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-3 sm:gap-x-6">
+                <a href="#anza" className="inline-flex rounded-full bg-sun-deep px-4 py-2.5 text-sm font-bold text-white hover:bg-[#b83c00] sm:px-5 sm:text-base">
+                  {c.heroStartCta} <span aria-hidden="true">&nbsp;↓</span>
+                </a>
+                <Link prefetch={false} href={`/${lang}/learn/`} className="text-sm font-semibold text-dawn underline-offset-4 hover:underline sm:text-base">
+                  {c.heroBrowse}
+                </Link>
+              </div>
+            </div>
           </div>
-        </IntroReplay>
+        </section>
+
+        <section id="anza" className="scroll-mt-20 bg-earth pt-4 pb-12 text-[#f3e9dc]">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <nav data-start aria-labelledby="start-title">
+              <h2 id="start-title" className="text-xl font-bold text-white sm:text-2xl">
+                {c.startTitle}
+              </h2>
+              <ul className="mt-3 grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-3">
+                {starts.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      prefetch={false}
+                      href={href}
+                      className="flex h-full items-center rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2.5 text-sm font-semibold text-white hover:border-dawn hover:bg-white/[0.08] sm:px-4 sm:text-base"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <p data-stats className="mt-4 text-xs text-[#b9a896] sm:text-sm">{statItems.join(" · ")}</p>
+          </div>
+        </section>
 
         <section id="njia" className="bg-earth pb-14 text-[#f3e9dc]" aria-labelledby="njia-title">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 id="njia-title" className="sr-only">
               {t(lang, "pathsTitle")}
             </h2>
-            <div className="grid gap-12 md:grid-cols-2 md:gap-10 lg:grid-cols-3">
-              {paths.map(({ r, lessons }) => (
-                <PathCard key={r.id} roadmap={r} lessons={lessons} lang={lang} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-earth pb-12 text-[#f3e9dc]" aria-labelledby="labs-title">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/[0.04] p-6 md:flex-row md:items-center md:justify-between md:gap-10 md:p-8">
-              <div>
-                <h2 id="labs-title" className="text-xl font-bold text-white sm:text-2xl">
-                  {t(lang, "labsTitle")}
-                </h2>
-                <p className="mt-2 max-w-2xl text-[#d9cbbb]">{t(lang, "labsBody")}</p>
-              </div>
-              <Link
-                href={`/${lang}/lightning/`}
-                className="inline-flex shrink-0 self-start rounded-full border border-dawn/60 px-5 py-2.5 font-semibold text-dawn hover:bg-dawn hover:text-earth md:self-center"
-              >
-                {t(lang, "labsCta")}
-              </Link>
-            </div>
+            <PathCard roadmap={lead.r} lessons={lead.lessons} lang={lang} number={1} outcome={c.leadOutcome} specializations={specializations} />
           </div>
         </section>
       </div>
-
-      <HowItWorks lang={lang} libraryCount={getLibrary().length} glossaryCount={getGlossary().length} />
+      <div className="bg-[var(--surface-warm)] pb-16">
+        <JoinQuestions lang={lang} />
+        <WorldGroups lang={lang} groups={worldGroups} map={<WorldMap groups={worldGroups} />} />
+      </div>
     </>
   );
 }

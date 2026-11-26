@@ -9,7 +9,7 @@ export function PostCard({ card, lang, lead = false }: { card: BlogCard; lang: L
     <article
       data-blog-card={card.slug}
       data-category={card.category}
-      className={`overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--bg)] ${lead ? "md:grid md:grid-cols-[1.3fr_1fr]" : ""}`}
+      className={`overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--bg)] ${lead && card.image ? "md:grid md:grid-cols-[1.3fr_1fr]" : ""}`}
     >
       <div className={lead ? "p-6 sm:p-8" : "p-5"}>
         <p className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">

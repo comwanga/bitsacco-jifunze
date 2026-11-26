@@ -28,6 +28,16 @@ test("curriculum-only context is encoded once and accepts no query, account rout
   }
 });
 
+test("a published blog post is allowed as context; other blog-like paths are not", () => {
+  for (const lang of ["en", "sw"] as const) {
+    const url = new URL(feedbackHref(lang, { pathTitle: "Makala", lessonTitle: "A post", pathname: `/${lang}/blog/chama-loses-wallet-access/` }));
+    expect(url.searchParams.get("body")).toContain(`/${lang}/blog/chama-loses-wallet-access/`);
+    for (const pathname of [`/${lang}/blog/`, `/${lang}/blog/a/b/`, `/${lang}/blog/post/?x=1`, `/${lang}/blog/post/#x`]) {
+      expect(() => feedbackHref(lang, { pathTitle: "Makala", pathname })).toThrow("public learning path");
+    }
+  }
+});
+
 test("content titles cannot introduce subject headers", () => {
   const url = new URL(feedbackHref("en", { pathTitle: "Savings", lessonTitle: "Safety\r\nBcc: other@example.org", pathname: "/en/savers/wallets-keys/" }));
   expect(url.searchParams.get("subject")).not.toMatch(/[\r\n]/);

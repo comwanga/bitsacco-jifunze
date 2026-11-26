@@ -19,8 +19,7 @@ export default async function BlogIndexPage({ params }: Params) {
     <>
       <section className="bg-[linear-gradient(160deg,var(--color-night)_0%,#0d3b4a_55%,var(--color-brand)_140%)] text-white">
         <div className="mx-auto max-w-6xl px-4 pt-10 pb-12 sm:px-6 sm:pt-14 sm:pb-16">
-          <p className="text-sm font-bold tracking-widest text-dawn uppercase">{t(lang, "blogTitle")}</p>
-          <h1 className="mt-3 max-w-3xl text-3xl leading-tight font-extrabold tracking-tight sm:text-5xl">{t(lang, "blogTitle")}</h1>
+          <h1 className="max-w-3xl text-3xl leading-tight font-extrabold tracking-tight sm:text-5xl">{t(lang, "blogTitle")}</h1>
           <p className="mt-4 max-w-2xl text-lg text-[#d6e2e6]">{t(lang, "blogLead")}</p>
         </div>
       </section>

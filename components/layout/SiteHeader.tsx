@@ -15,6 +15,7 @@ export function siteNav(lang: Lang): NavItem[] {
     },
     { href: p("lightning/"), label: t(lang, "navLabs"), match: [p("lightning/"), p("tree/lightning/"), p("list/lightning/")] },
     { href: p("library/"), label: t(lang, "navLibrary"), match: [p("library/")] },
+    { href: p("blog/"), label: t(lang, "navBlog"), match: [p("blog/")] },
     { href: p("glossary/"), label: t(lang, "navGlossary"), match: [p("glossary/")] },
     { href: p("progress/"), label: t(lang, "navProgress"), match: [p("progress/")] },
   ];

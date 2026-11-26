@@ -22,7 +22,9 @@ const plain = (text: string) => text.replace(/[\u0000-\u001f\u007f]/g, " ").trim
 
 /** Only build-time curriculum context belongs here. Never read location, storage, cookies or learner state. */
 export function feedbackHref(lang: Lang, context?: FeedbackContext): string {
-  if (context && (!/^\/(en|sw)\/(savers|builders|lightning)\/(?:[a-z0-9-]+\/)?$/.test(context.pathname) || !context.pathname.startsWith(`/${lang}/`))) {
+  // Learning paths, lessons and published blog posts: all public build-time content.
+  const publicContent = /^\/(en|sw)\/(?:(savers|builders|lightning)\/(?:[a-z0-9-]+\/)?|blog\/[a-z0-9-]+\/)$/;
+  if (context && (!publicContent.test(context.pathname) || !context.pathname.startsWith(`/${lang}/`))) {
     throw new Error("Feedback context must be a public learning path or lesson path without query or fragment");
   }
   const c = feedbackCopy[lang];

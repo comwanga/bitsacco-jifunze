@@ -71,8 +71,33 @@ Add the slug to `content/roadmaps/<roadmap>.json`. If only one language is ready
 3. Every quiz answer is one of its options, and resource URLs are HTTPS or valid internal site paths. The build also checks exported internal links.
 4. Adapted lessons name their source and licence.
 5. Glossary terms are used consistently. This is a warning, not a failure.
+6. Blog posts follow the rules in [Writing a blog post](#writing-a-blog-post).
 
 Then lint, typecheck, unit tests, the static build, a link check, CSP generation and the performance budget.
+
+## Writing a blog post
+
+The blog (**Makala** in Kiswahili) explains what is happening, why it matters and which lesson to read next. Lessons teach; a post leads readers into them. Anyone can write one, in Kiswahili, English or both, and the owner reviews it before it is published.
+
+**With GitHub's web editor (nothing to install):**
+
+1. Open [content/blog/_template/](content/blog/_template/) for a ready-made entry and post.
+2. Edit `content/blog/posts.json` and add your entry: `slug` (lowercase words joined by hyphens), `category` (one of `explainers`, `guides`, `developments`, `case-studies`, `myths`, `community`, `terms`, `pathways`), `author`, `publishedAt` (`YYYY-MM-DD`), optional `updatedAt`, optional `featured`, and 1–4 `relatedLessons` written as `roadmap/slug`, for example `savers/group-governance`.
+3. Add your text as `content/blog/sw/<slug>.mdx`, `content/blog/en/<slug>.mdx`, or both, with `title` and `description` front matter. A post written in one language still appears on both language indexes, marked with its language.
+4. Upload images to `public/images/blog/` (`.webp`, `.jpg`, `.png` or `.svg`, at most 400 KB each). Every image needs alt text: `imageAlt` in the front matter for a post image, `alt="…"` on a diagram.
+5. Commit to a new branch and open a pull request. CI explains any problem in plain words: a missing alt text, an unknown related lesson, an image that is too large.
+
+**In the text** you can use `<Term>`, `<Callout>`, tables and:
+
+- `<Diagram src alt>` with `<Marker x y title>` explanations, where `x` and `y` are percentages of the image. Readers tap a number to read the explanation; without JavaScript the explanations are a list.
+- `<Video src poster captions title />` for a short clip of your own: MP4 in `public/videos/blog/`, at most 2 minutes and 10 MB, with a poster image and WebVTT captions in the post's language. Nothing downloads until the reader presses play.
+- `<VideoLink href poster title duration />` for a longer video elsewhere. It is a link card, never an embedded player.
+
+Lab exercises belong in lessons and are not allowed in posts. Like lessons, posts must never give financial or investment advice, promise returns, call prices or tell readers what to buy.
+
+**Without GitHub:** send the owner your draft and any images, and the owner opens the pull request.
+
+The post appears on the site with the next deployment after the pull request is merged.
 
 ## Reviewers
 

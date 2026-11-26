@@ -1,0 +1,38 @@
+---
+title: "What happens if your chama loses access to its wallet?"
+description: "A lost phone, a treasurer who leaves, a stolen key: which of these a group wallet can survive, and what to agree before it happens."
+terms: ["multisig", "seed-phrase", "backup"]
+---
+
+Imagine the treasurer of a fictional chama, Umoja, calls a meeting: her phone is gone, and with it the app the group used for its savings. Is the money gone too? The honest answer is: it depends on decisions the group made long before that phone went missing.
+
+"Losing access" covers very different problems. A lost device, an official who stops answering, a stolen key and every key gone at once are not the same failure, and they do not have the same fix. The picture below shows the parts of a group wallet that decide which problems you can recover from. Tap a number to read about each part.
+
+<Diagram src="/images/blog/chama-treasury-en.svg" alt="A chama treasury: members approve an expense; a group wallet needs two of three signatures from the treasurer, the secretary and a member; a wallet setup record; and three backups kept in separate places">
+  <Marker x={92} y={4} title="Approval happens outside the wallet">The wallet only checks signatures. It cannot check whether the meeting minutes are genuine or the expense was agreed. Member approval and records are a separate control that people keep.</Marker>
+  <Marker x={4} y={42} title="Each signer holds a different key">Three officials, three separate keys. No chairperson should collect every <Term id="seed-phrase" /> "for safety": that turns three keys back into one point of failure.</Marker>
+  <Marker x={86} y={21} title="Two of three can still pay">With a 2-of-3 <Term id="multisig" /> wallet, one missing key can be tolerated, but only if the other two keys and the wallet's setup are usable. Two dishonest signers together can still spend.</Marker>
+  <Marker x={95} y={58} title="Keep the setup record">Recovery needs a record of the threshold and the signers' public keys, as well as enough private recovery material. The record cannot sign alone, but it can reveal balances and history, so keep it private.</Marker>
+  <Marker x={4} y={81} title="Backups in separate places">Three copies in one bag, one office or one cloud account are one failure. A <Term id="backup" /> plan has to survive both loss and theft, not just multiply copies.</Marker>
+</Diagram>
+
+## What a group wallet can survive
+
+If the group uses a 2-of-3 arrangement like the one above:
+
+- **One signer loses their phone.** The other two keys, plus the setup record, may still allow spending. Recovery can begin calmly, with a careful move to a newly secured arrangement if needed.
+- **One signer is unreachable.** Payments may be delayed until two signers are available. A higher threshold makes theft harder but makes this kind of delay more likely.
+- **Two signers act dishonestly together.** The third, honest signer cannot stop them. This is why member approval, records and independent checking matter as much as the keys.
+- **Every required key is lost.** No password reset, support line or app can bring the funds back.
+
+## When an official leaves
+
+Removing someone's name from the minutes does not remove their key. If former officials still hold enough keys, they may still be able to spend from the old wallet. A handover can mean setting up a new, independently checked wallet and moving the funds there, with members' authorisation and enough signatures from the old setup. Destroying one known copy of an old key does not prove no other copy exists.
+
+## Rehearse before it happens
+
+You can practise without any real keys. Make cards for each signer, the approval minutes and the setup record. Then take cards away: one absent official, one stolen key, two officials acting together, an election that replaces two officials. For each case, write down what the group can still do, and which failure no remaining control can repair.
+
+Agree in advance who can call a recovery meeting, how authority is confirmed and how members are kept informed without anyone seeing a secret. And never type real seed words into a website, a form or a support chat, however urgent a message sounds.
+
+The lessons below go deeper into signing rules, treasury policy and recovery planning.

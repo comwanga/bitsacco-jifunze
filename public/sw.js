@@ -88,7 +88,8 @@ function privateNavigation(pathname) {
 }
 
 function cacheableStatic(pathname) {
-  return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/") ||
+  // Blog images (each at most 400 KB, enforced at build) keep a post's diagrams readable offline.
+  return pathname.startsWith("/_next/static/") || pathname.startsWith("/icons/") || pathname.startsWith("/images/blog/") ||
     pathname === "/logo.svg" || pathname === "/images/world-dots.svg" || pathname === "/manifest.webmanifest";
 }
 
@@ -165,8 +166,8 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Explicit book transfers stay with the browser. Never cache a full PDF as a navigation page.
-  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/books/")) return;
+  // Explicit book and video transfers stay with the browser. Never cache a full PDF or clip as a navigation page.
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/books/") || url.pathname.startsWith("/videos/")) return;
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(cacheFirst(request));
     return;

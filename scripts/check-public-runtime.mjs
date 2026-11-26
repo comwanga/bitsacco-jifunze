@@ -33,6 +33,17 @@ try {
     const range = await fetch(pdfURL, { headers: { range: "bytes=0-31" } });
     check(range.status === 206 && (await range.text()).startsWith("%PDF-"), `native PDF readers can request byte ranges of ${book.filename}`);
   }
+  // Blog video media, when a build has any: captions need text/vtt (nginx has no built-in entry) and clips need byte ranges.
+  const videoDir = path.join("out", "videos", "blog");
+  const media = fs.existsSync(videoDir) ? fs.readdirSync(videoDir) : [];
+  for (const name of media.filter((n) => n.endsWith(".vtt")).slice(0, 1)) {
+    const r = await fetch(`http://localhost:4323/videos/blog/${name}`);
+    check(r.status === 200 && r.headers.get("content-type") === "text/vtt", `captions ${name} are served as text/vtt`);
+  }
+  for (const name of media.filter((n) => n.endsWith(".mp4")).slice(0, 1)) {
+    const r = await fetch(`http://localhost:4323/videos/blog/${name}`, { headers: { range: "bytes=0-15" } });
+    check(r.status === 206 && r.headers.get("content-type") === "video/mp4", `video ${name} supports byte ranges as video/mp4`);
+  }
   for (const pathname of ["/en/", "/sw/", "/sw/savers/wallets-keys/", "/en/lightning/routing-htlcs/", "/robots.txt", "/sitemap.xml", "/sw.js", "/missing-release-page"]) {
     const r = await fetch(`http://localhost:4323${pathname}`);
     check(r.status === (pathname.includes("missing-release") ? 404 : 200), `status ${pathname}`);

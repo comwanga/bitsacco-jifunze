@@ -76,3 +76,4 @@ export function makeMdxComponents(lang: Lang, glossary: GlossaryTerm[], ctx?: Le
 
   return { Term, Callout, Exercise, table: Table };
 }
+

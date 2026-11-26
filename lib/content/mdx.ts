@@ -22,3 +22,4 @@ export async function renderLessonBody(
   const { default: Content } = await evaluate(body, { ...runtime, remarkPlugins: [remarkGfm, remarkHeadingIds] });
   return createElement(Content, { components: makeMdxComponents(lang, glossary, ctx) });
 }
+

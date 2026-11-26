@@ -1,0 +1,10 @@
+[
+  { "id": "explainers", "title": { "sw": "Maelezo", "en": "Explainers" } },
+  { "id": "guides", "title": { "sw": "Miongozo", "en": "Practical guides" } },
+  { "id": "developments", "title": { "sw": "Yanayojiri", "en": "Current developments" } },
+  { "id": "case-studies", "title": { "sw": "Mifano halisi", "en": "Case studies" } },
+  { "id": "myths", "title": { "sw": "Kweli au uongo", "en": "Myth-busting" } },
+  { "id": "community", "title": { "sw": "Hadithi za jamii", "en": "Community stories" } },
+  { "id": "terms", "title": { "sw": "Maneno kwa kina", "en": "Glossary deep dives" } },
+  { "id": "pathways", "title": { "sw": "Njia za kujifunza", "en": "Learning pathways" } }
+]

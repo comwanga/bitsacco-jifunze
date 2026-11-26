@@ -1,0 +1,5 @@
+[
+  { "slug": "english-only", "category": "guides", "author": "Fixture Writer", "publishedAt": "2026-11-01", "relatedLessons": ["savers/alpha"] },
+  { "slug": "swahili-featured", "category": "explainers", "author": "Fixture Writer", "publishedAt": "2026-11-20", "featured": true, "relatedLessons": ["savers/alpha", "savers/beta"] },
+  { "slug": "both", "category": "guides", "author": "Fixture Writer", "publishedAt": "2026-11-10", "updatedAt": "2026-11-12", "relatedLessons": ["savers/beta"] }
+]

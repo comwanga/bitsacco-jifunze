@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="590" viewBox="0 0 400 590" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Hazina ya chama: wanachama wanaidhinisha, pochi ya kikundi inahitaji sahihi mbili kati ya tatu za wenye funguo watatu, rekodi ya mpangilio na nakala mahali tofauti</title>
+  <rect width="400" height="590" rx="20" fill="#fbf7f1"/>
+  <rect x="20" y="20" width="360" height="72" rx="14" fill="#1b2550"/>
+  <text x="200" y="51" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">Wanachama wanaidhinisha</text>
+  <text x="200" y="76" text-anchor="middle" font-size="15" fill="#d6e2e6">kumbukumbu na gharama iliyokubaliwa</text>
+  <path d="M200 92 V125" stroke="#1b2550" stroke-width="3" stroke-dasharray="6 6"/>
+  <rect x="60" y="125" width="280" height="95" rx="16" fill="#0f766e"/>
+  <text x="200" y="160" text-anchor="middle" font-size="21" font-weight="700" fill="#fff">Pochi ya kikundi</text>
+  <text x="200" y="186" text-anchor="middle" font-size="16" fill="#e6fffb">inahitaji sahihi 2 kati ya 3</text>
+  <text x="200" y="208" text-anchor="middle" font-size="15" fill="#ccfbf1">ili kulipa</text>
+  <path d="M120 220 L70 250 M200 220 V250 M280 220 L330 250" stroke="#92400e" stroke-width="3"/>
+  <g text-anchor="middle" fill="#1b2550">
+    <rect x="12" y="250" width="116" height="70" rx="14" fill="#f59e0b"/>
+    <text x="70" y="281" font-size="16" font-weight="700">Ufunguo 1</text>
+    <text x="70" y="302" font-size="14">mweka hazina</text>
+    <rect x="142" y="250" width="116" height="70" rx="14" fill="#f59e0b"/>
+    <text x="200" y="281" font-size="16" font-weight="700">Ufunguo 2</text>
+    <text x="200" y="302" font-size="14">katibu</text>
+    <rect x="272" y="250" width="116" height="70" rx="14" fill="#f59e0b"/>
+    <text x="330" y="281" font-size="16" font-weight="700">Ufunguo 3</text>
+    <text x="330" y="302" font-size="14">mwanachama</text>
+  </g>
+  <rect x="20" y="345" width="360" height="110" rx="12" fill="#fff" stroke="#1b2550" stroke-width="2"/>
+  <text x="200" y="374" text-anchor="middle" font-size="17" font-weight="700" fill="#1b2550">Rekodi ya mpangilio</text>
+  <text x="200" y="398" text-anchor="middle" font-size="14" fill="#3f3f46">kiwango na funguo za umma</text>
+  <text x="200" y="418" text-anchor="middle" font-size="14" fill="#3f3f46">haiwezi kusaini peke yake</text>
+  <text x="200" y="438" text-anchor="middle" font-size="14" fill="#3f3f46">ihifadhiwe kwa siri</text>
+  <g text-anchor="middle" fill="#1b2550">
+    <rect x="14" y="478" width="112" height="62" rx="10" fill="#fde68a"/>
+    <text x="70" y="505" font-size="15" font-weight="700">Nakala 1</text>
+    <text x="70" y="526" font-size="14">mahali A</text>
+    <rect x="144" y="478" width="112" height="62" rx="10" fill="#fde68a"/>
+    <text x="200" y="505" font-size="15" font-weight="700">Nakala 2</text>
+    <text x="200" y="526" font-size="14">mahali B</text>
+    <rect x="274" y="478" width="112" height="62" rx="10" fill="#fde68a"/>
+    <text x="330" y="505" font-size="15" font-weight="700">Nakala 3</text>
+    <text x="330" y="526" font-size="14">mahali C</text>
+  </g>
+  <text x="200" y="568" text-anchor="middle" font-size="14" fill="#57534e">mahali tofauti, si begi moja</text>
+</svg>

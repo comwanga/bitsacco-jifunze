@@ -1,0 +1,26 @@
+---
+title: "Your title, as a question or a plain statement"
+description: "One or two sentences shown on the blog index and in search results."
+terms: ["seed-phrase"]
+---
+
+Open with a short, concrete situation a learner recognises. Explain what is happening and why it matters.
+Link readers to lessons for the full explanation: the "Continue learning" cards come from relatedLessons.
+
+<Callout type="warning" title="A short warning title">Use callouts sparingly, for safety points.</Callout>
+
+Use glossary terms like <Term id="seed-phrase" /> so readers can look them up.
+
+A labelled diagram (optional). The image goes in public/images/blog/ (at most 400 KB); x and y are percentages of the image.
+
+<Diagram src="/images/blog/your-diagram.svg" alt="Describe the whole image in one sentence">
+  <Marker x={20} y={30} title="Short marker title">One or two sentences explaining this part of the image.</Marker>
+</Diagram>
+
+A short clip (optional): MP4 in public/videos/blog/, at most 2 minutes and 10 MB, with a poster and WebVTT captions.
+
+<Video src="/videos/blog/your-clip.mp4" poster="/images/blog/your-clip.webp" captions="/videos/blog/your-clip.en.vtt" title="What the clip shows" />
+
+A longer video elsewhere (optional): a link card, never an embedded player.
+
+<VideoLink href="https://www.youtube.com/watch?v=…" poster="/images/blog/your-talk.webp" title="Talk title" duration="12:30" />

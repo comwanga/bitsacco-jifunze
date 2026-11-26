@@ -69,6 +69,10 @@ Technical explanations use primary references such as the [Bitcoin developer net
 | Payment ambiguity, backups, HTLC timing and peer trust | Builder and Lightning lesson discussions |
 | Cash-flow timing, purchasing-power comparisons, contribution fairness and governance evidence | Savers lesson discussions |
 
+## Blog (Makala)
+
+Lessons answer "teach me this"; the blog answers "help me understand what is happening, why it matters and what to explore next." A post is an editorial layer around the curriculum, not a shorter copy of a lesson: it starts from something a learner meets (a chama decision, a news item, a myth, a confusing term) and ends with **Continue learning** links to 1–4 lessons that go deeper. Posts may be in Kiswahili, English or both; they follow the same review and no-advice rules as lessons. The writing workflow is in [Contributing](../CONTRIBUTING.md#writing-a-blog-post).
+
 ## Review status
 
 The project owner completed educational review on 11 November 2026, covering Kiswahili wording, Bitcoin accuracy, financial explanations, community/cooperative savings and documentation. On 12 November the owner waived separate independent technical, financial/cooperative specialist and practical assistive-technology reviews for that curriculum release. These decisions do not establish an independent reviewer identity or specialist sign-off.

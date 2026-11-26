@@ -2,7 +2,7 @@
 
 Start with the [project README](../README.md) for the learning paths, feedback and local development.
 
-- [Contributing](../CONTRIBUTING.md): bilingual lessons, schemas, quizzes, exercises and reviewer policy.
+- [Contributing](../CONTRIBUTING.md): bilingual lessons, schemas, quizzes, exercises, [blog posts](../CONTRIBUTING.md#writing-a-blog-post) and reviewer policy.
 - [Curriculum and content review](content-guide.md): implemented specializations, primary sources, required discussion and current review status.
 - [Production operations](deployment/production.md): deployed commit, isolation, exact-commit deployment, rollback and live acceptance.
 - [Staging operations](deployment/railway-staging.md): current services, allowlist/proxy state and controlled web deployment.

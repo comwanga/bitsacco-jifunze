@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { LANGS, type Lang } from "../i18n.ts";
+import { mp4DurationSeconds } from "./mp4.ts";
 import {
   ExerciseFileSchema,
   GlossarySchema,
@@ -11,13 +12,17 @@ import {
   QuizFileSchema,
   ROADMAP_IDS,
   RoadmapSchema,
+  BLOG_CATEGORY_IDS,
+  BlogCategoriesSchema,
+  BlogEntrySchema,
+  BlogFrontmatterSchema,
   type GlossaryTerm,
   type Roadmap,
 } from "./schemas.ts";
 
 export type Issue = {
   level: "error" | "warning";
-  rule: 1 | 2 | 3 | 4 | 5 | 6;
+  rule: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   file: string;
   message: string;
 };
@@ -384,5 +389,163 @@ export function validateContent(root: string, opts: ValidateOptions = {}): Issue
   const checks = checkIdsIn(opts.checksDir ?? path.join(root, "..", "lab", "jifunze_lab", "checks"));
   for (const roadmap of roadmaps) validateExercises(root, roadmap, checks, issues);
 
+  validateBlog(root, lessonKeys, issues);
+
   return issues;
+}
+
+const BLOG_IMAGE_MAX = 400 * 1024;
+const VIDEO_MAX = 10 * 1024 * 1024;
+const VIDEO_MAX_SECONDS = 120;
+// Scripts, event handlers, embedded HTML, javascript: URLs and remote href/src (xmlns declarations are not href/src).
+const UNSAFE_SVG = /<script\b|<foreignObject\b|\son[a-z]+\s*=|javascript:|\b(?:href|src)\s*=\s*["']\s*(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
+
+/** Rule 7: blog posts. Messages are written for post writers, naming the field and the fix. */
+function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): void {
+  const dir = path.join(root, "blog");
+  if (!fs.existsSync(dir)) return;
+  const err = (file: string, message: string) => issues.push({ level: "error", rule: 7, file: rel(root, file), message });
+  const registryFile = path.join(dir, "posts.json");
+  const categoriesFile = path.join(dir, "categories.json");
+  if (fs.existsSync(categoriesFile)) {
+    const parsed = BlogCategoriesSchema.safeParse(readJsonSafe(categoriesFile, issues, root, 7));
+    if (!parsed.success) err(categoriesFile, `categories.json: ${parsed.error.message}`);
+  }
+  const raw = fs.existsSync(registryFile) ? readJsonSafe(registryFile, issues, root, 7) : [];
+  if (!Array.isArray(raw)) { err(registryFile, "posts.json must be a list of posts"); return; }
+  if (raw.length === 0) err(registryFile, "at least one post is required: the static build needs at least one post page");
+
+  const publicFile = (site: string) => path.join(root, "..", "public", site);
+  const checkImage = (file: string, site: string, what: string) => {
+    if (!/^\/images\/blog\/[a-z0-9][a-z0-9-]*\.(webp|jpg|png|svg)$/.test(site)) return err(file, `${what} "${site}" must be a .webp, .jpg, .png or .svg file in /images/blog/`);
+    if (!fs.existsSync(publicFile(site))) return err(file, `${what}: image file not found: add public${site}`);
+    if (fs.statSync(publicFile(site)).size > BLOG_IMAGE_MAX) err(file, `${what}: public${site} is larger than 400 KB; make it smaller to save learners' mobile data`);
+    // An SVG opened directly is a document on this origin: anything executable or remote is refused.
+    if (site.endsWith(".svg")) {
+      const svg = fs.readFileSync(publicFile(site), "utf8");
+      if (UNSAFE_SVG.test(svg)) err(file, `${what}: SVG public${site} can run code or load outside content; remove scripts, event handlers, embedded HTML and outside links`);
+      const root = /<svg\b[^>]*>/i.exec(svg)?.[0] ?? "";
+      if (!/\swidth="[\d.]+"/.test(root) || !/\sheight="[\d.]+"/.test(root)) err(file, `${what}: SVG public${site} needs width and height on its <svg> element, or browsers show it at a 300×150 default size`);
+    }
+  };
+
+  const listed = new Set<string>();
+  for (const entry of raw as Record<string, unknown>[]) {
+    const slug = typeof entry?.slug === "string" ? entry.slug : "(no slug)";
+    if (listed.has(slug)) { err(registryFile, `duplicate slug "${slug}": each post needs its own slug`); continue; }
+    listed.add(slug);
+    if (typeof entry?.category === "string" && !(BLOG_CATEGORY_IDS as readonly string[]).includes(entry.category)) {
+      err(registryFile, `${slug}: unknown category "${entry.category}"; use one of ${BLOG_CATEGORY_IDS.join(", ")}`);
+    }
+    const parsed = BlogEntrySchema.safeParse(entry);
+    if (!parsed.success) {
+      for (const problem of parsed.error.issues) {
+        if (problem.path[0] === "category") continue; // reported above in plain words
+        err(registryFile, `${slug}: ${problem.path.join(".") || "entry"}: ${problem.message}`);
+      }
+      continue;
+    }
+    const post = parsed.data;
+    // The format check alone lets 2026-11-31 through, which would print as 1 December.
+    const realDate = (d: string) => { const t = new Date(`${d}T00:00:00Z`); return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === d; };
+    const dates = (["publishedAt", "updatedAt"] as const).filter((k) => post[k] !== undefined);
+    for (const k of dates) if (!realDate(post[k]!)) err(registryFile, `${slug}: ${k} "${post[k]}" is not a real calendar date`);
+    if (dates.every((k) => realDate(post[k]!)) && post.updatedAt && post.updatedAt < post.publishedAt) err(registryFile, `${slug}: updatedAt is before publishedAt`);
+    for (const lesson of post.relatedLessons) {
+      if (!lessonKeys.has(lesson)) err(registryFile, `${slug}: related lesson "${lesson}" does not exist; use roadmap/slug of a real lesson`);
+    }
+    if (post.image) checkImage(registryFile, post.image, `${slug}: image`);
+
+    const present = LANGS.filter((l) => fs.existsSync(path.join(dir, l, `${slug}.mdx`)));
+    if (present.length === 0) err(registryFile, `${slug}: no Kiswahili or English file; add blog/sw/${slug}.mdx or blog/en/${slug}.mdx`);
+    for (const lang of present) {
+      const file = path.join(dir, lang, `${slug}.mdx`);
+      let data: Record<string, unknown>, body: string;
+      try {
+        ({ data, content: body } = matter(fs.readFileSync(file, "utf8")));
+      } catch (e) {
+        err(file, `front matter could not be read: ${(e as Error).message}`);
+        continue;
+      }
+      const fm = BlogFrontmatterSchema.safeParse(data);
+      if (!fm.success) for (const problem of fm.error.issues) err(file, `${problem.path.join(".") || "front matter"}: ${problem.message}`);
+      if (post.image && !data.imageAlt) err(file, "imageAlt is required because the post has an image; describe the image in this language");
+      validateBlogBody(file, body, err, checkImage, publicFile);
+    }
+  }
+
+  for (const lang of LANGS) {
+    const langDir = path.join(dir, lang);
+    if (!fs.existsSync(langDir)) continue;
+    for (const name of fs.readdirSync(langDir)) {
+      if (name.endsWith(".mdx") && !listed.has(name.slice(0, -4))) err(path.join(langDir, name), `"${name.slice(0, -4)}" is not listed in posts.json; add an entry for it`);
+    }
+  }
+}
+
+function validateBlogBody(
+  file: string,
+  body: string,
+  err: (file: string, message: string) => void,
+  checkImage: (file: string, site: string, what: string) => void,
+  publicFile: (site: string) => string,
+): void {
+  const attr = (attrs: string, name: string) => new RegExp(`(?:^|\\s)${name}="([^"]*)"`).exec(attrs)?.[1];
+  for (const m of body.matchAll(/<Video\s([^>]*?)\/?>/g)) {
+    const [src, poster, captions, title] = ["src", "poster", "captions", "title"].map((n) => attr(m[1], n));
+    if (!title) err(file, 'video needs a title="…"');
+    if (!poster) err(file, 'video needs a poster image: add poster="/images/blog/…"');
+    else checkImage(file, poster, "video poster");
+    if (!src || !/^\/videos\/blog\/[a-z0-9][a-z0-9-]*\.mp4$/.test(src)) err(file, "video src must be an .mp4 file in /videos/blog/");
+    else if (!fs.existsSync(publicFile(src))) err(file, `video file not found: add public${src}`);
+    else {
+      const duration = mp4DurationSeconds(publicFile(src));
+      if (duration === null) err(file, `video must be an MP4 (H.264/AAC): public${src} is not one`);
+      else {
+        if (fs.statSync(publicFile(src)).size > VIDEO_MAX) err(file, `video public${src} is larger than 10 MB; shorten or compress it`);
+        if (duration > VIDEO_MAX_SECONDS) err(file, `video public${src} is longer than 2 minutes; link to longer videos with <VideoLink> instead`);
+      }
+    }
+    if (!captions || !/^\/videos\/blog\/[a-z0-9][a-z0-9.-]*\.vtt$/.test(captions)) err(file, 'video needs captions: add captions="/videos/blog/….vtt"');
+    else if (!fs.existsSync(publicFile(captions))) err(file, `captions file not found: add public${captions}`);
+    else if (!fs.readFileSync(publicFile(captions), "utf8").replace(/^﻿/, "").startsWith("WEBVTT")) err(file, `captions must be a WebVTT file starting with WEBVTT: public${captions}`);
+  }
+  for (const m of body.matchAll(/<VideoLink\s([^>]*?)\/?>/g)) {
+    const [href, poster, title, duration] = ["href", "poster", "title", "duration"].map((n) => attr(m[1], n));
+    if (!title) err(file, 'video link needs a title="…"');
+    if (!duration) err(file, 'video link needs a duration="m:ss"');
+    if (!poster) err(file, 'video link needs a poster image: add poster="/images/blog/…"');
+    else checkImage(file, poster, "video link poster");
+    if (!href) err(file, "video link needs an https:// href");
+    else {
+      const problem = href.startsWith("/") ? `"${href}" must be an https:// address on the video site` : checkUrl(href);
+      if (problem) err(file, `video link ${problem}`);
+    }
+  }
+  if (/<Exercise\b/.test(body)) err(file, "labs are not allowed in posts; link to the lesson that has the lab instead");
+  for (const m of stripCode(body).matchAll(/\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\)/g)) {
+    const problem = checkUrl(m[1]);
+    if (problem) err(file, `link ${problem}`);
+  }
+  for (const m of body.matchAll(/<Diagram\b([^>]*?)\/>/g)) {
+    if (!/\balt="[^"]+"/.test(m[1])) err(file, "diagram needs alt text: add alt=\"…\" describing the image");
+    err(file, "diagram needs at least one <Marker>: write <Diagram …> markers </Diagram>, or use a plain image");
+  }
+  for (const m of body.matchAll(/<Diagram\b([^>]*)>([\s\S]*?)<\/Diagram>/g)) {
+    const attrs = m[1];
+    const src = /\bsrc="([^"]*)"/.exec(attrs)?.[1];
+    if (!/\balt="[^"]+"/.test(attrs)) err(file, "diagram needs alt text: add alt=\"…\" describing the image");
+    if (!src) err(file, "diagram needs src=\"/images/blog/…\"");
+    else checkImage(file, src, "diagram");
+    const markers = [...m[2].matchAll(/<Marker\b([^>]*)>([\s\S]*?)<\/Marker>/g)];
+    if (markers.length === 0) err(file, "diagram needs at least one <Marker>");
+    for (const [n, marker] of markers.entries()) {
+      for (const [axis, pattern] of [["x", /\bx=\{(-?[\d.]+)\}/], ["y", /\by=\{(-?[\d.]+)\}/]] as const) {
+        const value = Number(pattern.exec(marker[1])?.[1]);
+        if (!Number.isFinite(value) || value < 0 || value > 100) err(file, `marker ${n + 1}: marker position must be 0–100 (${axis}={…} is a percentage of the image)`);
+      }
+      if (!/\btitle="[^"]+"/.test(marker[1])) err(file, `marker ${n + 1} needs a title`);
+      if (!marker[2].trim()) err(file, `marker ${n + 1} needs explanation text`);
+    }
+  }
 }

@@ -92,3 +92,43 @@ const DATE_FORMAT: Record<Lang, Intl.DateTimeFormat> = {
 export function formatBlogDate(iso: string, lang: Lang): string {
   return DATE_FORMAT[lang].format(new Date(`${iso}T00:00:00Z`));
 }
+
+/** What a listing needs to show one post in a given page language. */
+export type BlogCard = {
+  slug: string;
+  category: BlogEntry["category"];
+  categoryTitle: string;
+  title: string;
+  description: string;
+  servedLang: Lang;
+  isFallback: boolean;
+  publishedAt: string;
+  date: string;
+  minutes: number;
+  image?: string;
+  imageAlt?: string;
+};
+
+export function blogCard(post: BlogPost, lang: Lang, categories: BlogCategory[], root: string = CONTENT_ROOT): BlogCard {
+  const loaded = getBlogPost(post.slug, lang, root);
+  return {
+    slug: post.slug,
+    category: post.category,
+    categoryTitle: categories.find((c) => c.id === post.category)?.title[lang] ?? post.category,
+    title: loaded.frontmatter.title,
+    description: loaded.frontmatter.description,
+    servedLang: loaded.servedLang,
+    isFallback: loaded.isFallback,
+    publishedAt: post.publishedAt,
+    date: formatBlogDate(post.publishedAt, lang),
+    minutes: loaded.minutes,
+    image: post.image,
+    imageAlt: loaded.frontmatter.imageAlt,
+  };
+}
+
+/** Cards for every post, newest first, in the page language (or the post's own language). */
+export function blogCards(lang: Lang, root: string = CONTENT_ROOT): BlogCard[] {
+  const categories = getBlogCategories(root);
+  return listBlogPosts(root).map((p) => blogCard(p, lang, categories, root));
+}

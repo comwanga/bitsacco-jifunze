@@ -5,15 +5,16 @@ import { SITE_URL } from "../../lib/site";
 import { listRoadmaps, flatLessons } from "../../lib/content/load";
 import { SIMULATIONS } from "../../lib/simulations/registry";
 import { LANGS } from "../../lib/i18n";
+import { listBlogPosts } from "../../lib/content/blog";
 
 test("sitemap includes every localised page with matching language alternatives", () => {
   const entries = sitemap();
   const roadmaps = listRoadmaps();
-  const expectedCount = (7 + roadmaps.length * 2 + roadmaps.reduce((n, r) => n + flatLessons(r).length, 0) + 1 + SIMULATIONS.length) * LANGS.length;
+  const expectedCount = (7 + roadmaps.length * 2 + roadmaps.reduce((n, r) => n + flatLessons(r).length, 0) + 1 + SIMULATIONS.length + 1 + listBlogPosts().length) * LANGS.length;
   expect(entries).toHaveLength(expectedCount);
   expect(new Set(entries.map((e) => e.url)).size).toBe(entries.length);
   expect(entries.filter((e) => e.url.includes("/offline/"))).toEqual([]); // offline pages are noindex
-  for (const suffix of ["sw/savers/wallets-keys/", "en/lightning/conclusion/", "sw/learn/", "en/glossary/", "en/list/builders/", "sw/list/lightning/", "en/simulations/utxo/", "sw/simulations/channel-balances/", "sw/library/kujifunza-bitcoin/", "en/library/mastering-bitcoin-en/"]) {
+  for (const suffix of ["sw/savers/wallets-keys/", "en/lightning/conclusion/", "sw/learn/", "en/glossary/", "en/list/builders/", "sw/list/lightning/", "en/simulations/utxo/", "sw/simulations/channel-balances/", "sw/library/kujifunza-bitcoin/", "en/library/mastering-bitcoin-en/", "sw/blog/", "en/blog/"]) {
     expect(entries.some((e) => e.url === `${SITE_URL}/${suffix}`)).toBe(true);
   }
   expect(entries.filter((e) => e.url.includes("/tree/"))).toEqual([]); // canonical is the standard path URL

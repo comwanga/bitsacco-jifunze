@@ -227,6 +227,9 @@ describe("rule 7: blog posts", () => {
       publicFiles: okMedia,
     }, /https/);
   });
+  test("an empty registry, because the static build needs at least one post page", () => {
+    one({ posts: (p) => p.splice(0), files: { "en/both.mdx": null, "sw/both.mdx": null, "en/english-only.mdx": null, "sw/swahili-featured.mdx": null } }, /at least one post/);
+  });
   test("the writer template folder is ignored", () => {
     expect(blogErrors({ files: { "_template/post.mdx": post('<Exercise id="x" />') } })).toEqual([]);
   });

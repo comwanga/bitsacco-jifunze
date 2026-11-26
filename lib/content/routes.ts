@@ -1,4 +1,5 @@
 import { CONTENT_ROOT, flatLessons, listRoadmaps } from "./load.ts";
+import { listBlogPosts } from "./blog.ts";
 import { SIMULATIONS } from "../simulations/registry.ts";
 
 /** Language-relative static pages, shared by metadata and build/browser assertions. */
@@ -6,6 +7,7 @@ export function sitePaths(root = CONTENT_ROOT): string[] {
   return ["", "learn/", "library/", "library/mastering-bitcoin-en/", "library/kujifunza-bitcoin/", "glossary/", "progress/", "offline/",
     ...listRoadmaps(root).flatMap((r) => [`${r.id}/`, `tree/${r.id}/`, `list/${r.id}/`, ...flatLessons(r).map((slug) => `${r.id}/${slug}/`)]),
     "simulations/", ...SIMULATIONS.map((s) => `simulations/${s.id}/`),
+    "blog/", ...listBlogPosts(root).map((p) => `blog/${p.slug}/`),
   ];
 }
 

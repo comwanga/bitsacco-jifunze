@@ -10,8 +10,9 @@ test("classifies every scoped route without confusing tree, lesson and live lab 
       ["builders/utxos-transactions/index.html", "lesson", false],
       ["lightning/payment-channels/index.html", "lab", true],
       ["simulations/index.html", "simulation", false], ["simulations/utxo/index.html", "simulation", false],
+      ["blog/index.html", "blog", false], ["blog/some-post/index.html", "blog", false],
     ] as const) expect(uxPageKind(`${lang}/${route}`, lab)).toBe(kind);
   }
   expect(uxPageKind("404.html", false)).toBeNull();
-  expect(UX_LIMITS).toEqual({ home: 144.9, catalogue: 145, roadmap: 145.1, lesson: 147.3, lab: 153.2, tree: 145.1, simulation: 145, activated: 150, extra: 6 });
+  expect(UX_LIMITS).toEqual({ home: 144.9, catalogue: 145, roadmap: 145.1, lesson: 147.3, lab: 153.2, tree: 145.1, simulation: 145, blog: 145, activated: 150, extra: 6 });
 });

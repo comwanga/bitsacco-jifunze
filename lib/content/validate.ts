@@ -411,6 +411,7 @@ function validateBlog(root: string, lessonKeys: Set<string>, issues: Issue[]): v
   }
   const raw = fs.existsSync(registryFile) ? readJsonSafe(registryFile, issues, root, 7) : [];
   if (!Array.isArray(raw)) { err(registryFile, "posts.json must be a list of posts"); return; }
+  if (raw.length === 0) err(registryFile, "at least one post is required: the static build needs at least one post page");
 
   const publicFile = (site: string) => path.join(root, "..", "public", site);
   const checkImage = (file: string, site: string, what: string) => {

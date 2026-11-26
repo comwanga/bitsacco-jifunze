@@ -1,10 +1,10 @@
 # Curriculum and content review
 
-Jifunze has 49 lessons in English and Kiswahili: 24 Savers lessons, eight Bitcoin Builder lessons and 17 Lightning Builder lessons. The roadmap JSON files under [`content/roadmaps/`](../content/roadmaps/) define the current order and prerequisites. [CONTRIBUTING.md](../CONTRIBUTING.md) describes schemas, bilingual content, quizzes and the review process.
+Jifunze has 49 lessons in English and Kiswahili: 24 Community Finance & Bitcoin lessons (roadmap id `savers`), the main path, plus eight Bitcoin Builder lessons and 17 Lightning Builder lessons as optional technical paths. The roadmap JSON files under [`content/roadmaps/`](../content/roadmaps/) define the current order and prerequisites. [CONTRIBUTING.md](../CONTRIBUTING.md) describes schemas, bilingual content, quizzes and the review process.
 
 ## Learning model
 
-The eight original Savers lessons remain the introductory sequence, with stable URLs and progress keys. Three optional sections extend that roadmap. Learners may choose one specialization; section prerequisites are guidance, never forced account-based gates. Each optional sequence ends at its own capstone and links back to the path choices. The catalogue supports level filtering and the existing tree shows prerequisites. Builder courses/labs retain their separate technical audience.
+The eight original introductory lessons of the Community Finance & Bitcoin path remain its introductory sequence, with stable URLs and progress keys. Three optional sections extend that roadmap. Learners may choose one specialization; section prerequisites are guidance, never forced account-based gates. Each optional sequence ends at its own capstone and links back to the path choices. The catalogue opens on this path, supports path and level filtering, and the existing tree shows prerequisites. Builder courses/labs retain their separate technical audience.
 
 Every new lesson has English and Kiswahili objectives, explanation, a fictional case, a worked activity, required discussion, further reading and a four-question scenario quiz with explanations. No real money, keys or wallet connection is used. A single shared financial-scenario simulation supports reserve, price-shock and liquidity comparisons; paper exercises remain available without JavaScript.
 

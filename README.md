@@ -2,11 +2,16 @@
 
 Bitsacco Jifunze is a Kiswahili-first, bilingual community-finance and Bitcoin education platform: understand chamas, SACCOs and personal savings before you put money in, and how Bitcoin can strengthen them. Learn at **[bitsaccojifunze.xyz](https://bitsaccojifunze.xyz)** without an account.
 
-![Kiswahili homepage with the baobab and links to the three learning paths](docs/images/homepage-sw.png)
+![Kiswahili homepage: "Kagua kabla ya kuweka akiba", the savings circle, four starting points and the Fedha za Jamii na Bitcoin path](docs/images/homepage-sw.png)
+
+![English homepage: "Check before you save", the savings circle, four starting points and the Community Finance & Bitcoin path](docs/images/homepage-en.png)
 
 ## Learning paths
 
-- **Fedha za Jamii na Bitcoin / Community Finance & Bitcoin — 8 introductory lessons + 16 specialization lessons:** retain the accessible introduction, then choose individual savings/financial sovereignty, community savings or cooperative finance, progressing through foundations, intermediate practice and advanced cases.
+- **Fedha za Jamii na Bitcoin / Community Finance & Bitcoin — the main path, 8 introductory lessons + 16 specialization lessons (about 7 hours):** start with money, wallets and safety, then choose individual savings/financial sovereignty, community savings or cooperative finance, progressing through foundations, intermediate practice and advanced cases.
+
+Two optional technical paths serve builders:
+
 - **Bitcoin kwa Wajenzi / Bitcoin for Builders — 8 lessons:** regtest, transactions, keys, Lightning, Fedimint and contributing to open-source projects.
 - **Lightning kwa Wajenzi / Lightning for Builders — 17 lessons:** adapted from *Mastering the Lightning Network*, with interactive exercises.
 
@@ -14,22 +19,26 @@ All 49 lessons are available in Kiswahili and English, with learning trees, quiz
 
 The educational library includes the whitepaper in both languages and in-app readers and downloads for *Mastering Bitcoin*, third edition, in English and in Kiswahili (*Kujifunza Bitcoin*, translated by comwanga). See the [curriculum, primary sources and review guide](docs/content-guide.md).
 
-Learning progress stays in the browser and can be exported and imported. Previously opened lessons support offline reading; interactive simulations work offline after their modules have been loaded. The book is downloaded only on request and is not included in the offline lesson cache.
+There is no sign-up: learning progress is saved on the learner's device and can be exported and imported to move it to another one. Previously opened lessons support offline reading; interactive simulations work offline after their modules have been loaded. The books are downloaded only on request and are not included in the offline lesson cache.
 
 **Send Feedback / Tuma Maoni** opens the learner's email application. It is a plain email link in the header, footer and beside learning material. Lesson feedback includes the public lesson title and address.
 
 <details>
-<summary>Preview the learning paths and Lightning tree</summary>
+<summary>Preview the catalogue, library and Lightning tree</summary>
 
-Screenshots show the account-free production site, refreshed on 13 November 2026.
+Screenshots of the build from [PR #34](https://github.com/comwanga/bitsacco-jifunze/pull/34), taken on staging on 26 November 2026.
 
-**Three learning paths in Kiswahili**
+**Lesson catalogue**, opening on the Community Finance path with links to the other paths
 
-![Savers, Bitcoin Builders and Lightning Builders cards showing 24, 8 and 17 lessons](docs/images/learning-paths-sw.png)
+![Kiswahili catalogue filtered to Fedha za Jamii na Bitcoin, showing 24 of 49 lessons and links to the two builder paths](docs/images/catalogue-sw.png)
+
+**Library** with both editions of *Mastering Bitcoin*, each with a reader and a download
+
+![Kiswahili library with Mastering Bitcoin in English and Kujifunza Bitcoin in Kiswahili, translated by comwanga](docs/images/library-sw.png)
 
 **Lightning learning tree**
 
-![Lightning path with lesson cards, prerequisites and reading, quiz and lab labels](docs/images/lightning-tree-sw.png)
+![Lightning path tree with lesson cards, prerequisites and reading, quiz and lab labels](docs/images/lightning-tree-sw.png)
 
 </details>
 
